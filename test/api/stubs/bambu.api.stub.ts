@@ -28,13 +28,13 @@ export class BambuApiStub implements IPrinterApi {
   client: BambuClientStub;
   printerLogin: LoginDto;
   private readonly printerSocketStore: PrinterSocketStore;
-  private printerId?: string;
+  private printerId?: number;
 
   constructor(
     bambuClient: BambuClientStub,
     printerLogin: LoginDto,
     printerSocketStore: PrinterSocketStore,
-    loggerFactory: ILoggerFactory
+    loggerFactory: ILoggerFactory,
   ) {
     this.logger = loggerFactory("BambuApiStub");
     this.client = bambuClient;
@@ -46,7 +46,7 @@ export class BambuApiStub implements IPrinterApi {
   /**
    * Set the printer ID for accessing the MQTT adapter
    */
-  setPrinterId(printerId: string): void {
+  setPrinterId(printerId: number): void {
     this.printerId = printerId;
   }
 
@@ -57,8 +57,8 @@ export class BambuApiStub implements IPrinterApi {
     if (!this.printerId) {
       // Return a default stub adapter for testing
       return new BambuMqttAdapterStub(
-        () => ({ debug: () => {}, log: () => {}, warn: () => {}, error: () => {} } as unknown as LoggerService), // Logger factory stub
-        {} as any // EventEmitter2 stub
+        () => ({ debug: () => {}, log: () => {}, warn: () => {}, error: () => {} }) as unknown as LoggerService, // Logger factory stub
+        {} as any, // EventEmitter2 stub
       );
     }
 
@@ -69,8 +69,8 @@ export class BambuApiStub implements IPrinterApi {
 
     // Return a default stub adapter for testing
     return new BambuMqttAdapterStub(
-      () => ({ debug: () => {}, log: () => {}, warn: () => {}, error: () => {} } as unknown as LoggerService), // Logger factory stub
-      {} as any // EventEmitter2 stub
+      () => ({ debug: () => {}, log: () => {}, warn: () => {}, error: () => {} }) as unknown as LoggerService, // Logger factory stub
+      {} as any, // EventEmitter2 stub
     );
   }
 
@@ -95,6 +95,22 @@ export class BambuApiStub implements IPrinterApi {
   async getVersion(): Promise<string> {
     const response = await this.client.getApiVersion(this.printerLogin);
     return response.version;
+  }
+
+  async validateConnection(): Promise<void> {
+    // For Bambu stub, just test FTP connectivity like the real implementation
+    this.logger.debug("[STUB] Validating Bambu connection via FTP", this.logMeta());
+
+    try {
+      await this.ensureFtpConnected();
+      const files = await this.client.ftp.listFiles("/");
+      this.logger.debug(`[STUB] FTP connection successful - found ${files.length} directories`, this.logMeta());
+    } catch (ftpError) {
+      this.logger.debug(`[STUB] FTP validation failed: ${ftpError}`, this.logMeta());
+      throw new Error(`Bambu FTP connection failed: ${ftpError}`);
+    }
+
+    this.logger.log("[STUB] 🎉 Bambu connection validation completed successfully!", this.logMeta());
   }
 
   async connect(): Promise<void> {

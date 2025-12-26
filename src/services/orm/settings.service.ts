@@ -10,7 +10,6 @@ import {
 } from "@/constants/server-settings.constants";
 import { BaseService } from "@/services/orm/base.service";
 import { SettingsDto } from "../interfaces/settings.dto";
-import { SqliteIdType } from "@/shared.constants";
 import { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { z } from "zod";
 import {
@@ -24,18 +23,11 @@ import {
 } from "@/services/validators/settings-service.validation";
 import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
 import { validateInput } from "@/handlers/validators";
-import { ISettings } from "@/models/Settings";
 
-export class SettingsService
-  extends BaseService(Settings, SettingsDto)
-  implements ISettingsService<SqliteIdType, Settings>
-{
+export class SettingsService extends BaseService(Settings, SettingsDto) implements ISettingsService {
   toDto(entity: Settings): SettingsDto {
     return {
-      [serverSettingsKey]: {
-        ...entity[serverSettingsKey],
-        experimentalTypeormSupport: true,
-      },
+      [serverSettingsKey]: entity[serverSettingsKey],
       [frontendSettingKey]: entity[frontendSettingKey],
       [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
       [wizardSettingKey]: entity[wizardSettingKey],
@@ -46,13 +38,13 @@ export class SettingsService
   async getOrCreate() {
     let settings = await this.getOptional();
 
-    if (!settings) {
-      return await this.create(getDefaultSettings());
-    } else {
+    if (settings) {
       settings = migrateSettingsRuntime(settings);
 
       const settingsId = settings.id;
       return await this.update(settingsId, settings);
+    } else {
+      return await this.create(getDefaultSettings());
     }
   }
 
@@ -114,7 +106,7 @@ export class SettingsService
     return entity;
   }
 
-  private async getOptional(): Promise<ISettings<number> | null> {
+  private async getOptional(): Promise<Settings | null> {
     const settingsList = await this.repository.find({ take: 1 });
     return settingsList?.length ? settingsList[0] : null;
   }

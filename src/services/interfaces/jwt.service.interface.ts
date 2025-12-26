@@ -1,5 +1,3 @@
-import { IdType } from "@/shared.constants";
-
-export interface IJwtService<KeyType = IdType> {
-  signJwtToken(userId: KeyType, username: string): Promise<string>;
+export interface IJwtService {
+  signJwtToken(userId: number, username: string): Promise<string>;
 }

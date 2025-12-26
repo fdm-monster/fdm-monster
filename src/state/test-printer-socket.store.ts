@@ -1,4 +1,4 @@
-import { setInterval, setTimeout } from "timers/promises";
+import { setInterval, setTimeout } from "node:timers/promises";
 import { validateInput } from "@/handlers/validators";
 import { createTestPrinterSchema } from "./validation/create-test-printer.validation";
 import { octoPrintEvent, WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
@@ -18,6 +18,10 @@ import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.consta
 import { printerEvents } from "@/constants/event.constants";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { z } from "zod";
+
+// Use a large number range for test printer IDs to avoid conflicts with real printers
+const TEST_PRINTER_ID_BASE = 100000;
+let testPrinterIdCounter = 0;
 
 export class TestPrinterSocketStore {
   testSocket?: IWebsocketAdapter;
@@ -41,12 +45,15 @@ export class TestPrinterSocketStore {
     const validatedData = await validateInput(printer, createTestPrinterSchema);
     validatedData.enabled = true;
 
+    // Generate a unique test printer ID
+    const testPrinterId = TEST_PRINTER_ID_BASE + ++testPrinterIdCounter;
+
     // Create a new socket if it doesn't exist
     this.testSocket = this.socketFactory.createInstance(printer.printerType);
 
     // Reset the socket credentials before (re-)connecting
     this.testSocket.registerCredentials({
-      printerId: correlationToken,
+      printerId: testPrinterId,
       loginDto: {
         apiKey: printer.apiKey,
         username: printer.username,
@@ -79,7 +86,7 @@ export class TestPrinterSocketStore {
       prusaLinkEvent(WsMessage.WS_ERROR),
     ];
     const listener = ({ event, payload, printerId }: OctoPrintEventDto) => {
-      if (printerId !== correlationToken) {
+      if (printerId !== testPrinterId) {
         return;
       }
       this.socketIoGateway.send("test-printer-state", {
@@ -131,7 +138,7 @@ export class TestPrinterSocketStore {
         this.testSocket.close();
       }
       this.eventEmitter2.emit(printerEvents.printersDeleted, {
-        printerIds: [correlationToken],
+        printerIds: [testPrinterId],
       });
       delete this.testSocket;
       testEvents.forEach((te) => {

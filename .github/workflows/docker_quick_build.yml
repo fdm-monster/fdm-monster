@@ -46,17 +46,6 @@ jobs:
       # if branch is main => push to dockerhub with tag 'main'
 
       - name: Tagging Strategy
-        id: tagging
-        uses: HackerHappyHour/tagging-strategy@v3
-        with:
-          image_name: davidzwa/fdm-monster
-          tag_name: ${{ env.SERVER_VERSION }}-develop
-          tags: |
-            %X.Y.Z%
-          extra_tags: |
-            develop::${{ github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop' }}
-
-      - name: Tagging Strategy
         id: tagging2
         uses: HackerHappyHour/tagging-strategy@v3
         with:

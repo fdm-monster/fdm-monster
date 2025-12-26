@@ -5,7 +5,7 @@ import { MonsterPiService } from "@/services/core/monsterpi.service";
 let monsterPiService: MonsterPiService;
 
 beforeAll(async () => {
-  const container = configureContainer(true);
+  const container = configureContainer();
   monsterPiService = container.resolve(DITokens.monsterPiService);
 });
 

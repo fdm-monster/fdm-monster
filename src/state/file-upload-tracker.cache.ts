@@ -5,7 +5,6 @@ import { LoggerService } from "@/handlers/logger";
 import { AxiosProgressEvent } from "axios";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TrackedUpload } from "@/services/interfaces/file-upload-tracker.interface";
-import { IdType } from "@/shared.constants";
 
 export class FileUploadTrackerCache {
   private readonly currentUploads: TrackedUpload[] = [];
@@ -35,7 +34,7 @@ export class FileUploadTrackerCache {
     return this.currentUploads.find((cu) => cu.correlationToken === correlationToken);
   }
 
-  addUploadTracker(multerFile: Express.Multer.File, printerId: IdType) {
+  addUploadTracker(multerFile: Express.Multer.File, printerId: number) {
     const correlationToken = generateCorrelationToken();
     this.logger.log(`Starting upload session with token ${correlationToken}`);
 

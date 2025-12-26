@@ -32,7 +32,7 @@ export class FirstTimeSetupController {
     }
 
     const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
-    if (!!user) {
+    if (user) {
       throw new BadRequestException("This user already exists");
     }
 
@@ -51,16 +51,16 @@ export class FirstTimeSetupController {
       throw new ForbiddenError("Wizard already completed");
     }
 
-    const role = await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
+    await this.roleService.getSynchronizedRoleByName(ROLES.ADMIN);
     const user = await this.userService.findRawByUsername(rootUsername?.toLowerCase());
-    if (!!user) {
+    if (user) {
       throw new BadRequestException("This user already exists");
     }
 
     await this.userService.register({
       username: rootUsername,
       password: rootPassword,
-      roles: [role.id],
+      roles: [ROLES.ADMIN],
       isRootUser: true,
       isVerified: true,
       isDemoUser: false,
@@ -77,7 +77,9 @@ export class FirstTimeSetupController {
   @route("/yaml-import")
   async importYamlFile(req: Request, res: Response) {
     if (this.settingsStore.isWizardCompleted()) {
-      throw new ForbiddenError("Wizard already completed. Cannot import during first-time setup once wizard is complete.");
+      throw new ForbiddenError(
+        "Wizard already completed. Cannot import during first-time setup once wizard is complete.",
+      );
     }
 
     const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml"], false);

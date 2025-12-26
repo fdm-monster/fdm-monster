@@ -2,22 +2,18 @@ import { IPrinterApi, MoonrakerType, OctoprintType, PrusaLinkType, BambuType } f
 import { DITokens } from "@/container.tokens";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { PrinterCache } from "@/state/printer.cache";
-import { IdType } from "@/shared.constants";
 import { CradleService } from "./core/cradle.service";
 
 export class PrinterApiFactory {
-  constructor(
-    private readonly cradleService: CradleService,
-  ) {
-  }
+  constructor(private readonly cradleService: CradleService) {}
 
-  getById(id: IdType): IPrinterApi {
+  getById(id: number): IPrinterApi {
     const printerCache = this.cradleService.resolve<PrinterCache>(DITokens.printerCache);
     const login = printerCache.getLoginDto(id);
     const printerApi = this.getScopedPrinter(login);
 
     // For BambuApi, set the printer ID so it can access the MQTT adapter from PrinterSocketStore
-    if (login.printerType === BambuType && 'setPrinterId' in printerApi) {
+    if (login.printerType === BambuType && "setPrinterId" in printerApi) {
       (printerApi as any).setPrinterId(id);
     }
 

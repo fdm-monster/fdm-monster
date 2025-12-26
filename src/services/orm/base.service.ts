@@ -1,5 +1,4 @@
 import { IBaseService, Type } from "@/services/orm/base.interface";
-import { SqliteIdType } from "@/shared.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { DeepPartial, EntityNotFoundError, EntityTarget, FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { validate } from "class-validator";
@@ -22,7 +21,7 @@ export function BaseService<
 
     abstract toDto(entity: T): DTO;
 
-    async get(id: SqliteIdType, options?: FindOneOptions<T>) {
+    async get(id: number, options?: FindOneOptions<T>) {
       try {
         if (id === null || id === undefined) {
           throw new EntityNotFoundError(entity, "Id was not provided");
@@ -44,7 +43,7 @@ export function BaseService<
       return this.repository.find({ take: page.pageSize, skip: page.pageSize * page.page, ...options });
     }
 
-    async update(id: SqliteIdType, updateDto: UpdateDTO) {
+    async update(id: number, updateDto: UpdateDTO) {
       const entity = await this.get(id);
       await validate(updateDto);
       await validate(Object.assign(entity, updateDto));
@@ -64,12 +63,12 @@ export function BaseService<
       return await this.repository.save(entity);
     }
 
-    async delete(id: SqliteIdType) {
+    async delete(id: number) {
       const entity = await this.get(id);
       await this.repository.delete(entity.id);
     }
 
-    async deleteMany(ids: SqliteIdType[]) {
+    async deleteMany(ids: number[]) {
       await this.repository.delete(ids);
     }
   }

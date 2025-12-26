@@ -2,7 +2,6 @@ export const AppConstants = {
   NODE_ENV_KEY: "NODE_ENV",
   VERSION_KEY: "npm_package_version",
   SERVER_PORT_KEY: "SERVER_PORT",
-  MONGO_KEY: "MONGO",
   DATABASE_PATH: "DATABASE_PATH",
   DATABASE_FILE: "DATABASE_FILE",
 
@@ -21,7 +20,6 @@ export const AppConstants = {
   defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
   defaultAcceptedBambuExtensions: [".gcode", ".3mf"],
   defaultServerPort: 4000,
-  defaultMongoStringUnauthenticated: "mongodb://127.0.0.1:27017/fdm-monster",
   apiRoute: "/api",
   enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
 
@@ -73,12 +71,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.12.3",
-
-  influxUrl: "INFLUX_URL",
-  influxToken: "INFLUX_TOKEN",
-  influxOrg: "INFLUX_ORG",
-  influxBucket: "INFLUX_BUCKET",
+  defaultClientMinimum: "1.13.0",
 
   // Websocket values
   defaultWebsocketHandshakeTimeout: 3000,
@@ -96,12 +89,9 @@ export const AppConstants = {
 
   debugRoutesKey: "DEBUG_ROUTES",
 
-  ENABLE_EXPERIMENTAL_TYPEORM: "ENABLE_EXPERIMENTAL_TYPEORM",
-  enableExperimentalTypeormDefault: "false",
   ENABLE_PROMETHEUS_METRICS: "ENABLE_PROMETHEUS_METRICS",
   ENABLE_LOKI_LOGGING: "ENABLE_LOKI_LOGGING",
   LOKI_ADDRESS: "LOKI_ADDRESS",
   LOKI_TIMEOUT_SECONDS: "LOKI_TIMEOUT_SECONDS",
-  LOKI_INTERVAL: "LOKI_INTERVAL"
+  LOKI_INTERVAL: "LOKI_INTERVAL",
 };
-

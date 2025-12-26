@@ -1,19 +1,18 @@
-import { IdType } from "@/shared.constants";
-import { IRefreshToken } from "@/models/Auth/RefreshToken";
 import { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
+import { RefreshToken } from "@/entities";
 
-export interface IRefreshTokenService<KeyType = IdType, Entity = IRefreshToken<KeyType>> {
-  toDto(entity: Entity): RefreshTokenDto<KeyType>;
+export interface IRefreshTokenService<Entity = RefreshToken> {
+  toDto(entity: Entity): RefreshTokenDto;
 
   getRefreshToken(refreshToken: string): Promise<Entity>;
 
-  createRefreshTokenForUserId(userId: KeyType): Promise<string>;
+  createRefreshTokenForUserId(userId: number): Promise<string>;
 
   updateRefreshTokenAttempts(refreshToken: string, refreshAttemptsUsed: number): Promise<void>;
 
-  deleteRefreshTokenByUserId(userId: KeyType): Promise<void>;
+  deleteRefreshTokenByUserId(userId: number): Promise<void>;
 
-  purgeOutdatedRefreshTokensByUserId(userId: KeyType): Promise<void>;
+  purgeOutdatedRefreshTokensByUserId(userId: number): Promise<void>;
 
   purgeAllOutdatedRefreshTokens(): Promise<void>;
 

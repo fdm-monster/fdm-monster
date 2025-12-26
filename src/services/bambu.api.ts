@@ -35,13 +35,13 @@ export class BambuApi implements IPrinterApi {
   client: BambuClient;
   printerLogin: LoginDto;
   private readonly printerSocketStore: PrinterSocketStore;
-  private printerId?: string;
+  private printerId?: number;
 
   constructor(
     bambuClient: BambuClient,
     printerLogin: LoginDto,
     printerSocketStore: PrinterSocketStore,
-    loggerFactory: ILoggerFactory
+    loggerFactory: ILoggerFactory,
   ) {
     this.logger = loggerFactory(BambuApi.name);
     this.client = bambuClient;
@@ -53,7 +53,7 @@ export class BambuApi implements IPrinterApi {
   /**
    * Set the printer ID for accessing the MQTT adapter
    */
-  setPrinterId(printerId: string): void {
+  setPrinterId(printerId: number): void {
     this.printerId = printerId;
   }
 
@@ -98,6 +98,20 @@ export class BambuApi implements IPrinterApi {
   async getVersion(): Promise<string> {
     const response = await this.client.getApiVersion(this.printerLogin);
     return response.version;
+  }
+
+  async validateConnection(): Promise<void> {
+    this.logger.debug("Validating Bambu connection", this.logMeta());
+
+    // Test FTP connectivity first
+    try {
+      await this.ensureFtpConnected();
+      const files = await this.client.ftp.listFiles("/");
+      this.logger.debug(`FTP connection successful - found ${files.length} directories`, this.logMeta());
+    } catch (ftpError) {
+      this.logger.debug(`FTP validation failed: ${ftpError}`, this.logMeta());
+      throw new Error(`Bambu FTP connection failed: ${ftpError}`);
+    }
   }
 
   async connect(): Promise<void> {

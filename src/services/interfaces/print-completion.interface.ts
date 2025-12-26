@@ -1,16 +1,14 @@
-import { IdType } from "@/shared.constants";
 import {
   CreatePrintCompletionDto,
   PrintCompletionContext,
   PrintCompletionDto,
 } from "@/services/interfaces/print-completion.dto";
-import { IPrintCompletion } from "@/models/PrintCompletion";
-import { Schema } from "mongoose";
+import { PrintCompletion } from "@/entities";
 
-export interface IPrintCompletionService<KeyType extends IdType = IdType, Entity = IPrintCompletion<KeyType>> {
-  toDto(printCompletion: Entity): PrintCompletionDto<KeyType>;
+export interface IPrintCompletionService<Entity = PrintCompletion> {
+  toDto(printCompletion: Entity): PrintCompletionDto;
 
-  create(input: CreatePrintCompletionDto<KeyType>): Promise<Entity>;
+  create(input: CreatePrintCompletionDto): Promise<Entity>;
 
   list(): Promise<Entity[]>;
 
@@ -18,7 +16,7 @@ export interface IPrintCompletionService<KeyType extends IdType = IdType, Entity
 
   updateContext(correlationId: string | null | undefined, context: PrintCompletionContext): Promise<void>;
 
-  loadPrintContexts(): Promise<Record<KeyType, IPrintCompletion<KeyType, number | Schema.Types.ObjectId>[]>>;
+  loadPrintContexts(): Promise<Record<number, Entity[]>>;
 
   listGroupByPrinterStatus(): Promise<any[]>;
 }

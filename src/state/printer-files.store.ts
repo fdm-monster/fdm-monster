@@ -2,7 +2,6 @@ import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { PrinterCache } from "@/state/printer.cache";
 import { FileCache } from "@/state/file.cache";
 import { LoggerService } from "@/handlers/logger";
-import { IdType } from "@/shared.constants";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { captureException } from "@sentry/node";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
@@ -21,7 +20,7 @@ export class PrinterFilesStore {
 
   async loadFilesStore(): Promise<void> {
     const printers = await this.printerCache.listCachedPrinters(true);
-    for (const printer of printers.filter(p => p.enabled)) {
+    for (const printer of printers.filter((p) => p.enabled)) {
       try {
         const printerFiles = await this.loadFiles(printer.id);
         this.fileCache.cachePrinterFiles(printer.id, printerFiles);
@@ -32,7 +31,7 @@ export class PrinterFilesStore {
     }
   }
 
-  async loadFiles(printerId: IdType): Promise<any> {
+  async loadFiles(printerId: number): Promise<any> {
     const loginDto = await this.printerCache.getLoginDtoAsync(printerId);
     const printerApi = this.printerApiFactory.getScopedPrinter(loginDto);
     const files = await printerApi.getFiles();
@@ -40,11 +39,11 @@ export class PrinterFilesStore {
     return files;
   }
 
-  getFiles(printerId: IdType) {
+  getFiles(printerId: number) {
     return this.fileCache.getPrinterFiles(printerId);
   }
 
-  getOutdatedFiles(printerId: IdType, ageDaysMax: number) {
+  getOutdatedFiles(printerId: number, ageDaysMax: number) {
     if (!ageDaysMax) throw new ValidationException("ageDaysMax property is required to get printer's outdated files");
     const printerFiles = this.getFiles(printerId);
     if (!printerFiles?.length) return [];
@@ -52,7 +51,7 @@ export class PrinterFilesStore {
     return printerFiles.filter((file) => !!file.date && file.date + ageDaysMax * 86400 < nowTimestampSeconds);
   }
 
-  async deleteOutdatedFiles(printerId: IdType, ageDaysMax: number) {
+  async deleteOutdatedFiles(printerId: number, ageDaysMax: number) {
     const printerApi = this.printerApiFactory.getById(printerId);
 
     const failedFiles = [];
@@ -79,7 +78,7 @@ export class PrinterFilesStore {
     };
   }
 
-  async purgePrinterFiles(printerId: IdType) {
+  async purgePrinterFiles(printerId: number) {
     const printerState = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
 
     this.logger.log(`Purging file cache from printer`);
@@ -97,7 +96,7 @@ export class PrinterFilesStore {
     this.logger.log(`Clearing caches successful.`);
   }
 
-  async deleteFile(printerId: IdType, filePath: string) {
+  async deleteFile(printerId: number, filePath: string) {
     this.fileCache.purgeFile(printerId, filePath);
   }
 }

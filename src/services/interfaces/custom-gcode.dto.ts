@@ -1,7 +1,5 @@
-import { IdType } from "@/shared.constants";
-
-export class CustomGcodeDto<KeyType = IdType> {
-  id: KeyType;
+export class CustomGcodeDto {
+  id: number;
   name: string;
   description?: string;
   gcode: string[];

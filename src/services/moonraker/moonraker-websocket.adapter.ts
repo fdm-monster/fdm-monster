@@ -4,7 +4,6 @@ import EventEmitter2 from "eventemitter2";
 import { ConfigService } from "@/services/core/config.service";
 import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { LoggerService } from "@/handlers/logger";
-import { IdType } from "@/shared.constants";
 import { AppConstants } from "@/server.constants";
 import { httpToWsUrl } from "@/utils/url.utils";
 import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
@@ -42,9 +41,7 @@ import { ConnectionIdentifyResponseDto } from "@/services/moonraker/dto/websocke
 import { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
 import { FdmCurrentMessageDto, MoonrakerType } from "@/services/printer-api.interface";
 import { Event as WsEvent } from "ws";
-import {
-  NotifyServiceStateChangedParams,
-} from "@/services/moonraker/dto/websocket/notify-service-state-changed.params";
+import { NotifyServiceStateChangedParams } from "@/services/moonraker/dto/websocket/notify-service-state-changed.params";
 import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.adapter";
 import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { normalizeUrl } from "@/utils/normalize-url";
@@ -76,7 +73,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   apiState: ApiState = API_STATE.unset;
   // Guaranteed to be set and valid by PrinterApiFactory
   login: LoginDto;
-  printerId?: IdType;
+  printerId?: number;
   refreshPrinterObjectsInterval?: NodeJS.Timeout;
   printerObjects: PrinterObjectsQueryDto<SubscriptionType | null> = {
     eventtime: null,
@@ -136,8 +133,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     return false;
   }
 
-  async reauthSession() {
-  }
+  async reauthSession() {}
 
   registerCredentials(socketLogin: ISocketLogin) {
     const { printerId, loginDto } = socketLogin;
@@ -174,14 +170,13 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
     // this.logger.log(`Oneshot ${oneshot.data.result}`);
     // await this.client.getAccessOneshotToken(this.login);
 
-    await this.moonrakerClient.getApiVersion(this.login)
-      .catch((e: AxiosError) => {
-        this.setSocketState("aborted");
-        this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
-        this.setApiState("noResponse");
+    await this.moonrakerClient.getApiVersion(this.login).catch((e: AxiosError) => {
+      this.setSocketState("aborted");
+      this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
+      this.setApiState("noResponse");
 
-        throw e;
-      });
+      throw e;
+    });
     this.setApiState(API_STATE.responding);
 
     await this.updateCurrentStateSafely();

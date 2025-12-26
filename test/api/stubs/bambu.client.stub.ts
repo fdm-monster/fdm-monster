@@ -20,7 +20,7 @@ export class BambuClientStub {
     settingsStore: SettingsStore,
     loggerFactory: ILoggerFactory,
     eventEmitter2: EventEmitter2,
-    bambuFtpAdapter: BambuFtpAdapterStub
+    bambuFtpAdapter: BambuFtpAdapterStub,
   ) {
     this.settingsStore = settingsStore;
     this.eventEmitter2 = eventEmitter2;
@@ -85,7 +85,10 @@ export class BambuClientStub {
       return url.hostname;
     } catch {
       // If not a valid URL, assume it's just the hostname/IP
-      return printerURL.replace(/^https?:\/\//, "").split(":")[0].split("/")[0];
+      return printerURL
+        .replace(/^https?:\/\//, "")
+        .split(":")[0]
+        .split("/")[0];
     }
   }
 

@@ -22,7 +22,6 @@ COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
 RUN yarn workspaces focus --all --production
 
 COPY .env.template \
-    migrate-mongo-config.js \
     README.md \
     LICENSE CODE_OF_CONDUCT.md \
     CONTRIBUTING.md \
@@ -35,6 +34,5 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["bash", "/usr/local/bin/entrypoint.sh"]
 
 # SQLite Alpha adjustments
-ENV ENABLE_EXPERIMENTAL_TYPEORM=true
 ENV DATABASE_PATH="./database"
 ENV DATABASE_FILE="fdm-monster.sqlite"

@@ -1,5 +1,4 @@
 import express, { Application } from "express";
-import mongoose from "mongoose";
 import history from "connect-history-api-fallback";
 import { LoggerService } from "./handlers/logger";
 import { join } from "path";
@@ -23,7 +22,6 @@ export class ServerHost {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly configService: IConfigService,
-    private readonly isTypeormMode: boolean,
     private readonly settingsStore: SettingsStore,
     private readonly bootTask: BootTask,
     private readonly socketIoGateway: SocketIoGateway,
@@ -33,10 +31,6 @@ export class ServerHost {
   }
 
   async boot(app: Application, quick_boot = false, listenRequests = true) {
-    if (!this.isTypeormMode) {
-      // Enforce models to be strictly applied, any unknown property will not be persisted
-      mongoose.set("strictQuery", true);
-    }
     this.serveControllerRoutes(app);
 
     if (!quick_boot) {
@@ -47,20 +41,18 @@ export class ServerHost {
   }
 
   hasConnected() {
-    if (this.isTypeormMode) {
-      return this.typeormService.hasConnected();
-    } else {
-      return mongoose.connections[0].readyState;
-    }
+    return this.typeormService.hasConnected();
   }
 
   serveControllerRoutes(app: Application) {
     // Catches any HTML request to paths like / or file/ as long as its text/html
     app
       .use((req, res, next) => {
-        if (!req.originalUrl.startsWith("/metrics")
-          && !req.originalUrl.startsWith("/api")
-          && !req.originalUrl.startsWith("/socket.io")) {
+        if (
+          !req.originalUrl.startsWith("/metrics") &&
+          !req.originalUrl.startsWith("/api") &&
+          !req.originalUrl.startsWith("/socket.io")
+        ) {
           history()(req, res, next);
         } else {
           next();
@@ -91,9 +83,7 @@ export class ServerHost {
       const path = req.originalUrl;
 
       let resource = "MVC";
-      if (path.startsWith("/socket.io")
-        || path.startsWith("/api")
-        || path.startsWith("/metrics")) {
+      if (path.startsWith("/socket.io") || path.startsWith("/api") || path.startsWith("/metrics")) {
         resource = "API";
       } else if (path.endsWith(".min.js")) {
         resource = "client-bundle";
@@ -116,7 +106,7 @@ export class ServerHost {
       expressListRoutes(app, { prefix: "/" });
     }
 
-    if (!port || Number.isNaN(parseInt(port))) {
+    if (!port || Number.isNaN(Number.parseInt(port))) {
       throw new Error("The FDM Server requires a numeric port input argument to run");
     }
 

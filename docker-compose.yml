@@ -1,17 +1,4 @@
 services:
-  mongodb:
-    image: mongo:8
-    container_name: mongodb
-    environment:
-      # Authenticated variant, comment out for non-authenticated variant:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=fdm-root
-    ports:
-      - "21111:27017"
-    volumes:
-      - ./fdm-monster:/data
-    restart: unless-stopped
-
   mosquitto:
     container_name: fdmm-mosquitto
     image: eclipse-mosquitto:2.0.22
@@ -28,7 +15,7 @@ services:
   # docker build --platform linux/amd64,linux/arm64 -t 1.5.0-alpha . -f .\docker\Dockerfile
   fdm-monster:
     container_name: fdm-monster
-    image: fdmmonster/fdm-monster:1.5.4
+    image: fdmmonster/fdm-monster:1.9.3
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -41,26 +28,8 @@ services:
     ports:
       - "4000:4000"
     environment:
-      # Non-authenticated variant:
-#      - MONGO=mongodb://mongodb:27017/fdm-monster
-      # Authenticated variant:
-      - MONGO=mongodb://root:fdm-root@mongodb:27017/fdm-monster?authSource=admin
       - NODE_ENV=development
       - SERVER_PORT=4000
-    volumes:
-      - ./fdm-monster/media/:/app/media
-
-  fdm-monster-sqlite:
-    container_name: fdm-monster-sqlite
-    image: fdmmonster/fdm-monster:1.9.3-sqlite # -arm64
-    restart: unless-stopped
-    ports:
-      - "4000:4000"
-    environment:
-      - NODE_ENV=development
-      - SERVER_PORT=4000
-      # These three variables are implicit to this docker image
-      # - ENABLE_EXPERIMENTAL_TYPEORM=true
       # - DATABASE_PATH=./database
       # - DATABASE_FILE=fdm-monster.sqlite
     volumes:

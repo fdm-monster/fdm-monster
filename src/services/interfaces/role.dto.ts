@@ -1,6 +1,6 @@
-import { IdType } from "@/shared.constants";
+import { RoleName } from "@/constants/authorization.constants";
 
-export class RoleDto<KeyType = IdType> {
-  id: KeyType;
-  name: string;
+export class RoleDto {
+  id: number;
+  name: RoleName;
 }

@@ -248,15 +248,16 @@ export class PrinterController {
 
   private async testPrintApiConnection(inputLoginDto: LoginDto) {
     await validateInput(inputLoginDto, testPrinterApiSchema);
+
+    this.logger.debug(`Testing API connection for printer type: ${inputLoginDto.printerType}`, inputLoginDto);
+
     try {
-      if (this.printerApi) {
-        await this.printerApi.getVersion();
-      } else {
-        const printerApi = this.printerApiFactory.getScopedPrinter(inputLoginDto);
-        await printerApi.getVersion();
-      }
+      const printerApi = this.printerApiFactory.getScopedPrinter(inputLoginDto);
+      await printerApi.validateConnection();
+      this.logger.debug("Connection validation completed successfully");
     } catch (e) {
-      this.logger.log("Printer version test failed");
+      this.logger.log("Printer connection validation failed");
+      this.logger.debug(`Error details: ${e}`);
 
       if (e instanceof AxiosError) {
         this.logger.debug(e.message + " " + e.status + " " + e.response?.status);

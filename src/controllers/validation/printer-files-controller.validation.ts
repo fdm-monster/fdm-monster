@@ -13,5 +13,5 @@ export const getFileSchema = z.object({
 });
 
 export const uploadFileSchema = z.object({
-  startPrint: z.enum(['true', 'false'])
+  startPrint: z.enum(["true", "false"]),
 });

@@ -17,17 +17,16 @@ import { BambuMqttAdapterStub } from "./stubs/bambu-mqtt.adapter.stub";
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
 const thumbnailsRoute = `${defaultRoute}/thumbnails`;
-type idType = Number;
-const getRoute = (id: idType) => `${defaultRoute}/${id}`;
-const clearFilesRoute = (id: idType) => `${getRoute(id)}/clear`;
-const deleteFileRoute = (id: idType, path: string) => `${getRoute(id)}?path=${path}`;
-const printFileRoute = (id: idType) => `${getRoute(id)}/print`;
-const reloadThumbnailRoute = (id: idType) => `${getRoute(id)}/reload-thumbnail`;
-const uploadFileRoute = (id: idType) => `${getRoute(id)}/upload`;
-const getFilesRoute = (id: idType) => `${getRoute(id)}`;
-const downloadFileRoute = (id: idType, path: string) => `${getRoute(id)}/download/${path}`;
-const getCacheRoute = (id: idType) => `${getRoute(id)}/cache`;
-const getPrintThumbnailRoute = (id: idType) => `${getRoute(id)}/thumbnail`;
+const getRoute = (id: number) => `${defaultRoute}/${id}`;
+const clearFilesRoute = (id: number) => `${getRoute(id)}/clear`;
+const deleteFileRoute = (id: number, path: string) => `${getRoute(id)}?path=${path}`;
+const printFileRoute = (id: number) => `${getRoute(id)}/print`;
+const reloadThumbnailRoute = (id: number) => `${getRoute(id)}/reload-thumbnail`;
+const uploadFileRoute = (id: number) => `${getRoute(id)}/upload`;
+const getFilesRoute = (id: number) => `${getRoute(id)}`;
+const downloadFileRoute = (id: number, path: string) => `${getRoute(id)}/download/${path}`;
+const getCacheRoute = (id: number) => `${getRoute(id)}/cache`;
+const getPrintThumbnailRoute = (id: number) => `${getRoute(id)}/thumbnail`;
 
 let request: TestAgent<Test>;
 let container: AwilixContainer;
@@ -191,7 +190,8 @@ describe(PrinterFilesController.name, () => {
       .query("recursive=false")
       .reply(200, { files: [], free: 1, total: 1 });
 
-    const response = await request.post(uploadFileRoute(printer.id))
+    const response = await request
+      .post(uploadFileRoute(printer.id))
       .field("startPrint", "true")
       .attach("file", gcodePath);
     expectOkResponse(response);
@@ -208,7 +208,8 @@ describe(PrinterFilesController.name, () => {
       const bambuPrinter = await createTestBambuPrinter(request);
 
       // Test that .3mf files are accepted and uploaded successfully for Bambu printers
-      const response = await request.post(uploadFileRoute(bambuPrinter.id))
+      const response = await request
+        .post(uploadFileRoute(bambuPrinter.id))
         .field("startPrint", "false")
         .attach("file", examplBambuFilePath);
 
@@ -219,7 +220,8 @@ describe(PrinterFilesController.name, () => {
     it("should reject .3mf files for non-Bambu printers", async () => {
       const octoprintPrinter = await createTestPrinter(request);
 
-      const response = await request.post(uploadFileRoute(octoprintPrinter.id))
+      const response = await request
+        .post(uploadFileRoute(octoprintPrinter.id))
         .field("startPrint", "false")
         .attach("file", examplBambuFilePath);
 
@@ -230,7 +232,8 @@ describe(PrinterFilesController.name, () => {
     it("should accept .gcode files for Bambu printers", async () => {
       const bambuPrinter = await createTestBambuPrinter(request);
 
-      const response = await request.post(uploadFileRoute(bambuPrinter.id))
+      const response = await request
+        .post(uploadFileRoute(bambuPrinter.id))
         .field("startPrint", "false")
         .attach("file", gcodePath);
 

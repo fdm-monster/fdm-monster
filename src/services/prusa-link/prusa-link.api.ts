@@ -64,6 +64,10 @@ export class PrusaLinkApi implements IPrinterApi {
     return response.data.server;
   }
 
+  async validateConnection(): Promise<void> {
+    await this.getVersion();
+  }
+
   async getFiles(): Promise<FileDto[]> {
     const response = await this.client.get<PL_FileResponseDto>("/api/files");
     return response.data.files
@@ -74,7 +78,7 @@ export class PrusaLinkApi implements IPrinterApi {
             path: f.display,
             date: null,
             size: -1,
-          } as FileDto),
+          }) as FileDto,
       );
   }
 
@@ -218,7 +222,7 @@ export class PrusaLinkApi implements IPrinterApi {
         b.withHeaders({
           "Content-Length": contentLength.toString(),
           // Compliance with other printer services
-          "Overwrite": "?1",
+          Overwrite: "?1",
           // Compliance with other printer services
           "Print-After-Upload": startPrint ? "?1" : "?0",
         })
@@ -285,9 +289,7 @@ export class PrusaLinkApi implements IPrinterApi {
     return status.job?.id;
   }
 
-  private createClient(
-    buildFluentOptions?: (base: PrusaLinkHttpClientBuilder) => void,
-  ) {
+  private createClient(buildFluentOptions?: (base: PrusaLinkHttpClientBuilder) => void) {
     const builder = new PrusaLinkHttpClientBuilder();
 
     return this.httpClientFactory.createClientWithBaseUrl(builder, this.printerLogin.printerURL, (b) => {
@@ -301,7 +303,10 @@ export class PrusaLinkApi implements IPrinterApi {
           this.logger.error("Authentication error occurred", error);
         },
         (error, attemptCount) => {
-          this.logger.log(`Authentication attempt count ${attemptCount} for method ${error.config?.method?.toUpperCase()} path ${error.config?.url}`, this.logMeta());
+          this.logger.log(
+            `Authentication attempt count ${attemptCount} for method ${error.config?.method?.toUpperCase()} path ${error.config?.url}`,
+            this.logMeta(),
+          );
         },
         (authHeader) => {
           this.logger.debug("Authentication successful, saving auth header for later reuse", this.logMeta());

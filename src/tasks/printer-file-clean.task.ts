@@ -3,7 +3,6 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterFilesStore } from "@/state/printer-files.store";
 import { PrinterCache } from "@/state/printer.cache";
 import { SettingsStore } from "@/state/settings.store";
-import { IdType } from "@/shared.constants";
 import { PrinterDto } from "@/services/interfaces/printer.dto";
 
 /**
@@ -71,12 +70,12 @@ export class PrinterFileCleanTask {
     }
   }
 
-  async cleanPrinterFiles(printerId: IdType) {
+  async cleanPrinterFiles(printerId: number) {
     await this.printerFilesStore.deleteOutdatedFiles(printerId, this.ageDaysMaxSetting);
     await this.printerFilesStore.loadFiles(printerId);
   }
 
-  getPrinterOutdatedFiles(printer: PrinterDto<IdType>) {
+  getPrinterOutdatedFiles(printer: PrinterDto) {
     const ageDaysMax = this.ageDaysMaxSetting;
     return this.printerFilesStore.getOutdatedFiles(printer.id, ageDaysMax);
   }

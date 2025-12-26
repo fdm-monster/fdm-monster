@@ -5,32 +5,28 @@ import { ensureTestUserCreated } from "./test-data/create-user";
 import { ROLES } from "@/constants/authorization.constants";
 import { Test } from "supertest";
 import { User } from "@/entities";
-import { User as UserMongo } from "@/models";
 import { UserController } from "@/controllers/user.controller";
 import { AwilixContainer } from "awilix";
 import { SettingsStore } from "@/state/settings.store";
 import { DITokens } from "@/container.tokens";
 import { loginTestUser } from "./auth/login-test-user";
-import { IdType } from "@/shared.constants";
-import { getDatasource, isSqliteModeTest } from "../typeorm.manager";
+import { getDatasource } from "../typeorm.manager";
 import TestAgent from "supertest/lib/agent";
-import { IUserService } from "@/services/interfaces/user-service.interface";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 
 const defaultRoute = `${AppConstants.apiRoute}/user`;
 const profileRoute = `${defaultRoute}/profile`;
 const rolesRoute = `${defaultRoute}/roles`;
-const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
-const changeUsernameRoute = (id: IdType) => `${defaultRoute}/${id}/change-username`;
-const changePasswordRoute = (id: IdType) => `${defaultRoute}/${id}/change-password`;
-const setVerifiedRoute = (id: IdType) => `${defaultRoute}/${id}/set-verified`;
-const setUserRolesRoute = (id: IdType) => `${defaultRoute}/${id}/set-user-roles`;
-const setRootUserRoute = (id: IdType) => `${defaultRoute}/${id}/set-root-user`;
-const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
+const getRoute = (id: number) => `${defaultRoute}/${id}`;
+const changeUsernameRoute = (id: number) => `${defaultRoute}/${id}/change-username`;
+const changePasswordRoute = (id: number) => `${defaultRoute}/${id}/change-password`;
+const setVerifiedRoute = (id: number) => `${defaultRoute}/${id}/set-verified`;
+const setUserRolesRoute = (id: number) => `${defaultRoute}/${id}/set-user-roles`;
+const setRootUserRoute = (id: number) => `${defaultRoute}/${id}/set-root-user`;
+const deleteRoute = (id: number) => `${defaultRoute}/${id}`;
 
 let request: TestAgent<Test>;
 let container: AwilixContainer;
-let userService: IUserService;
 let roleService: IRoleService;
 
 beforeAll(async () => {
@@ -39,7 +35,6 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await container.resolve<SettingsStore>(DITokens.settingsStore).setLoginRequired(false);
-  userService = container.resolve<IUserService>(DITokens.userService);
   roleService = container.resolve<IRoleService>(DITokens.roleService);
 });
 
@@ -127,34 +122,32 @@ describe(UserController.name, () => {
   });
 
   it("should create registered user", async function () {
-    const role = await roleService.getSynchronizedRoleByName(ROLES.OPERATOR);
     const response = await request.post(defaultRoute).send({
       username: "david",
       password: "test1234",
-      roleIds: [role.id],
+      roles: [ROLES.OPERATOR],
     });
     expectOkResponse(response);
   });
 
   it("should set user roles", async function () {
-    const { token, refreshToken } = await loginTestUser(request, "fakeuser");
+    const { token } = await loginTestUser(request, "fakeuser");
 
     const user = await ensureTestUserCreated("test", "user", false, ROLES.OPERATOR, true, false);
-    const roles = await roleService.getSynchronizedRoleByName(ROLES.OPERATOR);
     const response = await request
       .post(setUserRolesRoute(user.id))
       .set("Authorization", `Bearer ${token}`)
       .send({
-        roleIds: [roles.id],
+        roles: [ROLES.OPERATOR],
       });
     expectOkResponse(response);
     const getUser = await request.get(getRoute(user.id));
     expectOkResponse(getUser);
-    expect(getUser.body.roles.includes(roles.id)).toBeTruthy();
+    expect(getUser.body.roles.includes(ROLES.OPERATOR)).toBeTruthy();
     expect(getUser.body.roles).toHaveLength(1);
 
     const response2 = await request.post(setUserRolesRoute(user.id)).set("Authorization", `Bearer ${token}`).send({
-      roleIds: [],
+      roles: [],
     });
     expectOkResponse(response2);
     const getUser2 = await request.get(getRoute(user.id));
@@ -183,14 +176,10 @@ describe(UserController.name, () => {
   });
 
   it("should not delete last admin user", async function () {
-    if (isSqliteModeTest()) {
-      const userRepo = getDatasource().getRepository(User);
-      const userCount = await userRepo.count();
-      expect(userCount).toBeGreaterThan(0);
-      await userRepo.clear();
-    } else {
-      await UserMongo.deleteMany({});
-    }
+    const userRepo = getDatasource().getRepository(User);
+    const userCount = await userRepo.count();
+    expect(userCount).toBeGreaterThan(0);
+    await userRepo.clear();
 
     const user = await ensureTestUserCreated("test", "user", false, ROLES.ADMIN);
     const response = await request.delete(deleteRoute(user.id)).send();

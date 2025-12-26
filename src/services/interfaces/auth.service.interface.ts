@@ -1,9 +1,7 @@
-import { IdType } from "@/shared.constants";
-
-export interface IAuthService<KeyType = IdType> {
+export interface IAuthService {
   loginUser(username: string, password: string): Promise<{ token: string; refreshToken: string }>;
 
-  logoutUserId(userId: KeyType, jwtToken?: string): Promise<void>;
+  logoutUserId(userId: number, jwtToken?: string): Promise<void>;
 
   logoutUserRefreshToken(refreshToken: string): Promise<void>;
 
@@ -11,5 +9,5 @@ export interface IAuthService<KeyType = IdType> {
 
   increaseRefreshTokenAttemptsUsed(refreshToken: string): Promise<void>;
 
-  signJwtToken(userId: KeyType): Promise<string>;
+  signJwtToken(userId: number): Promise<string>;
 }

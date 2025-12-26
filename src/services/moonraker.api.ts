@@ -48,6 +48,10 @@ export class MoonrakerApi implements IPrinterApi {
     return result.data?.server;
   }
 
+  async validateConnection(): Promise<void> {
+    await this.getVersion();
+  }
+
   async connect() {
     // TODO Needs investigation
     throw new NotImplementedException();

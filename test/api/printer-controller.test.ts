@@ -4,7 +4,6 @@ import { AppConstants } from "@/server.constants";
 import { createTestPrinter, testApiKey } from "./test-data/create-printer";
 import { Test } from "supertest";
 import { PrinterController } from "@/controllers/printer.controller";
-import { IdType } from "@/shared.constants";
 import TestAgent from "supertest/lib/agent";
 import nock from "nock";
 import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
@@ -12,19 +11,19 @@ import { OctoprintType, MoonrakerType } from "@/services/printer-api.interface";
 const defaultRoute = AppConstants.apiRoute + "/printer";
 const createRoute = defaultRoute;
 const testPrinterRoute = `${defaultRoute}/test-connection`;
-const getRoute = (id: IdType) => `${defaultRoute}/${id}`;
-const deleteRoute = (id: IdType) => `${defaultRoute}/${id}`;
-const updateRoute = (id: IdType) => `${defaultRoute}/${id}`;
-const stopJobRoute = (id: IdType) => `${updateRoute(id)}/job/stop`;
-const connectionRoute = (id: IdType) => `${updateRoute(id)}/connection`;
-const loginDetailsRoute = (id: IdType) => `${updateRoute(id)}/login-details`;
-const enabledRoute = (id: IdType) => `${updateRoute(id)}/enabled`;
-const disabledReasonRoute = (id: IdType) => `${updateRoute(id)}/disabled-reason`;
-const feedRateRoute = (id: IdType) => `${updateRoute(id)}/feed-rate`;
-const flowRateRoute = (id: IdType) => `${updateRoute(id)}/flow-rate`;
-const restartOctoPrintRoute = (id: IdType) => `${getRoute(id)}/octoprint/server/restart`;
-const serialConnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-connect`;
-const serialDisconnectCommandRoute = (id: IdType) => `${getRoute(id)}/serial-disconnect`;
+const getRoute = (id: number) => `${defaultRoute}/${id}`;
+const deleteRoute = (id: number) => `${defaultRoute}/${id}`;
+const updateRoute = (id: number) => `${defaultRoute}/${id}`;
+const stopJobRoute = (id: number) => `${updateRoute(id)}/job/stop`;
+const connectionRoute = (id: number) => `${updateRoute(id)}/connection`;
+const loginDetailsRoute = (id: number) => `${updateRoute(id)}/login-details`;
+const enabledRoute = (id: number) => `${updateRoute(id)}/enabled`;
+const disabledReasonRoute = (id: number) => `${updateRoute(id)}/disabled-reason`;
+const feedRateRoute = (id: number) => `${updateRoute(id)}/feed-rate`;
+const flowRateRoute = (id: number) => `${updateRoute(id)}/flow-rate`;
+const restartOctoPrintRoute = (id: number) => `${getRoute(id)}/octoprint/server/restart`;
+const serialConnectCommandRoute = (id: number) => `${getRoute(id)}/serial-connect`;
+const serialDisconnectCommandRoute = (id: number) => `${getRoute(id)}/serial-disconnect`;
 const batchRoute = `${defaultRoute}/batch`;
 
 let request: TestAgent<Test>;
@@ -96,12 +95,12 @@ describe(PrinterController.name, () => {
   });
 
   it(`should not be able to POST ${updateRoute} - missing printer field`, async () => {
-    const response = await request.patch(connectionRoute("asd")).send();
+    const response = await request.patch(connectionRoute(404)).send();
     expectNotFoundResponse(response);
   });
 
   it(`should not be able to DELETE ${deleteRoute} - nonexistent id`, async () => {
-    const response = await request.delete(deleteRoute("non-id")).send();
+    const response = await request.delete(deleteRoute(404)).send();
     expectNotFoundResponse(response);
   });
 
@@ -125,7 +124,7 @@ describe(PrinterController.name, () => {
   });
 
   it("should return no printer Info entry when Id is provided but doesnt exist", async () => {
-    const printerId = "615f4fa37081fa06f428df90";
+    const printerId = 404;
     const res = await request.get(getRoute(printerId)).send();
     expectNotFoundResponse(res);
     expect(res.body).toEqual({

@@ -12,12 +12,11 @@ import { AwilixContainer } from "awilix";
 import { PassportStatic } from "passport";
 import { SettingsStore } from "@/state/settings.store";
 import { ConfigService } from "@/services/core/config.service";
-import { IUser } from "@/models/Auth/User";
 import { IUserService } from "@/services/interfaces/user-service.interface";
 import { Socket } from "socket.io";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
-import { IdType } from "@/shared.constants";
+import { User } from "@/entities";
 
 export type JwtFromSocketFunction = (socket: Socket) => string | null;
 
@@ -41,9 +40,9 @@ export function verifyUserCallback(userService: IUserService) {
   return function (jwt_payload: any, done: VerifiedCallback) {
     userService
       .getUser(jwt_payload.userId)
-      .then((user: IUser<IdType>) => {
-        if (user && user.isVerified && !user.needsPasswordChange) {
-          return done(null, user);
+      .then((user: User) => {
+        if (user?.isVerified && !user.needsPasswordChange) {
+          return done(null, userService.toDto(user));
         }
         if (user?.needsPasswordChange) {
           return done(

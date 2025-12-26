@@ -1,4 +1,3 @@
-import { IdDto } from "@/shared.constants";
 import { PrinterType } from "@/services/printer-api.interface";
 
 export class CreatePrinterDto {
@@ -8,7 +7,8 @@ export class CreatePrinterDto {
   printerType: PrinterType;
 }
 
-export class PrinterDto<KeyType> extends IdDto<KeyType> {
+export class PrinterDto {
+  id: number;
   name: string;
   enabled: boolean;
   disabledReason?: string;

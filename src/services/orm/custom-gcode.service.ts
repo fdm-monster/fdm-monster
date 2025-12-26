@@ -1,14 +1,13 @@
-import { SqliteIdType } from "@/shared.constants";
 import { CustomGcode } from "@/entities";
 import { ICustomGcodeService } from "@/services/interfaces/custom-gcode.service.interface";
 import { CustomGcodeDto } from "@/services/interfaces/custom-gcode.dto";
 import { BaseService } from "@/services/orm/base.service";
 
 export class CustomGcodeService
-  extends BaseService(CustomGcode, CustomGcodeDto<SqliteIdType>, CustomGcodeDto<SqliteIdType>)
-  implements ICustomGcodeService<SqliteIdType, CustomGcode>
+  extends BaseService(CustomGcode, CustomGcodeDto, CustomGcodeDto)
+  implements ICustomGcodeService
 {
-  toDto(entity: CustomGcode): CustomGcodeDto<SqliteIdType> {
+  toDto(entity: CustomGcode): CustomGcodeDto {
     return {
       id: entity.id,
       name: entity.name,
@@ -17,15 +16,15 @@ export class CustomGcodeService
     };
   }
 
-  async create(gcodeScript: CustomGcodeDto<SqliteIdType>): Promise<CustomGcode> {
+  async create(gcodeScript: CustomGcodeDto): Promise<CustomGcode> {
     return await super.create(gcodeScript);
   }
 
-  async delete(gcodeScriptId: SqliteIdType) {
+  async delete(gcodeScriptId: number) {
     await super.delete(gcodeScriptId);
   }
 
-  async get(gcodeScriptId: SqliteIdType): Promise<CustomGcode> {
+  async get(gcodeScriptId: number): Promise<CustomGcode> {
     return await super.get(gcodeScriptId);
   }
 
@@ -33,7 +32,7 @@ export class CustomGcodeService
     return await super.list();
   }
 
-  async update(gcodeScriptId: SqliteIdType, updatedData: CustomGcodeDto<SqliteIdType>): Promise<CustomGcode> {
+  async update(gcodeScriptId: number, updatedData: CustomGcodeDto): Promise<CustomGcode> {
     return await super.update(gcodeScriptId, updatedData);
   }
 }

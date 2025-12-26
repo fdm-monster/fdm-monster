@@ -1,10 +1,8 @@
 import { DITokens } from "@/container.tokens";
 import { Floor } from "@/entities";
-import { Floor as FloorMongo } from "@/models";
 import { FloorStore } from "@/state/floor.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { setupTestApp } from "../../test-server";
-import { isSqliteModeTest } from "../../typeorm.manager";
 
 let floorStore: FloorStore;
 let typeormService: TypeormService;
@@ -16,16 +14,12 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  if (isSqliteModeTest()) {
-    await typeormService.getDataSource().getRepository(Floor).clear();
-  } else {
-    await FloorMongo.deleteMany({});
-  }
+  await typeormService.getDataSource().getRepository(Floor).clear();
 });
 
 describe(DITokens.floorStore, () => {
   it("should throw on getting non-existing floor", async function () {
-    await expect(() => floorStore.getFloor("63452115122876ea11cd1656")).rejects.toBeDefined();
+    await expect(() => floorStore.getFloor(404)).rejects.toBeDefined();
   });
 
   it("should delete existing floor", async function () {

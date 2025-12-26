@@ -86,7 +86,7 @@ jobs:
         uses: montudor/action-zip@v1.0.0
         with:
           args: | 
-            zip -qq -r dist-server-${{ env.RELEASE_TAG }}.zip dist .env.template package.json .yarn yarn.lock .yarnrc.yml migrate-mongo-config.js tsconfig.json README.md LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md SECURITY.md .swcrc .dockerignore            
+            zip -qq -r dist-server-${{ env.RELEASE_TAG }}.zip dist .env.template package.json .yarn yarn.lock .yarnrc.yml tsconfig.json README.md LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md SECURITY.md .swcrc .dockerignore            
 
       - name: Upload server bundle zip
         uses: actions/upload-release-asset@v1

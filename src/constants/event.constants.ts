@@ -1,5 +1,4 @@
-import { IdType } from "@/shared.constants";
-import { IPrinter } from "@/models/Printer";
+import { Printer } from "@/entities";
 
 export const socketIoConnectedEvent = "socketio.connected";
 
@@ -8,7 +7,7 @@ export const uploadDoneEvent = (token: string) => `upload.done.${token}`;
 export const uploadFailedEvent = (token: string) => `upload.failed.${token}`;
 
 export const prefix = "fdm-monster";
-export const fdmMonsterPrinterStoppedEvent = (printerId: IdType) => `${prefix}.${printerId}.printer-stopped`;
+export const fdmMonsterPrinterStoppedEvent = (printerId: number) => `${prefix}.${printerId}.printer-stopped`;
 
 export const printerEvents = {
   printersDeleted: "printersDeleted",
@@ -17,18 +16,18 @@ export const printerEvents = {
   batchPrinterCreated: "batchPrinterCreated",
 };
 
-export interface PrinterCreatedEvent<T = IdType> {
-  printer: IPrinter<T>;
+export interface PrinterCreatedEvent {
+  printer: Printer;
 }
 
-export interface PrinterUpdatedEvent<T = IdType> {
-  printer: IPrinter<T>;
+export interface PrinterUpdatedEvent {
+  printer: Printer;
 }
 
-export interface BatchPrinterCreatedEvent<T = IdType> {
-  printers: IPrinter<T>[];
+export interface BatchPrinterCreatedEvent {
+  printers: Printer[];
 }
 
-export interface PrintersDeletedEvent<T = IdType> {
-  printerIds: T[];
+export interface PrintersDeletedEvent {
+  printerIds: number[];
 }

@@ -37,7 +37,7 @@ export class OctoprintClient extends OctoprintRoutes {
     loggerFactory: ILoggerFactory,
     private readonly httpClientFactory: HttpClientFactory,
     private readonly eventEmitter2: EventEmitter2,
-    private readonly settingsStore: SettingsStore
+    private readonly settingsStore: SettingsStore,
   ) {
     super();
 
@@ -54,7 +54,7 @@ export class OctoprintClient extends OctoprintRoutes {
 
   async login(login: LoginDto) {
     return await this.createClient(login).post<OP_LoginDto>(this.apiLogin, {
-      passive: true
+      passive: true,
     });
   }
 

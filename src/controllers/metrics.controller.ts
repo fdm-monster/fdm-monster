@@ -6,8 +6,7 @@ import { AppConstants } from "@/server.constants";
 
 @route("/metrics")
 export class MetricsController {
-  constructor(private readonly configService: IConfigService) {
-  }
+  constructor(private readonly configService: IConfigService) {}
 
   @GET()
   @route("")

@@ -1,8 +1,6 @@
-import { IdType } from "@/shared.constants";
-
-export class PrusaLinkEventDto<K extends string = string, T = any, I extends IdType = IdType> {
+export class PrusaLinkEventDto<K extends string = string, T = any> {
   event: K;
   payload: T;
-  printerId: I;
+  printerId: number;
   printerType: 2;
 }

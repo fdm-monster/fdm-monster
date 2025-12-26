@@ -8,7 +8,7 @@ import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-eve
 
 export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
   protected declare logger: LoggerService;
-  private requestMap: Map<
+  private readonly requestMap: Map<
     number,
     {
       resolve: (value: JsonRpcResponseDto<any>) => void;
@@ -25,7 +25,7 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     this.requestMap = new Map();
   }
 
-  sendRequest<R, I = any>(request: JsonRpcRequestDto<I>, options = { timeout: 10000 }): Promise<JsonRpcResponseDto<R>> {
+  sendRequest<R, I = any>(request: JsonRpcRequestDto<I>, options?: { timeout: number }): Promise<JsonRpcResponseDto<R>> {
     if (!this.socket) {
       throw new Error("Websocket was not created, cannot send request");
     }
@@ -38,7 +38,7 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
       const timeout = setTimeout(() => {
         this.clearRequest(requestId);
         reject(new Error(`Websocket RPC Request by ID ${requestId} timed out`));
-      }, Math.min(3000, options?.timeout) ?? 10000);
+      }, Math.min(3000, options?.timeout ?? 10000));
 
       this.requestMap.set(requestId, { resolve, reject, timeout });
     });
@@ -85,5 +85,25 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
       clearTimeout(request.timeout);
       this.requestMap.delete(requestId);
     }
+  }
+
+  /**
+   * Clear all pending requests and their timeouts
+   * This should be called when closing the adapter to prevent memory/timeout leaks
+   */
+  private clearAllRequests(): void {
+    for (const [, request] of this.requestMap.entries()) {
+      clearTimeout(request.timeout);
+      request.reject(new Error("WebSocket adapter closed"));
+    }
+    this.requestMap.clear();
+  }
+
+  /**
+   * Override close to ensure proper cleanup of pending requests
+   */
+  close(): void {
+    this.clearAllRequests();
+    super.close();
   }
 }

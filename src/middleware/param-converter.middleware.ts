@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { DITokens } from "@/container.tokens";
 import { validateInput } from "@/handlers/validators";
 import { idRulesV2 } from "@/controllers/validation/generic.validation";
-import { isString } from "lodash";
 
 export const ParamInt = (paramName: string) => createParamDecorator(paramName, Number);
 export const ParamBool = (paramName: string) => createParamDecorator(paramName, Boolean);
@@ -22,11 +20,9 @@ function createParamDecorator(
 
     let convertedValue;
 
-    // Dynamic mapping Sqlite: number, MongoDB: string
-    const isTypeormMode = req.container?.resolve(DITokens.isTypeormMode);
     let validateIdAsType = null;
     if (type === "id") {
-      validateIdAsType = isTypeormMode ? Number : String;
+      validateIdAsType = Number;
     }
 
     if (type === Boolean) {
@@ -38,14 +34,9 @@ function createParamDecorator(
         return res.status(400).send(`Invalid boolean: ${paramName}`);
       }
     } else if (type === Number || validateIdAsType === Number) {
-      convertedValue = parseInt(paramValue, 10);
-      if (isNaN(convertedValue)) {
+      convertedValue = Number.parseInt(paramValue, 10);
+      if (Number.isNaN(convertedValue)) {
         return res.status(400).send(`Invalid number: ${paramName}`);
-      }
-    } else if (type === String || validateIdAsType === String) {
-      convertedValue = paramValue;
-      if (!isString(convertedValue)) {
-        return res.status(400).send(`Invalid string: ${paramName}`);
       }
     } else {
       // No conversion for other types
@@ -53,9 +44,9 @@ function createParamDecorator(
     }
 
     // Validate an id type so it fits with the database
-    if (validateIdAsType === String || validateIdAsType === Number) {
+    if (validateIdAsType === Number) {
       try {
-        await validateInput({ id: convertedValue }, idRulesV2(isTypeormMode));
+        await validateInput({ id: convertedValue }, idRulesV2);
       } catch (e) {
         return next(e);
       }

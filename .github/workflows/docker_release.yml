@@ -77,19 +77,6 @@ jobs:
           extra_tags: |
             latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}            
 
-      - name: Tagging Strategy SQLite
-        id: tagging_sqlite
-        uses: HackerHappyHour/tagging-strategy@v3
-        with:
-          image_name: fdmmonster/fdm-monster
-          tag_name: ${{ env.SERVER_VERSION }}
-          tags: |
-            %X%-sqlite::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-            %X.Y%-sqlite::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-            %X.Y.Z%-sqlite
-          extra_tags: |
-            latest-sqlite::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
-
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
         run: |
@@ -97,7 +84,6 @@ jobs:
           echo "Ref Type: ${{ github.ref_type }}"
           echo "PR Base Ref: ${{ github.event.pull_request.base.ref }}"
           echo "Regular tags: ${{ steps.tagging_regular.outputs.tags }}"
-          echo "SQLite tags: ${{ steps.tagging_sqlite.outputs.tags }}"
 
       # Speed up the build next time
       - name: Cache Docker layers
@@ -121,20 +107,7 @@ jobs:
           tags: ${{ steps.tagging_regular.outputs.tags }}
           labels: ${{ needs.meta.outputs.labels }}
 
-      - name: Build and push SQLite
-        id: docker_build_sqlite
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: "{{defaultContext}}"
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-          file: ./docker/sqlite.Dockerfile
-          tags: ${{ steps.tagging_sqlite.outputs.tags }}
-          labels: ${{ needs.meta.outputs.labels }}
-
       # Show image digest output
       - name: Image digest
         run: |
           echo "Regular build digest: ${{ steps.docker_build_regular.outputs.digest }}"
-          echo "SQLite build digest: ${{ steps.docker_build_sqlite.outputs.digest }}"

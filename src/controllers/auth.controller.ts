@@ -131,7 +131,7 @@ export class AuthController {
       throw new BadRequestException("Username is not allowed");
     }
 
-    const roles = await this.roleService.getAppDefaultRoleIds();
+    const roles = await this.roleService.getAppDefaultRoleNames();
     const result = await this.userService.register({
       username,
       password,

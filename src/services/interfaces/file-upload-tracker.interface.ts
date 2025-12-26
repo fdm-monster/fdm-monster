@@ -1,8 +1,6 @@
-import { IdType } from "@/shared.constants";
-
 export interface TrackedUpload {
   correlationToken: string;
-  printerId: IdType;
+  printerId: number;
   startedAt: number;
   multerFile: {
     originalname: string;

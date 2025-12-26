@@ -23,12 +23,12 @@ const server = http.createServer(app);
 
 app.get("/api/version", async (req, res) => {
   res.send({
-    "api": "2.0.0",
-    "server": "2.1.2",
-    "nozzle_diameter": 0.40,
-    "text": "PrusaLink",
-    "hostname": "prusa-mini",
-    "capabilities": {
+    api: "2.0.0",
+    server: "2.1.2",
+    nozzle_diameter: 0.4,
+    text: "PrusaLink",
+    hostname: "prusa-mini",
+    capabilities: {
       "upload-by-put": true,
     },
   });

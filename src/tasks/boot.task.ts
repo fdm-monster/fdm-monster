@@ -1,5 +1,3 @@
-import mongoose, { connect, ConnectOptions, syncIndexes } from "mongoose";
-import { fetchMongoDBConnectionString, runMigrations } from "@/server.env";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
@@ -11,13 +9,14 @@ import { FloorStore } from "@/state/floor.store";
 import { ConfigService } from "@/services/core/config.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterFilesStore } from "@/state/printer-files.store";
-import { PermissionService } from "@/services/mongoose/permission.service";
-import { RoleService } from "@/services/mongoose/role.service";
-import { UserService } from "@/services/mongoose/user.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { TaskService } from "@/services/interfaces/task.interfaces";
+import { RoleService } from "@/services/orm/role.service";
+import { UserService } from "@/services/orm/user.service";
+import { PermissionService } from "@/services/orm/permission.service";
+import { RoleName } from "@/constants/authorization.constants";
 
 export class BootTask implements TaskService {
   logger: LoggerService;
@@ -35,7 +34,6 @@ export class BootTask implements TaskService {
     private readonly floorStore: FloorStore,
     private readonly configService: ConfigService,
     private readonly typeormService: TypeormService,
-    private readonly isTypeormMode: boolean,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
   ) {
     this.logger = loggerFactory(BootTask.name);
@@ -50,30 +48,7 @@ export class BootTask implements TaskService {
   }
 
   async run() {
-    if (this.isTypeormMode) {
-      await this.typeormService.createConnection();
-    } else {
-      try {
-        await this.createConnection();
-        await this.migrateDatabase();
-      } catch (e) {
-        if (e instanceof mongoose.Error) {
-          // Tests should just continue
-          if (
-            !e.message.includes("Can't call `openUri()` on an active connection with different connection strings.")
-          ) {
-            // We are not in a test
-            if (e.message.includes("ECONNREFUSED")) {
-              this.logger.error("Database connection timed-out. Retrying in 5000.");
-            } else {
-              this.logger.error(`Database connection error: ${e.message}`);
-            }
-            this.taskManagerService.scheduleDisabledJob(DITokens.bootTask, false);
-            return;
-          }
-        }
-      }
-    }
+    await this.typeormService.createConnection();
 
     this.logger.log("Loading and synchronizing Server Settings");
     await this.settingsStore.loadSettings();
@@ -143,8 +118,10 @@ export class BootTask implements TaskService {
       AppConstants.OVERRIDE_DEMO_PASSWORD,
       AppConstants.DEFAULT_DEMO_PASSWORD,
     ) as string;
-    const demoRole = this.configService.get(AppConstants.OVERRIDE_DEMO_ROLE, AppConstants.DEFAULT_DEMO_ROLE) as string;
-    const adminRole = this.roleService.getRoleByName(demoRole);
+    const demoRole = this.configService.get(
+      AppConstants.OVERRIDE_DEMO_ROLE,
+      AppConstants.DEFAULT_DEMO_ROLE,
+    ) as RoleName;
 
     const demoUserId = await this.userService.getDemoUserId();
     if (!demoUserId) {
@@ -155,35 +132,15 @@ export class BootTask implements TaskService {
         isVerified: true,
         isRootUser: false,
         needsPasswordChange: false,
-        roles: [adminRole.id],
+        roles: [demoRole],
       });
       this.logger.log("Created demo account");
     } else {
       await this.userService.setVerifiedById(demoUserId, true);
       await this.userService.setIsRootUserById(demoUserId, false);
       await this.userService.updatePasswordUnsafeByUsername(demoUsername, demoPassword);
-      await this.userService.setUserRoleIds(demoUserId, [adminRole.id]);
+      await this.userService.setUserRoles(demoUserId, [demoRole]);
       this.logger.log("Updated demo account");
-    }
-  }
-
-  async createConnection() {
-    if (!this.isTypeormMode) {
-      const envUrl = fetchMongoDBConnectionString();
-      if (!envUrl?.length) {
-        throw new Error("Mongodb connection string not set");
-      }
-
-      await connect(envUrl, {
-        serverSelectionTimeoutMS: 1500,
-      } as ConnectOptions);
-      await syncIndexes();
-    }
-  }
-
-  async migrateDatabase() {
-    if (!this.isTypeormMode) {
-      await runMigrations(mongoose.connection.db, mongoose.connection.getClient());
     }
   }
 }
