@@ -86,21 +86,6 @@ jobs:
           tags: ${{ steps.tagging.outputs.tags }}
           labels: ${{ needs.meta.outputs.labels }}
 
-      - name: Build and push
-        id: docker_build_new
-        uses: docker/build-push-action@v6
-        with:
-          push: ${{ github.event_name != 'pull_request' }}
-          context: "{{defaultContext}}"
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-          file: ./docker/Dockerfile
-          tags: ${{ steps.tagging2.outputs.tags }}
-          labels: ${{ needs.meta.outputs.labels }}
-
       # Show image digest output
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
-
-      - name: Image digest 2
-        run: echo ${{ steps.docker_build_new.outputs.digest }}
