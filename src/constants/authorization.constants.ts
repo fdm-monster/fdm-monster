@@ -13,7 +13,7 @@ export const AUTH_ERROR_REASON = {
 export const PERM_GROUP = {
   PrinterFiles: "PrinterFiles",
   PrinterSettings: "PrinterSettings",
-  Floors: "PrinterFloors", // TODO rename in migration or seed
+  Floors: "Floors",
   PrintCompletion: "PrintCompletion",
   ServerInfo: "ServerInfo",
 } as const;
@@ -34,12 +34,12 @@ export const PERMS = {
     List: "PrintCompletion.List",
   },
   [PERM_GROUP.Floors]: {
-    Default: "PrinterFloors.Default",
-    List: "PrinterFloors.List",
-    Get: "PrinterFloors.Get",
-    Create: "PrinterFloors.Create",
-    Update: "PrinterFloors.Update",
-    Delete: "PrinterFloors.Delete",
+    Default: "Floors.Default",
+    List: "Floors.List",
+    Get: "Floors.Get",
+    Create: "Floors.Create",
+    Update: "Floors.Update",
+    Delete: "Floors.Delete",
   },
   [PERM_GROUP.PrinterSettings]: {
     Default: "PrinterSettings.Default",
@@ -77,16 +77,6 @@ export const ROLES = {
 } as const;
 
 export type RoleName = (typeof ROLES)[keyof typeof ROLES];
-
-const ROLE_VALUES = Object.values(ROLES) as RoleName[];
-
-export function isRoleName(value: string): value is RoleName {
-  return ROLE_VALUES.includes(value as RoleName);
-}
-
-export function filterToRoleNames(values: string[]): RoleName[] {
-  return values.filter(isRoleName);
-}
 
 export const ROLE_PERMS: Record<RoleName, PermissionName[]> = {
   [ROLES.ADMIN]: union(

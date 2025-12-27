@@ -1,5 +1,9 @@
 # Develop
 
+## Fixes
+
+- Renames PrinterFloors permission group to Floors
+
 # FDM Monster 2.0.0-rc1
 
 ## Features
