@@ -13,7 +13,7 @@ export class FloorController {
 
   @GET()
   @route("/")
-  @before([permission(PERMS.PrinterFloors.List)])
+  @before([permission(PERMS.Floors.List)])
   async list(req: Request, res: Response) {
     const floors = await this.floorStore.listCache();
     res.send(floors);
@@ -21,7 +21,7 @@ export class FloorController {
 
   @GET()
   @route("/:id")
-  @before([permission(PERMS.PrinterFloors.Get), ParamId("id")])
+  @before([permission(PERMS.Floors.Get), ParamId("id")])
   async get(req: Request, res: Response) {
     const floor = await this.floorStore.getFloor(req.local.id);
     res.send(floor);
@@ -29,7 +29,7 @@ export class FloorController {
 
   @DELETE()
   @route("/:id")
-  @before([permission(PERMS.PrinterFloors.Delete), ParamId("id")])
+  @before([permission(PERMS.Floors.Delete), ParamId("id")])
   async delete(req: Request, res: Response) {
     await this.floorStore.delete(req.local.id);
     res.send();
@@ -37,7 +37,7 @@ export class FloorController {
 
   @POST()
   @route("/")
-  @before([permission(PERMS.PrinterFloors.Create)])
+  @before([permission(PERMS.Floors.Create)])
   async create(req: Request, res: Response) {
     const floor = await this.floorStore.create(req.body);
     res.send(floor);
@@ -45,7 +45,7 @@ export class FloorController {
 
   @PATCH()
   @route("/:id/name")
-  @before([permission(PERMS.PrinterFloors.Update), ParamId("id")])
+  @before([permission(PERMS.Floors.Update), ParamId("id")])
   async updateName(req: Request, res: Response) {
     const floor = await this.floorStore.updateName(req.local.id, req.body.name);
     res.send(floor);
@@ -53,7 +53,7 @@ export class FloorController {
 
   @PATCH()
   @route("/:id/floor-number")
-  @before([permission(PERMS.PrinterFloors.Update), ParamId("id")])
+  @before([permission(PERMS.Floors.Update), ParamId("id")])
   async updateFloorNumber(req: Request, res: Response) {
     const floor = await this.floorStore.updateFloorNumber(req.local.id, req.body.floor);
     res.send(floor);
@@ -61,7 +61,7 @@ export class FloorController {
 
   @POST()
   @route("/:id/printer")
-  @before([permission(PERMS.PrinterFloors.Update), ParamId("id")])
+  @before([permission(PERMS.Floors.Update), ParamId("id")])
   async addPrinterToFloor(req: Request, res: Response) {
     const floor = await this.floorStore.addOrUpdatePrinter(req.local.id, req.body);
     res.send(floor);
@@ -69,7 +69,7 @@ export class FloorController {
 
   @DELETE()
   @route("/:id/printer")
-  @before([permission(PERMS.PrinterFloors.Update), ParamId("id")])
+  @before([permission(PERMS.Floors.Update), ParamId("id")])
   async removePrinterFromFloor(req: Request, res: Response) {
     const floor = await this.floorStore.removePrinter(req.local.id, req.body.printerId);
     res.send(floor);
