@@ -46,7 +46,7 @@ jobs:
       # if branch is main => push to dockerhub with tag 'main'
 
       - name: Tagging Strategy
-        id: tagging2
+        id: tagging_regular
         uses: HackerHappyHour/tagging-strategy@v3
         with:
           image_name: fdmmonster/fdm-monster
@@ -62,7 +62,7 @@ jobs:
           echo '${{ github.ref }}'
           echo '${{ github.ref_type }}'
           echo '${{ github.event.pull_request.base.ref }}'
-          echo '${{ steps.tagging.outputs.tags }}'
+          echo '${{ steps.tagging_regular.outputs.tags }}'
 
       # Speed up the build next time
       - name: Cache Docker layers
@@ -83,7 +83,7 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
           file: ./docker/Dockerfile
-          tags: ${{ steps.tagging.outputs.tags }}
+          tags: ${{ steps.tagging_regular.outputs.tags }}
           labels: ${{ needs.meta.outputs.labels }}
 
       # Show image digest output
