@@ -5,7 +5,7 @@ import { DITokens } from "./container.tokens";
 import { ServerHost } from "@/server.host";
 import { config } from "dotenv";
 import { LoggerService as Logger } from "@/handlers/logger";
-import { join } from "path";
+import { join } from "node:path";
 import { superRootPath } from "@/utils/fs.utils";
 import { createStaticLogger } from "@/handlers/logging/static.logger";
 
@@ -21,7 +21,7 @@ setupServer().then(({ httpServer, container }) => {
   container
     .resolve<ServerHost>(DITokens.serverHost)
     .boot(httpServer)
-    .catch(async (e: any | Error) => {
+    .catch(async (e: Error) => {
       console.error("Server has crashed unintentionally - please report this", e);
 
       captureException(e);

@@ -1,5 +1,9 @@
 # Develop
 
+## Feat
+
+- Add mock camera console to project (for development)
+
 ## Fixes
 
 - Renames PrinterFloors permission group to Floors
