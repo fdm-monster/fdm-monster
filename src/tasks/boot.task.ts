@@ -8,7 +8,6 @@ import { SettingsStore } from "@/state/settings.store";
 import { FloorStore } from "@/state/floor.store";
 import { ConfigService } from "@/services/core/config.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
-import { PrinterFilesStore } from "@/state/printer-files.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
@@ -27,7 +26,6 @@ export class BootTask implements TaskService {
     private readonly settingsStore: SettingsStore,
     private readonly multerService: MulterService,
     private readonly printerSocketStore: PrinterSocketStore,
-    private readonly printerFilesStore: PrinterFilesStore,
     private readonly permissionService: PermissionService,
     private readonly roleService: RoleService,
     private readonly userService: UserService,
@@ -88,8 +86,6 @@ export class BootTask implements TaskService {
     this.multerService.clearUploadsFolder();
     this.logger.log("Loading printer sockets");
     await this.printerSocketStore.loadPrinterSockets(); // New sockets
-    this.logger.log("Loading files store");
-    await this.printerFilesStore.loadFilesStore();
     this.logger.log("Loading floor store");
     await this.floorStore.loadStore();
     this.logger.log("Loading printer thumbnail cache");
