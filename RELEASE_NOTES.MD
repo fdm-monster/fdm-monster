@@ -8,6 +8,7 @@
 
 - Renames PrinterFloors permission group to Floors
 - Load printer files in background instead of synchronously
+- Bambu connection rejections cannot cause server crashes anymore
 
 # FDM Monster 2.0.0-rc1
 
