@@ -24,6 +24,7 @@ import { UserService } from "./services/orm/user.service";
 import { RoleService } from "./services/orm/role.service";
 import { PermissionService } from "./services/orm/permission.service";
 import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
+import { PrinterFilesLoadTask } from "./tasks/printer-files-load.task";
 import { ROLES } from "./constants/authorization.constants";
 import { CustomGcodeService } from "./services/orm/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
@@ -174,6 +175,7 @@ export function configureContainer() {
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
     [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
+    [di.printerFilesLoadTask]: asClass(PrinterFilesLoadTask).singleton(),
   });
 
   return container;
