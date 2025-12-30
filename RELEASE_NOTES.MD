@@ -7,6 +7,7 @@
 ## Fixes
 
 - Renames PrinterFloors permission group to Floors
+- Load printer files in background instead of synchronously
 
 # FDM Monster 2.0.0-rc1
 
