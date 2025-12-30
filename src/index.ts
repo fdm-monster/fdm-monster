@@ -17,6 +17,14 @@ logger.log("✓ Parsed environment with (optional) .env file, created static log
 
 setupEnvConfig();
 
+process.on("uncaughtException", (err) => {
+  logger.error("Uncaught exception", err);
+});
+
+process.on("unhandledRejection", (reason) => {
+  logger.error("Unhandled promise rejection", reason);
+});
+
 setupServer().then(({ httpServer, container }) => {
   container
     .resolve<ServerHost>(DITokens.serverHost)
