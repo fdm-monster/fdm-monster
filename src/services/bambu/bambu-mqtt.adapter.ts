@@ -475,11 +475,16 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
 
       if (topic.endsWith("/report") && payload.print) {
         this.lastState = payload.print as PrintData;
-        this.logger.debug("Received printer state update");
 
-        // Transform and emit current state
+        // Emit combined payload:
+        // - Transformed format for UI (state, temps, progress, job)
+        // - Raw print object for PrinterEventsCache job tracking
         const currentMessage = this.transformStateToCurrentMessage(this.lastState);
-        this.emitEvent("current", currentMessage).catch((err) => {
+        const combinedPayload = {
+          ...currentMessage,
+          print: payload.print, // Include raw print data for job tracking
+        };
+        this.emitEvent("current", combinedPayload).catch((err) => {
           this.logger.error("Failed to emit current event:", err);
         });
       }
