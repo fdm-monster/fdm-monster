@@ -4,7 +4,6 @@ import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  clientNextSchema,
   credentialSettingUpdateSchema,
   fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
@@ -137,15 +136,6 @@ export class SettingsController {
     } else {
       await this.printerThumbnailCache.resetCache();
     }
-    res.send(result);
-  }
-
-  @PUT()
-  @route("/experimental-client-support")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
-  async updateClientSupport(req: Request, res: Response) {
-    const { enabled } = await validateInput(req.body, clientNextSchema);
-    const result = await this.settingsStore.setExperimentalClientSupport(enabled);
     res.send(result);
   }
 

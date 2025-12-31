@@ -14,14 +14,7 @@ import { Request, Response } from "express";
 @route(AppConstants.apiRoute + "/batch")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
 export class BatchCallController {
-  constructor(private readonly batchCallService: BatchCallService) {}
-
-  @POST()
-  @route("/settings/get")
-  async batchSettingsGet(req: Request, res: Response) {
-    const { printerIds } = await validateInput(req.body, batchPrinterSchema);
-    const results = await this.batchCallService.batchSettingsGet(printerIds);
-    res.send(results);
+  constructor(private readonly batchCallService: BatchCallService) {
   }
 
   @POST()

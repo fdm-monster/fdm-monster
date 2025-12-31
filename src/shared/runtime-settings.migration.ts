@@ -54,8 +54,6 @@ export function migrateSettingsRuntime(knownSettings: Partial<Settings>): Settin
     entity[serverSettingsKey] = {
       loginRequired: entity[serverSettingsKey].loginRequired ?? defaultServerSettings.loginRequired,
       registration: entity[serverSettingsKey].registration ?? defaultServerSettings.registration,
-      experimentalClientSupport:
-        entity[serverSettingsKey].experimentalClientSupport ?? defaultServerSettings.experimentalClientSupport,
       experimentalMoonrakerSupport:
         entity[serverSettingsKey].experimentalMoonrakerSupport ?? defaultServerSettings.experimentalMoonrakerSupport,
       experimentalPrusaLinkSupport:

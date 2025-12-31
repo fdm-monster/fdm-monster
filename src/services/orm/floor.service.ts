@@ -147,7 +147,7 @@ export class FloorService
     if (
       position?.floorId === floorId &&
       position.x === validInput.x &&
-      position.x === validInput.y &&
+      position.y === validInput.y &&
       position.printerId === validInput.printerId
     ) {
       return this.get(floorId);

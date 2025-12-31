@@ -11,6 +11,7 @@ import { z, ZodError } from "zod";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { createPrinterSchema } from "@/services/validators/printer-service.validation";
 import { OctoprintType, BambuType } from "@/services/printer-api.interface";
+import { SettingsStore } from "@/state/settings.store";
 
 jest.mock("@/services/octoprint/octoprint.client");
 
@@ -19,6 +20,7 @@ let printerCache: PrinterCache;
 let testPrinterSocketStore: TestPrinterSocketStore;
 let printerFilesStore: PrinterFilesStore;
 let printerSocketStore: PrinterSocketStore;
+let settingsStore: SettingsStore;
 
 beforeAll(async () => {
   const container = configureContainer();
@@ -29,6 +31,7 @@ beforeAll(async () => {
   printerService = container.resolve(DITokens.printerService);
   printerFilesStore = container.resolve(DITokens.printerFilesStore);
   printerSocketStore = container.resolve(DITokens.printerSocketStore);
+  settingsStore = container.resolve(DITokens.settingsStore);
   await printerCache.loadCache();
 });
 
@@ -126,7 +129,10 @@ describe(PrinterSocketStore.name, () => {
   });
 
   it("should create a new socket adapter when printer type changes", async () => {
-    // Arrange - Create a printer with OctoPrint type
+    // Arrange - Enable experimental Bambu support
+    await settingsStore.setExperimentalBambuSupport(true);
+
+    // Create a printer with OctoPrint type
     const printerEntity = await printerService.create({
       ...validNewPrinterState,
       printerType: OctoprintType,
@@ -154,7 +160,10 @@ describe(PrinterSocketStore.name, () => {
   });
 
   it("should properly dispose of old adapter resources when printer type changes", async () => {
-    // Arrange - Create a printer with OctoPrint type
+    // Arrange - Enable experimental Bambu support
+    await settingsStore.setExperimentalBambuSupport(true);
+
+    // Create a printer with OctoPrint type
     const printerEntity = await printerService.create({
       ...validNewPrinterState,
       printerType: OctoprintType,

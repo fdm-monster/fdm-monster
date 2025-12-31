@@ -58,7 +58,7 @@ jobs:
           echo ${{ env.RELEASE_TAG }}
 
       # Build dist folder
-      - run: yarn set version berry
+      - run: corepack enable
       - run: yarn install --immutable
       - run: yarn build
       - run: yarn run tsc

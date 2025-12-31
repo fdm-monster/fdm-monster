@@ -1,8 +1,8 @@
 import express, { Application } from "express";
 import history from "connect-history-api-fallback";
 import { LoggerService } from "./handlers/logger";
-import { join } from "path";
-import { exceptionFilter } from "./middleware/exception.filter";
+import { join } from "node:path";
+import { ExceptionFilter } from "./middleware/exception.filter";
 import { fetchServerPort } from "./server.env";
 import { NotFoundException } from "./exceptions/runtime.exceptions";
 import { AppConstants } from "./server.constants";
@@ -26,6 +26,7 @@ export class ServerHost {
     private readonly bootTask: BootTask,
     private readonly socketIoGateway: SocketIoGateway,
     private readonly typeormService: TypeormService,
+    private readonly exceptionFilter: ExceptionFilter,
   ) {
     this.logger = loggerFactory(ServerHost.name);
   }
@@ -60,18 +61,8 @@ export class ServerHost {
       })
       .use(loadControllersFunc());
 
-    const nextClientPath = join(superRootPath(), "node_modules", AppConstants.clientNextPackageName, "dist");
     const bundleDistPath = join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist");
     const backupClientPath = join(superRootPath(), "node_modules", AppConstants.clientPackageName, "dist");
-
-    // Middleware to serve nextClientPath if isClientNextEnabled() is true
-    app.use((req, res, next) => {
-      if (this.isClientNextEnabled()) {
-        express.static(nextClientPath)(req, res, next);
-      } else {
-        next();
-      }
-    });
 
     // Serve the main bundle
     app.use(express.static(bundleDistPath));
@@ -96,7 +87,7 @@ export class ServerHost {
       }
     });
 
-    app.use(exceptionFilter);
+    app.use(this.exceptionFilter.handle.bind(this.exceptionFilter));
   }
 
   async httpListen(app: Application) {
@@ -115,10 +106,5 @@ export class ServerHost {
       this.logger.log(`Server started... open it at http://127.0.0.1:${port}`);
     });
     this.socketIoGateway.attachServer(server);
-  }
-
-  private isClientNextEnabled() {
-    const settings = this.settingsStore.getServerSettings();
-    return settings.experimentalClientSupport;
   }
 }

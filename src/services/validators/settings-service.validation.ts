@@ -8,7 +8,6 @@ export const serverSettingsUpdateSchema = z.object({
   experimentalBambuSupport: z.boolean(),
   experimentalPrusaLinkSupport: z.boolean(),
   experimentalThumbnailSupport: z.boolean(),
-  experimentalClientSupport: z.boolean(),
   sentryDiagnosticsEnabled: z.boolean(),
 });
 
@@ -70,9 +69,5 @@ export const bambuSupportSchema = z.object({
 });
 
 export const thumbnailSupportSchema = z.object({
-  enabled: z.boolean(),
-});
-
-export const clientNextSchema = z.object({
   enabled: z.boolean(),
 });

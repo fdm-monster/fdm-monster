@@ -105,7 +105,7 @@ export class ServerPrivateController {
   @POST()
   @route("/yaml-import")
   async importYaml(req: Request, res: Response) {
-    const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml"], false);
+    const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml",".yml"], false);
     const firstFile = files[0];
     const spec = await this.yamlService.importYaml(firstFile.buffer.toString());
 

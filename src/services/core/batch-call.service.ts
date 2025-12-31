@@ -100,28 +100,6 @@ export class BatchCallService {
     }
   }
 
-  async batchSettingsGet(printerIds: number[]): Promise<Awaited<BatchModel>> {
-    const promises = [];
-    for (const printerId of printerIds) {
-      const login = await this.printerCache.getLoginDtoAsync(printerId);
-      const time = Date.now();
-
-      const client = this.getPrinter(login);
-
-      const promise = client
-        .getSettings()
-        .then((r) => {
-          return { success: true, printerId, time: Date.now() - time, value: r };
-        })
-        .catch((e) => {
-          return { failure: true, error: e.message, printerId, time: Date.now() - time };
-        });
-
-      promises.push(promise);
-    }
-    return await Promise.all(promises);
-  }
-
   async batchConnectUsb(printerIds: number[]): Promise<Awaited<BatchModel>> {
     const promises = [];
     for (const printerId of printerIds) {

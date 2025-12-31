@@ -7,6 +7,7 @@ export const DITokens = {
   typeormService: "typeormService",
   // Instances
   serverHost: "serverHost",
+  exceptionFilter: "exceptionFilter",
   loggerFactory: "loggerFactory",
   httpClientFactory: "httpClientFactory",
   socketIoGateway: "socketIoGateway",

@@ -22,8 +22,7 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   loginRequired: true,
   registration: false,
   experimentalMoonrakerSupport: false,
-  experimentalBambuSupport: true,
-  experimentalClientSupport: false,
+  experimentalBambuSupport: false,
   experimentalThumbnailSupport: false,
   experimentalPrusaLinkSupport: false,
 });
@@ -40,8 +39,8 @@ export const getDefaultCredentialSettings = (): CredentialSettingsDto => ({
 
 export const frontendSettingKey = "frontend";
 export const getDefaultFrontendSettings = (): FrontendSettingsDto => ({
-  gridCols: 8,
-  gridRows: 8,
+  gridCols: 4,
+  gridRows: 2,
   largeTiles: false,
   tilePreferCancelOverQuickStop: false,
 });

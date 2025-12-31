@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: 24.x
 
-      - run: yarn set version berry
+      - run: corepack enable
       - run: yarn install --immutable
       - run: yarn run build
       - run: yarn run tsc

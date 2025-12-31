@@ -52,6 +52,7 @@ import { RefreshTokenService } from "@/services/orm/refresh-token.service";
 import { SettingsService } from "@/services/orm/settings.service";
 import { FloorService } from "@/services/orm/floor.service";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
+import { ExceptionFilter } from "@/middleware/exception.filter";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { UserRoleService } from "@/services/orm/user-role.service";
 import { PrinterGroupService } from "@/services/orm/printer-group.service";
@@ -106,6 +107,7 @@ export function configureContainer() {
     [di.printCompletionService]: asClass(PrintCompletionService).singleton(),
     // -- asClass --
     [di.serverHost]: asClass(ServerHost).singleton(),
+    [di.exceptionFilter]: asClass(ExceptionFilter).singleton(),
     [di.settingsStore]: asClass(SettingsStore).singleton(),
     [di.configService]: asClass(ConfigService),
     [di.authService]: asClass(AuthService).singleton(),

@@ -20,7 +20,6 @@ export interface ServerSettingsDto {
   loginRequired: boolean;
   experimentalMoonrakerSupport: boolean;
   experimentalBambuSupport: boolean;
-  experimentalClientSupport: boolean;
   experimentalThumbnailSupport: boolean;
   experimentalPrusaLinkSupport: boolean;
 }
