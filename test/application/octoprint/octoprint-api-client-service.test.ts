@@ -161,12 +161,6 @@ describe(OctoprintClient.name, () => {
     expect(result.data).toBeTruthy();
   });
 
-  it("should not throw error on setGCodeAnalysis", async () => {
-    nock(printerURL).post("/api/settings").reply(200, {});
-    const result = await octoprintClient.setGCodeAnalysis(auth, false);
-    expect(result.data).toBeTruthy();
-  });
-
   it("should not throw error on createFolder", async () => {
     nock(printerURL).post("/api/files/local").reply(200, {});
     const result = await octoprintClient.createFolder(auth, "newPath", "someFolder");

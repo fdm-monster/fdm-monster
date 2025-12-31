@@ -85,5 +85,5 @@ export class SocketIoGateway {
 }
 
 export const IO_MESSAGES = {
-  LegacyUpdate: "legacy-update",
+  Update: "update",
 };

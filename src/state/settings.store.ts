@@ -49,7 +49,6 @@ export class SettingsStore {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
         experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
-        experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
       [wizardSettingKey]: settings[wizardSettingKey],
@@ -73,7 +72,6 @@ export class SettingsStore {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
         experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
-        experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
         experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
       },
     });
@@ -265,13 +263,6 @@ export class SettingsStore {
   async setExperimentalThumbnailSupport(experimentalThumbnailSupport: boolean) {
     this.throwIfSettingsUnset();
     this.settings![serverSettingsKey].experimentalThumbnailSupport = experimentalThumbnailSupport;
-    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
-    return this.getSettings();
-  }
-
-  async setExperimentalClientSupport(experimentalClientSupport: boolean) {
-    this.throwIfSettingsUnset();
-    this.settings![serverSettingsKey].experimentalClientSupport = experimentalClientSupport;
     this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
     return this.getSettings();
   }

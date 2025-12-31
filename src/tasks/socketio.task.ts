@@ -48,6 +48,6 @@ export class SocketIoTask {
       trackedUploads,
     };
 
-    this.socketIoGateway.send(IO_MESSAGES.LegacyUpdate, socketIoData);
+    this.socketIoGateway.send(IO_MESSAGES.Update, socketIoData);
   }
 }

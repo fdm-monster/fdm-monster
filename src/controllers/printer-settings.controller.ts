@@ -1,8 +1,6 @@
 import { before, GET, POST, route } from "awilix-express";
 import { authenticate, permission } from "@/middleware/authenticate";
-import { validateMiddleware } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
-import { setGcodeAnalysisSchema } from "./validation/printer-settings-controller.validation";
 import { PERMS } from "@/constants/authorization.constants";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterCache } from "@/state/printer.cache";
@@ -23,17 +21,6 @@ export class PrinterSettingsController {
   async get(req: Request, res: Response) {
     const loginDto = await this.printerCache.getLoginDtoAsync(req.local.id);
     const settings = await this.octoprintClient.getSettings(loginDto);
-    res.send(settings.data);
-  }
-
-  @POST()
-  @route("/:id/gcode-analysis")
-  @before([ParamId("id")])
-  async setGCodeAnalysis(req: Request, res: Response) {
-    const { enabled } = await validateMiddleware(req, setGcodeAnalysisSchema);
-
-    const printerLogin = await this.printerCache.getLoginDtoAsync(req.local.id);
-    const settings = await this.octoprintClient.setGCodeAnalysis(printerLogin, enabled);
     res.send(settings.data);
   }
 

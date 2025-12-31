@@ -122,26 +122,6 @@ export const importPrintersFloorsYamlSchema = z.object({
     )
     .optional()
     .default([]),
-  roles: z
-    .array(
-      z.object({
-        id: numberOrStringIdValidator,
-        name: z.string(),
-      }),
-    )
-    .optional()
-    .default([]),
-  user_roles: z
-    .array(
-      z.object({
-        id: numberOrStringIdValidator,
-        userId: numberOrStringIdValidator,
-        roleId: numberOrStringIdValidator,
-        createdAt: z.date().optional(),
-      }),
-    )
-    .optional()
-    .default([]),
 });
 
 export type YamlExportSchema = z.infer<typeof importPrintersFloorsYamlSchema>;
