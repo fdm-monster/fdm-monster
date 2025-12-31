@@ -13,6 +13,7 @@ import { BambuApiStub } from "./stubs/bambu.api.stub";
 import { BambuClientStub } from "./stubs/bambu.client.stub";
 import { BambuFtpAdapterStub } from "./stubs/bambu-ftp.adapter.stub";
 import { BambuMqttAdapterStub } from "./stubs/bambu-mqtt.adapter.stub";
+import { SettingsStore } from "@/state/settings.store";
 
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
@@ -42,6 +43,9 @@ beforeAll(async () => {
   };
 
   ({ request, container } = await setupTestApp(true, stubMocks));
+  const settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
+  await settingsStore.setExperimentalBambuSupport(true);
+  
   printerService = container.resolve<IPrinterService>(DITokens.printerService);
 });
 
