@@ -23,6 +23,9 @@ import { RemovePrinterFile1720338804844 } from "@/migrations/1720338804844-Remov
 import { AddPrinterType1713897879622 } from "@/migrations/1713897879622-AddPrinterType";
 import { AddPrinterUsernamePassword1745141688926 } from "@/migrations/1745141688926-AddPrinterUsernamePassword";
 import { DropPermissions1766576698569 } from "@/migrations/1766576698569-DropPermissions";
+import {
+  ChangeCameraPrinterOnDeleteSetNull1767278216516
+} from "@/migrations/1767278216516-ChangeCameraPrinterOnDeleteSetNull";
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
@@ -63,6 +66,7 @@ export const AppDataSource = new DataSource({
     AddPrinterType1713897879622,
     AddPrinterUsernamePassword1745141688926,
     DropPermissions1766576698569,
+    ChangeCameraPrinterOnDeleteSetNull1767278216516
   ],
   subscribers: [],
 });

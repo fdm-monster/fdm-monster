@@ -13,6 +13,7 @@
 - Floor service wouldn't update printer position, comparison was x==x, y==x
 - ExceptionFilter now logs using loggerFactory
 - YAML import service was brittle against printer type failures, added robustness
+- Camera should tolerate printer deletion: SET NULL applied to Foreign Key
 
 ## Chore
 - Remove batch/single set gcode analysis to false

@@ -12,7 +12,7 @@ export class CameraStream {
   @Column()
   name: string;
 
-  @OneToOne(() => Printer, { nullable: true })
+  @OneToOne(() => Printer, { nullable: true, onDelete: "SET NULL" })
   @JoinColumn({ name: "printerId" })
   printer?: Relation<Printer>;
   @Column({ nullable: true, unique: true })
