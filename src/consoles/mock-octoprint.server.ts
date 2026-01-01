@@ -30,8 +30,8 @@ function getCurrentMessage() {
 
   // Determine state text
   let stateText = "Operational";
-  if (isFinished) stateText = "Operational"; // OctoPrint shows Operational when finished
-  else if (isPrinting && isPaused) stateText = "Paused";
+
+  if (isPrinting && isPaused) stateText = "Paused";
   else if (isPrinting) stateText = "Printing";
 
   // Use finishedFileName for the finished state, otherwise current file
