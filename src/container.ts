@@ -26,7 +26,6 @@ import { PermissionService } from "./services/orm/permission.service";
 import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
 import { PrinterFilesLoadTask } from "./tasks/printer-files-load.task";
 import { ROLES } from "./constants/authorization.constants";
-import { CustomGcodeService } from "./services/orm/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
 import { ConfigService, IConfigService } from "./services/core/config.service";
 import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
@@ -103,7 +102,6 @@ export function configureContainer() {
     [di.userRoleService]: asClass(UserRoleService).singleton(),
     [di.roleService]: asClass(RoleService).singleton(),
     [di.permissionService]: asClass(PermissionService).singleton(),
-    [di.customGCodeService]: asClass(CustomGcodeService).singleton(),
     [di.printCompletionService]: asClass(PrintCompletionService).singleton(),
     // -- asClass --
     [di.serverHost]: asClass(ServerHost).singleton(),

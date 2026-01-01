@@ -168,6 +168,17 @@ export class PrinterController {
     res.send(printerLogin);
   }
 
+  /**
+   * Sends gcode according to https://docs.octoprint.org/en/master/api/printer.html#send-an-arbitrary-command-to-the-printer
+   */
+  @POST()
+  @route("/:id/send-emergency-m112")
+  async sendEmergencyM112(req: Request, res: Response) {
+    const { printerApi } = getScopedPrinter(req);
+    await printerApi.quickStop();
+    res.send();
+  }
+
   @POST()
   @route("/:id/serial-connect")
   async sendSerialConnectCommand(req: Request, res: Response) {

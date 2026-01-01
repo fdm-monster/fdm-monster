@@ -10,14 +10,15 @@ import { Printer } from "@/entities/printer.entity";
 import { Settings } from "@/entities/settings.entity";
 import { PrintCompletion, RefreshToken, User } from "@/entities";
 import { CameraStream } from "@/entities/camera-stream.entity";
-import { CustomGcode } from "@/entities/custom-gcode.entity";
 import { Role } from "@/entities/role.entity";
 import { UserRole } from "@/entities/user-role.entity";
 import { InitSqlite1706829146617 } from "@/migrations/1706829146617-InitSqlite";
 import { PrinterGroup } from "@/entities/printer-group.entity";
 import { Group } from "@/entities/group.entity";
 import { PrinterGroup1707494762198 } from "@/migrations/1707494762198-PrinterGroup";
-import { ChangePrintCompletionDeletePrinterCascade1708465930665 } from "@/migrations/1708465930665-ChangePrintCompletionDeletePrinterCascade";
+import {
+  ChangePrintCompletionDeletePrinterCascade1708465930665
+} from "@/migrations/1708465930665-ChangePrintCompletionDeletePrinterCascade";
 import { ChangeRoleNameUnique1713300747465 } from "@/migrations/1713300747465-ChangeRoleNameUnique";
 import { RemovePrinterFile1720338804844 } from "@/migrations/1720338804844-RemovePrinterFile";
 import { AddPrinterType1713897879622 } from "@/migrations/1713897879622-AddPrinterType";
@@ -26,6 +27,7 @@ import { DropPermissions1766576698569 } from "@/migrations/1766576698569-DropPer
 import {
   ChangeCameraPrinterOnDeleteSetNull1767278216516
 } from "@/migrations/1767278216516-ChangeCameraPrinterOnDeleteSetNull";
+import { DropCustomGcode1767279607392 } from "@/migrations/1767279607392-DropCustomGcode";
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
@@ -49,7 +51,6 @@ export const AppDataSource = new DataSource({
     Settings,
     User,
     CameraStream,
-    CustomGcode,
     Role,
     RefreshToken,
     PrintCompletion,
@@ -66,7 +67,8 @@ export const AppDataSource = new DataSource({
     AddPrinterType1713897879622,
     AddPrinterUsernamePassword1745141688926,
     DropPermissions1766576698569,
-    ChangeCameraPrinterOnDeleteSetNull1767278216516
+    ChangeCameraPrinterOnDeleteSetNull1767278216516,
+    DropCustomGcode1767279607392
   ],
   subscribers: [],
 });

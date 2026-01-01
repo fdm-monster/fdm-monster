@@ -14,10 +14,12 @@
 - ExceptionFilter now logs using loggerFactory
 - YAML import service was brittle against printer type failures, added robustness
 - Camera should tolerate printer deletion: SET NULL applied to Foreign Key
+- Quick stop API endpoit moved to printer controller, removing the need for custom gcode api controller.
 
 ## Chore
 - Remove batch/single set gcode analysis to false
 - Removed client next experimental setting
+- Drop unused Custom Gcode table
 
 # FDM Monster 2.0.0-rc1
 

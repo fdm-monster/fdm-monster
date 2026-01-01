@@ -53,7 +53,6 @@ export const DITokens = {
   batchCallService: "batchCallService",
   influxDbV2BaseService: "influxDbV2BaseService",
   systemInfoBundleService: "systemInfoBundleService",
-  customGCodeService: "customGCodeService",
   // Stores
   floorStore: "floorStore",
   settingsStore: "settingsStore",
