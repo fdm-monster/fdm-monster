@@ -1,11 +1,11 @@
 import { DataSource } from "typeorm";
 import { PlatformTools } from "typeorm/platform/PlatformTools";
 import { CommandUtils } from "typeorm/commands/CommandUtils";
-import path from "path";
+import path from "node:path";
 import chalk from "chalk";
 import { camelCase } from "typeorm/util/StringUtils";
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
-import * as readline from "readline";
+import * as readline from "node:readline";
 
 /**
  * Formats query parameters for migration queries if parameters actually exist
