@@ -1,4 +1,4 @@
-import { GcodeAnalysisDto } from "@/services/interfaces/gcode-analysis.dto";
+import { GcodeAnalysisDto } from "@/services/octoprint/dto/files/gcode-analysis.dto";
 import { OctoPrintStatisticsDto, Prints, Refs } from "@/services/interfaces/printer-file.dto";
 
 export interface DisplayLayerProgressDto {
