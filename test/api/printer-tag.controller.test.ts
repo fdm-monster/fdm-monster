@@ -23,7 +23,7 @@ const addPrinterToTagRoute = (id: string) => `${defaultRoute}/${id}/printer`;
 const deletePrinterFromTagRoute = (id: string) => `${addPrinterToTagRoute(id)}`;
 
 describe(PrinterTagController.name, () => {
-  it("should list groups", async () => {
+  it("should list tag", async () => {
     const response = await request.get(listTagsRoute).send();
     expectOkResponse(response);
   });
@@ -103,9 +103,9 @@ describe(PrinterTagController.name, () => {
 
     const responseTags = await request.get(listTagsRoute).send();
     expectOkResponse(responseTags);
-    const groups = responseTags.body as TagWithPrintersDto[];
-    expect(groups.length).toBeGreaterThan(0);
-    const groupUnderTest = groups.find((g) => g.id == groupId);
+    const tag = responseTags.body as TagWithPrintersDto[];
+    expect(tag.length).toBeGreaterThan(0);
+    const groupUnderTest = tag.find((g) => g.id == groupId);
     expect(groupUnderTest).toBeDefined();
     expect(groupUnderTest!.printers.find((p) => p.printerId === printerId)).toBeDefined();
   });
