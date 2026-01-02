@@ -25,6 +25,7 @@
 - Removed client next experimental setting
 - Drop unused Custom Gcode table
 - Drop broken PrintCompletion table
+- Rename PrinterGroup to PrinterTag, and Group to Tag
 
 # FDM Monster 2.0.0-rc1
 
