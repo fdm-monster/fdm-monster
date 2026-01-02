@@ -17,7 +17,9 @@ export const exportPrintersFloorsYamlSchema = z.object({
   exportPrinters: z.boolean(),
   exportFloorGrid: z.boolean(),
   exportFloors: z.boolean(),
-  exportGroups: z.boolean(),
+  exportTags: z.boolean(),
+  // Legacy field for backward compatibility
+  exportGroups: z.boolean().optional(),
   exportSettings: z.boolean().default(false),
   exportUsers: z.boolean().default(false),
   printerComparisonStrategiesByPriority: z
@@ -52,6 +54,8 @@ export const importPrintersFloorsYamlSchema = z.object({
     exportPrinters: z.boolean(),
     exportFloorGrid: z.boolean(),
     exportFloors: z.boolean(),
+    exportTags: z.boolean().optional(),
+    // Legacy field for backward compatibility
     exportGroups: z.boolean().optional(),
     exportSettings: z.boolean().optional().default(false),
     exportUsers: z.boolean().optional().default(false),
@@ -93,7 +97,7 @@ export const importPrintersFloorsYamlSchema = z.object({
     )
     .min(0)
     .default([]),
-  groups: z
+  tags: z
     .array(
       z.object({
         id: numberOrStringIdValidator,

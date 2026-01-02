@@ -12,7 +12,7 @@ import { FloorStore } from "@/state/floor.store";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { IPrinterTagService } from "@/services/interfaces/tag.service.interface";
+import { IPrinterTagService } from "@/services/interfaces/printer-tag.service.interface";
 import { BambuType, MoonrakerType, OctoprintType, PrusaLinkType } from "@/services/printer-api.interface";
 import { z } from "zod";
 import { IUserService } from "@/services/interfaces/user-service.interface";
@@ -83,7 +83,7 @@ export class YamlService {
     );
 
     this.logger.log("Analysing tags for import");
-    const { updateByNameGroups, insertGroups } = await this.analyseUpsertGroups(importData.groups ?? []);
+    const { updateByNameTags, insertTags } = await this.analyseUpsertTags(importData.tags ?? []);
 
     this.logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
     const printerIdMap: { [k: number]: number } = {};
@@ -201,57 +201,57 @@ export class YamlService {
 
     await this.floorStore.loadStore();
 
-    this.logger.log(`Performing pure create groups (${insertGroups.length} groups)`);
-    for (const group of insertGroups) {
+    this.logger.log(`Performing pure create tags (${insertTags.length} tags)`);
+    for (const tag of insertTags) {
       try {
-        const createdGroup = await this.printerTagService.createTag({
-          name: group.name,
+        const createdTag = await this.printerTagService.createTag({
+          name: tag.name,
         });
-        for (const printer of group.printers) {
+        for (const printer of tag.printers) {
           const knownPrinterId = printerIdMap[printer.printerId] satisfies number | undefined;
           // If the ID was not mapped, this position is considered discarded
           if (!knownPrinterId) continue;
           try {
-            await this.printerTagService.addPrinterToTag(createdGroup.id, knownPrinterId);
+            await this.printerTagService.addPrinterToTag(createdTag.id, knownPrinterId);
           } catch (error) {
-            this.logger.error(`Failed to add printer ${knownPrinterId} to group ${group.name}:`, error);
-            // Continue with next printer in group
+            this.logger.error(`Failed to add printer ${knownPrinterId} to tag ${tag.name}:`, error);
+            // Continue with next printer in tag
           }
         }
       } catch (error) {
-        this.logger.error(`Failed to create group ${group.name}:`, error);
-        // Continue with next group - don't let one failure break the entire import
+        this.logger.error(`Failed to create tag ${tag.name}:`, error);
+        // Continue with next tag - don't let one failure break the entire import
       }
     }
 
-    this.logger.log(`Performing update of grouped printer links (${updateByNameGroups.length} groups)`);
-    for (const updateGroupSpec of updateByNameGroups) {
+    this.logger.log(`Performing update of tag printer links (${updateByNameTags.length} tags)`);
+    for (const updateTagSpec of updateByNameTags) {
       try {
-        const existingGroup = await this.printerTagService.getPrintersByTag(updateGroupSpec.groupId);
-        const existingPrinterIds = existingGroup.printers.map((p) => p.printerId);
-        const wantedTargetPrinterIds = (updateGroupSpec.value.printers as { printerId: number }[])
+        const existingTag = await this.printerTagService.getPrintersByTag(updateTagSpec.tagId);
+        const existingPrinterIds = existingTag.printers.map((p) => p.printerId);
+        const wantedTargetPrinterIds = (updateTagSpec.value.printers as { printerId: number }[])
           .filter((p) => !!printerIdMap[p.printerId])
           .map((p) => printerIdMap[p.printerId]);
 
         for (const unwantedId of existingPrinterIds.filter((eid) => !wantedTargetPrinterIds.includes(eid))) {
           try {
-            await this.printerTagService.removePrinterFromTag(existingGroup.id, unwantedId);
+            await this.printerTagService.removePrinterFromTag(existingTag.id, unwantedId);
           } catch (error) {
-            this.logger.error(`Failed to remove printer ${unwantedId} from group ${existingGroup.name}:`, error);
+            this.logger.error(`Failed to remove printer ${unwantedId} from tag ${existingTag.name}:`, error);
             // Continue with next printer
           }
         }
         for (const nonExistingNewId of wantedTargetPrinterIds.filter((eid) => !existingPrinterIds.includes(eid))) {
           try {
-            await this.printerTagService.addPrinterToTag(existingGroup.id, nonExistingNewId);
+            await this.printerTagService.addPrinterToTag(existingTag.id, nonExistingNewId);
           } catch (error) {
-            this.logger.error(`Failed to add printer ${nonExistingNewId} to group ${existingGroup.name}:`, error);
+            this.logger.error(`Failed to add printer ${nonExistingNewId} to tag ${existingTag.name}:`, error);
             // Continue with next printer
           }
         }
       } catch (error) {
-        this.logger.error(`Failed to update group ${updateGroupSpec.value.name}:`, error);
-        // Continue with next group - don't let one failure break the entire import
+        this.logger.error(`Failed to update tag ${updateTagSpec.value.name}:`, error);
+        // Continue with next tag - don't let one failure break the entire import
       }
     }
 
@@ -450,48 +450,48 @@ export class YamlService {
     };
   }
 
-  async analyseUpsertGroups(upsertGroups: any[]) {
-    if (!upsertGroups?.length) {
+  async analyseUpsertTags(upsertTags: any[]) {
+    if (!upsertTags?.length) {
       return {
-        updateByNameGroups: [],
-        insertGroups: [],
+        updateByNameTags: [],
+        insertTags: [],
       };
     }
 
-    const existingGroups = await this.printerTagService.list();
-    const names = existingGroups.map((p) => p.name.toLowerCase());
-    const ids = existingGroups.map((p) => p.id.toString());
+    const existingTags = await this.printerTagService.listTags();
+    const names = existingTags.map((p) => p.name.toLowerCase());
+    const ids = existingTags.map((p) => p.id.toString());
 
-    const insertGroups = [];
-    const updateByNameGroups = [];
-    for (const group of upsertGroups) {
-      const comparedProperty = group.name.toLowerCase();
+    const insertTags = [];
+    const updateByNameTags = [];
+    for (const tag of upsertTags) {
+      const comparedProperty = tag.name.toLowerCase();
       const foundIndex = names.findIndex((n) => n === comparedProperty);
       if (foundIndex !== -1) {
         if (!ids[foundIndex]) {
-          throw new Error("IDS not found, group name");
+          throw new Error("IDS not found, tag name");
         }
-        updateByNameGroups.push({
+        updateByNameTags.push({
           strategy: "name",
-          groupId: Number.parseInt(ids[foundIndex]),
-          value: group,
+          tagId: Number.parseInt(ids[foundIndex]),
+          value: tag,
         });
         break;
       } else {
-        insertGroups.push(group);
+        insertTags.push(tag);
       }
     }
 
     return {
-      insertGroups,
-      updateByNameGroups,
+      insertTags,
+      updateByNameTags,
     };
   }
 
   async exportYaml(options: z.infer<typeof exportPrintersFloorsYamlSchema>) {
     const input = await validateInput(options, exportPrintersFloorsYamlSchema);
 
-    const { exportFloors, exportPrinters, exportFloorGrid, exportGroups, exportSettings, exportUsers } = input;
+    const { exportFloors, exportPrinters, exportFloorGrid, exportTags, exportSettings, exportUsers } = input;
 
     const dumpedObject = {
       version: process.env.npm_package_version,
@@ -500,7 +500,7 @@ export class YamlService {
       config: input,
       printers: undefined as any,
       floors: undefined as any,
-      groups: undefined as any,
+      tags: undefined as any,
       settings: undefined as any,
       users: undefined as any,
       user_roles: undefined as any,
@@ -549,13 +549,13 @@ export class YamlService {
       });
     }
 
-    if (exportGroups) {
-      const groups = await this.printerTagService.list();
-      dumpedObject.groups = groups.map((g) => {
+    if (exportTags) {
+      const tags = await this.printerTagService.listTags();
+      dumpedObject.tags = tags.map((t) => {
         return {
-          name: g.name,
-          id: g.id,
-          printers: g.printers.map((p) => {
+          name: t.name,
+          id: t.id,
+          printers: t.printers.map((p) => {
             return {
               printerId: p.printerId,
             };
@@ -634,6 +634,18 @@ export class YamlService {
           }
         }
       }
+    }
+
+    // Normalize groups to tags (backwards compatibility)
+    if ((importSpec as any).groups && !importSpec.tags) {
+      importSpec.tags = (importSpec as any).groups;
+      delete (importSpec as any).groups;
+    }
+
+    // Normalize exportGroups to exportTags in config (backwards compatibility)
+    if ((importSpec.config as any).exportGroups !== undefined && importSpec.config.exportTags === undefined) {
+      (importSpec.config as any).exportTags = (importSpec.config as any).exportGroups;
+      delete (importSpec.config as any).exportGroups;
     }
   }
 }
