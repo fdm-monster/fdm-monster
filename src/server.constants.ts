@@ -85,8 +85,6 @@ export const AppConstants = {
   sentryCustomDsnDefault:
     "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",
 
-  debugRoutesKey: "DEBUG_ROUTES",
-
   ENABLE_PROMETHEUS_METRICS: "ENABLE_PROMETHEUS_METRICS",
   ENABLE_LOKI_LOGGING: "ENABLE_LOKI_LOGGING",
   LOKI_ADDRESS: "LOKI_ADDRESS",

@@ -1,7 +1,7 @@
 import { AwilixContainer } from "awilix";
 import { Test } from "supertest";
 import { setupTestApp } from "../../test-server";
-import { expectOkResponse } from "../../extensions";
+import { expectOkResponse, expectRedirectResponse } from "../../extensions";
 import { DITokens } from "@/container.tokens";
 import { AppConstants } from "@/server.constants";
 import { ServerHost } from "@/server.host";
@@ -21,9 +21,9 @@ describe(ServerHost.name, () => {
     expect(serverHost.hasConnected()).toBeTruthy();
   });
 
-  it("should hit API - skipping history redirect - for /api", async () => {
+  it("should redirect to API docs - skipping history redirect - for /api", async () => {
     const response = await request.get(AppConstants.apiRoute).send();
-    expectOkResponse(response);
+    expectRedirectResponse(response);
   });
 
   /**

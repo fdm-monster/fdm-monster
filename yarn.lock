@@ -627,7 +627,6 @@ __metadata:
     dotenv: "npm:17.2.3"
     eventemitter2: "npm:6.4.9"
     express: "npm:4.22.1"
-    express-list-routes: "npm:1.3.2"
     form-data: "npm:4.0.5"
     ftp-srv: "npm:4.6.3"
     helmet: "npm:8.1.0"
@@ -5056,13 +5055,6 @@ __metadata:
   version: 3.1.3
   resolution: "exponential-backoff@npm:3.1.3"
   checksum: 10c0/77e3ae682b7b1f4972f563c6dbcd2b0d54ac679e62d5d32f3e5085feba20483cf28bd505543f520e287a56d4d55a28d7874299941faf637e779a1aa5994d1267
-  languageName: node
-  linkType: hard
-
-"express-list-routes@npm:1.3.2":
-  version: 1.3.2
-  resolution: "express-list-routes@npm:1.3.2"
-  checksum: 10c0/713b7d55a40e2035658d62264828d4599864c287b29c87ab847ae1447677a700b786738ab07566324dca311a400b75eaf760dbd5a8a036932aa0f15f81a5a63b
   languageName: node
   linkType: hard
 

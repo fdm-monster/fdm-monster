@@ -9,7 +9,6 @@ import { AppConstants } from "./server.constants";
 import { superRootPath } from "./utils/fs.utils";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
-import { isProductionEnvironment } from "@/utils/env.utils";
 import { IConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
@@ -109,10 +108,6 @@ export class ServerHost {
 
   async httpListen(app: Application) {
     const port = fetchServerPort();
-    if (!isProductionEnvironment() && this.configService.get<string>(AppConstants.debugRoutesKey, "false") === "true") {
-      const expressListRoutes = require("express-list-routes");
-      expressListRoutes(app, { prefix: "/" });
-    }
 
     if (!port || Number.isNaN(Number.parseInt(port))) {
       throw new Error("The FDM Server requires a numeric port input argument to run");
