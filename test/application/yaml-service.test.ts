@@ -217,7 +217,7 @@ describe(YamlService.name, () => {
     const printer = await printerService.create({ ...testPrinterData, name: "ExportTestPrinter" });
     await floorService.create({
       name: "ExportTestFloor",
-      floor: 99,
+      order: 99,
       printers: [
         {
           x: 1,
@@ -263,7 +263,7 @@ describe(YamlService.name, () => {
     const printer = await printerService.create({ ...testPrinterData, name: "YamlImportTestPrinter" });
     const defaultFloor = await floorService.create({
       name: "Floor1_DifferentName",
-      floor: 15,
+      order: 15,
       printers: [
         {
           // Position is not used in imported floor "Floor1"
@@ -287,7 +287,7 @@ describe(YamlService.name, () => {
     expect(typeof newFloor2.id).toBe("number");
 
     expect(newFloor2).toBeDefined();
-    expect(newFloor2.floor).toBe(16);
+    expect(newFloor2.order).toBe(16);
     expect(newFloor2.printers).toHaveLength(1);
 
     const positionTemp = await floorPositionService.findPosition(newFloor2.id as number, 0, 0);
@@ -295,7 +295,7 @@ describe(YamlService.name, () => {
 
     // The original floor's name is now gone, and the original printer has not been removed from it (overwrite action)
     expect(floors.find((f) => f.name === "Floor1_DifferentName")).toBeUndefined();
-    const mutatedFloor1 = floors.find((f) => f.name === "Floor1" && f.floor === 15)!;
+    const mutatedFloor1 = floors.find((f) => f.name === "Floor1" && f.order === 15)!;
     expect(mutatedFloor1).toBeDefined();
 
     expect(mutatedFloor1.printers).toHaveLength(1);

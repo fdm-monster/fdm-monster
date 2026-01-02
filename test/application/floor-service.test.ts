@@ -19,7 +19,7 @@ describe(FloorService.name, () => {
     // Create it
     const result = await floorService.create({
       name: "TopFloor1",
-      floor: 1,
+      order: 1,
       printers: [],
     });
 
@@ -31,7 +31,7 @@ describe(FloorService.name, () => {
   it("dto mapping floor", async () => {
     const floor = await floorService.create({
       name: "TopFloor1",
-      floor: 11,
+      order: 11,
       printers: [],
     });
     const dto = floorService.toDto(floor);
@@ -43,7 +43,7 @@ describe(FloorService.name, () => {
     // Create it
     const floor = await floorService.create({
       name: "TopFloor1",
-      floor: 2,
+      order: 2,
       printers: [],
     });
 
@@ -60,7 +60,7 @@ describe(FloorService.name, () => {
     // Create it
     const floor = await floorService.create({
       name: "TopFloor1",
-      floor: 3,
+      order: 3,
       printers: [],
     });
 
@@ -81,7 +81,7 @@ describe(FloorService.name, () => {
     // Create it
     let floor = await floorService.create({
       name: "TopFloor1",
-      floor: 4,
+      order: 4,
     });
 
     await floorService.addOrUpdatePrinter(floor.id, { printerId: printer.id, x: 1, y: 1 });

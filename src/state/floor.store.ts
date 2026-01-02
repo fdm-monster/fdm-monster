@@ -18,14 +18,6 @@ export class FloorStore extends KeyDiffCache<FloorDto> {
   async loadStore() {
     const floors = await this.floorService.list();
 
-    if (!floors?.length) {
-      this.logger.log("Creating default floor as non existed");
-      const floor = await this.floorService.createDefaultFloor();
-      const floorDto = this.floorService.toDto(floor);
-      await this.setKeyValue(floor.id, floorDto, true);
-      return;
-    }
-
     const keyValues = floors.map((floor) => ({
       key: floor.id,
       value: this.floorService.toDto(floor),
@@ -81,8 +73,8 @@ export class FloorStore extends KeyDiffCache<FloorDto> {
     return floorDto;
   }
 
-  async updateFloorNumber(floorId: number, floorLevel: number) {
-    const floor = await this.floorService.updateLevel(floorId, floorLevel);
+  async updateFloorOrder(floorId: number, floorLevel: number) {
+    const floor = await this.floorService.updateOrder(floorId, floorLevel);
     const floorDto = this.floorService.toDto(floor);
     await this.setKeyValue(floorId, floorDto, true);
     return floorDto;

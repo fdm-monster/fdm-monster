@@ -402,7 +402,7 @@ export class YamlService {
   async analyseFloorsUpsert(upsertFloors: any[], comparisonStrategy: string) {
     const existingFloors = await this.floorService.list();
     const names = existingFloors.map((p) => p.name.toLowerCase());
-    const floorLevels = existingFloors.map((p) => p.floor);
+    const floorLevels = existingFloors.map((p) => p.order);
     const ids = existingFloors.map((p) => p.id.toString());
 
     const insertFloors = [];
@@ -424,7 +424,7 @@ export class YamlService {
             break;
           }
         } else if (strategy === "floor") {
-          const comparedProperty = floor.floor;
+          const comparedProperty = floor.order;
           const foundIndex = floorLevels.findIndex((n) => n === comparedProperty);
           if (foundIndex !== -1) {
             if (!ids[foundIndex]) {
@@ -529,7 +529,7 @@ export class YamlService {
       dumpedObject.floors = floors.map((f) => {
         const dumpedFloor = {
           id: f.id,
-          floor: f.floor,
+          order: f.order,
           name: f.name,
           printers: undefined as any,
         };
@@ -614,9 +614,16 @@ export class YamlService {
       }
     }
 
-    // Normalize floor data if using sqlite
-    if (databaseTypeSqlite) {
-      for (const floor of importSpec.floors) {
+    // Normalize floor data
+    for (const floor of importSpec.floors) {
+      // Migrate legacy 'floor' property to 'order'
+      if (floor.floor !== undefined && floor.order === undefined) {
+        floor.order = floor.floor;
+        delete floor.floor;
+      }
+
+      // Normalize IDs for sqlite
+      if (databaseTypeSqlite) {
         if (typeof floor.id === "string") {
           floor.id = Number.parseInt(floor.id);
         }

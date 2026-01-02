@@ -33,7 +33,7 @@ describe(DITokens.floorStore, () => {
     expect(floors).toHaveLength(1);
     await floorStore.update(floors[0].id, {
       name: "flo",
-      floor: 1,
+      order: 1,
     });
     const floors2 = await floorStore.listCache();
     expect(floors2).toHaveLength(1);
