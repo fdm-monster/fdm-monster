@@ -2,7 +2,6 @@ import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import {
   credentialSettingsKey,
   frontendSettingKey,
-  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
@@ -16,7 +15,6 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { z } from "zod";
 import {
   credentialSettingUpdateSchema,
-  fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
@@ -53,7 +51,6 @@ export class SettingsStore {
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
-      [printerFileCleanSettingKey]: settings[printerFileCleanSettingKey],
       [timeoutSettingKey]: settings[timeoutSettingKey],
     });
   }
@@ -163,14 +160,6 @@ export class SettingsStore {
     return this.getSettings()[timeoutSettingKey];
   }
 
-  getFileCleanSettings() {
-    return this.getSettings()[printerFileCleanSettingKey];
-  }
-
-  isPreUploadFileCleanEnabled() {
-    return this.getSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
-  }
-
   async setWizardCompleted(version: number) {
     this.settings = await this.settingsService.updateWizardSettings({
       wizardCompleted: true,
@@ -205,11 +194,6 @@ export class SettingsStore {
 
   async updateTimeoutSettings(timeoutSettings: z.infer<typeof timeoutSettingsUpdateSchema>) {
     this.settings = await this.settingsService.updateTimeoutSettings(timeoutSettings);
-    return this.getSettings();
-  }
-
-  async updateFileCleanSettings(fileClean: z.infer<typeof fileCleanSettingsUpdateSchema>) {
-    this.settings = await this.settingsService.updateFileCleanSettings(fileClean);
     return this.getSettings();
   }
 

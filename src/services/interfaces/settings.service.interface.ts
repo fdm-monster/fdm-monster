@@ -1,7 +1,6 @@
 import { SettingsDto } from "@/services/interfaces/settings.dto";
 import {
   credentialSettingUpdateSchema,
-  fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   jwtSecretCredentialSettingUpdateSchema,
   serverSettingsUpdateSchema,
@@ -15,8 +14,6 @@ export interface ISettingsService<Entity = Settings> {
   toDto(entity: Entity): SettingsDto;
 
   getOrCreate(): Promise<Entity>;
-
-  updateFileCleanSettings(update: z.infer<typeof fileCleanSettingsUpdateSchema>): Promise<Entity>;
 
   updateWizardSettings(update: z.infer<typeof wizardUpdateSchema>): Promise<Entity>;
 

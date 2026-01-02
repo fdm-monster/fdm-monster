@@ -3,7 +3,6 @@ import {
   credentialSettingsKey,
   frontendSettingKey,
   getDefaultSettings,
-  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
@@ -14,7 +13,6 @@ import { ISettingsService } from "@/services/interfaces/settings.service.interfa
 import { z } from "zod";
 import {
   credentialSettingUpdateSchema,
-  fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   jwtSecretCredentialSettingUpdateSchema,
   serverSettingsUpdateSchema,
@@ -29,7 +27,6 @@ export class SettingsService extends BaseService(Settings, SettingsDto) implemen
     return {
       [serverSettingsKey]: entity[serverSettingsKey],
       [frontendSettingKey]: entity[frontendSettingKey],
-      [printerFileCleanSettingKey]: entity[printerFileCleanSettingKey],
       [wizardSettingKey]: entity[wizardSettingKey],
       [timeoutSettingKey]: entity[timeoutSettingKey],
     };
@@ -70,14 +67,6 @@ export class SettingsService extends BaseService(Settings, SettingsDto) implemen
     entity[credentialSettingsKey].refreshTokenExpiry = validatedInput.refreshTokenExpiry;
     entity[credentialSettingsKey].refreshTokenAttempts = validatedInput.refreshTokenAttempts;
     entity[credentialSettingsKey].jwtExpiresIn = validatedInput.jwtExpiresIn;
-    await this.update(entity.id, entity);
-    return entity;
-  }
-
-  async updateFileCleanSettings(update: z.infer<typeof fileCleanSettingsUpdateSchema>) {
-    const validatedInput = await validateInput(update, fileCleanSettingsUpdateSchema);
-    const entity = await this.getOrCreate();
-    entity[printerFileCleanSettingKey] = validatedInput;
     await this.update(entity.id, entity);
     return entity;
   }

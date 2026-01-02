@@ -5,9 +5,7 @@ import { AppConstants } from "@/server.constants";
 import {
   credentialSettingsKey,
   frontendSettingKey,
-  getDefaultFileCleanSettings,
   getDefaultFrontendSettings,
-  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
@@ -23,7 +21,6 @@ const sensitiveSettingsRoute = `${defaultRoute}/sensitive`;
 const credentialSettingsRoute = `${defaultRoute}/credential`;
 const experimentalMoonrakerSupport = `${defaultRoute}/experimental-moonraker-support`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
-const fileCleanSettingsRoute = `${defaultRoute}/file-clean`;
 const sentryDiagnosticsRoute = `${defaultRoute}/sentry-diagnostics`;
 
 beforeAll(async () => {
@@ -50,7 +47,6 @@ describe(SettingsController.name, () => {
       wizardVersion: AppConstants.currentWizardVersion,
     });
     expect(body[frontendSettingKey]).toMatchObject(getDefaultFrontendSettings());
-    expect(body[printerFileCleanSettingKey]).toMatchObject(getDefaultFileCleanSettings());
     expect(body.connection).toMatchObject({
       clientIp: expect.any(String),
       version: expect.any(String),
@@ -95,20 +91,6 @@ describe(SettingsController.name, () => {
     expect(response.body).not.toBeNull();
     expect(response.body).toMatchObject({
       [frontendSettingKey]: newFrontendSettings,
-    });
-    expectOkResponse(response);
-  });
-
-  it("should OK on PUT fileClean settings", async () => {
-    const newFileCleanSettings = {
-      autoRemoveOldFilesBeforeUpload: true,
-      autoRemoveOldFilesAtBoot: true,
-      autoRemoveOldFilesCriteriumDays: 30,
-    };
-    const response = await request.put(fileCleanSettingsRoute).send(newFileCleanSettings);
-    expect(response.body).not.toBeNull();
-    expect(response.body).toMatchObject({
-      [printerFileCleanSettingKey]: newFileCleanSettings,
     });
     expectOkResponse(response);
   });

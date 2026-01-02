@@ -46,12 +46,6 @@ export const wizardUpdateSchema = z.object({
   wizardVersion: z.number().int().min(0),
 });
 
-export const fileCleanSettingsUpdateSchema = z.object({
-  autoRemoveOldFilesBeforeUpload: z.boolean(),
-  autoRemoveOldFilesAtBoot: z.boolean(),
-  autoRemoveOldFilesCriteriumDays: z.number().int().min(0),
-});
-
 export const sentryDiagnosticsEnabledSchema = z.object({
   enabled: z.boolean(),
 });

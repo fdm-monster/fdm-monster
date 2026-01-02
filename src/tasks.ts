@@ -22,7 +22,6 @@ export class ServerTasks {
     registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
     registerTask(DITokens.clientDistDownloadTask, TaskPresets.RUNONCE),
     registerTask(DITokens.socketIoTask, TaskPresets.PERIODIC, 500),
-    registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),
     // Every 2 seconds
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 2000, true),
     // Every 15 seconds

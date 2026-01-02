@@ -29,6 +29,7 @@ import {
 } from "@/migrations/1767278216516-ChangeCameraPrinterOnDeleteSetNull";
 import { DropCustomGcode1767279607392 } from "@/migrations/1767279607392-DropCustomGcode";
 import { DropPrintCompletions1767291804417 } from "@/migrations/1767291804417-DropPrintCompletions";
+import { DropSettingsFileClean1767352862576 } from "@/migrations/1767352862576-DropSettingsFileClean";
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
@@ -70,6 +71,7 @@ export const AppDataSource = new DataSource({
     ChangeCameraPrinterOnDeleteSetNull1767278216516,
     DropCustomGcode1767279607392,
     DropPrintCompletions1767291804417,
+    DropSettingsFileClean1767352862576,
   ],
   subscribers: [],
 });
