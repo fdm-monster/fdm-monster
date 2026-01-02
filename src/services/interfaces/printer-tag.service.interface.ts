@@ -9,7 +9,7 @@ export interface IPrinterTagService<Entity = PrinterTag> {
 
   getPrintersByTag(tagId: number): Promise<TagWithPrintersDto>;
 
-  createTag(group: CreateTagDto): Promise<TagWithPrintersDto>;
+  createTag(tag: CreateTagDto): Promise<TagWithPrintersDto>;
 
   updateTagName(tagId: number, name: string): Promise<void>;
 

@@ -29,27 +29,27 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
       };
     }
 
-    for (const group of tags) {
-      tagRecords[group.id].printers = await this.repository.findBy({ tagId: group.id });
+    for (const tag of tags) {
+      tagRecords[tag.id].printers = await this.repository.findBy({ tagId: tag.id });
     }
 
     return Object.values(tagRecords);
   }
 
   async getTag(tagId: number) {
-    const group = await this.tagRepository.findOneBy({ id: tagId });
-    if (!group) {
-      throw new NotFoundException("Group does not exist");
+    const tag = await this.tagRepository.findOneBy({ id: tagId });
+    if (!tag) {
+      throw new NotFoundException("Tag does not exist");
     }
-    return group;
+    return tag;
   }
 
   async getPrintersByTag(tagId: number): Promise<TagWithPrintersDto> {
-    const group = await this.getTag(tagId);
-    const printerTags = await this.repository.findBy({ tagId: group.id });
+    const tag = await this.getTag(tagId);
+    const printerTags = await this.repository.findBy({ tagId: tag.id });
     return {
-      id: group.id,
-      name: group.name,
+      id: tag.id,
+      name: tag.name,
       printers: printerTags,
     };
   }
@@ -58,9 +58,9 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
     await validate(dto);
     const entity = this.tagRepository.create(dto);
     await validate(entity);
-    const group = await this.tagRepository.save(entity);
+    const tag = await this.tagRepository.save(entity);
 
-    return await this.getPrintersByTag(group.id);
+    return await this.getPrintersByTag(tag.id);
   }
 
   async updateTagName(tagId: number, name: string): Promise<void> {
@@ -72,20 +72,20 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
   }
 
   async deleteTag(tagId: number): Promise<void> {
-    const group = await this.getTag(tagId);
-    await this.tagRepository.delete({ id: group.id });
+    const tag = await this.getTag(tagId);
+    await this.tagRepository.delete({ id: tag.id });
   }
 
   async addPrinterToTag(tagId: number, printerId: number): Promise<PrinterTag> {
-    const group = await this.getTag(tagId);
+    const tag = await this.getTag(tagId);
     const alreadyExisting = await this.repository.findOneBy({
-      tagId: group.id,
+      tagId: tag.id,
       printerId,
     });
     if (alreadyExisting) return alreadyExisting;
 
     return await this.create({
-      tagId: group.id,
+      tagId: tag.id,
       printerId,
     });
   }
