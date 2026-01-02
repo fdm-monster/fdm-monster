@@ -19,7 +19,7 @@ const getRoute = (id: number) => `${listRoute}/${id}`;
 const addPrinterToFloorRoute = (id: number) => `${listRoute}/${id}/printer`;
 const deleteRoute = (id: number) => `${listRoute}/${id}`;
 const updateNameRoute = (id: number) => `${getRoute(id)}/name`;
-const updateFloorNumberRoute = (id: number) => `${getRoute(id)}/floor-number`;
+const updateFloorOrderRoute = (id: number) => `${getRoute(id)}/floor-order`;
 
 let request: TestAgent<Test>;
 
@@ -94,7 +94,7 @@ describe(FloorController.name, () => {
 
   it("should be able to update floor number", async () => {
     const floor = await createTestFloor(request, "Floor123", 5070);
-    const response = await request.patch(updateFloorNumberRoute(floor.id)).send({
+    const response = await request.patch(updateFloorOrderRoute(floor.id)).send({
       floor: 5071,
     });
     expectOkResponse(response, { name: "Floor123", order: 5071 });
