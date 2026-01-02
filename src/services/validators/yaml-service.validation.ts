@@ -7,7 +7,7 @@ import {
   printerUrlValidator,
 } from "@/services/validators/printer-service.validation";
 import {
-  floorLevelValidator,
+  floorOrderValidator,
   floorNameValidator,
   xValidator,
   yValidator,
@@ -84,7 +84,9 @@ export const importPrintersFloorsYamlSchema = z.object({
     .array(
       z.object({
         id: numberOrStringIdValidator,
-        floor: floorLevelValidator,
+        order: floorOrderValidator,
+        // Legacy property
+        floor: floorOrderValidator.optional(),
         name: floorNameValidator,
         printers: printerPositionsSchema,
       }),
