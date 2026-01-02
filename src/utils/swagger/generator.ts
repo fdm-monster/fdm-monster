@@ -2,8 +2,14 @@ import { OpenAPIObject, PathItemObject, SchemaObject } from "openapi3-ts/oas31";
 import { API_METADATA_KEY } from "@/utils/swagger/decorators";
 import { findControllers, FindControllersResult } from "awilix-express";
 import { IRouteConfig, MethodName } from "awilix-router-core/lib/state-util";
+import { LoggerService } from "@/handlers/logger";
 
 export class SwaggerGenerator {
+  private readonly logger: LoggerService;
+
+  constructor(logger: LoggerService) {
+    this.logger = logger;
+  }
   private readonly openApiDoc: OpenAPIObject = {
     openapi: "3.1.0",
     info: {
@@ -55,8 +61,9 @@ export class SwaggerGenerator {
       for (const registration of discoveredControllers) {
         await this.processController(registration);
       }
+      this.logger.log(`Generated OpenAPI spec with ${Object.keys(this.openApiDoc.paths || {}).length} paths`);
     } catch (error) {
-      console.error("Generate swagger error: ", error);
+      this.logger.error("Failed to generate swagger specification", error);
     }
 
     return this.openApiDoc;
@@ -80,10 +87,10 @@ export class SwaggerGenerator {
 
     const method = methodName.toString();
     const name = method.toLowerCase();
-    for (let path of methodConfig.paths) {
-      path = root.paths[0] + path;
+    for (let methodPath of methodConfig.paths) {
+      methodPath = root.paths[0] + methodPath;
       // Convert Express path format (:id) to OpenAPI format ({id})
-      path = path.replace(/:([a-zA-Z0-9_]+)/g, "{$1}");
+      methodPath = methodPath.replaceAll(/:([a-zA-Z0-9_]+)/g, "{$1}");
 
       const metadata = Reflect.getMetadata(API_METADATA_KEY, controller.target);
       for (const verb of methodConfig.verbs) {
@@ -104,8 +111,7 @@ export class SwaggerGenerator {
         } as any;
 
         // Extract path parameters from the path (e.g., {id}, {userId}, etc.)
-        const pathParams = this.extractPathParameters(path);
-        operationObject.parameters = pathParams;
+        operationObject.parameters = this.extractPathParameters(methodPath);
 
         // Process method parameters and response type
         const paramTypes = Reflect.getMetadata("design:paramtypes", controller.target, name);
@@ -128,12 +134,10 @@ export class SwaggerGenerator {
           [httpMethod]: operationObject,
         };
 
-        if (!this.openApiDoc.paths) {
-          this.openApiDoc.paths = {};
-        }
+        this.openApiDoc.paths ??= {};
 
-        this.openApiDoc.paths[path] = {
-          ...(this.openApiDoc.paths[path] || {}),
+        this.openApiDoc.paths[methodPath] = {
+          ...(this.openApiDoc.paths[methodPath] || {}),
           ...operation,
         };
       }

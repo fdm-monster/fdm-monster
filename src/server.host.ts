@@ -72,7 +72,7 @@ export class ServerHost {
 
     // Setup Swagger documentation (if enabled)
     if (!swaggerDisabled) {
-      await setupSwagger(app);
+      await setupSwagger(app, this.logger);
       this.logger.log("Swagger/OpenAPI documentation enabled");
     } else {
       this.logger.log("Swagger/OpenAPI documentation disabled");

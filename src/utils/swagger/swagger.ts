@@ -1,10 +1,10 @@
-// src/swagger/setup.ts
 import { SwaggerGenerator } from "./generator";
-import * as fs from "node:fs/promises";
 import { Express, static as expressStatic } from "express";
 import { join, dirname } from "node:path";
 import { AppConstants } from "@/server.constants";
 import { superRootPath, ensureDirExists } from "@/utils/fs.utils";
+import { LoggerService } from "@/handlers/logger";
+import { writeFile } from "node:fs/promises";
 
 // Find swagger-ui-dist path
 function getSwaggerUiDistPath(): string {
@@ -59,52 +59,26 @@ function generateSwaggerHTML(): string {
   `.trim();
 }
 
-export async function setupSwagger(app: Express) {
-  const generator = new SwaggerGenerator();
+export async function setupSwagger(app: Express, logger: LoggerService) {
+  const generator = new SwaggerGenerator(logger);
   const specification = await generator.generate();
 
   // Conditionally save specification to file
   const generateJsonFile = process.env[AppConstants.GENERATE_SWAGGER_JSON] === "true";
-  console.log(`GENERATE_SWAGGER_JSON flag: ${process.env[AppConstants.GENERATE_SWAGGER_JSON]} (enabled: ${generateJsonFile})`);
 
   if (generateJsonFile) {
     try {
       const mediaPath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
-      console.log(`Media path: ${mediaPath}`);
-      console.log(`Super root path: ${superRootPath()}`);
-
       ensureDirExists(mediaPath);
-      console.log(`Directory ensured/created`);
 
       const swaggerJsonPath = join(mediaPath, "swagger.json");
       const jsonContent = JSON.stringify(specification, null, 2);
-      console.log(`Writing ${jsonContent.length} bytes to ${swaggerJsonPath}`);
 
-      await fs.writeFile(swaggerJsonPath, jsonContent, "utf-8");
-      console.log(`File write completed successfully`);
-
-      // Verify file exists
-      try {
-        const stats = await fs.stat(swaggerJsonPath);
-        console.log(`File verified: ${stats.size} bytes`);
-
-        // Also check if file is readable
-        const readBack = await fs.readFile(swaggerJsonPath, "utf-8");
-        console.log(`File read back successfully: ${readBack.length} bytes`);
-
-        // List directory contents
-        const dirContents = await fs.readdir(mediaPath);
-        console.log(`Media directory contains: ${dirContents.join(", ")}`);
-      } catch (statError) {
-        console.error(`Failed to verify file:`, statError);
-      }
-
-      console.log(`Swagger JSON generated at: ${swaggerJsonPath}`);
+      await writeFile(swaggerJsonPath, jsonContent, "utf-8");
+      logger.log(`Swagger JSON file generated at: ${swaggerJsonPath}`);
     } catch (error) {
-      console.error("Failed to generate swagger.json file:", error);
+      logger.error("Failed to generate swagger.json file", error);
     }
-  } else {
-    console.log("Swagger JSON file generation disabled");
   }
 
   // Serve swagger-ui-dist static files
