@@ -28,8 +28,6 @@ import { PrinterFilesLoadTask } from "./tasks/printer-files-load.task";
 import { ROLES } from "./constants/authorization.constants";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
 import { ConfigService, IConfigService } from "./services/core/config.service";
-import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
-import { PrintCompletionService } from "./services/orm/print-completion.service";
 import { SocketIoGateway } from "./state/socket-io.gateway";
 import { ClientBundleService } from "./services/core/client-bundle.service";
 import { FloorStore } from "./state/floor.store";
@@ -102,7 +100,6 @@ export function configureContainer() {
     [di.userRoleService]: asClass(UserRoleService).singleton(),
     [di.roleService]: asClass(RoleService).singleton(),
     [di.permissionService]: asClass(PermissionService).singleton(),
-    [di.printCompletionService]: asClass(PrintCompletionService).singleton(),
     // -- asClass --
     [di.serverHost]: asClass(ServerHost).singleton(),
     [di.exceptionFilter]: asClass(ExceptionFilter).singleton(),
@@ -171,7 +168,6 @@ export function configureContainer() {
     [di.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
     [di.socketIoTask]: asClass(SocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
     [di.clientDistDownloadTask]: asClass(ClientDistDownloadTask).singleton(),
-    [di.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
     [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
