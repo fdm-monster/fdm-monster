@@ -4,5 +4,5 @@ import { join } from "path";
 export const loadControllersFunc = () =>
   loadControllers("./controllers/*.controller.*", {
     cwd: join(__dirname, ".."),
-    ignore: ["**/*.map"],
+    ignore: ["**/*.map", "**/*.d.ts"],
   });

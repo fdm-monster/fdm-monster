@@ -13,8 +13,8 @@ import { isProductionEnvironment } from "@/utils/env.utils";
 import { IConfigService } from "@/services/core/config.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { SettingsStore } from "@/state/settings.store";
 import { loadControllersFunc } from "@/shared/load-controllers";
+import { setupSwagger } from "@/utils/swagger/swagger";
 
 export class ServerHost {
   private readonly logger: LoggerService;
@@ -22,7 +22,6 @@ export class ServerHost {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly configService: IConfigService,
-    private readonly settingsStore: SettingsStore,
     private readonly bootTask: BootTask,
     private readonly socketIoGateway: SocketIoGateway,
     private readonly typeormService: TypeormService,
@@ -32,7 +31,7 @@ export class ServerHost {
   }
 
   async boot(app: Application, quick_boot = false, listenRequests = true) {
-    this.serveControllerRoutes(app);
+    await this.serveControllerRoutes(app);
 
     if (!quick_boot) {
       await this.bootTask.runOnce();
@@ -45,13 +44,23 @@ export class ServerHost {
     return this.typeormService.hasConnected();
   }
 
-  serveControllerRoutes(app: Application) {
+  async serveControllerRoutes(app: Application) {
+    const swaggerDisabled = process.env[AppConstants.DISABLE_SWAGGER_OPENAPI] === "true";
+
+    // Redirect /api to swagger documentation (must be before controller loading)
+    if (!swaggerDisabled) {
+      app.get("/api", (_req, res) => {
+        res.redirect("/api-docs/swagger.json");
+      });
+    }
+
     // Catches any HTML request to paths like / or file/ as long as its text/html
     app
       .use((req, res, next) => {
         if (
           !req.originalUrl.startsWith("/metrics") &&
           !req.originalUrl.startsWith("/api") &&
+          !req.originalUrl.startsWith("/api-docs") &&
           !req.originalUrl.startsWith("/socket.io")
         ) {
           history()(req, res, next);
@@ -60,6 +69,14 @@ export class ServerHost {
         }
       })
       .use(loadControllersFunc());
+
+    // Setup Swagger documentation (if enabled)
+    if (!swaggerDisabled) {
+      await setupSwagger(app);
+      this.logger.log("Swagger/OpenAPI documentation enabled");
+    } else {
+      this.logger.log("Swagger/OpenAPI documentation disabled");
+    }
 
     const bundleDistPath = join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist");
     const backupClientPath = join(superRootPath(), "node_modules", AppConstants.clientPackageName, "dist");
@@ -74,7 +91,7 @@ export class ServerHost {
       const path = req.originalUrl;
 
       let resource = "MVC";
-      if (path.startsWith("/socket.io") || path.startsWith("/api") || path.startsWith("/metrics")) {
+      if (path.startsWith("/socket.io") || path.startsWith("/api") || path.startsWith("/metrics") || path.startsWith("/api-docs")) {
         resource = "API";
       } else if (path.endsWith(".min.js")) {
         resource = "client-bundle";
@@ -101,9 +118,13 @@ export class ServerHost {
       throw new Error("The FDM Server requires a numeric port input argument to run");
     }
 
+    const swaggerDisabled = process.env[AppConstants.DISABLE_SWAGGER_OPENAPI] === "true";
     const hostOrFqdn = "0.0.0.0";
     const server = app.listen(parseInt(port), hostOrFqdn, () => {
       this.logger.log(`Server started... open it at http://127.0.0.1:${port}`);
+      if (!swaggerDisabled) {
+        this.logger.log(`API Documentation available at http://127.0.0.1:${port}/api-docs`);
+      }
     });
     this.socketIoGateway.attachServer(server);
   }
