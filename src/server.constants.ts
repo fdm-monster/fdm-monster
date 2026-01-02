@@ -17,6 +17,7 @@ export const AppConstants = {
   defaultClientBundleZipsStorage: "./media/client-dist-zips",
   defaultPrinterThumbnailsStorage: "./media/printer-thumbnails",
   defaultFileUploadsStorage: "./media/file-uploads",
+  defaultPrintFilesStorage: "./media/files",
   defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
   defaultAcceptedBambuExtensions: [".gcode", ".3mf"],
   defaultServerPort: 4000,

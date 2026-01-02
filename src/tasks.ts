@@ -28,5 +28,7 @@ export class ServerTasks {
     registerTask(DITokens.printerWebsocketRestoreTask, TaskPresets.PERIODIC, 15 * 1000, false),
     // Load printer files in background after boot
     registerTask(DITokens.printerFilesLoadTask, TaskPresets.RUNDELAYED, 1000),
+    // Analyze pending print jobs every 30 seconds
+    registerTask(DITokens.printJobAnalysisTask, TaskPresets.PERIODIC, 30 * 1000, false),
   ];
 }

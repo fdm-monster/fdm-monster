@@ -67,6 +67,11 @@ import { BambuClient } from "@/services/bambu/bambu.client";
 import { BambuMqttAdapter } from "@/services/bambu/bambu-mqtt.adapter";
 import { BambuFtpAdapter } from "@/services/bambu/bambu-ftp.adapter";
 import { BambuApi } from "@/services/bambu.api";
+import { PrintQueueService } from "@/services/print-queue.service";
+import { FileStorageService } from "@/services/file-storage.service";
+import { PrintJobService } from "@/services/orm/print-job.service";
+import { FileAnalysisService } from "@/services/file-analysis.service";
+import { PrintJobAnalysisTask } from "@/tasks/print-job-analysis.task";
 
 export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -162,6 +167,10 @@ export function configureContainer() {
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
     [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
     [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
+    [di.printJobService]: asClass(PrintJobService).singleton(),
+    [di.printQueueService]: asClass(PrintQueueService).singleton(),
+    [di.fileStorageService]: asClass(FileStorageService).singleton(),
+    [di.fileAnalysisService]: asClass(FileAnalysisService).singleton(),
 
     [di.bootTask]: asClass(BootTask),
     [di.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
@@ -170,6 +179,7 @@ export function configureContainer() {
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
     [di.printerFilesLoadTask]: asClass(PrinterFilesLoadTask).singleton(),
+    [di.printJobAnalysisTask]: asClass(PrintJobAnalysisTask).singleton(),
   });
 
   return container;

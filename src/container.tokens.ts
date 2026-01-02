@@ -20,6 +20,9 @@ export const DITokens = {
   printerTagService: "printerTagService",
   floorPositionService: "floorPositionService",
   printJobService: "printJobService",
+  printQueueService: "printQueueService",
+  fileStorageService: "fileStorageService",
+  fileAnalysisService: "fileAnalysisService",
   floorService: "floorService",
   yamlService: "yamlService",
   settingsService: "settingsService",
@@ -76,4 +79,5 @@ export const DITokens = {
   printerWebsocketTask: "printerWebsocketTask",
   printerWebsocketRestoreTask: "printerWebsocketRestoreTask",
   printerFilesLoadTask: "printerFilesLoadTask",
+  printJobAnalysisTask: "printJobAnalysisTask",
 } as const;

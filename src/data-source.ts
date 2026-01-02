@@ -28,10 +28,12 @@ import {
   ChangeCameraPrinterOnDeleteSetNull1767278216516
 } from "@/migrations/1767278216516-ChangeCameraPrinterOnDeleteSetNull";
 import { DropCustomGcode1767279607392 } from "@/migrations/1767279607392-DropCustomGcode";
+import { PrintJob } from "@/entities/print-job.entity";
 import { DropPrintCompletions1767291804417 } from "@/migrations/1767291804417-DropPrintCompletions";
 import { DropSettingsFileClean1767352862576 } from "@/migrations/1767352862576-DropSettingsFileClean";
 import { ChangeFloorNonUniqueOrder1767370191762 } from "@/migrations/1767370191762-ChangeFloorNonUniqueOrder";
 import { RenameGroupToTag1767432108916 } from "@/migrations/1767432108916-RenameGroupToTag";
+import { CreatePrintJob1767293504692 } from "@/migrations/1767293504692-CreatePrintJob";
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
@@ -60,6 +62,7 @@ export const AppDataSource = new DataSource({
     UserRole,
     Tag,
     PrinterTag,
+    PrintJob
   ],
   migrations: [
     InitSqlite1706829146617,
@@ -76,6 +79,7 @@ export const AppDataSource = new DataSource({
     DropSettingsFileClean1767352862576,
     ChangeFloorNonUniqueOrder1767370191762,
     RenameGroupToTag1767432108916
+    CreatePrintJob1767293504692
   ],
   subscribers: [],
 });

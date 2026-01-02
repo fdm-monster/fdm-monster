@@ -2,6 +2,7 @@ import { before, DELETE, GET, POST, route } from "awilix-express";
 import { authenticate, authorizeRoles, permission } from "@/middleware/authenticate";
 import { validateInput } from "@/handlers/validators";
 import { AppConstants } from "@/server.constants";
+import * as path from "node:path";
 import {
   downloadFileSchema,
   getFileSchema,
@@ -23,6 +24,10 @@ import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { getScopedPrinter } from "@/middleware/printer-resolver";
+import { PrintJobService } from "@/services/orm/print-job.service";
+import { FileAnalysisService } from "@/services/file-analysis.service";
+import { FileStorageService } from "@/services/file-storage.service";
+import * as fsSync from "fs";
 
 @route(AppConstants.apiRoute + "/printer-files")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR]), printerResolveMiddleware()])
@@ -34,6 +39,9 @@ export class PrinterFilesController {
     private readonly printerApi: IPrinterApi,
     private readonly printerLogin: LoginDto,
     private readonly printerFilesStore: PrinterFilesStore,
+    private readonly printJobService: PrintJobService,
+    private readonly fileAnalysisService: FileAnalysisService,
+    private readonly fileStorageService: FileStorageService,
     private readonly settingsStore: SettingsStore,
     private readonly multerService: MulterService,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
@@ -232,19 +240,134 @@ export class PrinterFilesController {
     });
     await this.printerFilesStore.loadFiles(currentPrinterId);
 
-    try {
-      if (this.settingsStore.isThumbnailSupportEnabled()) {
-        await this.printerThumbnailCache.loadPrinterThumbnailLocal(currentPrinterId, files[0].path);
-      }
-    } catch (e) {
-      this.logger.error(`Unexpected error processing thumbnail ${errorSummary(e)}`);
-      captureException(e);
-    }
+    // Process file: analyze, store, create job
+    const ext = path.extname(uploadedFile.originalname);
+    const tempPathWithExt = uploadedFile.path + ext;
 
     try {
-      this.multerService.clearUploadedFile(uploadedFile);
-    } catch (e) {
-      this.logger.error(`Could not remove uploaded file from temporary storage ${errorSummary(e)}`);
+      this.logger.log(`Processing uploaded file: ${uploadedFile.originalname} (ext: ${ext})`);
+
+      // Copy file with proper extension for hash calculation and analysis
+      if (!fsSync.existsSync(uploadedFile.path)) {
+        throw new Error(`Upload file does not exist: ${uploadedFile.path}`);
+      }
+
+      fsSync.copyFileSync(uploadedFile.path, tempPathWithExt);
+
+          // Calculate hash for deduplication
+          const fileHash = await this.fileStorageService.calculateFileHash(tempPathWithExt);
+          this.logger.log(`File hash: ${fileHash.substring(0, 12)}...`);
+
+          // Check if file already analyzed (by hash)
+          const existingJob = await this.fileStorageService.findDuplicateByHash(fileHash);
+
+          let metadata;
+          let fileStorageId;
+
+          if (existingJob && existingJob.fileStorageId) {
+            // Found duplicate by hash - REUSE existing storage file
+            const cachedMetadata = await this.fileStorageService.loadMetadata(existingJob.fileStorageId);
+
+            if (cachedMetadata) {
+              // Use cached metadata from JSON file (fastest - no re-analysis, no re-storage)
+              this.logger.log(`Duplicate file detected (job ${existingJob.id}, hash match) - reusing storage ${existingJob.fileStorageId}`);
+              metadata = {
+                ...cachedMetadata,
+                fileName: uploadedFile.originalname, // Update filename to current upload
+              };
+              fileStorageId = existingJob.fileStorageId; // REUSE existing storage!
+            } else if (existingJob.analysisState === "ANALYZED" && existingJob.metadata) {
+              // No JSON cache, but have metadata in DB - use it and create JSON
+              this.logger.log(`Duplicate file with DB metadata (job ${existingJob.id}) - reusing storage ${existingJob.fileStorageId}`);
+              metadata = {
+                ...existingJob.metadata,
+                fileName: uploadedFile.originalname,
+              };
+              fileStorageId = existingJob.fileStorageId; // REUSE existing storage!
+
+              // Save metadata JSON for future deduplication (preserve original filename)
+              await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, uploadedFile.originalname);
+            } else {
+              // Duplicate hash but not analyzed - reuse storage, analyze file
+              this.logger.log(`Duplicate file not analyzed - reusing storage ${existingJob.fileStorageId}, analyzing now`);
+
+              // Get existing file for analysis
+              const existingFilePath = this.fileStorageService.getFilePath(existingJob.fileStorageId);
+              const analysisResult = await this.fileAnalysisService.analyzeFile(existingFilePath);
+              metadata = analysisResult.metadata;
+
+              fileStorageId = existingJob.fileStorageId; // REUSE existing storage!
+              await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, uploadedFile.originalname);
+              this.logger.log(`Analysis complete and cached: ${fileStorageId}`);
+            }
+          } else {
+            // New file - analyze BEFORE saving (saveFile moves the original!)
+            this.logger.log(`Analyzing new file: ${uploadedFile.originalname}`);
+            const analysisResult = await this.fileAnalysisService.analyzeFile(tempPathWithExt);
+            metadata = analysisResult.metadata;
+            const thumbnails = analysisResult.thumbnails;
+            this.logger.log(`Analysis complete: format=${metadata.fileFormat}, layers=${metadata.totalLayers}, time=${metadata.gcodePrintTimeSeconds}s, filament=${metadata.filamentUsedGrams}g, thumbnails=${thumbnails.length}`);
+
+            // Now save file to storage with deterministic ID (moves file from temp to permanent storage)
+            fileStorageId = await this.fileStorageService.saveFile(uploadedFile, fileHash);
+            this.logger.log(`Saved file to storage: ${fileStorageId} (deterministic from hash+name)`);
+
+            // Save thumbnails
+            let thumbnailMetadata: any[] = [];
+            if (thumbnails.length > 0) {
+              thumbnailMetadata = await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails);
+              this.logger.log(`Saved ${thumbnailMetadata.length} thumbnail(s) for ${fileStorageId}`);
+            }
+
+            // Save metadata JSON with thumbnail index
+            await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, uploadedFile.originalname, thumbnailMetadata);
+            this.logger.log(`Saved metadata JSON for ${fileStorageId}`);
+          }
+
+          // Create job with analyzed metadata, hash, and storageId
+          const job = await this.printJobService.createPendingJob(
+            currentPrinterId,
+            uploadedFile.originalname,
+            metadata,
+            currentPrinter.name
+          );
+
+          // Update job with storage info
+          job.fileStorageId = fileStorageId;
+          job.fileHash = fileHash;
+          await this.printJobService.printJobRepository.save(job);
+
+          this.logger.log(
+            `Created job ${job.id}: format=${job.fileFormat}, ` +
+            `state=${job.analysisState}, ` +
+            `storageId=${fileStorageId}, ` +
+            `hash=${fileHash.substring(0, 8)}...`
+          );
+
+      // Clean up temp analysis file
+      if (fsSync.existsSync(tempPathWithExt)) {
+        fsSync.unlinkSync(tempPathWithExt);
+      }
+
+      // Load legacy printer thumbnail if enabled
+      if (this.settingsStore.isThumbnailSupportEnabled()) {
+        try {
+          await this.printerThumbnailCache.loadPrinterThumbnailLocal(currentPrinterId, uploadedFile.path);
+        } catch (thumbError) {
+          this.logger.warn(`Legacy printer thumbnail extraction failed: ${errorSummary(thumbError)}`);
+        }
+      }
+    } catch (error) {
+      this.logger.error(`File processing failed: ${errorSummary(error)}`);
+      captureException(error);
+      // Don't throw - allow upload to succeed even if analysis/storage fails
+    } finally {
+      // Always clean up temp file
+      try {
+        this.multerService.clearUploadedFile(uploadedFile);
+      } catch (e) {
+        this.logger.error(`Could not remove uploaded file from temporary storage ${errorSummary(e)}`);
+      }
     }
 
     res.send();
