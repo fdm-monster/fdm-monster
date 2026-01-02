@@ -9,7 +9,7 @@ export class Floor {
   @Column()
   name: string;
 
-  @Column({})
+  @Column()
   order: number;
 
   @OneToMany(
