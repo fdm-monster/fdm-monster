@@ -46,13 +46,6 @@ export class ServerHost {
   async serveControllerRoutes(app: Application) {
     const swaggerDisabled = process.env[AppConstants.DISABLE_SWAGGER_OPENAPI] === "true";
 
-    // Redirect /api to swagger documentation (must be before controller loading)
-    if (!swaggerDisabled) {
-      app.get("/api", (_req, res) => {
-        res.redirect("/api-docs/swagger.json");
-      });
-    }
-
     // Catches any HTML request to paths like / or file/ as long as its text/html
     app
       .use((req, res, next) => {

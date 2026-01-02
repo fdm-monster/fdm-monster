@@ -25,16 +25,16 @@ export class MulterService {
   }
 
   public clearUploadsFolder() {
-    const fileStoragePath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
-    if (!existsSync(fileStoragePath)) return;
+    const fileUploadsPath = join(superRootPath(), AppConstants.defaultFileUploadsStorage);
+    if (!existsSync(fileUploadsPath)) return;
 
-    const files = readdirSync(fileStoragePath, { withFileTypes: true })
+    const files = readdirSync(fileUploadsPath, { withFileTypes: true })
       .filter((item) => !item.isDirectory())
       .map((item) => item.name);
 
     for (const file of files) {
       try {
-        rmSync(join(fileStoragePath, file));
+        rmSync(join(fileUploadsPath, file));
       } catch (error) {
         this.logger.error(`Could not clear upload file in temporary folder ${errorSummary(error)}`);
       }

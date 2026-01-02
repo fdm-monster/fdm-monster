@@ -17,6 +17,7 @@
 - Camera should tolerate printer deletion: SET NULL applied to Foreign Key
 - Quick stop API endpoint moved to printer controller, removing the need for custom gcode api controller.
 - Drop printer file clean task, outdated concept
+- File uploads now go to media/file-uploads instead of media
 
 ## Chore
 - Remove batch/single set gcode analysis to false
