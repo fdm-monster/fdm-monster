@@ -9,10 +9,8 @@ export class Floor {
   @Column()
   name: string;
 
-  @Column({
-    unique: true,
-  })
-  floor: number;
+  @Column({})
+  order: number;
 
   @OneToMany(
     () => FloorPosition,

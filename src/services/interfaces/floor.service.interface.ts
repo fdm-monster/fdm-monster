@@ -5,8 +5,6 @@ import { FindOneOptions } from "typeorm";
 export interface IFloorService {
   create(input: CreateFloorDto): Promise<Floor>;
 
-  createDefaultFloor(): Promise<Floor>;
-
   delete(floorId: number): Promise<void>;
 
   addOrUpdatePrinter(floorId: number, position: CreatePositionDto): Promise<Floor>;
@@ -23,7 +21,7 @@ export interface IFloorService {
 
   update(floorId: number, input: UpdateFloorDto): Promise<Floor>;
 
-  updateLevel(floorId: number, level: number): Promise<Floor>;
+  updateOrder(floorId: number, order: number): Promise<Floor>;
 
   updateName(floorId: number, name: string): Promise<Floor>;
 }

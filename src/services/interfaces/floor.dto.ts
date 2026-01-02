@@ -15,18 +15,18 @@ export class CreatePositionDto {
 export class FloorDto {
   id: number;
   name: string;
-  floor: number;
+  order: number;
   printers: PositionDto[];
 }
 
 export class CreateFloorDto {
   printers?: CreatePositionDto[];
   name: string;
-  floor: number;
+  order: number;
 }
 
 export class UpdateFloorDto {
   printers?: PositionDto[];
   name?: string;
-  floor?: number;
+  order?: number;
 }

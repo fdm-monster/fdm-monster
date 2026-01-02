@@ -52,10 +52,10 @@ export class FloorController {
   }
 
   @PATCH()
-  @route("/:id/floor-number")
+  @route("/:id/floor-order")
   @before([permission(PERMS.Floors.Update), ParamId("id")])
-  async updateFloorNumber(req: Request, res: Response) {
-    const floor = await this.floorStore.updateFloorNumber(req.local.id, req.body.floor);
+  async updateFloorOrder(req: Request, res: Response) {
+    const floor = await this.floorStore.updateFloorOrder(req.local.id, req.body.floor);
     res.send(floor);
   }
 
