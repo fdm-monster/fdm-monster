@@ -5,7 +5,6 @@ import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import {
   credentialSettingUpdateSchema,
-  fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   moonrakerSupportSchema,
   prusaLinkSupportSchema,
@@ -173,15 +172,6 @@ export class SettingsController {
     const validatedInput = await validateInput(req.body, credentialSettingUpdateSchema);
     await this.settingsStore.updateCredentialSettings(validatedInput);
     res.send();
-  }
-
-  @PUT()
-  @route("/file-clean")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
-  async updateFileCleanSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, fileCleanSettingsUpdateSchema);
-    const result = await this.settingsStore.updateFileCleanSettings(validatedInput);
-    res.send(result);
   }
 
   @PUT()

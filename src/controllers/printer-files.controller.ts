@@ -34,7 +34,6 @@ export class PrinterFilesController {
     private readonly printerApi: IPrinterApi,
     private readonly printerLogin: LoginDto,
     private readonly printerFilesStore: PrinterFilesStore,
-    private readonly printJobService: PrintJobService,
     private readonly settingsStore: SettingsStore,
     private readonly multerService: MulterService,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
