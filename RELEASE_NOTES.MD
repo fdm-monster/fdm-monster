@@ -3,6 +3,7 @@
 ## Feat
 
 - Add mock camera console to project (for development)
+- Add swagger and OpenAPI integration
 
 ## Fixes
 

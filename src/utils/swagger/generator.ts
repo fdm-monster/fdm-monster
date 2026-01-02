@@ -9,7 +9,7 @@ export class SwaggerGenerator {
     info: {
       title: "FDM Monster API",
       version: process.env.npm_package_version || "2.0.0",
-      description: "FDM Monster is a bulk OctoPrint manager to set up, configure and monitor 3D printers. Our aim is to provide extremely optimized websocket performance and reliability.",
+      description: "FDM Monster is a bulk OctoPrint, Klipper, PrusaLink and BambuLab manager to set up, configure and monitor 3D printers. Our aim is to provide neat overview over your farm.",
       license: {
         name: "AGPL-3.0-or-later",
         url: "https://www.gnu.org/licenses/agpl-3.0.en.html",
