@@ -54,7 +54,7 @@ describe(FloorController.name, () => {
     expectInvalidResponse(createResponse);
   });
 
-  it("should not be able to create floor with same floor level number", async () => {
+  it("should be able to create floor with same floor order number", async () => {
     const order = 234;
     const body = await createTestFloor(request, "Floor101", order);
     expect(body.name).toBe("Floor101");
@@ -63,7 +63,7 @@ describe(FloorController.name, () => {
       order: order,
       printers: [],
     });
-    expectInternalServerError(createResponse);
+    expectOkResponse(createResponse);
   });
 
   it("should be able to create floor with different floor numbers", async () => {
@@ -92,7 +92,7 @@ describe(FloorController.name, () => {
     expectOkResponse(response, { name: "newName" });
   });
 
-  it("should be able to update floor number", async () => {
+  it("should be able to update floor order", async () => {
     const floor = await createTestFloor(request, "Floor123", 5070);
     const response = await request.patch(updateFloorOrderRoute(floor.id)).send({
       floor: 5071,

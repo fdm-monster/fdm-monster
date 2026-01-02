@@ -4,6 +4,7 @@
 
 - Add mock camera console to project (for development)
 - Add swagger and OpenAPI integration
+- UI Client is now fdm-monster-client-next at v2.0.0
 
 ## Fixes
 
