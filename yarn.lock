@@ -566,17 +566,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fdm-monster/client-next@npm:0.1.0":
-  version: 0.1.0
-  resolution: "@fdm-monster/client-next@npm:0.1.0"
-  checksum: 10c0/314786a1542d2d36632277b44b2dda48aa4238e6c910e7857ff3bdda796f0a53bac9277c59b614bf09fd5d1f62360b202ebbd30b99fae6e1c8de922bd4dbef0d
-  languageName: node
-  linkType: hard
-
-"@fdm-monster/client@npm:1.13.0":
-  version: 1.13.0
-  resolution: "@fdm-monster/client@npm:1.13.0"
-  checksum: 10c0/2990c801f2b69c5e9c8c2cdbcd1aac7936c3a96847eb82684512862324c833becb274630fd7c046722e7ba4178eb26cc0ed743459d4084c16b37c6b9def2b6ea
+"@fdm-monster/client-next@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@fdm-monster/client-next@npm:2.0.0"
+  checksum: 10c0/576777d0d9cb6bb46947e2da38ef423a4783d0f6c57b1cbbd784c668af6c7f69f23272674b08d7d657ccfdc3c554244c4ccb8ebea93ca63c07ac9105baf467cc
   languageName: node
   linkType: hard
 
@@ -585,8 +578,7 @@ __metadata:
   resolution: "@fdm-monster/server@workspace:."
   dependencies:
     "@biomejs/biome": "npm:2.3.10"
-    "@fdm-monster/client": "npm:1.13.0"
-    "@fdm-monster/client-next": "npm:0.1.0"
+    "@fdm-monster/client-next": "npm:2.0.0"
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"

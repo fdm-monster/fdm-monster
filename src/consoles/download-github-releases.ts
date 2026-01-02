@@ -11,7 +11,7 @@ interface Release {
 
 const fetchReleases = async () => {
   try {
-    const response = await axios.get<Release[]>("https://api.github.com/repos/fdm-monster/fdm-monster-client/releases");
+    const response = await axios.get<Release[]>("https://api.github.com/repos/fdm-monster/fdm-monster-client-next/releases");
     const releases = response.data;
 
     // Filter relevant information from each release
@@ -34,7 +34,7 @@ const fetchReleases = async () => {
 const fetchLatest = async () => {
   try {
     const response = await axios.get<Release>(
-      "https://api.github.com/repos/fdm-monster/fdm-monster-client/releases/latest",
+      "https://api.github.com/repos/fdm-monster/fdm-monster-client-next/releases/latest",
     );
     const release = response.data;
 
@@ -47,7 +47,7 @@ const fetchLatest = async () => {
     };
 
     // Write data to a JSON file
-    const outputPath = path.join(__dirname, "github-releases-latest-client-slim-oct-2024.data.json");
+    const outputPath = path.join(__dirname, "github-releases-latest-client-slim.data.json");
     fs.writeFileSync(outputPath, JSON.stringify(releaseData, null, 2));
     console.log(`Releases data written to ${outputPath}`);
   } catch (error) {
