@@ -60,7 +60,7 @@ describe(ServerPrivateController.name, () => {
       exportPrinters: true,
       exportFloorGrid: true,
       exportFloors: true,
-      exportGroups: true,
+      exportTags: true,
       printerComparisonStrategiesByPriority: ["name"],
       floorComparisonStrategiesByPriority: "name",
       notes: "Some export from 2023",
