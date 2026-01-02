@@ -32,11 +32,18 @@ beforeEach(async () => {
 });
 
 describe(FloorController.name, () => {
-  it("should return non-empty floor list", async () => {
+  it("should return empty floor list initially", async () => {
+    const response = await request.get(listRoute).send();
+    const data = expectOkResponse(response);
+    expect(data).toHaveLength(0);
+  });
+
+  it("should return floor after creation", async () => {
+    await createTestFloor(request, "Test Floor", 1);
     const response = await request.get(listRoute).send();
     const data = expectOkResponse(response);
     expect(data).toHaveLength(1);
-    expect(data[0].name).toBe("Default Floor");
+    expect(data[0].name).toBe("Test Floor");
 
     const getResponse = await request.get(getRoute(data[0].id));
     expectOkResponse(getResponse);
@@ -48,12 +55,12 @@ describe(FloorController.name, () => {
   });
 
   it("should not be able to create floor with same floor level number", async () => {
-    const floorNumber = 234;
-    const body = await createTestFloor(request, "Floor101", floorNumber);
+    const order = 234;
+    const body = await createTestFloor(request, "Floor101", order);
     expect(body.name).toBe("Floor101");
     const createResponse = await request.post(floorRoute).send({
       name: body.name,
-      floor: floorNumber,
+      order: order,
       printers: [],
     });
     expectInternalServerError(createResponse);
@@ -90,7 +97,7 @@ describe(FloorController.name, () => {
     const response = await request.patch(updateFloorNumberRoute(floor.id)).send({
       floor: 5071,
     });
-    expectOkResponse(response, { name: "Floor123", floor: 5071 });
+    expectOkResponse(response, { name: "Floor123", order: 5071 });
   });
 
   it("should be able to delete floor", async () => {

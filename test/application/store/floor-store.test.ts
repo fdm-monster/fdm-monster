@@ -23,19 +23,27 @@ describe(DITokens.floorStore, () => {
   });
 
   it("should delete existing floor", async function () {
+    // Create a test floor first
+    const floor = await floorStore.create({ name: "Test Floor", order: 1, printers: [] });
     const floors = await floorStore.listCache();
     expect(floors).toHaveLength(1);
-    await floorStore.delete(floors[0].id);
+    await floorStore.delete(floor.id);
+    const floorsAfterDelete = await floorStore.listCache();
+    expect(floorsAfterDelete).toHaveLength(0);
   });
 
   it("should update floor", async () => {
+    // Create a test floor first
+    const floor = await floorStore.create({ name: "Original", order: 1, printers: [] });
     const floors = await floorStore.listCache();
     expect(floors).toHaveLength(1);
-    await floorStore.update(floors[0].id, {
+    await floorStore.update(floor.id, {
       name: "flo",
-      order: 1,
+      order: 2,
     });
     const floors2 = await floorStore.listCache();
     expect(floors2).toHaveLength(1);
+    expect(floors2[0].name).toBe("flo");
+    expect(floors2[0].order).toBe(2);
   });
 });
