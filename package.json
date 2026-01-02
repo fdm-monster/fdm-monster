@@ -23,7 +23,7 @@
     "console:many-http-file-receivers": "node ./dist/consoles/launch-http-servers.js",
     "console:github-releases": "yarn build && NODE_ENV=development node --watch --enable-source-maps ./dist/consoles/download-github-releases.js",
     "console:create": "yarn build && NODE_ENV=development node --enable-source-maps ./dist/consoles/typeorm-create.js",
-    "console:generate": "yarn build && NODE_ENV=development node --enable-source-maps ./dist/consoles/typeorm-generate.js",
+    "console:generate": "swc clean && yarn build && NODE_ENV=development node --enable-source-maps ./dist/consoles/typeorm-generate.js",
     "console:migrate": "yarn build && NODE_ENV=development node --watch --enable-source-maps ./dist/consoles/typeorm-migrate.js",
     "console:upload": "yarn build && cross-env NODE_ENV=development node ./dist/consoles/upload-test.js",
     "console:mock-octoprint": "yarn build && NODE_ENV=development node --enable-source-maps ./dist/consoles/mock-octoprint.server.js",
