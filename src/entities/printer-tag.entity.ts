@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { Printer } from "@/entities/printer.entity";
-import { Group } from "@/entities/group.entity";
+import { Tag } from "@/entities/tag.entity";
 
 @Entity()
-@Unique(["printerId", "groupId"])
-export class PrinterGroup {
+@Unique(["printerId", "tagId"])
+export class PrinterTag {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -15,10 +15,10 @@ export class PrinterGroup {
   @Column()
   printerId: number;
 
-  @ManyToOne(() => Group, { onDelete: "CASCADE", nullable: false })
-  @JoinColumn({ name: "groupId" })
-  group: Relation<Group>;
+  @ManyToOne(() => Tag, { onDelete: "CASCADE", nullable: false })
+  @JoinColumn({ name: "tagId" })
+  tag: Relation<Tag>;
 
   @Column()
-  groupId: number;
+  tagId: number;
 }

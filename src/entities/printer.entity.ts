@@ -1,6 +1,6 @@
 import { IsAlphanumeric } from "class-validator";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
-import { PrinterGroup } from "@/entities/printer-group.entity";
+import { PrinterTag } from "@/entities/printer-tag.entity";
 import { OctoprintType } from "@/services/printer-api.interface";
 
 @Entity()
@@ -46,10 +46,10 @@ export class Printer {
   assignee?: string;
 
   @OneToMany(
-    () => PrinterGroup,
+    () => PrinterTag,
     (pc) => pc.printer,
   )
-  printerGroups: Relation<PrinterGroup>[];
+  printerTags: Relation<PrinterTag>[];
 
   @CreateDateColumn({ type: "int" })
   dateAdded: number;
