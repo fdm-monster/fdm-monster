@@ -7,3 +7,5 @@ export { Role } from "./role.entity";
 export { UserRole } from "./user-role.entity";
 export { Settings } from "./settings.entity";
 export { RefreshToken } from "./refresh-token.entity";
+export { PrinterTag } from "./printer-tag.entity";
+export { Tag } from "./tag.entity";

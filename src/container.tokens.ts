@@ -17,7 +17,7 @@ export const DITokens = {
   toadScheduler: "toadScheduler",
   eventEmitter2: "eventEmitter2",
   printerService: "printerService",
-  printerGroupService: "printerGroupService",
+  printerTagService: "printerTagService",
   floorPositionService: "floorPositionService",
   printJobService: "printJobService",
   floorService: "floorService",

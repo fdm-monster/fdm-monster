@@ -7,7 +7,7 @@ import { join } from "path";
 import { readFileSync } from "node:fs";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { PrinterGroupService } from "@/services/orm/printer-group.service";
+import { PrinterTagService } from "@/services/orm/printer-tag.service";
 import { testPrinterData } from "./test-data/printer.data";
 import { FloorStore } from "@/state/floor.store";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
@@ -18,7 +18,7 @@ let printerCache: PrinterCache;
 let printerService: IPrinterService;
 let floorService: IFloorService;
 let floorStore: FloorStore;
-let printerGroupService: PrinterGroupService;
+let printerTagService: PrinterTagService;
 let floorPositionService: FloorPositionService;
 
 beforeAll(async () => {
@@ -29,7 +29,7 @@ beforeAll(async () => {
   floorService = container.resolve(DITokens.floorService);
   floorPositionService = container.resolve(DITokens.floorPositionService);
   floorStore = container.resolve(DITokens.floorStore);
-  printerGroupService = container.resolve(DITokens.printerGroupService);
+  printerTagService = container.resolve(DITokens.printerTagService);
 });
 afterEach(async () => {
   const printers = await printerService.list();
@@ -117,7 +117,7 @@ describe(YamlService.name, () => {
     expect(floor.printers).toHaveLength(3);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
 
-    const groups = await printerGroupService.listGroups();
+    const groups = await printerTagService.list();
     expect(groups).toHaveLength(0);
   });
 
@@ -136,7 +136,7 @@ describe(YamlService.name, () => {
     expect(floor.printers).toHaveLength(4);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
 
-    const groups = await printerGroupService.listGroups();
+    const groups = await printerTagService.list();
     expect(groups).toBeDefined();
     const group = groups.find((g) => g.name === "Group A123_1.6.1")!;
     expect(group).toBeDefined();

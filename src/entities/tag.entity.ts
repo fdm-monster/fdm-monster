@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { Length } from "class-validator";
 
 @Entity()
-export class Group {
+export class Tag {
   @PrimaryGeneratedColumn()
   id: number;
 

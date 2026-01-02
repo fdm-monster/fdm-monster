@@ -51,7 +51,7 @@ import { FloorPositionService } from "@/services/orm/floor-position.service";
 import { ExceptionFilter } from "@/middleware/exception.filter";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { UserRoleService } from "@/services/orm/user-role.service";
-import { PrinterGroupService } from "@/services/orm/printer-group.service";
+import { PrinterTagService } from "@/services/orm/printer-tag.service";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { MoonrakerWebsocketAdapter } from "@/services/moonraker/moonraker-websocket.adapter";
 import { OctoprintApi } from "@/services/octoprint.api";
@@ -93,7 +93,7 @@ export function configureContainer() {
     [di.floorPositionService]: asClass(FloorPositionService).singleton(),
     [di.cameraStreamService]: asClass(CameraStreamService).singleton(),
     [di.printerService]: asClass(PrinterService),
-    [di.printerGroupService]: asClass(PrinterGroupService),
+    [di.printerTagService]: asClass(PrinterTagService),
     [di.refreshTokenService]: asClass(RefreshTokenService).singleton(),
     [di.userService]: asClass(UserService).singleton(),
     [di.userRoleService]: asClass(UserRoleService).singleton(),

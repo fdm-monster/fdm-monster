@@ -13,8 +13,8 @@ import { CameraStream } from "@/entities/camera-stream.entity";
 import { Role } from "@/entities/role.entity";
 import { UserRole } from "@/entities/user-role.entity";
 import { InitSqlite1706829146617 } from "@/migrations/1706829146617-InitSqlite";
-import { PrinterGroup } from "@/entities/printer-group.entity";
-import { Group } from "@/entities/group.entity";
+import { PrinterTag } from "@/entities/printer-tag.entity";
+import { Tag } from "@/entities/tag.entity";
 import { PrinterGroup1707494762198 } from "@/migrations/1707494762198-PrinterGroup";
 import {
   ChangePrintCompletionDeletePrinterCascade1708465930665
@@ -57,8 +57,8 @@ export const AppDataSource = new DataSource({
     Role,
     RefreshToken,
     UserRole,
-    Group,
-    PrinterGroup,
+    Tag,
+    PrinterTag,
   ],
   migrations: [
     InitSqlite1706829146617,
