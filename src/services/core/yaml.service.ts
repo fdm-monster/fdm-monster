@@ -276,9 +276,6 @@ export class YamlService {
     if (settings.frontend) {
       await this.settingsStore.updateFrontendSettings(settings.frontend);
     }
-    if (settings.printerFileClean) {
-      await this.settingsStore.updateFileCleanSettings(settings.printerFileClean);
-    }
 
     if (settings.wizard?.wizardCompleted) {
       const importedWizardVersion: number = settings.wizard.wizardVersion;

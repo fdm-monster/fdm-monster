@@ -14,7 +14,6 @@ import { PERMS, ROLES } from "@/constants/authorization.constants";
 import { PrinterFilesStore } from "@/state/printer-files.store";
 import { SettingsStore } from "@/state/settings.store";
 import { MulterService } from "@/services/core/multer.service";
-import { PrinterFileCleanTask } from "@/tasks/printer-file-clean.task";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Request, Response } from "express";
@@ -35,7 +34,7 @@ export class PrinterFilesController {
     private readonly printerApi: IPrinterApi,
     private readonly printerLogin: LoginDto,
     private readonly printerFilesStore: PrinterFilesStore,
-    private readonly printerFileCleanTask: PrinterFileCleanTask,
+    private readonly printJobService: PrintJobService,
     private readonly settingsStore: SettingsStore,
     private readonly multerService: MulterService,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
@@ -219,12 +218,6 @@ export class PrinterFilesController {
       throw new ValidationException({
         error: "Only 1 file can be uploaded at a time",
       });
-    }
-
-    // Perform specific file clean if configured
-    const fileCleanEnabled = this.settingsStore.isPreUploadFileCleanEnabled();
-    if (fileCleanEnabled) {
-      await this.printerFileCleanTask.cleanPrinterFiles(currentPrinterId);
     }
 
     const uploadedFile = files[0];
