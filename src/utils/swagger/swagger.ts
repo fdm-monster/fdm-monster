@@ -1,5 +1,5 @@
 import { SwaggerGenerator } from "./generator";
-import { Express, static as expressStatic } from "express";
+import { Application, static as expressStatic } from "express";
 import { join, dirname } from "node:path";
 import { AppConstants } from "@/server.constants";
 import { superRootPath, ensureDirExists } from "@/utils/fs.utils";
@@ -59,7 +59,7 @@ function generateSwaggerHTML(): string {
   `.trim();
 }
 
-export async function setupSwagger(app: Express, logger: LoggerService) {
+export async function setupSwagger(app: Application, logger: LoggerService) {
   const generator = new SwaggerGenerator(logger);
   const specification = await generator.generate();
 

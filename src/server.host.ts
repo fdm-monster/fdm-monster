@@ -71,11 +71,11 @@ export class ServerHost {
       .use(loadControllersFunc());
 
     // Setup Swagger documentation (if enabled)
-    if (!swaggerDisabled) {
+    if (swaggerDisabled) {
+      this.logger.log("Swagger/OpenAPI documentation disabled");
+    } else {
       await setupSwagger(app, this.logger);
       this.logger.log("Swagger/OpenAPI documentation enabled");
-    } else {
-      this.logger.log("Swagger/OpenAPI documentation disabled");
     }
 
     const bundleDistPath = join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist");
@@ -120,7 +120,7 @@ export class ServerHost {
 
     const swaggerDisabled = process.env[AppConstants.DISABLE_SWAGGER_OPENAPI] === "true";
     const hostOrFqdn = "0.0.0.0";
-    const server = app.listen(parseInt(port), hostOrFqdn, () => {
+    const server = app.listen(Number.parseInt(port), hostOrFqdn, () => {
       this.logger.log(`Server started... open it at http://127.0.0.1:${port}`);
       if (!swaggerDisabled) {
         this.logger.log(`API Documentation available at http://127.0.0.1:${port}/api-docs`);
