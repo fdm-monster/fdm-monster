@@ -6,5 +6,4 @@ export { Printer } from "./printer.entity";
 export { Role } from "./role.entity";
 export { UserRole } from "./user-role.entity";
 export { Settings } from "./settings.entity";
-export { PrintCompletion } from "./print-completion.entity";
 export { RefreshToken } from "./refresh-token.entity";

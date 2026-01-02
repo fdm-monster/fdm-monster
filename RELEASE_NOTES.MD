@@ -20,6 +20,7 @@
 - Remove batch/single set gcode analysis to false
 - Removed client next experimental setting
 - Drop unused Custom Gcode table
+- Drop broken PrintCompletion table
 
 # FDM Monster 2.0.0-rc1
 

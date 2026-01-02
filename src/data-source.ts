@@ -8,7 +8,7 @@ import { Floor } from "@/entities/floor.entity";
 import { FloorPosition } from "@/entities/floor-position.entity";
 import { Printer } from "@/entities/printer.entity";
 import { Settings } from "@/entities/settings.entity";
-import { PrintCompletion, RefreshToken, User } from "@/entities";
+import { RefreshToken, User } from "@/entities";
 import { CameraStream } from "@/entities/camera-stream.entity";
 import { Role } from "@/entities/role.entity";
 import { UserRole } from "@/entities/user-role.entity";
@@ -28,6 +28,7 @@ import {
   ChangeCameraPrinterOnDeleteSetNull1767278216516
 } from "@/migrations/1767278216516-ChangeCameraPrinterOnDeleteSetNull";
 import { DropCustomGcode1767279607392 } from "@/migrations/1767279607392-DropCustomGcode";
+import { DropPrintCompletions1767291804417 } from "@/migrations/1767291804417-DropPrintCompletions";
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
@@ -53,7 +54,6 @@ export const AppDataSource = new DataSource({
     CameraStream,
     Role,
     RefreshToken,
-    PrintCompletion,
     UserRole,
     Group,
     PrinterGroup,
@@ -68,7 +68,8 @@ export const AppDataSource = new DataSource({
     AddPrinterUsernamePassword1745141688926,
     DropPermissions1766576698569,
     ChangeCameraPrinterOnDeleteSetNull1767278216516,
-    DropCustomGcode1767279607392
+    DropCustomGcode1767279607392,
+    DropPrintCompletions1767291804417,
   ],
   subscribers: [],
 });

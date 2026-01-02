@@ -13,8 +13,8 @@ export const AUTH_ERROR_REASON = {
 export const PERM_GROUP = {
   PrinterFiles: "PrinterFiles",
   PrinterSettings: "PrinterSettings",
+  Jobs: "Jobs",
   Floors: "Floors",
-  PrintCompletion: "PrintCompletion",
   ServerInfo: "ServerInfo",
 } as const;
 
@@ -29,9 +29,9 @@ export const PERMS = {
     Upload: "PrinterFiles.Upload",
     Actions: "PrinterFiles.Actions",
   },
-  [PERM_GROUP.PrintCompletion]: {
-    Default: "PrintCompletion.Default",
-    List: "PrintCompletion.List",
+  [PERM_GROUP.Jobs]: {
+    Default: "Jobs.Default",
+    List: "Jobs.List",
   },
   [PERM_GROUP.Floors]: {
     Default: "Floors.Default",
@@ -80,16 +80,16 @@ export type RoleName = (typeof ROLES)[keyof typeof ROLES];
 
 export const ROLE_PERMS: Record<RoleName, PermissionName[]> = {
   [ROLES.ADMIN]: union(
+    allPerms(PERM_GROUP.Jobs),
     allPerms(PERM_GROUP.Floors),
     allPerms(PERM_GROUP.PrinterFiles),
-    allPerms(PERM_GROUP.PrintCompletion),
     allPerms(PERM_GROUP.PrinterSettings),
     allPerms(PERM_GROUP.ServerInfo),
   ),
   [ROLES.OPERATOR]: union(
+    allPerms(PERM_GROUP.Jobs),
     allPerms(PERM_GROUP.Floors),
     allPerms(PERM_GROUP.PrinterFiles),
-    allPerms(PERM_GROUP.PrintCompletion),
     allPerms(PERM_GROUP.PrinterSettings),
   ),
   [ROLES.GUEST]: [],
