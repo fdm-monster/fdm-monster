@@ -25,9 +25,9 @@ describe(ServerPrivateController.name, () => {
   it("should get client releases", async () => {
     // TODO these dont work yet (octokit undici/native-fetch)
     nock("https://api.github.com/")
-      .get("/repos/fdm-monster/fdm-monster-client/releases/latest")
+      .get("/repos/fdm-monster/fdm-monster-client-next/releases/latest")
       .reply(200, require("./test-data/github-releases-latest-client-slim-oct-2024.data.json"))
-      .get("/repos/fdm-monster/fdm-monster-client/releases")
+      .get("/repos/fdm-monster/fdm-monster-client-next/releases")
       .reply(200, require("./test-data/github-releases-client-slim-oct-2024.data.json"));
 
     expect(nock.activeMocks()).toHaveLength(2);

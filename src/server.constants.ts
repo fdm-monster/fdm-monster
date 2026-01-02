@@ -45,7 +45,7 @@ export const AppConstants = {
   DEFAULT_JWT_ISSUER: "fdm-monster-server",
   // String, not persisted
   OVERRIDE_JWT_AUDIENCE: "OVERRIDE_JWT_AUDIENCE",
-  DEFAULT_JWT_AUDIENCE: "fdm-monster-client",
+  DEFAULT_JWT_AUDIENCE: "fdm-monster-client-next",
 
   OVERRIDE_IS_DEMO_MODE: "OVERRIDE_IS_DEMO_MODE",
   OVERRIDE_DEMO_USERNAME: "OVERRIDE_DEMO_USERNAME",
@@ -63,13 +63,13 @@ export const AppConstants = {
   GITHUB_PAT: "GITHUB_PAT",
   serverPackageName: "@fdm-monster/server",
   serverRepoName: "fdm-monster",
-  clientPackageName: "@fdm-monster/client",
-  clientRepoName: "fdm-monster-client",
+  clientPackageName: "@fdm-monster/client-next",
+  clientRepoName: "fdm-monster-client-next",
   githubUrl: "https://github.com/fdm-monster/fdm-monster",
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.13.0",
+  defaultClientMinimum: "2.0.0",
 
   // Websocket values
   defaultWebsocketHandshakeTimeout: 3000,

@@ -1,6 +1,6 @@
 <p align="center" style="margin-bottom: 0">
     <a href="https://docs.fdm-monster.net/" target="_blank" rel="noopener noreferrer">
-        <img width="150" src="https://github.com/fdm-monster/fdm-monster-client/blob/main/public/img/logo.png?raw=true" alt="FDM Monster">
+        <img width="150" src="https://github.com/fdm-monster/fdm-monster-client-next/blob/main/public/img/logo.png?raw=true" alt="FDM Monster">
     </a>
 </p>
 <h1 align="center" style="padding-top: 0; margin-top: 10px">FDM Monster</h1>
