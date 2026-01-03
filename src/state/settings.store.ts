@@ -46,8 +46,7 @@ export class SettingsStore {
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
-        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
-        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
@@ -68,8 +67,7 @@ export class SettingsStore {
       [serverSettingsKey]: {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
-        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
-        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport
       },
     });
   }
@@ -144,12 +142,6 @@ export class SettingsStore {
     this.throwIfSettingsUnset();
 
     return this.settings![serverSettingsKey].registration;
-  }
-
-  isThumbnailSupportEnabled() {
-    this.throwIfSettingsUnset();
-
-    return this.settings![serverSettingsKey].experimentalThumbnailSupport;
   }
 
   getServerSettings() {
@@ -240,13 +232,6 @@ export class SettingsStore {
   async setExperimentalBambuSupport(experimentalBambuSupport: boolean) {
     this.throwIfSettingsUnset();
     this.settings![serverSettingsKey].experimentalBambuSupport = experimentalBambuSupport;
-    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
-    return this.getSettings();
-  }
-
-  async setExperimentalThumbnailSupport(experimentalThumbnailSupport: boolean) {
-    this.throwIfSettingsUnset();
-    this.settings![serverSettingsKey].experimentalThumbnailSupport = experimentalThumbnailSupport;
     this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
     return this.getSettings();
   }

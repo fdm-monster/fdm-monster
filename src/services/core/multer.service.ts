@@ -49,11 +49,6 @@ export class MulterService {
     }
   }
 
-  fileExists(downloadFilename: string, collection: string) {
-    const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
-    return existsSync(downloadPath);
-  }
-
   getMulterGCodeFileFilter(storeAsFile = true) {
     return this.getMulterFileFilter(storeAsFile);
   }
@@ -105,7 +100,7 @@ export class MulterService {
     return multer({
       storage: storeAsFile
         ? diskStorage({
-            destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
+            destination: join(superRootPath(), AppConstants.defaultFileUploadsStorage),
           })
         : memoryStorage(),
     }).any();

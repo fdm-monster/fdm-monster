@@ -298,11 +298,20 @@ const PRINT_DURATION = 20; // 20 seconds
           }
         } else if (command === "stop") {
           if (isPrinting) {
+            const stoppedFile = currentPrintFile;
             isPrinting = false;
             isPaused = false;
             printProgress = 0;
-            currentPrintFile = "";
-            console.log(`[BAMBU MOCK MQTT] Stopping print`);
+            // Keep filename for one more state update so backend can identify which job was cancelled
+            // Real Bambu printers send IDLE state with the filename still present
+            console.log(`[BAMBU MOCK MQTT] Stopping print: ${stoppedFile}`);
+
+            // Clear filename after a short delay to simulate real behavior
+            setTimeout(() => {
+              if (!isPrinting) {
+                currentPrintFile = "";
+              }
+            }, MESSAGE_INTERVAL * 2);
           }
         }
       }

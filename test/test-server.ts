@@ -14,7 +14,7 @@ import { SettingsStore } from "@/state/settings.store";
 export async function setupTestApp(
   loadPrinterStore = false,
   mocks: any = undefined,
-  quick_boot = true,
+  quickBoot = true,
   skipWizardCompletion = false,
 ): Promise<{
   container: AwilixContainer;
@@ -44,7 +44,7 @@ export async function setupTestApp(
   await settingsStore.setExperimentalMoonrakerSupport(true);
 
   const serverHost = container.resolve(DITokens.serverHost);
-  await serverHost.boot(httpServer, quick_boot, false);
+  await serverHost.boot(httpServer, quickBoot, false);
 
   if (!skipWizardCompletion) {
     await settingsStore.setWizardCompleted(AppConstants.currentWizardVersion);

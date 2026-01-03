@@ -19,7 +19,6 @@ export class Settings {
     registration: boolean;
     experimentalMoonrakerSupport: boolean;
     experimentalBambuSupport: boolean;
-    experimentalThumbnailSupport: boolean;
     experimentalPrusaLinkSupport: boolean;
   };
 

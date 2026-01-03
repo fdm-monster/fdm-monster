@@ -9,7 +9,6 @@ import {
   moonrakerSupportSchema,
   prusaLinkSupportSchema,
   sentryDiagnosticsEnabledSchema,
-  thumbnailSupportSchema,
   timeoutSettingsUpdateSchema,
   bambuSupportSchema,
 } from "@/services/validators/settings-service.validation";
@@ -119,21 +118,6 @@ export class SettingsController {
       for (const printer of bambuPrinters) {
         await this.printerService.updateEnabled(printer.id, false);
       }
-    }
-    res.send(result);
-  }
-
-  @PUT()
-  @route("/experimental-thumbnail-support")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
-  async updateThumbnailSupport(req: Request, res: Response) {
-    const { enabled } = await validateInput(req.body, thumbnailSupportSchema);
-    const result = await this.settingsStore.setExperimentalThumbnailSupport(enabled);
-
-    if (enabled) {
-      await this.printerThumbnailCache.loadCache();
-    } else {
-      await this.printerThumbnailCache.resetCache();
     }
     res.send(result);
   }

@@ -17,10 +17,11 @@ export const AppConstants = {
   defaultClientBundleZipsStorage: "./media/client-dist-zips",
   defaultPrinterThumbnailsStorage: "./media/printer-thumbnails",
   defaultFileUploadsStorage: "./media/file-uploads",
+  defaultPrintFilesStorage: "./media/files",
   defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
   defaultAcceptedBambuExtensions: [".gcode", ".3mf"],
   defaultServerPort: 4000,
-  apiRoute: "/api",
+  apiRoute: "/api/v2",
   enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
 
   // Boolean string (true/false), persisted always

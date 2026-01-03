@@ -49,9 +49,7 @@ export function migrateSettingsRuntime(knownSettings: Partial<Settings>): Settin
       experimentalBambuSupport:
         entity[serverSettingsKey].experimentalBambuSupport ?? defaultServerSettings.experimentalBambuSupport,
       sentryDiagnosticsEnabled:
-        entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled,
-      experimentalThumbnailSupport:
-        entity[serverSettingsKey].experimentalThumbnailSupport ?? defaultServerSettings.experimentalThumbnailSupport,
+        entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled
     };
   }
 
