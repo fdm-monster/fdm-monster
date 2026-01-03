@@ -16,6 +16,7 @@ import { RoleService } from "@/services/orm/role.service";
 import { UserService } from "@/services/orm/user.service";
 import { PermissionService } from "@/services/orm/permission.service";
 import { RoleName } from "@/constants/authorization.constants";
+import { PrintFileDownloaderService } from "@/services/print-file-downloader.service";
 
 export class BootTask implements TaskService {
   logger: LoggerService;
@@ -33,6 +34,7 @@ export class BootTask implements TaskService {
     private readonly configService: ConfigService,
     private readonly typeormService: TypeormService,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
+    private readonly printFileDownloaderService: PrintFileDownloaderService,
   ) {
     this.logger = loggerFactory(BootTask.name);
   }
