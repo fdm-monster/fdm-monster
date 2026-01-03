@@ -1,13 +1,19 @@
 # Develop
 
+# FDM Monster 2.0.0
+
 ## Feat
 
+- All UI features in https://github.com/fdm-monster/fdm-monster-client-next/blob/main/RELEASE_NOTES.MD
 - Add mock camera console to project (for development)
 - Add swagger and OpenAPI integration
 - UI Client is now fdm-monster-client-next at v2.0.0
 - Add color option to tag
 - Add API to upload from slicer
 - Change API to /api/v2
+- Queue
+- PrintJob
+- File Analysis
 
 ## Fixes
 
