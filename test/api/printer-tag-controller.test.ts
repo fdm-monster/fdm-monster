@@ -1,6 +1,5 @@
 import { setupTestApp } from "../test-server";
 import {
-  expectInvalidResponse,
   expectNotFoundResponse,
   expectOkResponse,
 } from "../extensions";
@@ -133,7 +132,7 @@ describe(PrinterTagController.name, () => {
     });
 
     it("should not be able to update non-existing tag name", async () => {
-      const tag = await createTestTag(request, "ValidName", "#FF0000");
+      await createTestTag(request, "ValidName", "#FF0000");
       const response = await request.patch(updateNameRoute(99999)).send({
         name: "NewName",
       });
