@@ -8,7 +8,8 @@ export class RenameGroupToTag1767432108916 implements MigrationInterface {
       CREATE TABLE "tag"
       (
         "id"   integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-        "name" varchar                           NOT NULL
+        "name" varchar                           NOT NULL,
+        "color" varchar
       )
     `);
     await queryRunner.query(`

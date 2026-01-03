@@ -206,6 +206,7 @@ export class YamlService {
       try {
         const createdTag = await this.printerTagService.createTag({
           name: tag.name,
+          color: tag.color
         });
         for (const printer of tag.printers) {
           const knownPrinterId = printerIdMap[printer.printerId] satisfies number | undefined;

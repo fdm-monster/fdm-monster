@@ -5,4 +5,5 @@ export class PrinterTagDto {
 
 export class CreateTagDto {
   name: string;
+  color?: string;
 }

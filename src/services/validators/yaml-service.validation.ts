@@ -102,6 +102,7 @@ export const importPrintersFloorsYamlSchema = z.object({
       z.object({
         id: numberOrStringIdValidator,
         name: z.string(),
+        color: z.string().optional(),
         printers: z.array(
           z.object({
             printerId: numberOrStringIdValidator,

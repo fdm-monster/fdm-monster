@@ -55,7 +55,7 @@ export class FloorController {
   @route("/:id/floor-order")
   @before([permission(PERMS.Floors.Update), ParamId("id")])
   async updateFloorOrder(req: Request, res: Response) {
-    const floor = await this.floorStore.updateFloorOrder(req.local.id, req.body.floor);
+    const floor = await this.floorStore.updateFloorOrder(req.local.id, req.body.order);
     res.send(floor);
   }
 

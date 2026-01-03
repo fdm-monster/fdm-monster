@@ -13,6 +13,8 @@ export interface IPrinterTagService<Entity = PrinterTag> {
 
   updateTagName(tagId: number, name: string): Promise<void>;
 
+  updateTagColor(tagId: number, color: string): Promise<void>;
+
   deleteTag(tagId: number): Promise<void>;
 
   addPrinterToTag(tagId: number, printerId: number): Promise<Entity>;
