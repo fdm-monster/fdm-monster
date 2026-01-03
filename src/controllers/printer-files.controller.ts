@@ -12,7 +12,6 @@ import { NotFoundException, ValidationException } from "@/exceptions/runtime.exc
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
 import { PrinterFilesStore } from "@/state/printer-files.store";
-import { SettingsStore } from "@/state/settings.store";
 import { MulterService } from "@/services/core/multer.service";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -21,7 +20,6 @@ import { BambuType, IPrinterApi } from "@/services/printer-api.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
-import { LoginDto } from "@/services/interfaces/login.dto";
 import { getScopedPrinter } from "@/middleware/printer-resolver";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { FileStorageService } from "@/services/file-storage.service";
@@ -37,12 +35,10 @@ export class PrinterFilesController {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly printerApi: IPrinterApi,
-    private readonly printerLogin: LoginDto,
     private readonly printerFilesStore: PrinterFilesStore,
     private readonly printJobService: PrintJobService,
     private readonly fileAnalysisService: FileAnalysisService,
     private readonly fileStorageService: FileStorageService,
-    private readonly settingsStore: SettingsStore,
     private readonly multerService: MulterService,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
   ) {
