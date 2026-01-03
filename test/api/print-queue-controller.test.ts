@@ -4,21 +4,45 @@ import { DITokens } from "@/container.tokens";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { PrintQueueService } from "@/services/print-queue.service";
 import { FileStorageService } from "@/services/file-storage.service";
+import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { AppConstants } from "@/server.constants";
+import { asValue } from "awilix";
 
 describe("PrintQueueController", () => {
   let testRequest: any;
   let printJobService: PrintJobService;
   let printQueueService: PrintQueueService;
   let fileStorageService: FileStorageService;
+  let printerApiFactory: PrinterApiFactory;
   const baseRoute = `${AppConstants.apiRoute}/print-queue`;
 
   beforeAll(async () => {
-    const { request, container } = await setupTestApp(false, undefined, true, false);
+    // Mock printer API factory to prevent actual file uploads
+    const mockPrinterApi = {
+      uploadFile: jest.fn().mockResolvedValue(undefined),
+    };
+    const mockPrinterApiFactory = {
+      getById: jest.fn().mockReturnValue(mockPrinterApi),
+    };
+
+    // Mock file storage service to prevent writing to real media folder
+    const mockFileStorageService = {
+      saveFile: jest.fn().mockResolvedValue("mock-file-storage-id"),
+      ensureStorageDirectories: jest.fn().mockResolvedValue(undefined),
+      getFilePath: jest.fn().mockReturnValue("/mock/path/file.gcode"),
+      readFile: jest.fn().mockReturnValue(Buffer.from("; mock gcode\nG28\n")),
+    };
+
+    const { request, container } = await setupTestApp(false, {
+      [DITokens.printerApiFactory]: asValue(mockPrinterApiFactory),
+      [DITokens.fileStorageService]: asValue(mockFileStorageService)
+    }, true, false);
+
     testRequest = request;
     printJobService = container.resolve<PrintJobService>(DITokens.printJobService);
     printQueueService = container.resolve<PrintQueueService>(DITokens.printQueueService);
     fileStorageService = container.resolve<FileStorageService>(DITokens.fileStorageService);
+    printerApiFactory = container.resolve<PrinterApiFactory>(DITokens.printerApiFactory);
   });
 
   describe("GET /print-queue - Global Queue", () => {
@@ -259,7 +283,7 @@ describe("PrintQueueController", () => {
     });
   });
 
-  describe("DELETE /print-queue/:printerId/:jobId - Remove from Queue", () => {
+  describe("Remove print-queue :printerId :jobId - Remove from Queue", () => {
     it("should remove job from queue", async () => {
       const printer = await createTestPrinter(testRequest);
       const job = await printJobService.createPendingJob(printer.id, "test-remove.gcode", {
@@ -634,6 +658,15 @@ describe("PrintQueueController", () => {
         totalLayers: null,
       });
 
+      // Create a test file in storage
+      const testFileContent = Buffer.from("; test gcode\nG28\nG1 X10 Y10\nM104 S0\nM140 S0\n");
+      const mockFile = {
+        originalname: "test-submit.gcode",
+        buffer: testFileContent,
+      } as Express.Multer.File;
+      job.fileStorageId = await fileStorageService.saveFile(mockFile);
+      await printJobService.printJobRepository.save(job);
+
       const res = await testRequest
         .post(`${baseRoute}/${printer.id}/submit/${job.id}`)
         .set("Accept", "application/json");
@@ -688,12 +721,10 @@ describe("PrintQueueController", () => {
 
       expect(res.status).toBe(200);
 
-      // Verify job is no longer queued (check immediately before async event handler completes)
+      // Verify job is no longer queued
       const updatedJob = await printJobService.printJobRepository.findOne({ where: { id: job.id } });
       expect(updatedJob?.queuePosition).toBeNull();
-      // Note: The async event handler may mark the job as FAILED if the printer mock doesn't support uploads
-      // In a real scenario with a working printer, this would be PRINTING
-      expect(["PRINTING", "FAILED"]).toContain(updatedJob?.status);
+      expect(["PRINTING"]).toContain(updatedJob?.status);
     });
 
     it("should validate printer ID and job ID", async () => {

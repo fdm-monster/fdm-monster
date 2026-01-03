@@ -52,6 +52,14 @@ export class FileStorageService implements IFileStorageService {
   }
 
   /**
+   * Read file from storage
+   */
+  readFile(fileStorageId: string): Buffer {
+    const filePath = this.getFilePath(fileStorageId);
+    return readFileSync(filePath);
+  }
+
+  /**
    * Save uploaded file to storage
    * Storage ID is deterministic based on file hash + filename for deduplication
    */

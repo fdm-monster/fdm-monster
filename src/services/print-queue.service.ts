@@ -7,7 +7,6 @@ import { LoggerService } from "@/handlers/logger";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { FileStorageService } from "@/services/file-storage.service";
 import { captureException } from "@sentry/node";
-import { readFileSync } from "node:fs";
 
 export interface QueuedJob {
   id: number;
@@ -336,12 +335,8 @@ export class PrintQueueService implements IPrintQueueService {
         throw new Error(`Job ${jobId} has no fileStorageId - cannot submit to printer`);
       }
 
-      // Get file path from storage
-      const filePath = this.fileStorageService.getFilePath(fileStorageId);
-      this.logger.log(`Retrieved file path for job ${jobId}: ${filePath}`);
-
-      // Read file as buffer
-      const fileBuffer = readFileSync(filePath);
+      // Read file from storage
+      const fileBuffer = this.fileStorageService.readFile(fileStorageId);
       this.logger.log(`Read ${fileBuffer.length} bytes for job ${jobId}`);
 
       // Get printer API instance
