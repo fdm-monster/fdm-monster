@@ -66,6 +66,8 @@ describe(ServerPublicController.name, () => {
     const response = await request.get(getRoute).send();
     expect(response.body).toMatchObject({
       message: "Login disabled. Please load the Vue app.",
+      apiDocs: "http://localhost:4000/api-docs/",
+      swaggerJson: "http://localhost:4000/api-docs/swagger.json",
     });
     expectOkResponse(response);
   });
@@ -77,6 +79,8 @@ describe(ServerPublicController.name, () => {
     const response = await request.get(getRoute).set("Authorization", `Bearer ${token}`).send();
     expect(response.body).toMatchObject({
       message: "Login required. Please load the Vue app.",
+      apiDocs: "http://localhost:4000/api-docs/",
+      swaggerJson: "http://localhost:4000/api-docs/swagger.json",
     });
     expectOkResponse(response);
 
