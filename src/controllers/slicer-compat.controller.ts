@@ -51,6 +51,8 @@ export class SlicerCompatController {
   @POST()
   @route("/files/local")
   async uploadFile(req: Request, res: Response) {
+    let files: Express.Multer.File[] | undefined;
+
     try {
       // Accept all common 3D printer file formats
       const acceptedExtensions = [
@@ -59,7 +61,7 @@ export class SlicerCompatController {
       ];
 
       // Load uploaded file using multer
-      const files = await this.multerService.multerLoadFileAsync(req, res, acceptedExtensions, true);
+      files = await this.multerService.multerLoadFileAsync(req, res, acceptedExtensions, true);
 
       if (!files?.length) {
         res.status(400).send({
@@ -150,18 +152,24 @@ export class SlicerCompatController {
         },
       });
 
-      this.logger.log(`File uploaded via OctoPrint API: ${file.originalname} -> ${fileStorageId}`);
+      this.logger.log(`File uploaded to printer: ${file.originalname} -> ${fileStorageId}`);
     } catch (error) {
-      this.logger.error(`OctoPrint upload failed: ${error}`);
-      res.status(500).send({
-        error: "Upload failed",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
+      // Clean up temp file if it exists
+      if (files?.[0]?.path) {
+        try {
+          this.multerService.clearUploadedFile(files[0]);
+        } catch (e) {
+          this.logger.error(`Could not remove uploaded file from temporary storage`);
+        }
+      }
+
+      // Re-throw to let exception filter handle it properly
+      throw error;
     }
   }
 
   /**
-   * OctoPrint files list endpoint
+   * Files list endpoint
    * GET /api/files
    */
   @GET()
@@ -170,8 +178,8 @@ export class SlicerCompatController {
     try {
       const files = await this.fileStorageService.listAllFiles();
 
-      // Convert to OctoPrint format
-      const octoPrintFiles = files.map(file => ({
+      // Convert to known format
+      const knownFiles = files.map(file => ({
         name: file.metadata?._originalFileName || file.fileName,
         path: file.fileStorageId,
         type: "machinecode",
@@ -195,20 +203,18 @@ export class SlicerCompatController {
       }));
 
       res.send({
-        files: octoPrintFiles,
+        files: knownFiles,
         free: 0, // Not applicable
         total: 0, // Not applicable
       });
     } catch (error) {
-      this.logger.error(`Failed to list files via OctoPrint API: ${error}`);
-      res.status(500).send({
-        error: "Failed to list files",
-      });
+      this.logger.error(`Failed to list files via printer API: ${error}`);
+      throw error;
     }
   }
 
   /**
-   * OctoPrint server endpoint (for compatibility checks)
+   * Server endpoint (for compatibility checks)
    * GET /api/server
    */
   @GET()

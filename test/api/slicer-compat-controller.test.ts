@@ -18,7 +18,7 @@ describe("SlicerCompatController", () => {
   describe("GET /api/version - OctoPrint version endpoint", () => {
     it("should return OctoPrint-compatible version info", async () => {
       const res = await testRequest
-        .get(`${baseRoute}/version`)
+        .get(`${ baseRoute }/version`)
         .set("Accept", "application/json");
 
       expect(res.status).toBe(200);
@@ -33,7 +33,7 @@ describe("SlicerCompatController", () => {
     it("should be publicly accessible (no auth required)", async () => {
       // Test without authentication
       const res = await testRequest
-        .get(`${baseRoute}/version`)
+        .get(`${ baseRoute }/version`)
         .set("Accept", "application/json");
 
       expect(res.status).toBe(200);
@@ -43,7 +43,7 @@ describe("SlicerCompatController", () => {
   describe("GET /api/server - OctoPrint server endpoint", () => {
     it("should return server information", async () => {
       const res = await testRequest
-        .get(`${baseRoute}/server`)
+        .get(`${ baseRoute }/server`)
         .set("Accept", "application/json");
 
       expect(res.status).toBe(200);
@@ -54,7 +54,7 @@ describe("SlicerCompatController", () => {
 
     it("should be publicly accessible", async () => {
       const res = await testRequest
-        .get(`${baseRoute}/server`)
+        .get(`${ baseRoute }/server`)
         .set("Accept", "application/json");
 
       expect(res.status).toBe(200);
@@ -64,7 +64,7 @@ describe("SlicerCompatController", () => {
   describe("GET /api/files - List files", () => {
     it("should return empty files array when no files exist", async () => {
       const res = await testRequest
-        .get(`${baseRoute}/files`)
+        .get(`${ baseRoute }/files`)
         .set("Accept", "application/json");
 
       expect(res.status).toBe(200);
@@ -86,7 +86,7 @@ describe("SlicerCompatController", () => {
       }
 
       const uploadRes = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(fileContent), "test-list.gcode");
 
@@ -94,7 +94,7 @@ describe("SlicerCompatController", () => {
 
       // Now list files
       const res = await testRequest
-        .get(`${baseRoute}/files`)
+        .get(`${ baseRoute }/files`)
         .set("Accept", "application/json");
 
       expect(res.status).toBe(200);
@@ -128,7 +128,7 @@ M140 S0
 `;
 
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(fileContent), "test-upload.gcode");
 
@@ -146,7 +146,7 @@ M140 S0
       const fileContent = "G28\nG1 X10 Y10\n";
 
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(fileContent), "test-metadata.gcode");
 
@@ -164,7 +164,7 @@ M140 S0
       const fileContent = "G28\nG1 X10 Y10\n";
 
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .field("print", "true")
         .attach("file", Buffer.from(fileContent), "test-print.gcode");
@@ -177,7 +177,7 @@ M140 S0
       const fileContent = "G28\nG1 X10 Y10\n";
 
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .field("select", "true")
         .attach("file", Buffer.from(fileContent), "test-select.gcode");
@@ -188,7 +188,7 @@ M140 S0
 
     it("should return 400 when no file is uploaded", async () => {
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json");
 
       expect(res.status).toBe(400);
@@ -199,18 +199,32 @@ M140 S0
     it("should handle multiple file formats (gcode, 3mf, bgcode)", async () => {
       const formats = [
         { ext: "gcode", content: "G28\nG1 X10 Y10\n" },
-        { ext: "gco", content: "G28\nG1 X10 Y10\n" },
-        { ext: "g", content: "G28\nG1 X10 Y10\n" },
+        { ext: "3mf", content: "G28\nG1 X10 Y10\n" },
+        { ext: "bgcode", content: "G28\nG1 X10 Y10\n" },
       ];
 
       for (const format of formats) {
         const res = await testRequest
-          .post(`${baseRoute}/files/local`)
+          .post(`${ baseRoute }/files/local`)
           .set("Accept", "application/json")
-          .attach("file", Buffer.from(format.content), `test.${format.ext}`);
+          .attach("file", Buffer.from(format.content), `test.${ format.ext }`);
 
         expect(res.status).toBe(201);
         expect(res.body.done).toBe(true);
+      }
+    });
+
+    it("should reject invalid file extensions with 400", async () => {
+      const invalidExtensions = ["txt", "pdf", "zip", "stl"];
+
+      for (const ext of invalidExtensions) {
+        const res = await testRequest
+          .post(`${ baseRoute }/files/local`)
+          .set("Accept", "application/json")
+          .attach("file", Buffer.from("test content"), `test.${ ext }`);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty("error");
       }
     });
 
@@ -225,7 +239,7 @@ G1 X20 Y20 E5 F1500
 `;
 
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(fileContent), "test-analysis.gcode");
 
@@ -238,7 +252,7 @@ G1 X20 Y20 E5 F1500
       const originalFilename = "my-special-print-file.gcode";
 
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(fileContent), originalFilename);
 
@@ -250,7 +264,7 @@ G1 X20 Y20 E5 F1500
       const fileContent = "G28\nG1 X10 Y10\n";
 
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(fileContent), "test-hash.gcode");
 
@@ -260,7 +274,7 @@ G1 X20 Y20 E5 F1500
 
       // Upload same file again - should have same hash
       const res2 = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(fileContent), "test-hash-2.gcode");
 
@@ -271,7 +285,7 @@ G1 X20 Y20 E5 F1500
     it("should handle upload errors gracefully", async () => {
       // Try uploading with invalid data
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .send({ invalid: "data" });
 
@@ -284,7 +298,7 @@ G1 X20 Y20 E5 F1500
       const fileContent = "G28\nG1 X10 Y10\n";
 
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .field("print", "false")
         .field("select", "true")
@@ -303,7 +317,7 @@ G1 X20 Y20 E5 F1500
 
       // Upload
       const uploadRes = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(fileContent), filename);
 
@@ -312,7 +326,7 @@ G1 X20 Y20 E5 F1500
 
       // List and verify it appears
       const listRes = await testRequest
-        .get(`${baseRoute}/files`)
+        .get(`${ baseRoute }/files`)
         .set("Accept", "application/json");
 
       expect(listRes.status).toBe(200);
@@ -323,11 +337,11 @@ G1 X20 Y20 E5 F1500
 
     it("should handle multiple concurrent uploads", async () => {
       const uploads = Array.from({ length: 3 }, (_, i) => {
-        const content = `G28\nG1 X${i * 10} Y${i * 10}\n`;
+        const content = `G28\nG1 X${ i * 10 } Y${ i * 10 }\n`;
         return testRequest
-          .post(`${baseRoute}/files/local`)
+          .post(`${ baseRoute }/files/local`)
           .set("Accept", "application/json")
-          .attach("file", Buffer.from(content), `concurrent-${i}.gcode`);
+          .attach("file", Buffer.from(content), `concurrent-${ i }.gcode`);
       });
 
       const results = await Promise.all(uploads);
@@ -347,7 +361,7 @@ G1 X20 Y20 E5 F1500
   describe("Edge cases and error handling", () => {
     it("should handle empty gcode file", async () => {
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(""), "empty.gcode");
 
@@ -360,7 +374,7 @@ G1 X20 Y20 E5 F1500
       const fileContent = "G28\n";
 
       const res = await testRequest
-        .post(`${baseRoute}/files/local`)
+        .post(`${ baseRoute }/files/local`)
         .set("Accept", "application/json")
         .attach("file", Buffer.from(fileContent), longFilename);
 
@@ -377,7 +391,7 @@ G1 X20 Y20 E5 F1500
 
       for (const filename of specialFilenames) {
         const res = await testRequest
-          .post(`${baseRoute}/files/local`)
+          .post(`${ baseRoute }/files/local`)
           .set("Accept", "application/json")
           .attach("file", Buffer.from("G28\n"), filename);
 
