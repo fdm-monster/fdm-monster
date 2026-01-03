@@ -75,7 +75,7 @@ export const AppDataSource = new DataSource({
     DropPrintCompletions1767291804417,
     DropSettingsFileClean1767352862576,
     ChangeFloorNonUniqueOrder1767370191762,
-    RenameGroupToTag1767371395741
+    RenameGroupToTag1767432108916
   ],
   subscribers: [],
 });
