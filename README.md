@@ -158,13 +158,14 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 - [x] 🔌 Raspberry Pi image (https://github.com/fdm-monster/MonsterPi)
 - [x] :rocket: Documentation (https://docs.fdm-monster.net)
 - [x] 🛡️ Login and user management
-- [x] OctoFarm export 
+- [x] OctoFarm printer import 
 - [x] Klipper and Moonraker API integration
 - [x] GCode Thumbnail support
 - [x] `.bgcode` support
 - [x] Modernized UI layout and tile design
-- [ ] History and statistics
-- [ ] Extended webcam integration
+- [x] History and statistics
+- [x] Print Queue
+- [x] Extended webcam integration
 - [ ] Spoolman integration
 
 ## License

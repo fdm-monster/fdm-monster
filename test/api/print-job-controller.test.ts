@@ -32,7 +32,69 @@ describe("PrintJobController", () => {
     expect(typeof res.body.pages).toBe("number");
   });
 
+  describe("GET /print-jobs/:id", () => {
+    it("should get single job", async () => {
+      const printer = await createTestPrinter(testRequest);
+      const job = await printJobService.markStarted(printer.id, "test-get.gcode");
+
+      const res = await testRequest
+        .get(`${baseRoute}/${job!.id}`)
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(200);
+      expect(res.body.id).toBe(job!.id);
+      expect(res.body.fileName).toBe("test-get.gcode");
+      expect(res.body.printerId).toBe(printer.id);
+    });
+
+    it("should return 404 for non-existent job", async () => {
+      const res = await testRequest
+        .get(`${baseRoute}/999999`)
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toContain("not found");
+    });
+  });
+
   describe("Status setting endpoints", () => {
+    describe("POST /print-jobs/:id/set-completed", () => {
+      it("should mark UNKNOWN job as COMPLETED", async () => {
+        const printer = await createTestPrinter(testRequest);
+        const job = await printJobService.markStarted(printer.id, "test-set-completed.gcode");
+
+        // Set to UNKNOWN first
+        job!.status = "UNKNOWN";
+        await printJobService.printJobRepository.save(job!);
+
+        const res = await testRequest
+          .post(`${baseRoute}/${job!.id}/set-completed`)
+          .set("Accept", "application/json");
+
+        expect(res.status).toBe(200);
+        expect(res.body.message).toBe("Job marked as completed");
+        expect(res.body.previousStatus).toBe("UNKNOWN");
+        expect(res.body.newStatus).toBe("COMPLETED");
+
+        const updatedJob = await printJobService.printJobRepository.findOne({ where: { id: job!.id } });
+        expect(updatedJob?.status).toBe("COMPLETED");
+        expect(updatedJob?.endedAt).toBeTruthy();
+        expect(updatedJob?.progress).toBe(100);
+      });
+
+      it("should reject marking non-UNKNOWN job as COMPLETED", async () => {
+        const printer = await createTestPrinter(testRequest);
+        const job = await printJobService.markStarted(printer.id, "test-printing-completed.gcode");
+
+        const res = await testRequest
+          .post(`${baseRoute}/${job!.id}/set-completed`)
+          .set("Accept", "application/json");
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toContain("Can only mark UNKNOWN jobs");
+      });
+    });
+
     describe("POST /print-jobs/:id/set-failed", () => {
       it("should mark PRINTING job as FAILED", async () => {
         const printer = await createTestPrinter(testRequest);
@@ -260,6 +322,80 @@ describe("PrintJobController", () => {
         expect(res.status).toBe(404);
         expect(res.body.error).toContain("not found");
       });
+    });
+  });
+
+  describe("DELETE /print-jobs/:id", () => {
+    it("should delete job without file", async () => {
+      const printer = await createTestPrinter(testRequest);
+      const job = await printJobService.createPendingJob(printer.id, "test-delete.gcode", {
+        fileName: "test-delete.gcode",
+        fileFormat: "gcode",
+        gcodePrintTimeSeconds: null,
+        nozzleDiameterMm: null,
+        filamentDiameterMm: null,
+        filamentDensityGramsCm3: null,
+        filamentUsedMm: null,
+        filamentUsedCm3: null,
+        filamentUsedGrams: null,
+        totalFilamentUsedGrams: null,
+        layerHeight: null,
+        firstLayerHeight: null,
+        bedTemperature: null,
+        nozzleTemperature: null,
+        fillDensity: null,
+        filamentType: null,
+        printerModel: null,
+        slicerVersion: null,
+        maxLayerZ: null,
+        totalLayers: null,
+      });
+
+      const res = await testRequest
+        .delete(`${baseRoute}/${job.id}`)
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toContain("Job deleted");
+      expect(res.body.jobId).toBe(job.id);
+
+      // Verify job was deleted
+      const deletedJob = await printJobService.printJobRepository.findOne({ where: { id: job.id } });
+      expect(deletedJob).toBeNull();
+    });
+
+    it("should reject deleting active print job", async () => {
+      const printer = await createTestPrinter(testRequest);
+      const job = await printJobService.markStarted(printer.id, "test-active-delete.gcode");
+
+      const res = await testRequest
+        .delete(`${baseRoute}/${job!.id}`)
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("Cannot delete active print job");
+    });
+  });
+
+  describe("POST /print-jobs/from-file", () => {
+    it("should return 400 for missing fileStorageId", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/from-file`)
+        .send({ printerId: 1 })
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("fileStorageId is required");
+    });
+
+    it("should return 400 for missing printerId", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/from-file`)
+        .send({ fileStorageId: "test-file-id" })
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("printerId is required");
     });
   });
 });
