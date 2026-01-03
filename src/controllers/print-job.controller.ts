@@ -10,6 +10,8 @@ import { FileAnalysisService } from "@/services/file-analysis.service";
 import { FileStorageService } from "@/services/file-storage.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
+import { ParamId, ParamInt } from "@/middleware/param-converter.middleware";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
 
 @route(AppConstants.apiRoute + "/print-jobs")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN])])
@@ -67,25 +69,13 @@ export class PrintJobController {
 
   @GET()
   @route("/:id")
+  @before([ParamId("id")])
   async getJob(req: Request, res: Response) {
-    const jobId = parseInt(req.params.id);
+    const jobId = req.local.id;
 
-    if (isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid job ID" });
-      return;
-    }
+    const job = await this.printJobService.getJobByIdOrFail(jobId, ['printer']);
 
     try {
-      const job = await this.printJobService.printJobRepository.findOne({
-        where: { id: jobId },
-        relations: ['printer'],
-      });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
       // Get thumbnail count if available
       let thumbnailCount = 0;
       if (job.fileStorageId) {
@@ -105,88 +95,13 @@ export class PrintJobController {
   }
 
   @POST()
-  @route("/:id/set-sku-count")
-  async setSkuCount(req: Request, res: Response) {
-    const jobId = parseInt(req.params.id);
-    const { skuCount, plateNumber } = req.body;
-
-    if (isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid job ID" });
-      return;
-    }
-
-    if (!skuCount || skuCount < 1) {
-      res.status(400).send({ error: "skuCount must be a positive number" });
-      return;
-    }
-
-    try {
-      const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
-      const metadata = job.metadata as any;
-
-      if (plateNumber && metadata?.plates) {
-        // Set SKU count for specific plate
-        const plate = metadata.plates.find((p: any) => p.plateNumber === plateNumber);
-        if (plate) {
-          plate.skuCount = skuCount;
-        } else {
-          res.status(404).send({ error: `Plate ${plateNumber} not found` });
-          return;
-        }
-      } else {
-        // Set SKU count for entire job (single-plate or all plates)
-        if (metadata) {
-          metadata.skuCount = skuCount;
-        }
-      }
-
-      job.metadata = metadata;
-      await this.printJobService.printJobRepository.save(job);
-
-      // Update metadata JSON
-      if (job.fileStorageId) {
-        const fileHash = job.fileHash || undefined;
-        await this.fileStorageService.saveMetadata(job.fileStorageId, metadata, fileHash, job.fileName);
-      }
-
-      this.logger.log(`Updated SKU count for job ${jobId}${plateNumber ? ` plate ${plateNumber}` : ''}: ${skuCount}`);
-
-      res.send({
-        message: "SKU count updated",
-        jobId,
-        plateNumber,
-        skuCount,
-      });
-    } catch (error) {
-      this.logger.error(`Failed to update SKU count for job ${jobId}: ${error}`);
-      res.status(500).send({ error: "Failed to update SKU count" });
-    }
-  }
-
-  @POST()
   @route("/:id/set-completed")
+  @before([ParamId("id")])
   async setCompleted(req: Request, res: Response) {
-    const jobId = Number.parseInt(req.params.id);
-
-    if (Number.isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid job ID" });
-      return;
-    }
+    const jobId = req.local.id;
+    const job = await this.printJobService.getJobByIdOrFail(jobId);
 
     try {
-      const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
       // Only allow marking UNKNOWN jobs as completed
       if (job.status !== "UNKNOWN") {
         res.status(400).send({
@@ -238,33 +153,23 @@ export class PrintJobController {
 
   @POST()
   @route("/:id/set-failed")
+  @before([ParamId("id")])
   async setFailed(req: Request, res: Response) {
-    const jobId = Number.parseInt(req.params.id);
+    const jobId = req.local.id;
+    const job = await this.printJobService.getJobByIdOrFail(jobId);
 
-    if (Number.isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid job ID" });
+    const previousStatus = job.status;
+
+    // Only allow marking UNKNOWN or PRINTING jobs as failed
+    if (!["UNKNOWN", "PRINTING", "CANCELLED", "COMPLETED"].includes(job.status)) {
+      res.status(400).send({
+        error: "Can only mark UNKNOWN, PRINTING, CANCELLED, or COMPLETED jobs as failed",
+        currentStatus: job.status,
+      });
       return;
     }
 
     try {
-      const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
-      const previousStatus = job.status;
-
-      // Only allow marking UNKNOWN or PRINTING jobs as failed
-      if (!["UNKNOWN", "PRINTING", "CANCELLED", "COMPLETED"].includes(job.status)) {
-        res.status(400).send({
-          error: "Can only mark UNKNOWN, PRINTING, CANCELLED, or COMPLETED jobs as failed",
-          currentStatus: job.status,
-        });
-        return;
-      }
-
       this.logger.log(`Manually marking job ${jobId} as FAILED (was ${previousStatus})`);
 
       const endedAt = new Date();
@@ -313,33 +218,23 @@ export class PrintJobController {
 
   @POST()
   @route("/:id/set-cancelled")
+  @before([ParamId("id")])
   async setCancelled(req: Request, res: Response) {
-    const jobId = parseInt(req.params.id);
+    const jobId = req.local.id;
+    const job = await this.printJobService.getJobByIdOrFail(jobId);
 
-    if (isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid job ID" });
+    const previousStatus = job.status;
+
+    // Only allow marking UNKNOWN, PRINTING, or PAUSED jobs as cancelled
+    if (!["UNKNOWN", "PRINTING", "PAUSED"].includes(job.status)) {
+      res.status(400).send({
+        error: "Can only mark UNKNOWN, PRINTING, or PAUSED jobs as cancelled",
+        currentStatus: job.status,
+      });
       return;
     }
 
     try {
-      const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
-      const previousStatus = job.status;
-
-      // Only allow marking UNKNOWN, PRINTING, or PAUSED jobs as cancelled
-      if (!["UNKNOWN", "PRINTING", "PAUSED"].includes(job.status)) {
-        res.status(400).send({
-          error: "Can only mark UNKNOWN, PRINTING, or PAUSED jobs as cancelled",
-          currentStatus: job.status,
-        });
-        return;
-      }
-
       this.logger.log(`Manually marking job ${jobId} as CANCELLED (was ${previousStatus})`);
 
       const endedAt = new Date();
@@ -384,34 +279,24 @@ export class PrintJobController {
 
   @POST()
   @route("/:id/set-unknown")
+  @before([ParamId("id")])
   async setUnknown(req: Request, res: Response) {
-    const jobId = parseInt(req.params.id);
+    const jobId = req.local.id;
+    const job = await this.printJobService.getJobByIdOrFail(jobId);
 
-    if (isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid job ID" });
+    const previousStatus = job.status;
+
+    // Only allow marking PRINTING or PAUSED jobs as unknown (for desync scenarios)
+    if (!["PRINTING", "PAUSED"].includes(job.status)) {
+      res.status(400).send({
+        error: "Can only mark PRINTING or PAUSED jobs as unknown",
+        currentStatus: job.status,
+        suggestion: "This endpoint is for marking jobs with uncertain state (e.g., after connection loss)",
+      });
       return;
     }
 
     try {
-      const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
-      const previousStatus = job.status;
-
-      // Only allow marking PRINTING or PAUSED jobs as unknown (for desync scenarios)
-      if (!["PRINTING", "PAUSED"].includes(job.status)) {
-        res.status(400).send({
-          error: "Can only mark PRINTING or PAUSED jobs as unknown",
-          currentStatus: job.status,
-          suggestion: "This endpoint is for marking jobs with uncertain state (e.g., after connection loss)",
-        });
-        return;
-      }
-
       this.logger.log(`Manually marking job ${jobId} as UNKNOWN (was ${previousStatus})`);
 
       job.status = "UNKNOWN";
@@ -438,25 +323,14 @@ export class PrintJobController {
 
   @POST()
   @route("/:id/re-analyze")
+  @before([ParamId("id")])
   async reAnalyzeJob(req: Request, res: Response) {
-    const jobId = parseInt(req.params.id);
-
-    if (isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid job ID" });
-      return;
-    }
+    const jobId = req.local.id;
+    const job = await this.printJobService.getJobByIdOrFail(jobId);
 
     this.logger.log(`Re-analyzing job ${jobId}`);
 
     try {
-      // Get the job
-      const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
       // Check if we have the file locally
       if (!job.fileStorageId) {
         // No local file - trigger download event for async processing
@@ -477,8 +351,7 @@ export class PrintJobController {
       // Check if file exists
       const exists = await this.fileAnalysisService.needsAnalysis(filePath);
       if (!exists) {
-        res.status(404).send({ error: `File not found in storage: ${job.fileStorageId}` });
-        return;
+        throw new NotFoundException(`File not found in storage: ${job.fileStorageId}`);
       }
 
       this.logger.log(`Re-analyzing file for job ${jobId}: ${filePath}`);
@@ -524,33 +397,23 @@ export class PrintJobController {
 
   @DELETE()
   @route("/:id")
+  @before([ParamId("id")])
   async deleteJob(req: Request, res: Response) {
-    const jobId = Number.parseInt(req.params.id);
+    const jobId = req.local.id;
+    const job = await this.printJobService.getJobByIdOrFail(jobId);
     const deleteFileParam = req.query.deleteFile === 'true';
 
-    if (Number.isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid job ID" });
+    // Prevent deleting jobs that are currently printing
+    if (job.status === "PRINTING" || job.status === "PAUSED") {
+      res.status(400).send({
+        error: "Cannot delete active print job",
+        status: job.status,
+        suggestion: "Wait for print to complete or cancel it first",
+      });
       return;
     }
 
     try {
-      // Get the job
-      const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
-      // Prevent deleting jobs that are currently printing
-      if (job.status === "PRINTING" || job.status === "PAUSED") {
-        res.status(400).send({
-          error: "Cannot delete active print job",
-          status: job.status,
-          suggestion: "Wait for print to complete or cancel it first",
-        });
-        return;
-      }
 
       const fileStorageId = job.fileStorageId;
       const fileName = job.fileName;
@@ -613,26 +476,17 @@ export class PrintJobController {
 
   @GET()
   @route("/:id/thumbnails")
+  @before([ParamId("id")])
   async getThumbnails(req: Request, res: Response) {
-    const jobId = parseInt(req.params.id);
+    const jobId = req.local.id;
+    const job = await this.printJobService.getJobByIdOrFail(jobId);
 
-    if (isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid job ID" });
+    if (!job.fileStorageId) {
+      res.send({ jobId, thumbnails: [] });
       return;
     }
 
     try {
-      const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
-      if (!job.fileStorageId) {
-        res.send({ jobId, thumbnails: [] });
-        return;
-      }
 
       // Load metadata to get thumbnail details
       const metadata = await this.fileStorageService.loadMetadata(job.fileStorageId);
@@ -659,33 +513,22 @@ export class PrintJobController {
 
   @GET()
   @route("/:id/thumbnails/:index")
+  @before([ParamId("id"), ParamInt("index")])
   async getThumbnail(req: Request, res: Response) {
-    const jobId = parseInt(req.params.id);
-    const index = parseInt(req.params.index);
+    const jobId = req.local.id;
+    const index = req.local.index;
+    const job = await this.printJobService.getJobByIdOrFail(jobId);
 
-    if (isNaN(jobId) || isNaN(index)) {
-      res.status(400).send({ error: "Invalid job ID or thumbnail index" });
-      return;
+    if (!job.fileStorageId) {
+      throw new NotFoundException("Job has no stored file");
     }
 
     try {
-      const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
-
-      if (!job) {
-        res.status(404).send({ error: `Job ${jobId} not found` });
-        return;
-      }
-
-      if (!job.fileStorageId) {
-        res.status(404).send({ error: "Job has no stored file" });
-        return;
-      }
 
       const thumbnail = await this.fileStorageService.getThumbnail(job.fileStorageId, index);
 
       if (!thumbnail) {
-        res.status(404).send({ error: `Thumbnail ${index} not found` });
-        return;
+        throw new NotFoundException(`Thumbnail ${index} not found`);
       }
 
       // Determine content type from magic bytes
@@ -729,8 +572,7 @@ export class PrintJobController {
       // Check if file exists in storage
       const fileExists = await this.fileStorageService.fileExists(fileStorageId);
       if (!fileExists) {
-        res.status(404).send({ error: "File not found in storage" });
-        return;
+        throw new NotFoundException("File not found in storage" );
       }
 
       // Load file metadata

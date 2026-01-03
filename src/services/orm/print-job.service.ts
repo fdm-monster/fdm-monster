@@ -3,6 +3,7 @@ import { PrintJob, PrintJobMetadata } from "@/entities/print-job.entity";
 import { EventEmitter2 } from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
 
 // Events emitted by this service
 export interface PrintJobAnalyzedEvent {
@@ -89,6 +90,17 @@ export class PrintJobService implements IPrintJobService {
     this.printJobRepository = typeormService.getDataSource().getRepository(PrintJob);
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(PrintJobService.name);
+  }
+
+  async getJobByIdOrFail(id: number, relations?: string[]): Promise<PrintJob> {
+    const job = await this.printJobRepository.findOne({
+      where: { id },
+      relations
+    });
+    if (!job) {
+      throw new NotFoundException(`Job ${id} not found`);
+    }
+    return job;
   }
 
   async handleFileAnalyzed(

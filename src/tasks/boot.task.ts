@@ -17,6 +17,7 @@ import { UserService } from "@/services/orm/user.service";
 import { PermissionService } from "@/services/orm/permission.service";
 import { RoleName } from "@/constants/authorization.constants";
 import { PrintFileDownloaderService } from "@/services/print-file-downloader.service";
+import { FileStorageService } from "@/services/file-storage.service";
 
 export class BootTask implements TaskService {
   logger: LoggerService;
@@ -35,6 +36,7 @@ export class BootTask implements TaskService {
     private readonly typeormService: TypeormService,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
     private readonly printFileDownloaderService: PrintFileDownloaderService,
+    private readonly fileStorageService: FileStorageService,
   ) {
     this.logger = loggerFactory(BootTask.name);
   }
@@ -49,6 +51,9 @@ export class BootTask implements TaskService {
 
   async run() {
     await this.typeormService.createConnection();
+
+    this.logger.log("Ensuring file storage directories exist");
+    await this.fileStorageService.ensureStorageDirectories();
 
     this.logger.log("Loading and synchronizing Server Settings");
     await this.settingsStore.loadSettings();

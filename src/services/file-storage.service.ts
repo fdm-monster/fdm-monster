@@ -1,12 +1,13 @@
-import * as fs from "fs/promises";
-import * as path from "path";
-import * as crypto from "crypto";
 import { Repository } from "typeorm";
 import { PrintJob } from "@/entities/print-job.entity";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { AppConstants } from "@/server.constants";
 import { superRootPath } from "@/utils/fs.utils";
+import path, { basename, extname, join } from "node:path";
+import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
 
 export interface IFileStorageService {
   saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
@@ -28,24 +29,23 @@ export interface IFileStorageService {
  */
 export class FileStorageService implements IFileStorageService {
   printJobRepository: Repository<PrintJob>;
-  private logger;
-  private storageBasePath: string;
+  private readonly logger;
+  private readonly storageBasePath: string;
+  private readonly STORAGE_SUBDIRS = ["gcode", "3mf", "bgcode"] as const;
 
   constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService) {
     this.printJobRepository = typeormService.getDataSource().getRepository(PrintJob);
     this.logger = loggerFactory(FileStorageService.name);
 
-    // Use media folder following standard pattern
-    this.storageBasePath = path.join(superRootPath(), AppConstants.defaultPrintFilesStorage);
-    this.ensureStorageDirectories();
+    this.storageBasePath = join(superRootPath(), AppConstants.defaultPrintFilesStorage);
   }
 
-  private async ensureStorageDirectories() {
+  async ensureStorageDirectories() {
     try {
-      await fs.mkdir(this.storageBasePath, { recursive: true });
-      await fs.mkdir(path.join(this.storageBasePath, "gcode"), { recursive: true });
-      await fs.mkdir(path.join(this.storageBasePath, "3mf"), { recursive: true });
-      await fs.mkdir(path.join(this.storageBasePath, "bgcode"), { recursive: true });
+      await mkdir(this.storageBasePath, { recursive: true });
+      for (const subdir of this.STORAGE_SUBDIRS) {
+        await mkdir(join(this.storageBasePath, subdir), { recursive: true });
+      }
     } catch (error) {
       this.logger.error("Failed to create storage directories", error);
     }
@@ -56,13 +56,13 @@ export class FileStorageService implements IFileStorageService {
    * Storage ID is deterministic based on file hash + filename for deduplication
    */
   async saveFile(file: Express.Multer.File, fileHash?: string): Promise<string> {
-    const fileExt = path.extname(file.originalname).toLowerCase();
+    const fileExt = extname(file.originalname).toLowerCase();
 
     // Generate deterministic file ID from hash + filename
     let fileId: string;
     if (fileHash) {
       // Deterministic: hash(fileHash + fileName) for deduplication
-      const nameHash = crypto.createHash('sha256')
+      const nameHash = createHash('sha256')
         .update(fileHash + file.originalname)
         .digest('hex')
         .substring(0, 32);
@@ -80,16 +80,16 @@ export class FileStorageService implements IFileStorageService {
       subdir = "bgcode";
     }
 
-    const targetDir = path.join(this.storageBasePath, subdir);
-    const targetPath = path.join(targetDir, `${fileId}${fileExt}`);
+    const targetDir = join(this.storageBasePath, subdir);
+    const targetPath = join(targetDir, `${fileId}${fileExt}`);
 
     // Copy file to storage
     if (file.path) {
       // Multer already saved it, move it
-      await fs.rename(file.path, targetPath);
+      await rename(file.path, targetPath);
     } else if (file.buffer) {
       // File is in memory, write it
-      await fs.writeFile(targetPath, file.buffer);
+      await writeFile(targetPath, file.buffer);
     } else {
       throw new Error("File has no path or buffer");
     }
@@ -107,7 +107,7 @@ export class FileStorageService implements IFileStorageService {
       throw new Error(`File ${fileStorageId} not found in storage`);
     }
 
-    return fs.readFile(filePath);
+    return readFile(filePath);
   }
 
   /**
@@ -121,12 +121,12 @@ export class FileStorageService implements IFileStorageService {
     }
 
     // Delete the file
-    await fs.unlink(filePath);
+    await unlink(filePath);
 
     // Delete metadata JSON if it exists
     const metadataPath = filePath + ".json";
     try {
-      await fs.unlink(metadataPath);
+      await unlink(metadataPath);
       this.logger.debug(`Deleted metadata JSON for ${fileStorageId}`);
     } catch {
       // Metadata file might not exist
@@ -135,7 +135,7 @@ export class FileStorageService implements IFileStorageService {
     // Delete thumbnail directory if it exists
     const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, '_thumbnails');
     try {
-      await fs.rm(thumbnailDir, { recursive: true, force: true });
+      await rm(thumbnailDir, { recursive: true, force: true });
       this.logger.debug(`Deleted thumbnails for ${fileStorageId}`);
     } catch {
       // Thumbnail dir might not exist
@@ -150,30 +150,27 @@ export class FileStorageService implements IFileStorageService {
   getFilePath(fileStorageId: string) : string {
     // This is synchronous, returns best-guess path
     // Use findFilePath for async validation
-    const subdirs = ["gcode", "3mf", "bgcode"];
 
     // Try to find file with common extensions
-    for (const subdir of subdirs) {
+    for (const subdir of this.STORAGE_SUBDIRS) {
       for (const ext of [".gcode", ".3mf", ".bgcode", ""]) {
-        const fullPath = path.join(this.storageBasePath, subdir, fileStorageId + ext);
-        // Synchronous check if file exists
-        const fsSync = require('fs');
-        if (fsSync.existsSync(fullPath)) {
+        const fullPath = join(this.storageBasePath, subdir, fileStorageId + ext);
+        if (existsSync(fullPath)) {
           return fullPath;
         }
       }
     }
 
     // Return best guess if not found (caller should validate)
-    return path.join(this.storageBasePath, "gcode", fileStorageId);
+    return join(this.storageBasePath, "gcode", fileStorageId);
   }
 
   /**
    * Calculate SHA256 hash of file
    */
   async calculateFileHash(filePath: string): Promise<string> {
-    const fileBuffer = await fs.readFile(filePath);
-    const hashSum = crypto.createHash("sha256");
+    const fileBuffer = await readFile(filePath);
+    const hashSum = createHash("sha256");
     hashSum.update(fileBuffer);
     return hashSum.digest("hex");
   }
@@ -183,7 +180,7 @@ export class FileStorageService implements IFileStorageService {
    * Same file with same name = same ID (perfect deduplication)
    */
   getDeterministicId(fileHash: string, fileName: string): string {
-    const nameHash = crypto.createHash('sha256')
+    const nameHash = createHash('sha256')
       .update(fileHash + fileName)
       .digest('hex')
       .substring(0, 32);
@@ -194,15 +191,13 @@ export class FileStorageService implements IFileStorageService {
    * Find file path across subdirectories
    */
   private async findFilePath(fileStorageId: string): Promise<string | null> {
-    const subdirs = ["gcode", "3mf", "bgcode"];
-
-    for (const subdir of subdirs) {
-      const dirPath = path.join(this.storageBasePath, subdir);
+    for (const subdir of this.STORAGE_SUBDIRS) {
+      const dirPath = join(this.storageBasePath, subdir);
       try {
-        const files = await fs.readdir(dirPath);
+        const files = await readdir(dirPath);
         const matchingFile = files.find(f => f.startsWith(fileStorageId));
         if (matchingFile) {
-          return path.join(dirPath, matchingFile);
+          return join(dirPath, matchingFile);
         }
       } catch {
         // Directory might not exist, continue
@@ -218,19 +213,6 @@ export class FileStorageService implements IFileStorageService {
   async fileExists(fileStorageId: string): Promise<boolean> {
     const filePath = await this.findFilePath(fileStorageId);
     return filePath !== null;
-  }
-
-  /**
-   * Get file size
-   */
-  async getFileSize(fileStorageId: string): Promise<number> {
-    const filePath = await this.findFilePath(fileStorageId);
-    if (!filePath) {
-      throw new Error(`File ${fileStorageId} not found`);
-    }
-
-    const stats = await fs.stat(filePath);
-    return stats.size;
   }
 
   /**
@@ -260,7 +242,7 @@ export class FileStorageService implements IFileStorageService {
     let existingOriginalFileName = originalFileName;
     let existingThumbnails = thumbnailMetadata;
     try {
-      const existingContent = await fs.readFile(metadataPath, "utf8");
+      const existingContent = await readFile(metadataPath, "utf8");
       const existing = JSON.parse(existingContent);
       // Preserve original filename from first save
       if (existing._originalFileName && !originalFileName) {
@@ -283,8 +265,9 @@ export class FileStorageService implements IFileStorageService {
       _thumbnails: existingThumbnails || [],
     };
 
-    await fs.writeFile(metadataPath, JSON.stringify(metadataWithMeta, null, 2), "utf8");
-    this.logger.debug(`Saved metadata for ${fileStorageId}${thumbnailMetadata ? ` with ${thumbnailMetadata.length} thumbnail(s)` : ''}`);
+    await writeFile(metadataPath, JSON.stringify(metadataWithMeta, null, 2), "utf8");
+    const thumbnailMeta = thumbnailMetadata ? ` with ${thumbnailMetadata.length} thumbnail(s)` : '';
+    this.logger.debug(`Saved metadata for ${fileStorageId}${thumbnailMeta}`);
   }
 
   /**
@@ -298,7 +281,7 @@ export class FileStorageService implements IFileStorageService {
 
     const metadataPath = filePath + ".json";
     try {
-      const content = await fs.readFile(metadataPath, "utf8");
+      const content = await readFile(metadataPath, "utf8");
       return JSON.parse(content);
     } catch (error) {
       // Metadata file doesn't exist or is invalid
@@ -317,7 +300,7 @@ export class FileStorageService implements IFileStorageService {
 
     const metadataPath = filePath + ".json";
     try {
-      await fs.access(metadataPath);
+      await access(metadataPath);
       return true;
     } catch {
       return false;
@@ -354,14 +337,14 @@ export class FileStorageService implements IFileStorageService {
 
     // Delete old thumbnails directory if it exists
     try {
-      await fs.rm(thumbnailDir, { recursive: true, force: true });
+      await rm(thumbnailDir, { recursive: true, force: true });
       this.logger.debug(`Cleared old thumbnails for ${fileStorageId}`);
     } catch {
       // Directory might not exist
     }
 
     // Create fresh thumbnail directory
-    await fs.mkdir(thumbnailDir, { recursive: true });
+    await mkdir(thumbnailDir, { recursive: true });
 
     for (let i = 0; i < thumbnails.length; i++) {
       const thumb = thumbnails[i];
@@ -369,12 +352,12 @@ export class FileStorageService implements IFileStorageService {
 
       const ext = thumb.format?.toLowerCase() || 'png';
       const filename = `thumb_${i}.${ext}`;
-      const thumbPath = path.join(thumbnailDir, filename);
+      const thumbPath = join(thumbnailDir, filename);
 
       try {
         // Decode base64 and write
         const buffer = Buffer.from(thumb.data, 'base64');
-        await fs.writeFile(thumbPath, buffer);
+        await writeFile(thumbPath, buffer);
 
         savedThumbnails.push({
           index: i,
@@ -406,9 +389,9 @@ export class FileStorageService implements IFileStorageService {
 
     // Try different extensions (PNG, JPG, QOI)
     for (const ext of ['png', 'jpg', 'jpeg', 'qoi']) {
-      const thumbPath = path.join(thumbnailDir, `thumb_${index}.${ext}`);
+      const thumbPath = join(thumbnailDir, `thumb_${index}.${ext}`);
       try {
-        return await fs.readFile(thumbPath);
+        return await readFile(thumbPath);
       } catch {
         // Try next extension
       }
@@ -427,8 +410,8 @@ export class FileStorageService implements IFileStorageService {
     const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, '_thumbnails');
 
     try {
-      const files = await fs.readdir(thumbnailDir);
-      return files.filter(f => f.startsWith('thumb_')).sort();
+      const files = await readdir(thumbnailDir);
+      return files.filter(f => f.startsWith('thumb_')).sort((a, b) => a.localeCompare(b));
     } catch {
       return [];
     }
@@ -448,20 +431,19 @@ export class FileStorageService implements IFileStorageService {
     metadata?: any;
   }>> {
     const files: any[] = [];
-    const subdirs = ["gcode", "3mf", "bgcode"];
 
-    for (const subdir of subdirs) {
-      const dirPath = path.join(this.storageBasePath, subdir);
+    for (const subdir of this.STORAGE_SUBDIRS) {
+      const dirPath = join(this.storageBasePath, subdir);
       try {
-        const dirFiles = await fs.readdir(dirPath);
+        const dirFiles = await readdir(dirPath);
 
         for (const file of dirFiles) {
           // Skip thumbnail directories and metadata files
           if (file.endsWith('_thumbnails') || file.endsWith('.json')) continue;
 
           const fileId = path.parse(file).name;
-          const filePath = path.join(dirPath, file);
-          const stats = await fs.stat(filePath);
+          const filePath = join(dirPath, file);
+          const stats = await stat(filePath);
 
           // Load metadata
           const metadata = await this.loadMetadata(fileId);
@@ -506,14 +488,14 @@ export class FileStorageService implements IFileStorageService {
     if (!filePath) return null;
 
     try {
-      const stats = await fs.stat(filePath);
+      const stats = await stat(filePath);
       const metadata = await this.loadMetadata(fileStorageId);
       const thumbnails = await this.listThumbnails(fileStorageId);
-      const ext = path.extname(filePath).substring(1);
+      const ext = extname(filePath).substring(1);
 
       return {
         fileStorageId,
-        fileName: metadata?._fileName || path.basename(filePath),
+        fileName: metadata?._fileName || basename(filePath),
         fileFormat: ext,
         fileSize: stats.size,
         fileHash: metadata?._fileHash || '',
@@ -525,41 +507,6 @@ export class FileStorageService implements IFileStorageService {
       this.logger.error(`Error getting file info for ${fileStorageId}`, error);
       return null;
     }
-  }
-
-  /**
-   * Clean up orphaned files (files not referenced by any job)
-   */
-  async cleanupOrphanedFiles(): Promise<number> {
-    let cleaned = 0;
-    const subdirs = ["gcode", "3mf", "bgcode"];
-
-    for (const subdir of subdirs) {
-      const dirPath = path.join(this.storageBasePath, subdir);
-      try {
-        const files = await fs.readdir(dirPath);
-
-        for (const file of files) {
-          const fileId = path.parse(file).name;
-
-          // Check if any job references this file
-          const job = await this.printJobRepository.findOne({
-            where: { fileStorageId: fileId },
-          });
-
-          if (!job) {
-            await fs.unlink(path.join(dirPath, file));
-            cleaned++;
-            this.logger.log(`Cleaned orphaned file: ${file}`);
-          }
-        }
-      } catch (error) {
-        this.logger.error(`Error cleaning ${subdir}`, error);
-      }
-    }
-
-    this.logger.log(`Cleaned ${cleaned} orphaned file(s)`);
-    return cleaned;
   }
 }
 
