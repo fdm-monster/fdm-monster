@@ -17,8 +17,8 @@ export const updateFloorNameSchema = z.object({
   name: floorNameValidator,
 });
 
-export const updateFloorLevelSchema = z.object({
-  floor: floorOrderValidator,
+export const updateFloorOrderSchema = z.object({
+  order: floorOrderValidator,
 });
 
 export const createOrUpdateFloorSchema = z.object({

@@ -8,7 +8,7 @@ import { validateInput } from "@/handlers/validators";
 import {
   createOrUpdateFloorSchema,
   printerInFloorSchema,
-  updateFloorLevelSchema,
+  updateFloorOrderSchema,
   updateFloorNameSchema,
 } from "@/services/validators/floor-service.validation";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
@@ -119,11 +119,11 @@ export class FloorService
     return this.update(floorId, floor);
   }
 
-  async updateOrder(floorId: number, level: number): Promise<Floor> {
-    const { floor: validLevel } = await validateInput({ floor: level }, updateFloorLevelSchema);
+  async updateOrder(floorId: number, order: number): Promise<Floor> {
+    const { order: validOrder } = await validateInput({ order }, updateFloorOrderSchema);
 
     const floor = await this.get(floorId);
-    floor.order = validLevel;
+    floor.order = validOrder;
     return await this.update(floorId, floor);
   }
 

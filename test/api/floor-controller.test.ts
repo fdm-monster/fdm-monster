@@ -95,7 +95,7 @@ describe(FloorController.name, () => {
   it("should be able to update floor order", async () => {
     const floor = await createTestFloor(request, "Floor123", 5070);
     const response = await request.patch(updateFloorOrderRoute(floor.id)).send({
-      floor: 5071,
+      order: 5071,
     });
     expectOkResponse(response, { name: "Floor123", order: 5071 });
   });

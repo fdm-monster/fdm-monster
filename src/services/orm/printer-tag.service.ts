@@ -25,6 +25,7 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
       tagRecords[tag.id] = {
         id: tag.id,
         name: tag.name,
+        color: tag.color,
         printers: [] as PrinterTagDto[],
       };
     }
@@ -50,6 +51,7 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
     return {
       id: tag.id,
       name: tag.name,
+      color: tag.color,
       printers: printerTags,
     };
   }
@@ -66,6 +68,14 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
   async updateTagName(tagId: number, name: string): Promise<void> {
     const entity = await this.getTag(tagId);
     const updateDto = { name };
+    await validate(updateDto);
+    await validate(Object.assign(entity, updateDto));
+    await this.tagRepository.update(entity.id, updateDto);
+  }
+
+  async updateTagColor(tagId: number, color: string): Promise<void> {
+    const entity = await this.getTag(tagId);
+    const updateDto = { color };
     await validate(updateDto);
     await validate(Object.assign(entity, updateDto));
     await this.tagRepository.update(entity.id, updateDto);

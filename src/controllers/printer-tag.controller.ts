@@ -43,6 +43,14 @@ export class PrinterTagController {
     res.send(entity);
   }
 
+  @PATCH()
+  @route("/:id/color")
+  @before([ParamId("id")])
+  async updateTagColor(req: Request, res: Response) {
+    const entity = await this.printerTagService.updateTagColor(req.local.id, req.body.color);
+    res.send(entity);
+  }
+
   @DELETE()
   @route("/:id")
   @before([ParamId("id")])
