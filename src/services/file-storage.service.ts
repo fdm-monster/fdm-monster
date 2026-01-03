@@ -7,7 +7,7 @@ import { superRootPath } from "@/utils/fs.utils";
 import path, { basename, extname, join } from "node:path";
 import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { existsSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 
 export interface IFileStorageService {
   saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
