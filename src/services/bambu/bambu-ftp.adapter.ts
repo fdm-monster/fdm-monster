@@ -125,7 +125,7 @@ export class BambuFtpAdapter {
    * Get the file storage path for temporary files
    */
   private getFileStoragePath(filename: string): string {
-    const storagePath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
+    const storagePath = join(superRootPath(), AppConstants.defaultFileUploadsStorage);
 
     // Ensure directory exists
     if (!existsSync(storagePath)) {

@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: 24.x
 
-      - run: yarn set version berry
+      - run: corepack enable
       - run: yarn install --immutable
       - run: yarn run build
       - run: yarn run tsc
@@ -53,3 +53,4 @@ jobs:
           dry-run: true
           token: ${{ secrets.NPM_TOKEN }}
           package: package.json
+          tag: ${{ contains(env.SERVER_VERSION, 'rc') && 'rc' || contains(env.SERVER_VERSION, 'beta') && 'beta' || contains(env.SERVER_VERSION, 'alpha') && 'alpha' || 'latest' }}

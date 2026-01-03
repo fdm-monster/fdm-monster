@@ -1,5 +1,44 @@
 # Develop
 
+# FDM Monster 2.0.0
+
+## Feat
+
+- All UI features in https://github.com/fdm-monster/fdm-monster-client-next/blob/main/RELEASE_NOTES.MD
+- Add mock camera console to project (for development)
+- Add swagger and OpenAPI integration
+- UI Client is now fdm-monster-client-next at v2.0.0
+- Add color option to tag
+- Add API to upload from slicer
+- Change API to /api/v2
+- Queue
+- PrintJob
+- File Analysis
+
+## Fixes
+
+- Renames PrinterFloors permission group to Floors
+- Load printer files in background instead of synchronously
+- BambuLab connection rejections cannot cause server crashes anymore
+- Default grid size is now 4 by 2 (which is less overwhelming)
+- Floor service wouldn't update printer position, comparison was x==x, y==x
+- ExceptionFilter now logs using loggerFactory
+- YAML import service was brittle against printer type failures, added robustness
+- Camera should tolerate printer deletion: SET NULL applied to Foreign Key
+- Quick stop API endpoint moved to printer controller, removing the need for custom gcode api controller.
+- Drop printer file clean task, outdated concept
+- File uploads now go to media/file-uploads instead of media
+- First-time-setup api filter now allows swagger endpoints
+- Floor order change not properly implemented in API service
+- Remove experimental thumbnail support
+
+## Chore
+- Remove batch/single set gcode analysis to false
+- Removed client next experimental setting
+- Drop unused Custom Gcode table
+- Drop broken PrintCompletion table
+- Rename PrinterGroup to PrinterTag, and Group to Tag
+
 # FDM Monster 2.0.0-rc1
 
 ## Features

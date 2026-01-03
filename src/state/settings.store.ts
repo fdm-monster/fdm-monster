@@ -2,7 +2,6 @@ import { InternalServerException } from "@/exceptions/runtime.exceptions";
 import {
   credentialSettingsKey,
   frontendSettingKey,
-  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
@@ -16,7 +15,6 @@ import { ILoggerFactory } from "@/handlers/logger-factory";
 import { z } from "zod";
 import {
   credentialSettingUpdateSchema,
-  fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
@@ -48,13 +46,10 @@ export class SettingsStore {
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
-        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
-        experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
-        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
-      [printerFileCleanSettingKey]: settings[printerFileCleanSettingKey],
       [timeoutSettingKey]: settings[timeoutSettingKey],
     });
   }
@@ -72,9 +67,7 @@ export class SettingsStore {
       [serverSettingsKey]: {
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
-        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
-        experimentalClientSupport: settings[serverSettingsKey].experimentalClientSupport,
-        experimentalThumbnailSupport: settings[serverSettingsKey].experimentalThumbnailSupport,
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport
       },
     });
   }
@@ -151,26 +144,12 @@ export class SettingsStore {
     return this.settings![serverSettingsKey].registration;
   }
 
-  isThumbnailSupportEnabled() {
-    this.throwIfSettingsUnset();
-
-    return this.settings![serverSettingsKey].experimentalThumbnailSupport;
-  }
-
   getServerSettings() {
     return this.getSettings()[serverSettingsKey];
   }
 
   getTimeoutSettings() {
     return this.getSettings()[timeoutSettingKey];
-  }
-
-  getFileCleanSettings() {
-    return this.getSettings()[printerFileCleanSettingKey];
-  }
-
-  isPreUploadFileCleanEnabled() {
-    return this.getSettings()[printerFileCleanSettingKey]?.autoRemoveOldFilesBeforeUpload;
   }
 
   async setWizardCompleted(version: number) {
@@ -207,11 +186,6 @@ export class SettingsStore {
 
   async updateTimeoutSettings(timeoutSettings: z.infer<typeof timeoutSettingsUpdateSchema>) {
     this.settings = await this.settingsService.updateTimeoutSettings(timeoutSettings);
-    return this.getSettings();
-  }
-
-  async updateFileCleanSettings(fileClean: z.infer<typeof fileCleanSettingsUpdateSchema>) {
-    this.settings = await this.settingsService.updateFileCleanSettings(fileClean);
     return this.getSettings();
   }
 
@@ -258,20 +232,6 @@ export class SettingsStore {
   async setExperimentalBambuSupport(experimentalBambuSupport: boolean) {
     this.throwIfSettingsUnset();
     this.settings![serverSettingsKey].experimentalBambuSupport = experimentalBambuSupport;
-    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
-    return this.getSettings();
-  }
-
-  async setExperimentalThumbnailSupport(experimentalThumbnailSupport: boolean) {
-    this.throwIfSettingsUnset();
-    this.settings![serverSettingsKey].experimentalThumbnailSupport = experimentalThumbnailSupport;
-    this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
-    return this.getSettings();
-  }
-
-  async setExperimentalClientSupport(experimentalClientSupport: boolean) {
-    this.throwIfSettingsUnset();
-    this.settings![serverSettingsKey].experimentalClientSupport = experimentalClientSupport;
     this.settings = await this.settingsService.updateServerSettings(this.settings![serverSettingsKey]);
     return this.getSettings();
   }

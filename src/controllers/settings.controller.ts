@@ -4,14 +4,11 @@ import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  clientNextSchema,
   credentialSettingUpdateSchema,
-  fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   moonrakerSupportSchema,
   prusaLinkSupportSchema,
   sentryDiagnosticsEnabledSchema,
-  thumbnailSupportSchema,
   timeoutSettingsUpdateSchema,
   bambuSupportSchema,
 } from "@/services/validators/settings-service.validation";
@@ -126,30 +123,6 @@ export class SettingsController {
   }
 
   @PUT()
-  @route("/experimental-thumbnail-support")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
-  async updateThumbnailSupport(req: Request, res: Response) {
-    const { enabled } = await validateInput(req.body, thumbnailSupportSchema);
-    const result = await this.settingsStore.setExperimentalThumbnailSupport(enabled);
-
-    if (enabled) {
-      await this.printerThumbnailCache.loadCache();
-    } else {
-      await this.printerThumbnailCache.resetCache();
-    }
-    res.send(result);
-  }
-
-  @PUT()
-  @route("/experimental-client-support")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
-  async updateClientSupport(req: Request, res: Response) {
-    const { enabled } = await validateInput(req.body, clientNextSchema);
-    const result = await this.settingsStore.setExperimentalClientSupport(enabled);
-    res.send(result);
-  }
-
-  @PUT()
   @route("/frontend")
   @before([authorizeRoles([ROLES.ADMIN])])
   async updateFrontendSettings(req: Request, res: Response) {
@@ -183,15 +156,6 @@ export class SettingsController {
     const validatedInput = await validateInput(req.body, credentialSettingUpdateSchema);
     await this.settingsStore.updateCredentialSettings(validatedInput);
     res.send();
-  }
-
-  @PUT()
-  @route("/file-clean")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
-  async updateFileCleanSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, fileCleanSettingsUpdateSchema);
-    const result = await this.settingsStore.updateFileCleanSettings(validatedInput);
-    res.send(result);
   }
 
   @PUT()

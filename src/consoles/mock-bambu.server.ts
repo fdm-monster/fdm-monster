@@ -104,7 +104,9 @@ async function generateSelfSignedCert(): Promise<SecureContextOptions> {
 
 // Shared state between FTP and MQTT
 let isPrinting = false;
+let isFinished = false; // Transient state to signal completion
 let currentPrintFile = "";
+let finishedFileName = ""; // Store filename for finished state
 let printProgress = 0;
 let isPaused = false;
 let nozzleTemp = 25;
@@ -170,7 +172,13 @@ const PRINT_DURATION = 20; // 20 seconds
     });
 
     const publishState = () => {
-      if (isPrinting && !isPaused) {
+      // Clear finished state after it's been sent
+      if (isFinished) {
+        isFinished = false;
+        finishedFileName = "";
+        currentPrintFile = "";
+        printProgress = 0;
+      } else if (isPrinting && !isPaused) {
         // Calculate progress based on elapsed time (20 second print)
         const elapsedSeconds = (Date.now() - printStartTime) / 1000;
         printProgress = Math.min((elapsedSeconds / PRINT_DURATION) * 100, 100);
@@ -185,19 +193,30 @@ const PRINT_DURATION = 20; // 20 seconds
         }
 
         if (printProgress >= 100) {
+          // Set finished state before clearing print state
+          isFinished = true;
+          finishedFileName = currentPrintFile;
           isPrinting = false;
-          printProgress = 0;
-          currentPrintFile = "";
-          console.log(`[BAMBU MOCK MQTT] Print completed`);
+          printProgress = 100;
+          console.log(`[BAMBU MOCK MQTT] Print completed: ${currentPrintFile}`);
         }
       }
 
-      if (!isPrinting && nozzleTemp > 25) {
+      if (!isPrinting && !isFinished && nozzleTemp > 25) {
         nozzleTemp = Math.max(nozzleTemp - 2, 25);
         bedTemp = Math.max(bedTemp - 1, 25);
       }
 
-      const printingLabel = isPaused ? "paused" : "printing";
+      // Determine gcode_state
+      let gcodeState = "IDLE";
+      if (isFinished) gcodeState = "FINISHED";
+      else if (isPrinting && isPaused) gcodeState = "PAUSE";
+      else if (isPrinting) gcodeState = "PRINTING";
+
+      const fileName = isFinished ? finishedFileName : currentPrintFile;
+      const hasJob = isPrinting || isFinished;
+      const printingLabel = isPaused ? "paused" : (isFinished ? "finished" : "printing");
+
       const state = {
         print: {
           nozzle_temper: Math.round(nozzleTemp),
@@ -205,15 +224,15 @@ const PRINT_DURATION = 20; // 20 seconds
           bed_temper: Math.round(bedTemp),
           bed_target_temper: isPrinting ? 60 : 0,
           chamber_temper: 30,
-          mc_percent: Math.round(printProgress),
-          mc_remaining_time: isPrinting ? Math.round(PRINT_DURATION - (Date.now() - printStartTime) / 1000) : 0,
-          mc_print_stage: isPrinting ? printingLabel : "idle",
-          gcode_state: isPrinting ? "PRINTING" : "IDLE",
-          gcode_file: isPrinting ? currentPrintFile : "",
+          mc_percent: isFinished ? 100 : Math.round(printProgress),
+          mc_remaining_time: hasJob ? Math.round(Math.max(0, (PRINT_DURATION - (Date.now() - printStartTime) / 1000) / 60)) : 0, // In minutes
+          mc_print_stage: hasJob ? printingLabel : "idle",
+          gcode_state: gcodeState,
+          gcode_file: fileName || "",
           wifi_signal: "-45dBm",
-          layer_num: isPrinting ? Math.floor(printProgress / 2) : 0,
-          total_layer_num: isPrinting ? 50 : 0,
-          subtask_name: isPrinting ? currentPrintFile : "",
+          layer_num: hasJob ? Math.floor((isFinished ? 100 : printProgress) / 2) : 0,
+          total_layer_num: hasJob ? 50 : 0,
+          subtask_name: fileName || "",
           heatbreak_fan_speed: isPrinting ? "5000" : "0",
           cooling_fan_speed: isPrinting ? "8000" : "0",
           big_fan1_speed: isPrinting ? "3000" : "0",
@@ -279,11 +298,20 @@ const PRINT_DURATION = 20; // 20 seconds
           }
         } else if (command === "stop") {
           if (isPrinting) {
+            const stoppedFile = currentPrintFile;
             isPrinting = false;
             isPaused = false;
             printProgress = 0;
-            currentPrintFile = "";
-            console.log(`[BAMBU MOCK MQTT] Stopping print`);
+            // Keep filename for one more state update so backend can identify which job was cancelled
+            // Real Bambu printers send IDLE state with the filename still present
+            console.log(`[BAMBU MOCK MQTT] Stopping print: ${stoppedFile}`);
+
+            // Clear filename after a short delay to simulate real behavior
+            setTimeout(() => {
+              if (!isPrinting) {
+                currentPrintFile = "";
+              }
+            }, MESSAGE_INTERVAL * 2);
           }
         }
       }

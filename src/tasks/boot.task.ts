@@ -8,7 +8,6 @@ import { SettingsStore } from "@/state/settings.store";
 import { FloorStore } from "@/state/floor.store";
 import { ConfigService } from "@/services/core/config.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
-import { PrinterFilesStore } from "@/state/printer-files.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
@@ -17,6 +16,8 @@ import { RoleService } from "@/services/orm/role.service";
 import { UserService } from "@/services/orm/user.service";
 import { PermissionService } from "@/services/orm/permission.service";
 import { RoleName } from "@/constants/authorization.constants";
+import { PrintFileDownloaderService } from "@/services/print-file-downloader.service";
+import { FileStorageService } from "@/services/file-storage.service";
 
 export class BootTask implements TaskService {
   logger: LoggerService;
@@ -27,7 +28,6 @@ export class BootTask implements TaskService {
     private readonly settingsStore: SettingsStore,
     private readonly multerService: MulterService,
     private readonly printerSocketStore: PrinterSocketStore,
-    private readonly printerFilesStore: PrinterFilesStore,
     private readonly permissionService: PermissionService,
     private readonly roleService: RoleService,
     private readonly userService: UserService,
@@ -35,6 +35,8 @@ export class BootTask implements TaskService {
     private readonly configService: ConfigService,
     private readonly typeormService: TypeormService,
     private readonly printerThumbnailCache: PrinterThumbnailCache,
+    private readonly printFileDownloaderService: PrintFileDownloaderService,
+    private readonly fileStorageService: FileStorageService,
   ) {
     this.logger = loggerFactory(BootTask.name);
   }
@@ -49,6 +51,9 @@ export class BootTask implements TaskService {
 
   async run() {
     await this.typeormService.createConnection();
+
+    this.logger.log("Ensuring file storage directories exist");
+    await this.fileStorageService.ensureStorageDirectories();
 
     this.logger.log("Loading and synchronizing Server Settings");
     await this.settingsStore.loadSettings();
@@ -88,8 +93,6 @@ export class BootTask implements TaskService {
     this.multerService.clearUploadsFolder();
     this.logger.log("Loading printer sockets");
     await this.printerSocketStore.loadPrinterSockets(); // New sockets
-    this.logger.log("Loading files store");
-    await this.printerFilesStore.loadFilesStore();
     this.logger.log("Loading floor store");
     await this.floorStore.loadStore();
     this.logger.log("Loading printer thumbnail cache");

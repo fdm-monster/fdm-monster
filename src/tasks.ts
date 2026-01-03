@@ -17,15 +17,18 @@ export function registerTask(task: any, preset: TimingPreset, milliseconds = 0, 
 }
 
 export class ServerTasks {
-  public static SERVER_BOOT_TASK = registerTask(DITokens.bootTask, TaskPresets.PERIODIC_DISABLED, 5000, false);
-  public static BOOT_TASKS = [
+  public static readonly SERVER_BOOT_TASK = registerTask(DITokens.bootTask, TaskPresets.PERIODIC_DISABLED, 5000, false);
+  public static readonly BOOT_TASKS = [
     registerTask(DITokens.softwareUpdateTask, TaskPresets.RUNDELAYED, 1500),
     registerTask(DITokens.clientDistDownloadTask, TaskPresets.RUNONCE),
     registerTask(DITokens.socketIoTask, TaskPresets.PERIODIC, 500),
-    registerTask(DITokens.printerFileCleanTask, TaskPresets.RUNONCE, 60 * 1000, true),
     // Every 2 seconds
     registerTask(DITokens.printerWebsocketTask, TaskPresets.PERIODIC, 2000, true),
     // Every 15 seconds
     registerTask(DITokens.printerWebsocketRestoreTask, TaskPresets.PERIODIC, 15 * 1000, false),
+    // Load printer files in background after boot
+    registerTask(DITokens.printerFilesLoadTask, TaskPresets.RUNDELAYED, 1000),
+    // Analyze pending print jobs every 30 seconds
+    registerTask(DITokens.printJobAnalysisTask, TaskPresets.PERIODIC, 30 * 1000, false),
   ];
 }

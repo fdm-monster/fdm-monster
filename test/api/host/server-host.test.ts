@@ -21,7 +21,7 @@ describe(ServerHost.name, () => {
     expect(serverHost.hasConnected()).toBeTruthy();
   });
 
-  it("should hit API - skipping history redirect - for /api", async () => {
+  it("should redirect to API docs - skipping history redirect - for /api", async () => {
     const response = await request.get(AppConstants.apiRoute).send();
     expectOkResponse(response);
   });

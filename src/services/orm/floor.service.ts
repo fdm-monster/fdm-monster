@@ -8,7 +8,7 @@ import { validateInput } from "@/handlers/validators";
 import {
   createOrUpdateFloorSchema,
   printerInFloorSchema,
-  updateFloorLevelSchema,
+  updateFloorOrderSchema,
   updateFloorNameSchema,
 } from "@/services/validators/floor-service.validation";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
@@ -47,7 +47,7 @@ export class FloorService
 
     const floor = await super.create({
       name: outcome.name,
-      floor: outcome.floor,
+      order: outcome.order,
       printers: [],
     });
 
@@ -64,7 +64,7 @@ export class FloorService
     return {
       id: floor.id,
       name: floor.name,
-      floor: floor.floor,
+      order: floor.order,
       printers: floor.printers.map((p) => ({
         printerId: p.printerId,
         floorId: p.floorId,
@@ -72,15 +72,6 @@ export class FloorService
         y: p.y,
       })),
     };
-  }
-
-  async createDefaultFloor() {
-    const floor = await this.create({
-      name: "Default Floor",
-      floor: 1,
-    });
-
-    return await this.get(floor.id);
   }
 
   /**
@@ -95,7 +86,7 @@ export class FloorService
       ...existingFloor,
       name: update.name,
       printers: update.printers,
-      floor: update.floor,
+      order: update.order,
     };
     const validatedFloor = await validateInput(floorUpdate, createOrUpdateFloorSchema);
 
@@ -128,11 +119,11 @@ export class FloorService
     return this.update(floorId, floor);
   }
 
-  async updateLevel(floorId: number, level: number): Promise<Floor> {
-    const { floor: validLevel } = await validateInput({ floor: level }, updateFloorLevelSchema);
+  async updateOrder(floorId: number, order: number): Promise<Floor> {
+    const { order: validOrder } = await validateInput({ order }, updateFloorOrderSchema);
 
     const floor = await this.get(floorId);
-    floor.floor = validLevel;
+    floor.order = validOrder;
     return await this.update(floorId, floor);
   }
 
@@ -147,7 +138,7 @@ export class FloorService
     if (
       position?.floorId === floorId &&
       position.x === validInput.x &&
-      position.x === validInput.y &&
+      position.y === validInput.y &&
       position.printerId === validInput.printerId
     ) {
       return this.get(floorId);

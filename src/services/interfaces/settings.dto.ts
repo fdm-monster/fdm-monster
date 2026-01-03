@@ -1,6 +1,5 @@
 import {
   frontendSettingKey,
-  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
@@ -8,7 +7,6 @@ import {
 import { z } from "zod";
 import {
   credentialSettingUpdateSchema,
-  fileCleanSettingsUpdateSchema,
   frontendSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
   wizardUpdateSchema,
@@ -20,16 +18,12 @@ export interface ServerSettingsDto {
   loginRequired: boolean;
   experimentalMoonrakerSupport: boolean;
   experimentalBambuSupport: boolean;
-  experimentalClientSupport: boolean;
-  experimentalThumbnailSupport: boolean;
   experimentalPrusaLinkSupport: boolean;
 }
 
 export type WizardSettingsDto = z.infer<typeof wizardUpdateSchema>;
 
 export type FrontendSettingsDto = z.infer<typeof frontendSettingsUpdateSchema>;
-
-export type FileCleanSettingsDto = z.infer<typeof fileCleanSettingsUpdateSchema>;
 
 export type CredentialSettingsDto = z.infer<typeof credentialSettingUpdateSchema>;
 
@@ -40,6 +34,5 @@ export class SettingsDto {
   [wizardSettingKey]: WizardSettingsDto;
   [frontendSettingKey]: FrontendSettingsDto;
   // [credentialSettingsKey]: CredentialSettingsDto;
-  [printerFileCleanSettingKey]: FileCleanSettingsDto;
   [timeoutSettingKey]: TimeoutSettingsDto;
 }

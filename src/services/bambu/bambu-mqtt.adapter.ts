@@ -12,7 +12,7 @@ import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
 import { BambuType } from "@/services/printer-api.interface";
 import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 
-export const bambuEvent = (event: string) => `bambu.${event}`;
+export const bambuEvent = (event: string) => `bambu.${ event }`;
 
 export interface BambuEventDto {
   event: string;
@@ -91,10 +91,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
       throw new Error("Cannot open connection: credentials not registered");
     }
 
-    this.connect(this.host, this.accessCode, this.serial).catch((err) => {
-      this.logger.error("Failed to open MQTT connection: " + err.toString());
-      this.updateSocketState(SOCKET_STATE.error);
-    });
+    this.connect(this.host, this.accessCode, this.serial);
   }
 
   close(): void {
@@ -126,7 +123,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
   /**
    * Connect to printer MQTT broker
    */
-  async connect(host: string, accessCode: string, serial: string): Promise<void> {
+  connect(host: string, accessCode: string, serial: string): void {
     if (this.mqttClient?.connected) {
       this.logger.debug("MQTT already connected");
       this.updateSocketState(SOCKET_STATE.opened);
@@ -134,7 +131,8 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     }
 
     if (this.isConnecting) {
-      throw new Error("Connection already in progress");
+      this.logger.warn("Connection already in progress");
+      return;
     }
 
     this.host = host;
@@ -143,92 +141,92 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     this.isConnecting = true;
     this.updateSocketState(SOCKET_STATE.opening);
 
-    const mqttUrl = `mqtts://${host}:8883`;
+    const mqttUrl = `mqtts://${ host }:8883`;
     const timeout = this.settingsStore.getTimeoutSettings().apiTimeout;
 
-    this.logger.log(`Connecting to Bambu MQTT at ${mqttUrl}`);
+    this.logger.log(`Connecting to Bambu MQTT at ${ mqttUrl }`);
 
-    return new Promise<void>((resolve, reject) => {
-      const connectionTimeout = setTimeout(() => {
-        this.isConnecting = false;
-        this.updateSocketState(SOCKET_STATE.error);
-        this.cleanup();
-        reject(new Error("MQTT connection timeout"));
-      }, timeout);
+    const connectionTimeout = setTimeout(() => {
+      this.isConnecting = false;
+      this.updateSocketState(SOCKET_STATE.error);
+      this.logger.error("MQTT connection timeout");
+      // Don't cleanup immediately - let the client close gracefully
+      // The close event handler will trigger cleanup
+      if (this.mqttClient) {
+        this.mqttClient.end(true);
+      }
+    }, timeout);
 
-      try {
-        this.mqttClient = mqtt.connect(mqttUrl, {
-          username: "bblp",
-          password: accessCode,
-          clientId: `fdm_monster_${serial}_${Date.now()}`,
-          protocol: "mqtts",
-          connectTimeout: timeout,
-          reconnectPeriod: 5000,
-          keepalive: 60,
-          rejectUnauthorized: false,
-        });
+    try {
+      this.mqttClient = mqtt.connect(mqttUrl, {
+        username: "bblp",
+        password: accessCode,
+        clientId: `fdm_monster_${ serial }_${ Date.now() }`,
+        protocol: "mqtts",
+        connectTimeout: timeout,
+        reconnectPeriod: 0,
+        keepalive: 60,
+        rejectUnauthorized: false,
+      });
 
-        this.mqttClient.on("connect", () => {
-          clearTimeout(connectionTimeout);
-          this.isConnecting = false;
-          this.updateSocketState(SOCKET_STATE.authenticated);
-          this.updateApiState(API_STATE.responding);
-          this.logger.log("MQTT connected successfully");
-
-          const reportTopic = `device/${serial}/report`;
-          this.mqttClient!.subscribe(reportTopic, { qos: 0 }, (err) => {
-            if (err) {
-              this.logger.error(`Failed to subscribe to ${reportTopic}:`, err);
-              this.updateSocketState(SOCKET_STATE.error);
-              reject(new Error(`Subscribe failed: ${err.message}`));
-            } else {
-              this.logger.debug(`Subscribed to ${reportTopic}`);
-              resolve();
-            }
-          });
-        });
-
-        this.mqttClient.on("error", (error) => {
-          clearTimeout(connectionTimeout);
-          this.isConnecting = false;
-          this.updateSocketState(SOCKET_STATE.error);
-          this.emitEvent(WsMessage.WS_ERROR, error.message).catch(() => {});
-          this.logger.error("MQTT error:", error);
-
-          if (!this.mqttClient?.connected) {
-            reject(error);
-          }
-        });
-
-        this.mqttClient.on("message", (topic, message) => {
-          this.lastMessageReceivedTimestamp = Date.now();
-          this.handleMessage(topic, message);
-        });
-
-        this.mqttClient.on("disconnect", () => {
-          this.updateSocketState(SOCKET_STATE.closed);
-          this.emitEvent(WsMessage.WS_CLOSED, "disconnected").catch(() => {});
-          this.logger.warn("MQTT disconnected");
-        });
-
-        this.mqttClient.on("reconnect", () => {
-          this.updateSocketState(SOCKET_STATE.opening);
-          this.logger.debug("MQTT reconnecting...");
-        });
-
-        this.mqttClient.on("close", () => {
-          this.updateSocketState(SOCKET_STATE.closed);
-          this.emitEvent(WsMessage.WS_CLOSED, "connection closed").catch(() => {});
-          this.logger.debug("MQTT connection closed");
-        });
-      } catch (error) {
+      this.mqttClient.on("connect", () => {
         clearTimeout(connectionTimeout);
         this.isConnecting = false;
+        this.updateSocketState(SOCKET_STATE.authenticated);
+        this.updateApiState(API_STATE.responding);
+        this.logger.log("MQTT connected successfully");
+
+        const reportTopic = `device/${ serial }/report`;
+        this.mqttClient!.subscribe(reportTopic, { qos: 0 }, (err) => {
+          if (err) {
+            this.logger.error(`Failed to subscribe to ${ reportTopic }:`, err);
+            this.updateSocketState(SOCKET_STATE.error);
+          } else {
+            this.logger.debug(`Subscribed to ${ reportTopic }`);
+          }
+        });
+      });
+
+      this.mqttClient.on("error", (error) => {
+        this.isConnecting = false;
         this.updateSocketState(SOCKET_STATE.error);
+        this.emitEvent(WsMessage.WS_ERROR, error.message).catch(() => {
+        });
+        this.logger.error("MQTT error:", error);
+      });
+
+      this.mqttClient.on("message", (topic, message) => {
+        this.lastMessageReceivedTimestamp = Date.now();
+        this.handleMessage(topic, message);
+      });
+
+      this.mqttClient.on("disconnect", () => {
+        this.updateSocketState(SOCKET_STATE.closed);
+        this.emitEvent(WsMessage.WS_CLOSED, "disconnected").catch(() => {
+        });
+        this.logger.warn("MQTT disconnected");
+      });
+
+      this.mqttClient.on("reconnect", () => {
+        this.updateSocketState(SOCKET_STATE.opening);
+        this.logger.debug("MQTT reconnecting...");
+      });
+
+      this.mqttClient.on("close", () => {
+        this.updateSocketState(SOCKET_STATE.closed);
+        this.emitEvent(WsMessage.WS_CLOSED, "connection closed").catch(() => {
+        });
+        this.logger.debug("MQTT connection closed");
+        // Cleanup after close to ensure all handlers caught any final errors
         this.cleanup();
-        reject(error);
-      }
-    });
+      });
+    } catch (error) {
+      clearTimeout(connectionTimeout);
+      this.isConnecting = false;
+      this.updateSocketState(SOCKET_STATE.error);
+      this.logger.error("Failed to create MQTT client:", error);
+      this.cleanup();
+    }
   }
 
   /**
@@ -275,7 +273,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
       throw new Error("Serial number not set");
     }
 
-    const requestTopic = `device/${this.serial}/request`;
+    const requestTopic = `device/${ this.serial }/request`;
     const message = JSON.stringify(payload);
 
     return new Promise<void>((resolve, reject) => {
@@ -299,7 +297,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
       print: {
         command: "project_file",
         param: filename,
-        url: `file:///sdcard/${filename}`,
+        url: `file:///sdcard/${ filename }`,
         subtask_name: filename,
         sequence_id: String(Date.now()),
       },
@@ -477,11 +475,16 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
 
       if (topic.endsWith("/report") && payload.print) {
         this.lastState = payload.print as PrintData;
-        this.logger.debug("Received printer state update");
 
-        // Transform and emit current state
+        // Emit combined payload:
+        // - Transformed format for UI (state, temps, progress, job)
+        // - Raw print object for PrinterEventsCache job tracking
         const currentMessage = this.transformStateToCurrentMessage(this.lastState);
-        this.emitEvent("current", currentMessage).catch((err) => {
+        const combinedPayload = {
+          ...currentMessage,
+          print: payload.print, // Include raw print data for job tracking
+        };
+        this.emitEvent("current", combinedPayload).catch((err) => {
           this.logger.error("Failed to emit current event:", err);
         });
       }
@@ -498,6 +501,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
       this.mqttClient.removeAllListeners();
       this.mqttClient = null;
     }
+    this.isConnecting = false;
     this.lastState = null;
   }
 }

@@ -23,13 +23,10 @@ import { BootTask } from "./tasks/boot.task";
 import { UserService } from "./services/orm/user.service";
 import { RoleService } from "./services/orm/role.service";
 import { PermissionService } from "./services/orm/permission.service";
-import { PrinterFileCleanTask } from "./tasks/printer-file-clean.task";
+import { PrinterFilesLoadTask } from "./tasks/printer-files-load.task";
 import { ROLES } from "./constants/authorization.constants";
-import { CustomGcodeService } from "./services/orm/custom-gcode.service";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
 import { ConfigService, IConfigService } from "./services/core/config.service";
-import { PrintCompletionSocketIoTask } from "./tasks/print-completion.socketio.task";
-import { PrintCompletionService } from "./services/orm/print-completion.service";
 import { SocketIoGateway } from "./state/socket-io.gateway";
 import { ClientBundleService } from "./services/core/client-bundle.service";
 import { FloorStore } from "./state/floor.store";
@@ -51,9 +48,10 @@ import { RefreshTokenService } from "@/services/orm/refresh-token.service";
 import { SettingsService } from "@/services/orm/settings.service";
 import { FloorService } from "@/services/orm/floor.service";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
+import { ExceptionFilter } from "@/middleware/exception.filter";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { UserRoleService } from "@/services/orm/user-role.service";
-import { PrinterGroupService } from "@/services/orm/printer-group.service";
+import { PrinterTagService } from "@/services/orm/printer-tag.service";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { MoonrakerWebsocketAdapter } from "@/services/moonraker/moonraker-websocket.adapter";
 import { OctoprintApi } from "@/services/octoprint.api";
@@ -69,6 +67,12 @@ import { BambuClient } from "@/services/bambu/bambu.client";
 import { BambuMqttAdapter } from "@/services/bambu/bambu-mqtt.adapter";
 import { BambuFtpAdapter } from "@/services/bambu/bambu-ftp.adapter";
 import { BambuApi } from "@/services/bambu.api";
+import { PrintQueueService } from "@/services/print-queue.service";
+import { FileStorageService } from "@/services/file-storage.service";
+import { PrintJobService } from "@/services/orm/print-job.service";
+import { FileAnalysisService } from "@/services/file-analysis.service";
+import { PrintJobAnalysisTask } from "@/tasks/print-job-analysis.task";
+import { PrintFileDownloaderService } from "@/services/print-file-downloader.service";
 
 export function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -95,16 +99,15 @@ export function configureContainer() {
     [di.floorPositionService]: asClass(FloorPositionService).singleton(),
     [di.cameraStreamService]: asClass(CameraStreamService).singleton(),
     [di.printerService]: asClass(PrinterService),
-    [di.printerGroupService]: asClass(PrinterGroupService),
+    [di.printerTagService]: asClass(PrinterTagService),
     [di.refreshTokenService]: asClass(RefreshTokenService).singleton(),
     [di.userService]: asClass(UserService).singleton(),
     [di.userRoleService]: asClass(UserRoleService).singleton(),
     [di.roleService]: asClass(RoleService).singleton(),
     [di.permissionService]: asClass(PermissionService).singleton(),
-    [di.customGCodeService]: asClass(CustomGcodeService).singleton(),
-    [di.printCompletionService]: asClass(PrintCompletionService).singleton(),
     // -- asClass --
     [di.serverHost]: asClass(ServerHost).singleton(),
+    [di.exceptionFilter]: asClass(ExceptionFilter).singleton(),
     [di.settingsStore]: asClass(SettingsStore).singleton(),
     [di.configService]: asClass(ConfigService),
     [di.authService]: asClass(AuthService).singleton(),
@@ -165,15 +168,20 @@ export function configureContainer() {
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
     [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
     [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
+    [di.printJobService]: asClass(PrintJobService).singleton(),
+    [di.printQueueService]: asClass(PrintQueueService).singleton(),
+    [di.fileStorageService]: asClass(FileStorageService).singleton(),
+    [di.fileAnalysisService]: asClass(FileAnalysisService).singleton(),
+    [di.printFileDownloaderService]: asClass(PrintFileDownloaderService).singleton(),
 
     [di.bootTask]: asClass(BootTask),
     [di.softwareUpdateTask]: asClass(SoftwareUpdateTask), // Provided SSE handlers (couplers) shared with controllers
     [di.socketIoTask]: asClass(SocketIoTask).singleton(), // This task is a quick task (~100ms per printer)
     [di.clientDistDownloadTask]: asClass(ClientDistDownloadTask).singleton(),
-    [di.printCompletionSocketIoTask]: asClass(PrintCompletionSocketIoTask).singleton(),
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
-    [di.printerFileCleanTask]: asClass(PrinterFileCleanTask).singleton(),
+    [di.printerFilesLoadTask]: asClass(PrinterFilesLoadTask).singleton(),
+    [di.printJobAnalysisTask]: asClass(PrintJobAnalysisTask).singleton(),
   });
 
   return container;

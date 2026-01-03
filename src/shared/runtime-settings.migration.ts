@@ -2,12 +2,10 @@ import {
   credentialSettingsKey,
   frontendSettingKey,
   getDefaultCredentialSettings,
-  getDefaultFileCleanSettings,
   getDefaultFrontendSettings,
   getDefaultServerSettings,
   getDefaultTimeout,
   getDefaultWizardSettings,
-  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
@@ -36,16 +34,6 @@ export function migrateSettingsRuntime(knownSettings: Partial<Settings>): Settin
     // Verification and signing of JWT tokens, can be changed on the fly
     jwtSecret: uuidv4(),
   };
-  entity[printerFileCleanSettingKey] ??= getDefaultFileCleanSettings();
-
-  if (entity[printerFileCleanSettingKey]) {
-    // Remove superfluous settings
-    entity[printerFileCleanSettingKey] = {
-      autoRemoveOldFilesBeforeUpload: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-      autoRemoveOldFilesAtBoot: entity[printerFileCleanSettingKey].autoRemoveOldFilesBeforeUpload,
-      autoRemoveOldFilesCriteriumDays: entity[printerFileCleanSettingKey].autoRemoveOldFilesCriteriumDays,
-    };
-  }
 
   if (entity[serverSettingsKey]) {
     const defaultServerSettings = getDefaultServerSettings();
@@ -54,8 +42,6 @@ export function migrateSettingsRuntime(knownSettings: Partial<Settings>): Settin
     entity[serverSettingsKey] = {
       loginRequired: entity[serverSettingsKey].loginRequired ?? defaultServerSettings.loginRequired,
       registration: entity[serverSettingsKey].registration ?? defaultServerSettings.registration,
-      experimentalClientSupport:
-        entity[serverSettingsKey].experimentalClientSupport ?? defaultServerSettings.experimentalClientSupport,
       experimentalMoonrakerSupport:
         entity[serverSettingsKey].experimentalMoonrakerSupport ?? defaultServerSettings.experimentalMoonrakerSupport,
       experimentalPrusaLinkSupport:
@@ -63,9 +49,7 @@ export function migrateSettingsRuntime(knownSettings: Partial<Settings>): Settin
       experimentalBambuSupport:
         entity[serverSettingsKey].experimentalBambuSupport ?? defaultServerSettings.experimentalBambuSupport,
       sentryDiagnosticsEnabled:
-        entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled,
-      experimentalThumbnailSupport:
-        entity[serverSettingsKey].experimentalThumbnailSupport ?? defaultServerSettings.experimentalThumbnailSupport,
+        entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled
     };
   }
 

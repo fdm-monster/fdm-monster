@@ -17,10 +17,11 @@ export const AppConstants = {
   defaultClientBundleZipsStorage: "./media/client-dist-zips",
   defaultPrinterThumbnailsStorage: "./media/printer-thumbnails",
   defaultFileUploadsStorage: "./media/file-uploads",
+  defaultPrintFilesStorage: "./media/files",
   defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
   defaultAcceptedBambuExtensions: [".gcode", ".3mf"],
   defaultServerPort: 4000,
-  apiRoute: "/api",
+  apiRoute: "/api/v2",
   enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
 
   // Boolean string (true/false), persisted always
@@ -45,7 +46,7 @@ export const AppConstants = {
   DEFAULT_JWT_ISSUER: "fdm-monster-server",
   // String, not persisted
   OVERRIDE_JWT_AUDIENCE: "OVERRIDE_JWT_AUDIENCE",
-  DEFAULT_JWT_AUDIENCE: "fdm-monster-client",
+  DEFAULT_JWT_AUDIENCE: "fdm-monster-client-next",
 
   OVERRIDE_IS_DEMO_MODE: "OVERRIDE_IS_DEMO_MODE",
   OVERRIDE_DEMO_USERNAME: "OVERRIDE_DEMO_USERNAME",
@@ -63,15 +64,13 @@ export const AppConstants = {
   GITHUB_PAT: "GITHUB_PAT",
   serverPackageName: "@fdm-monster/server",
   serverRepoName: "fdm-monster",
-  clientPackageName: "@fdm-monster/client",
-  clientRepoName: "fdm-monster-client",
-  clientNextPackageName: "@fdm-monster/client-next",
-  clientNextRepoName: "fdm-monster-client-next",
+  clientPackageName: "@fdm-monster/client-next",
+  clientRepoName: "fdm-monster-client-next",
   githubUrl: "https://github.com/fdm-monster/fdm-monster",
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "1.13.0",
+  defaultClientMinimum: "2.1.0",
 
   // Websocket values
   defaultWebsocketHandshakeTimeout: 3000,
@@ -87,11 +86,13 @@ export const AppConstants = {
   sentryCustomDsnDefault:
     "https://164b8028a8a745bba3dbcab991b84ae7@o4503975545733120.ingest.sentry.io/4505101598261248",
 
-  debugRoutesKey: "DEBUG_ROUTES",
-
   ENABLE_PROMETHEUS_METRICS: "ENABLE_PROMETHEUS_METRICS",
   ENABLE_LOKI_LOGGING: "ENABLE_LOKI_LOGGING",
   LOKI_ADDRESS: "LOKI_ADDRESS",
   LOKI_TIMEOUT_SECONDS: "LOKI_TIMEOUT_SECONDS",
   LOKI_INTERVAL: "LOKI_INTERVAL",
+
+  // Swagger/OpenAPI Documentation
+  DISABLE_SWAGGER_OPENAPI: "DISABLE_SWAGGER_OPENAPI",
+  GENERATE_SWAGGER_JSON: "GENERATE_SWAGGER_JSON",
 };

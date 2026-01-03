@@ -14,10 +14,6 @@ beforeAll(async () => {
 });
 
 describe("MulterService", () => {
-  it("should find file", () => {
-    expect(multerService.fileExists("file", "storage")).toBeFalsy();
-  });
-
   it("should clear folder", () => {
     fs.existsSync.mockReturnValue(true);
     fs.readdirSync.mockReturnValue([

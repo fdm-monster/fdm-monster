@@ -7,8 +7,6 @@ export const serverSettingsUpdateSchema = z.object({
   experimentalMoonrakerSupport: z.boolean(),
   experimentalBambuSupport: z.boolean(),
   experimentalPrusaLinkSupport: z.boolean(),
-  experimentalThumbnailSupport: z.boolean(),
-  experimentalClientSupport: z.boolean(),
   sentryDiagnosticsEnabled: z.boolean(),
 });
 
@@ -47,12 +45,6 @@ export const wizardUpdateSchema = z.object({
   wizardVersion: z.number().int().min(0),
 });
 
-export const fileCleanSettingsUpdateSchema = z.object({
-  autoRemoveOldFilesBeforeUpload: z.boolean(),
-  autoRemoveOldFilesAtBoot: z.boolean(),
-  autoRemoveOldFilesCriteriumDays: z.number().int().min(0),
-});
-
 export const sentryDiagnosticsEnabledSchema = z.object({
   enabled: z.boolean(),
 });
@@ -66,13 +58,5 @@ export const prusaLinkSupportSchema = z.object({
 });
 
 export const bambuSupportSchema = z.object({
-  enabled: z.boolean(),
-});
-
-export const thumbnailSupportSchema = z.object({
-  enabled: z.boolean(),
-});
-
-export const clientNextSchema = z.object({
   enabled: z.boolean(),
 });

@@ -22,6 +22,7 @@ const disabledReasonRoute = (id: number) => `${updateRoute(id)}/disabled-reason`
 const feedRateRoute = (id: number) => `${updateRoute(id)}/feed-rate`;
 const flowRateRoute = (id: number) => `${updateRoute(id)}/flow-rate`;
 const restartOctoPrintRoute = (id: number) => `${getRoute(id)}/octoprint/server/restart`;
+const emergencyGCodeRoute = (id: number) => `${defaultRoute}/${id}/send-emergency-m112/`;
 const serialConnectCommandRoute = (id: number) => `${getRoute(id)}/serial-connect`;
 const serialDisconnectCommandRoute = (id: number) => `${getRoute(id)}/serial-disconnect`;
 const batchRoute = `${defaultRoute}/batch`;
@@ -264,6 +265,15 @@ describe(PrinterController.name, () => {
 
     const res = await request.post(restartOctoPrintRoute(printer.id)).send();
     expectOkResponse(res);
+  });
+
+  it("should send emergency gcode command", async function () {
+    const printer = await createTestPrinter(request);
+
+    nock(printer.printerURL).post("/api/printer/command").reply(200, {});
+
+    const response = await request.post(emergencyGCodeRoute(printer.id)).send();
+    expectOkResponse(response, null);
   });
 
   it("should send serial connect command", async () => {

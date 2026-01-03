@@ -1,6 +1,6 @@
 <p align="center" style="margin-bottom: 0">
     <a href="https://docs.fdm-monster.net/" target="_blank" rel="noopener noreferrer">
-        <img width="150" src="https://github.com/fdm-monster/fdm-monster-client/blob/main/public/img/logo.png?raw=true" alt="FDM Monster">
+        <img width="150" src="https://github.com/fdm-monster/fdm-monster-client-next/blob/main/public/img/logo.png?raw=true" alt="FDM Monster">
     </a>
 </p>
 <h1 align="center" style="padding-top: 0; margin-top: 10px">FDM Monster</h1>
@@ -158,13 +158,14 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 - [x] 🔌 Raspberry Pi image (https://github.com/fdm-monster/MonsterPi)
 - [x] :rocket: Documentation (https://docs.fdm-monster.net)
 - [x] 🛡️ Login and user management
-- [x] OctoFarm export 
+- [x] OctoFarm printer import 
 - [x] Klipper and Moonraker API integration
 - [x] GCode Thumbnail support
 - [x] `.bgcode` support
 - [x] Modernized UI layout and tile design
-- [ ] History and statistics
-- [ ] Extended webcam integration
+- [x] History and statistics
+- [x] Print Queue
+- [x] Extended webcam integration
 - [ ] Spoolman integration
 
 ## License

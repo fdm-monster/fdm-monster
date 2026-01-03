@@ -13,6 +13,7 @@ import { BambuApiStub } from "./stubs/bambu.api.stub";
 import { BambuClientStub } from "./stubs/bambu.client.stub";
 import { BambuFtpAdapterStub } from "./stubs/bambu-ftp.adapter.stub";
 import { BambuMqttAdapterStub } from "./stubs/bambu-mqtt.adapter.stub";
+import { SettingsStore } from "@/state/settings.store";
 
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
 const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
@@ -21,7 +22,6 @@ const getRoute = (id: number) => `${defaultRoute}/${id}`;
 const clearFilesRoute = (id: number) => `${getRoute(id)}/clear`;
 const deleteFileRoute = (id: number, path: string) => `${getRoute(id)}?path=${path}`;
 const printFileRoute = (id: number) => `${getRoute(id)}/print`;
-const reloadThumbnailRoute = (id: number) => `${getRoute(id)}/reload-thumbnail`;
 const uploadFileRoute = (id: number) => `${getRoute(id)}/upload`;
 const getFilesRoute = (id: number) => `${getRoute(id)}`;
 const downloadFileRoute = (id: number, path: string) => `${getRoute(id)}/download/${path}`;
@@ -42,6 +42,9 @@ beforeAll(async () => {
   };
 
   ({ request, container } = await setupTestApp(true, stubMocks));
+  const settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
+  await settingsStore.setExperimentalBambuSupport(true);
+  
   printerService = container.resolve<IPrinterService>(DITokens.printerService);
 });
 
@@ -105,15 +108,6 @@ describe(PrinterFilesController.name, () => {
   it("should allow GET on cached printer thumbnail", async () => {
     const printer = await createTestPrinter(request);
     const response = await request.get(getPrintThumbnailRoute(printer.id)).send();
-    expectOkResponse(response);
-  });
-
-  it("should allow POST to reload thumbnail cache", async () => {
-    const printer = await createTestPrinter(request);
-    nock(printer.printerURL).get("/api/files/local/123.gcode").reply(200, "; thumbnail begin\n; thumbnail end");
-    const response = await request.post(reloadThumbnailRoute(printer.id)).send({
-      filePath: "123.gcode",
-    });
     expectOkResponse(response);
   });
 

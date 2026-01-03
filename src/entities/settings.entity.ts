@@ -1,7 +1,6 @@
 import {
   credentialSettingsKey,
   frontendSettingKey,
-  printerFileCleanSettingKey,
   serverSettingsKey,
   timeoutSettingKey,
   wizardSettingKey,
@@ -19,9 +18,7 @@ export class Settings {
     loginRequired: boolean;
     registration: boolean;
     experimentalMoonrakerSupport: boolean;
-    experimentalClientSupport: boolean;
     experimentalBambuSupport: boolean;
-    experimentalThumbnailSupport: boolean;
     experimentalPrusaLinkSupport: boolean;
   };
 
@@ -38,13 +35,6 @@ export class Settings {
     wizardCompleted: boolean;
     wizardCompletedAt: Date | null;
     wizardVersion: number;
-  };
-
-  @Column({ type: "simple-json", nullable: false })
-  [printerFileCleanSettingKey]: {
-    autoRemoveOldFilesBeforeUpload: boolean;
-    autoRemoveOldFilesAtBoot: boolean;
-    autoRemoveOldFilesCriteriumDays: number;
   };
 
   @Column({ type: "simple-json", nullable: false })

@@ -10,7 +10,6 @@ import { IPrinterService } from "@/services/interfaces/printer.service.interface
 import TestAgent from "supertest/lib/agent";
 
 const defaultRoute = AppConstants.apiRoute + "/batch";
-const batchSettingsGetRoute = `${defaultRoute}/settings/get`;
 const batchConnectUsbRoute = `${defaultRoute}/connect/usb`;
 const batchConnectSocketRoute = `${defaultRoute}/connect/socket`;
 const batchToggleEnabledRoute = `${defaultRoute}/toggle-enabled`;
@@ -34,15 +33,6 @@ afterEach(async () => {
 });
 
 describe(BatchCallController.name, () => {
-  it("should allow POST to fetch batch settings", async () => {
-    const printer = await createTestPrinter(request);
-    const printer2 = await createTestPrinter(request);
-    const response = await request.post(batchSettingsGetRoute).send({
-      printerIds: [printer.id, printer2.id],
-    });
-    expectOkResponse(response);
-  });
-
   it("should allow POST to fetch batch reprint returning printer files", async () => {
     const printer = await createTestPrinter(request);
     const printer2 = await createTestPrinter(request);

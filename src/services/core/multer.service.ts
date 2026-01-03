@@ -25,16 +25,16 @@ export class MulterService {
   }
 
   public clearUploadsFolder() {
-    const fileStoragePath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
-    if (!existsSync(fileStoragePath)) return;
+    const fileUploadsPath = join(superRootPath(), AppConstants.defaultFileUploadsStorage);
+    if (!existsSync(fileUploadsPath)) return;
 
-    const files = readdirSync(fileStoragePath, { withFileTypes: true })
+    const files = readdirSync(fileUploadsPath, { withFileTypes: true })
       .filter((item) => !item.isDirectory())
       .map((item) => item.name);
 
     for (const file of files) {
       try {
-        rmSync(join(fileStoragePath, file));
+        rmSync(join(fileUploadsPath, file));
       } catch (error) {
         this.logger.error(`Could not clear upload file in temporary folder ${errorSummary(error)}`);
       }
@@ -47,11 +47,6 @@ export class MulterService {
     } else {
       this.logger.warn("Cannot unlink temporarily uploaded file as it was not found");
     }
-  }
-
-  fileExists(downloadFilename: string, collection: string) {
-    const downloadPath = join(superRootPath(), AppConstants.defaultFileStorageFolder, collection, downloadFilename);
-    return existsSync(downloadPath);
   }
 
   getMulterGCodeFileFilter(storeAsFile = true) {
@@ -105,7 +100,7 @@ export class MulterService {
     return multer({
       storage: storeAsFile
         ? diskStorage({
-            destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
+            destination: join(superRootPath(), AppConstants.defaultFileUploadsStorage),
           })
         : memoryStorage(),
     }).any();

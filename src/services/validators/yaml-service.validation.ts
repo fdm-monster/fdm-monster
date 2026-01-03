@@ -7,7 +7,7 @@ import {
   printerUrlValidator,
 } from "@/services/validators/printer-service.validation";
 import {
-  floorLevelValidator,
+  floorOrderValidator,
   floorNameValidator,
   xValidator,
   yValidator,
@@ -17,7 +17,9 @@ export const exportPrintersFloorsYamlSchema = z.object({
   exportPrinters: z.boolean(),
   exportFloorGrid: z.boolean(),
   exportFloors: z.boolean(),
-  exportGroups: z.boolean(),
+  exportTags: z.boolean(),
+  // Legacy field for backward compatibility
+  exportGroups: z.boolean().optional(),
   exportSettings: z.boolean().default(false),
   exportUsers: z.boolean().default(false),
   printerComparisonStrategiesByPriority: z
@@ -52,6 +54,8 @@ export const importPrintersFloorsYamlSchema = z.object({
     exportPrinters: z.boolean(),
     exportFloorGrid: z.boolean(),
     exportFloors: z.boolean(),
+    exportTags: z.boolean().optional(),
+    // Legacy field for backward compatibility
     exportGroups: z.boolean().optional(),
     exportSettings: z.boolean().optional().default(false),
     exportUsers: z.boolean().optional().default(false),
@@ -84,18 +88,21 @@ export const importPrintersFloorsYamlSchema = z.object({
     .array(
       z.object({
         id: numberOrStringIdValidator,
-        floor: floorLevelValidator,
+        order: floorOrderValidator,
+        // Legacy property
+        floor: floorOrderValidator.optional(),
         name: floorNameValidator,
         printers: printerPositionsSchema,
       }),
     )
     .min(0)
     .default([]),
-  groups: z
+  tags: z
     .array(
       z.object({
         id: numberOrStringIdValidator,
         name: z.string(),
+        color: z.string().optional(),
         printers: z.array(
           z.object({
             printerId: numberOrStringIdValidator,
@@ -118,26 +125,6 @@ export const importPrintersFloorsYamlSchema = z.object({
         passwordHash: z.string(),
         createdAt: z.date().optional(),
         roles: z.array(z.any()).optional(),
-      }),
-    )
-    .optional()
-    .default([]),
-  roles: z
-    .array(
-      z.object({
-        id: numberOrStringIdValidator,
-        name: z.string(),
-      }),
-    )
-    .optional()
-    .default([]),
-  user_roles: z
-    .array(
-      z.object({
-        id: numberOrStringIdValidator,
-        userId: numberOrStringIdValidator,
-        roleId: numberOrStringIdValidator,
-        createdAt: z.date().optional(),
       }),
     )
     .optional()

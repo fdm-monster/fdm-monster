@@ -15,7 +15,7 @@ services:
   # docker build --platform linux/amd64,linux/arm64 -t 1.5.0-alpha . -f .\docker\Dockerfile
   fdm-monster:
     container_name: fdm-monster
-    image: fdmmonster/fdm-monster:1.9.3
+    image: fdmmonster/fdm-monster:2.0.0-rc1
     build:
       context: .
       dockerfile: docker/Dockerfile

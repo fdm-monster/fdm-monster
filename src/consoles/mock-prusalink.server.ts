@@ -1,11 +1,11 @@
-import path from "path";
-import fs from "fs";
+import path from "node:path";
+import fs from "node:fs";
 import console from "node:console";
 import multer from "multer";
 import express from "express";
-import http from "http";
+import http from "node:http";
 
-const port = process.argv[2] ? parseInt(process.argv[2]) : 2234;
+const port = process.argv[2] ? Number.parseInt(process.argv[2]) : 2234;
 const uploadsDir = path.join(__dirname, "uploads", `server-${port.toString()}`);
 
 if (!fs.existsSync(uploadsDir)) {

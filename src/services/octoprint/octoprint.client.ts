@@ -123,11 +123,6 @@ export class OctoprintClient extends OctoprintRoutes {
     return await this.createClient(login).post(this.apiSettingsPart, settingPatch);
   }
 
-  async setGCodeAnalysis(login: LoginDto, enabled: boolean) {
-    const settingPatch = this.gcodeAnalysisSetting(enabled);
-    return await this.createClient(login).post(this.apiSettingsPart, settingPatch);
-  }
-
   async getCurrentUser(login: LoginDto) {
     return await this.createClient(login).get<CurrentUserDto>(this.apiCurrentUser);
   }

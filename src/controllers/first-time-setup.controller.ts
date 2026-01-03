@@ -82,7 +82,7 @@ export class FirstTimeSetupController {
       );
     }
 
-    const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml"], false);
+    const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml", ".yml"], false);
     const firstFile = files[0];
 
     await this.yamlService.importYaml(firstFile.buffer.toString());

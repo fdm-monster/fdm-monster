@@ -7,7 +7,7 @@ import { join } from "path";
 import { readFileSync } from "node:fs";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { PrinterGroupService } from "@/services/orm/printer-group.service";
+import { PrinterTagService } from "@/services/orm/printer-tag.service";
 import { testPrinterData } from "./test-data/printer.data";
 import { FloorStore } from "@/state/floor.store";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
@@ -18,7 +18,7 @@ let printerCache: PrinterCache;
 let printerService: IPrinterService;
 let floorService: IFloorService;
 let floorStore: FloorStore;
-let printerGroupService: PrinterGroupService;
+let printerTagService: PrinterTagService;
 let floorPositionService: FloorPositionService;
 
 beforeAll(async () => {
@@ -29,7 +29,7 @@ beforeAll(async () => {
   floorService = container.resolve(DITokens.floorService);
   floorPositionService = container.resolve(DITokens.floorPositionService);
   floorStore = container.resolve(DITokens.floorStore);
-  printerGroupService = container.resolve(DITokens.printerGroupService);
+  printerTagService = container.resolve(DITokens.printerTagService);
 });
 afterEach(async () => {
   const printers = await printerService.list();
@@ -51,7 +51,7 @@ describe(YamlService.name, () => {
       exportFloors: true,
       exportPrinters: true,
       exportFloorGrid: true,
-      exportGroups: true,
+      exportTags: true,
       exportSettings: true,
       exportUsers: true,
       printerComparisonStrategiesByPriority: ["name", "id"],
@@ -117,8 +117,8 @@ describe(YamlService.name, () => {
     expect(floor.printers).toHaveLength(3);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
 
-    const groups = await printerGroupService.listGroups();
-    expect(groups).toHaveLength(0);
+    const tags = await printerTagService.listTags();
+    expect(tags).toHaveLength(0);
   });
 
   it("should import 1.6.1 sqlite yaml", async () => {
@@ -136,12 +136,12 @@ describe(YamlService.name, () => {
     expect(floor.printers).toHaveLength(4);
     expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
 
-    const groups = await printerGroupService.listGroups();
-    expect(groups).toBeDefined();
-    const group = groups.find((g) => g.name === "Group A123_1.6.1")!;
-    expect(group).toBeDefined();
-    expect(group.printers).toHaveLength(2);
-    expect(groups.find((g) => g.name === "Group test_1.6.1")!.printers).toHaveLength(0);
+    const tags = await printerTagService.listTags();
+    expect(tags).toBeDefined();
+    const tag = tags.find((g) => g.name === "Group A123_1.6.1")!;
+    expect(tag).toBeDefined();
+    expect(tag.printers).toHaveLength(2);
+    expect(tags.find((g) => g.name === "Group test_1.6.1")!.printers).toHaveLength(0);
   });
 
   it("should parse 1.9.1 mongodb full yaml file format", async () => {
@@ -161,7 +161,7 @@ describe(YamlService.name, () => {
       exportFloors: false,
       exportPrinters: false,
       exportFloorGrid: false,
-      exportGroups: false,
+      exportTags: false,
       exportSettings: true,
       exportUsers: true,
       printerComparisonStrategiesByPriority: ["name", "id"],
@@ -180,7 +180,7 @@ describe(YamlService.name, () => {
       exportFloors: true,
       exportPrinters: true,
       exportFloorGrid: true,
-      exportGroups: true,
+      exportTags: true,
       exportSettings: true,
       exportUsers: true,
       printerComparisonStrategiesByPriority: ["name", "id"],
@@ -190,6 +190,7 @@ describe(YamlService.name, () => {
     expect(yamlDump).toBeDefined();
     expect(yamlDump).toContain("exportPrinters: true");
     expect(yamlDump).toContain("exportFloors: true");
+    expect(yamlDump).toContain("exportTags: true");
     expect(yamlDump).toContain("exportSettings: true");
     expect(yamlDump).toContain("exportUsers: true");
   });
@@ -199,7 +200,7 @@ describe(YamlService.name, () => {
       exportFloors: false,
       exportPrinters: true,
       exportFloorGrid: false,
-      exportGroups: false,
+      exportTags: false,
       exportSettings: false,
       exportUsers: false,
       printerComparisonStrategiesByPriority: ["name", "id"],
@@ -217,7 +218,7 @@ describe(YamlService.name, () => {
     const printer = await printerService.create({ ...testPrinterData, name: "ExportTestPrinter" });
     await floorService.create({
       name: "ExportTestFloor",
-      floor: 99,
+      order: 99,
       printers: [
         {
           x: 1,
@@ -231,7 +232,7 @@ describe(YamlService.name, () => {
       exportFloors: true,
       exportPrinters: true,
       exportFloorGrid: true,
-      exportGroups: false,
+      exportTags: false,
       exportSettings: false,
       exportUsers: false,
       printerComparisonStrategiesByPriority: ["name"],
@@ -263,7 +264,7 @@ describe(YamlService.name, () => {
     const printer = await printerService.create({ ...testPrinterData, name: "YamlImportTestPrinter" });
     const defaultFloor = await floorService.create({
       name: "Floor1_DifferentName",
-      floor: 15,
+      order: 15,
       printers: [
         {
           // Position is not used in imported floor "Floor1"
@@ -287,7 +288,7 @@ describe(YamlService.name, () => {
     expect(typeof newFloor2.id).toBe("number");
 
     expect(newFloor2).toBeDefined();
-    expect(newFloor2.floor).toBe(16);
+    expect(newFloor2.order).toBe(16);
     expect(newFloor2.printers).toHaveLength(1);
 
     const positionTemp = await floorPositionService.findPosition(newFloor2.id as number, 0, 0);
@@ -295,7 +296,7 @@ describe(YamlService.name, () => {
 
     // The original floor's name is now gone, and the original printer has not been removed from it (overwrite action)
     expect(floors.find((f) => f.name === "Floor1_DifferentName")).toBeUndefined();
-    const mutatedFloor1 = floors.find((f) => f.name === "Floor1" && f.floor === 15)!;
+    const mutatedFloor1 = floors.find((f) => f.name === "Floor1" && f.order === 15)!;
     expect(mutatedFloor1).toBeDefined();
 
     expect(mutatedFloor1.printers).toHaveLength(1);

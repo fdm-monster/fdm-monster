@@ -1,7 +1,6 @@
 import { AppConstants } from "@/server.constants";
 import {
   CredentialSettingsDto,
-  FileCleanSettingsDto,
   FrontendSettingsDto,
   ServerSettingsDto,
   TimeoutSettingsDto,
@@ -22,9 +21,7 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   loginRequired: true,
   registration: false,
   experimentalMoonrakerSupport: false,
-  experimentalBambuSupport: true,
-  experimentalClientSupport: false,
-  experimentalThumbnailSupport: false,
+  experimentalBambuSupport: false,
   experimentalPrusaLinkSupport: false,
 });
 
@@ -40,8 +37,8 @@ export const getDefaultCredentialSettings = (): CredentialSettingsDto => ({
 
 export const frontendSettingKey = "frontend";
 export const getDefaultFrontendSettings = (): FrontendSettingsDto => ({
-  gridCols: 8,
-  gridRows: 8,
+  gridCols: 4,
+  gridRows: 2,
   largeTiles: false,
   tilePreferCancelOverQuickStop: false,
 });
@@ -52,12 +49,6 @@ export const getDefaultTimeout = (): TimeoutSettingsDto => ({
   apiUploadTimeout: 30000,
 });
 
-export const printerFileCleanSettingKey = "printerFileClean";
-export const getDefaultFileCleanSettings = (): FileCleanSettingsDto => ({
-  autoRemoveOldFilesBeforeUpload: false,
-  autoRemoveOldFilesAtBoot: false,
-  autoRemoveOldFilesCriteriumDays: 7,
-});
 
 export const getDefaultSettings = () => ({
   [serverSettingsKey]: getDefaultServerSettings(),
@@ -66,7 +57,6 @@ export const getDefaultSettings = () => ({
     ...getDefaultCredentialSettings(),
     jwtSecret: uuidv4(),
   },
-  [printerFileCleanSettingKey]: getDefaultFileCleanSettings(),
   [frontendSettingKey]: getDefaultFrontendSettings(),
   [timeoutSettingKey]: getDefaultTimeout(),
 });

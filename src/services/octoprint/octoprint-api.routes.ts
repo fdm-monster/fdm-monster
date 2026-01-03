@@ -73,12 +73,4 @@ export class OctoprintRoutes {
       },
     };
   }
-
-  gcodeAnalysisSetting(enabled: boolean) {
-    return {
-      gcodeAnalysis: {
-        runAt: enabled ? "idle" : "never",
-      },
-    };
-  }
 }

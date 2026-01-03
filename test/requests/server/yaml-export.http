@@ -6,7 +6,7 @@ Content-Type: application/json
   "exportPrinters": true,
   "exportFloorGrid": true,
   "exportFloors": true,
-  "exportGroups": true,
+  "exportTags": true,
   "exportSettings": true,
   "exportUsers": true,
   "printerComparisonStrategiesByPriority": ["name", "url", "id"],
