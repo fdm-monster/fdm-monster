@@ -31,7 +31,7 @@ import { DropCustomGcode1767279607392 } from "@/migrations/1767279607392-DropCus
 import { DropPrintCompletions1767291804417 } from "@/migrations/1767291804417-DropPrintCompletions";
 import { DropSettingsFileClean1767352862576 } from "@/migrations/1767352862576-DropSettingsFileClean";
 import { ChangeFloorNonUniqueOrder1767370191762 } from "@/migrations/1767370191762-ChangeFloorNonUniqueOrder";
-import { RenameGroupToTag1767371395741 } from "@/migrations/1767371395741-RenameGroupToTag";
+import { RenameGroupToTag1767432108916 } from "@/migrations/1767432108916-RenameGroupToTag";
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
@@ -75,7 +75,7 @@ export const AppDataSource = new DataSource({
     DropPrintCompletions1767291804417,
     DropSettingsFileClean1767352862576,
     ChangeFloorNonUniqueOrder1767370191762,
-    RenameGroupToTag1767371395741
+    RenameGroupToTag1767432108916
   ],
   subscribers: [],
 });
