@@ -26,11 +26,15 @@ export class ServerPublicController {
     if (!(await this.settingsStore.getLoginRequired())) {
       return res.send({
         message: "Login disabled. Please load the Vue app.",
+        apiDocs: "http://localhost:4000/api-docs/",
+        swaggerJson: "http://localhost:4000/api-docs/swagger.json",
       });
     }
 
     return res.send({
       message: "Login required. Please load the Vue app.",
+      apiDocs: "http://localhost:4000/api-docs/",
+      swaggerJson: "http://localhost:4000/api-docs/swagger.json",
     });
   }
 
