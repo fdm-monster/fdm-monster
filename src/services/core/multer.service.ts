@@ -105,7 +105,7 @@ export class MulterService {
     return multer({
       storage: storeAsFile
         ? diskStorage({
-            destination: join(superRootPath(), AppConstants.defaultFileStorageFolder),
+            destination: join(superRootPath(), AppConstants.defaultFileUploadsStorage),
           })
         : memoryStorage(),
     }).any();
