@@ -1,4 +1,4 @@
-import * as fs from "fs/promises";
+import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import AdmZip from "adm-zip";
 import { ThreeMFMetadata } from "@/entities/print-job.entity";
@@ -40,9 +40,20 @@ export class ThreeMFParser {
     const zip = new AdmZip(filePath);
     const zipEntries = zip.getEntries();
 
-    // Extract metadata from 3D model XML
-    const modelEntry = zipEntries.find(e => e.entryName === "3D/3dmodel.model" || e.entryName === "Metadata/model_settings.config");
-    const metadata = modelEntry ? this.extractMetadataFromXML(modelEntry.getData().toString("utf8")) : {};
+    // Check for metadata.json first (some slicers may use this)
+    const metadataJsonEntry = zipEntries.find(e => e.entryName === "metadata.json");
+    let metadata: Record<string, any> = {};
+
+    if (metadataJsonEntry) {
+      // Parse JSON metadata
+      const jsonContent = metadataJsonEntry.getData().toString("utf8");
+      const jsonData = JSON.parse(jsonContent);
+      metadata = this.normalizeJsonMetadata(jsonData);
+    } else {
+      // Extract metadata from 3D model XML
+      const modelEntry = zipEntries.find(e => e.entryName === "3D/3dmodel.model" || e.entryName === "Metadata/model_settings.config");
+      metadata = modelEntry ? this.extractMetadataFromXML(modelEntry.getData().toString("utf8")) : {};
+    }
 
     // Check for multi-plate structure (Bambu Lab)
     const plates = this.extractPlates(zipEntries);
@@ -155,6 +166,27 @@ export class ThreeMFParser {
     };
   }
 
+  private normalizeJsonMetadata(jsonData: any): Record<string, any> {
+    // Normalize JSON metadata keys to match expected format
+    const metadata: Record<string, any> = {};
+
+    // Map common JSON metadata keys to our internal format
+    if (jsonData.nozzleDiameter !== undefined) metadata.nozzleDiameter = String(jsonData.nozzleDiameter);
+    if (jsonData.estimatedPrintTimeSec !== undefined) metadata.printTime = String(jsonData.estimatedPrintTimeSec);
+    if (jsonData.filamentDiameter !== undefined) metadata.filamentDiameter = String(jsonData.filamentDiameter);
+    if (jsonData.filamentDensity !== undefined) metadata.filamentDensity = String(jsonData.filamentDensity);
+    if (jsonData.filamentUsedGrams !== undefined) metadata.filamentWeight = String(jsonData.filamentUsedGrams);
+    if (jsonData.layerHeight !== undefined) metadata.layerHeight = String(jsonData.layerHeight);
+    if (jsonData.firstLayerHeight !== undefined) metadata.firstLayerHeight = String(jsonData.firstLayerHeight);
+    if (jsonData.bedTemp !== undefined) metadata.bedTemp = String(jsonData.bedTemp);
+    if (jsonData.nozzleTemp !== undefined) metadata.nozzleTemp = String(jsonData.nozzleTemp);
+    if (jsonData.fillDensity !== undefined) metadata.infillDensity = String(jsonData.fillDensity);
+    if (jsonData.filamentType !== undefined) metadata.filamentType = jsonData.filamentType;
+    if (jsonData.printerModel !== undefined) metadata.printerModel = jsonData.printerModel;
+
+    return metadata;
+  }
+
   private extractMetadataFromXML(xml: string): Record<string, string> {
     const metadata: Record<string, string> = {};
 
@@ -214,7 +246,7 @@ export class ThreeMFParser {
       if (!plateMatch) continue;
 
       // Bambu uses 1-indexed plate numbers in filenames (plate_1.gcode = plate 1)
-      const plateNumber = parseInt(plateMatch[1]);
+      const plateNumber = Number.parseInt(plateMatch[1]);
       // Read more bytes to include CONFIG_BLOCK (contains layer_height, temps, etc.)
       const gcodeContent = entry.getData().toString("utf8", 0, Math.min(50000, entry.getData().length));
 
@@ -346,7 +378,7 @@ export class ThreeMFParser {
         // M190 S65 - Wait for bed temperature
         if (!metadata.bed_temperature_actual) {
           const bedTempMatch = line.match(/^M1(40|90)\s+S(\d+)/);
-          if (bedTempMatch && parseInt(bedTempMatch[2]) > 0) {
+          if (bedTempMatch && Number.parseInt(bedTempMatch[2]) > 0) {
             metadata.bed_temperature_actual = bedTempMatch[2];
           }
         }
@@ -373,8 +405,8 @@ export class ThreeMFParser {
     for (const entry of thumbEntries) {
       // Try to extract dimensions from filename
       const sizeMatch = entry.entryName.match(/(\d+)x(\d+)/);
-      const width = sizeMatch ? parseInt(sizeMatch[1]) : 0;
-      const height = sizeMatch ? parseInt(sizeMatch[2]) : 0;
+      const width = sizeMatch ? Number.parseInt(sizeMatch[1]) : 0;
+      const height = sizeMatch ? Number.parseInt(sizeMatch[2]) : 0;
 
       const format = entry.entryName.match(/\.(png|jpg|jpeg)$/i)?.[1].toUpperCase() || "PNG";
 
@@ -396,14 +428,14 @@ export class ThreeMFParser {
 
   private parseFloat(value: string | undefined): number | null {
     if (!value) return null;
-    const num = parseFloat(value);
-    return isNaN(num) ? null : num;
+    const num = Number.parseFloat(value);
+    return Number.isNaN(num) ? null : num;
   }
 
   private parseInt(value: string | undefined): number | null {
     if (!value) return null;
-    const num = parseInt(value, 10);
-    return isNaN(num) ? null : num;
+    const num = Number.parseInt(value, 10);
+    return Number.isNaN(num) ? null : num;
   }
 
   private parseTime(value: string | undefined): number | null {
@@ -412,15 +444,15 @@ export class ThreeMFParser {
     // Try parsing as a duration string first (e.g., "11m 15s" or "1h 30m")
     const match = value.match(/(?:(\d+)h)?(?:\s*(\d+)m)?(?:\s*(\d+)s)?/);
     if (match && (match[1] || match[2] || match[3])) {
-      const hours = parseInt(match[1] || "0");
-      const minutes = parseInt(match[2] || "0");
-      const secs = parseInt(match[3] || "0");
+      const hours = Number.parseInt(match[1] || "0");
+      const minutes = Number.parseInt(match[2] || "0");
+      const secs = Number.parseInt(match[3] || "0");
       return hours * 3600 + minutes * 60 + secs;
     }
 
     // Fallback to parsing as plain seconds
-    const seconds = parseFloat(value);
-    if (!isNaN(seconds)) return seconds;
+    const seconds = Number.parseFloat(value);
+    if (!Number.isNaN(seconds)) return seconds;
 
     return null;
   }

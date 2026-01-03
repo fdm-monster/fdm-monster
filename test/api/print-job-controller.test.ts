@@ -2,10 +2,12 @@ import { setupTestApp } from "../test-server";
 import { createTestPrinter } from "./test-data/create-printer";
 import { DITokens } from "@/container.tokens";
 import { PrintJobService } from "@/services/orm/print-job.service";
+import { AppConstants } from "@/server.constants";
 
 describe("PrintJobController", () => {
   let testRequest: any;
   let printJobService: PrintJobService;
+  const baseRoute = `${AppConstants.apiRoute}/print-jobs`;
 
   beforeAll(async () => {
     const { request, container } = await setupTestApp(false, undefined, true, false);
@@ -13,15 +15,15 @@ describe("PrintJobController", () => {
     printJobService = container.resolve<PrintJobService>(DITokens.printJobService);
   });
 
-  it("GET /api/print-jobs/search returns array", async () => {
-    const res = await testRequest.get("/api/print-jobs/search").set("Accept", "application/json");
+  it("GET /print-jobs/search returns array", async () => {
+    const res = await testRequest.get(`${baseRoute}/search`).set("Accept", "application/json");
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
 
-  it("GET /api/print-jobs/search-paged returns paged result", async () => {
+  it("GET /print-jobs/search-paged returns paged result", async () => {
     const res = await testRequest
-      .get("/api/print-jobs/search-paged?page=1&pageSize=5")
+      .get(`${baseRoute}/search-paged?page=1&pageSize=5`)
       .set("Accept", "application/json");
     expect(res.status).toBe(200);
     expect(typeof res.body).toBe("object");
@@ -31,13 +33,13 @@ describe("PrintJobController", () => {
   });
 
   describe("Status setting endpoints", () => {
-    describe("POST /api/print-jobs/:id/set-failed", () => {
+    describe("POST /print-jobs/:id/set-failed", () => {
       it("should mark PRINTING job as FAILED", async () => {
         const printer = await createTestPrinter(testRequest);
         const job = await printJobService.markStarted(printer.id, "test-failed.gcode");
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-failed`)
+          .post(`${baseRoute}/${job!.id}/set-failed`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(200);
@@ -62,7 +64,7 @@ describe("PrintJobController", () => {
         await printJobService.printJobRepository.save(job!);
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-failed`)
+          .post(`${baseRoute}/${job!.id}/set-failed`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(200);
@@ -70,22 +72,24 @@ describe("PrintJobController", () => {
         expect(res.body.newStatus).toBe("FAILED");
       });
 
-      it("should reject marking COMPLETED job as FAILED", async () => {
+      it("should allow marking COMPLETED job as FAILED", async () => {
         const printer = await createTestPrinter(testRequest);
         const job = await printJobService.markStarted(printer.id, "test-completed.gcode");
         await printJobService.markFinished(printer.id, "test-completed.gcode");
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-failed`)
+          .post(`${baseRoute}/${job!.id}/set-failed`)
           .set("Accept", "application/json");
 
-        expect(res.status).toBe(400);
-        expect(res.body.error).toContain("Can only mark UNKNOWN, PRINTING, or PAUSED jobs");
+        expect(res.status).toBe(200);
+        expect(res.body.message).toBe("Job marked as failed");
+        expect(res.body.previousStatus).toBe("COMPLETED");
+        expect(res.body.newStatus).toBe("FAILED");
       });
 
       it("should return 404 for non-existent job", async () => {
         const res = await testRequest
-          .post("/api/print-jobs/999999/set-failed")
+          .post(`${baseRoute}/999999/set-failed`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(404);
@@ -93,13 +97,13 @@ describe("PrintJobController", () => {
       });
     });
 
-    describe("POST /api/print-jobs/:id/set-cancelled", () => {
+    describe("POST /print-jobs/:id/set-cancelled", () => {
       it("should mark PRINTING job as CANCELLED", async () => {
         const printer = await createTestPrinter(testRequest);
         const job = await printJobService.markStarted(printer.id, "test-cancelled.gcode");
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-cancelled`)
+          .post(`${baseRoute}/${job!.id}/set-cancelled`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(200);
@@ -120,7 +124,7 @@ describe("PrintJobController", () => {
         await printJobService.handlePrintPaused(printer.id);
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-cancelled`)
+          .post(`${baseRoute}/${job!.id}/set-cancelled`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(200);
@@ -136,7 +140,7 @@ describe("PrintJobController", () => {
         await new Promise(resolve => setTimeout(resolve, 100));
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-cancelled`)
+          .post(`${baseRoute}/${job!.id}/set-cancelled`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(200);
@@ -151,7 +155,7 @@ describe("PrintJobController", () => {
         await printJobService.markFinished(printer.id, "test-completed-cancel.gcode");
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-cancelled`)
+          .post(`${baseRoute}/${job!.id}/set-cancelled`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(400);
@@ -159,13 +163,13 @@ describe("PrintJobController", () => {
       });
     });
 
-    describe("POST /api/print-jobs/:id/set-unknown", () => {
+    describe("POST /print-jobs/:id/set-unknown", () => {
       it("should mark PRINTING job as UNKNOWN", async () => {
         const printer = await createTestPrinter(testRequest);
         const job = await printJobService.markStarted(printer.id, "test-unknown.gcode");
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-unknown`)
+          .post(`${baseRoute}/${job!.id}/set-unknown`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(200);
@@ -187,7 +191,7 @@ describe("PrintJobController", () => {
         await printJobService.handlePrintPaused(printer.id);
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-unknown`)
+          .post(`${baseRoute}/${job!.id}/set-unknown`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(200);
@@ -201,7 +205,7 @@ describe("PrintJobController", () => {
         await printJobService.markFinished(printer.id, "test-completed-unknown.gcode");
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job!.id}/set-unknown`)
+          .post(`${baseRoute}/${job!.id}/set-unknown`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(400);
@@ -241,7 +245,7 @@ describe("PrintJobController", () => {
         );
 
         const res = await testRequest
-          .post(`/api/print-jobs/${job.id}/set-unknown`)
+          .post(`${baseRoute}/${job.id}/set-unknown`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(400);
@@ -250,7 +254,7 @@ describe("PrintJobController", () => {
 
       it("should return 404 for non-existent job", async () => {
         const res = await testRequest
-          .post("/api/print-jobs/999999/set-unknown")
+          .post(`${baseRoute}/999999/set-unknown`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(404);
