@@ -6,6 +6,8 @@
 - Add swagger and OpenAPI integration
 - UI Client is now fdm-monster-client-next at v2.0.0
 - Add color option to tag
+- Add API to upload from slicer
+- Change API to /api/v2
 
 ## Fixes
 
@@ -22,6 +24,7 @@
 - File uploads now go to media/file-uploads instead of media
 - First-time-setup api filter now allows swagger endpoints
 - Floor order change not properly implemented in API service
+- Remove experimental thumbnail support
 
 ## Chore
 - Remove batch/single set gcode analysis to false

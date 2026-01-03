@@ -124,21 +124,6 @@ export class SettingsController {
   }
 
   @PUT()
-  @route("/experimental-thumbnail-support")
-  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
-  async updateThumbnailSupport(req: Request, res: Response) {
-    const { enabled } = await validateInput(req.body, thumbnailSupportSchema);
-    const result = await this.settingsStore.setExperimentalThumbnailSupport(enabled);
-
-    if (enabled) {
-      await this.printerThumbnailCache.loadCache();
-    } else {
-      await this.printerThumbnailCache.resetCache();
-    }
-    res.send(result);
-  }
-
-  @PUT()
   @route("/frontend")
   @before([authorizeRoles([ROLES.ADMIN])])
   async updateFrontendSettings(req: Request, res: Response) {

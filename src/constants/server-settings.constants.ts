@@ -22,7 +22,6 @@ export const getDefaultServerSettings = (): ServerSettingsDto => ({
   registration: false,
   experimentalMoonrakerSupport: false,
   experimentalBambuSupport: false,
-  experimentalThumbnailSupport: false,
   experimentalPrusaLinkSupport: false,
 });
 

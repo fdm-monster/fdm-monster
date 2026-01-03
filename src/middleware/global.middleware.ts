@@ -17,13 +17,13 @@ export const validateWizardCompleted = inject(
       }
 
       const allowedPaths = [
-        "/api/first-time-setup/complete",
-        "/api/first-time-setup/validate",
-        "/api/first-time-setup/yaml-import",
-        "/api/test",
-        "/api/auth/login-required",
+        "/api/v2/first-time-setup/complete",
+        "/api/v2/first-time-setup/validate",
+        "/api/v2/first-time-setup/yaml-import",
+        "/api/v2/test",
+        "/api/v2/auth/login-required",
       ];
-      if (allowedPaths.includes(req.path) || !req.path.startsWith("/api") || req.path.startsWith("/api-docs")) {
+      if (allowedPaths.includes(req.path) || !req.path.startsWith("/api/v2") || req.path.startsWith("/api-docs")) {
         next();
       } else {
         logger.error("Wizard not completed", req.path);

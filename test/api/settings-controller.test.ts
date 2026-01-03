@@ -39,8 +39,7 @@ describe(SettingsController.name, () => {
       sentryDiagnosticsEnabled: false,
       loginRequired: false,
       registration: false,
-      experimentalMoonrakerSupport: true,
-      experimentalThumbnailSupport: false,
+      experimentalMoonrakerSupport: true
     });
     expect(body[wizardSettingKey]).toMatchObject({
       wizardCompleted: true,
