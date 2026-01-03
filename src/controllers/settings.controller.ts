@@ -9,7 +9,6 @@ import {
   moonrakerSupportSchema,
   prusaLinkSupportSchema,
   sentryDiagnosticsEnabledSchema,
-  thumbnailSupportSchema,
   timeoutSettingsUpdateSchema,
   bambuSupportSchema,
 } from "@/services/validators/settings-service.validation";

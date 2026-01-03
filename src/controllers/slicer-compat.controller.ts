@@ -1,6 +1,5 @@
-import { before, GET, POST, route } from "awilix-express";
+import { GET, POST, route } from "awilix-express";
 import { Request, Response } from "express";
-import { authenticate } from "@/middleware/authenticate";
 import { FileStorageService } from "@/services/file-storage.service";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { MulterService } from "@/services/core/multer.service";
@@ -119,8 +118,6 @@ export class SlicerCompatController {
         this.logger.error(`Failed to analyze uploaded file: ${analysisError}`);
         // Continue even if analysis fails
       }
-
-      const fileSize = await this.fileStorageService.getFileSize(fileStorageId);
 
       // Clean up temp file
       try {

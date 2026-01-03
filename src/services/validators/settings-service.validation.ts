@@ -60,7 +60,3 @@ export const prusaLinkSupportSchema = z.object({
 export const bambuSupportSchema = z.object({
   enabled: z.boolean(),
 });
-
-export const thumbnailSupportSchema = z.object({
-  enabled: z.boolean(),
-});
