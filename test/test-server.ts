@@ -53,6 +53,10 @@ export async function setupTestApp(
   await container.resolve(DITokens.permissionService).syncPermissions();
   await container.resolve(DITokens.roleService).syncRoles();
 
+  // Ensure file storage directories exist (needed for file upload tests)
+  const fileStorageService = container.resolve(DITokens.fileStorageService);
+  await fileStorageService.ensureStorageDirectories();
+
   if (loadPrinterStore) {
     // Requires (in-memory) database connection, so its optional
     const printerSocketStore = container.resolve(DITokens.printerSocketStore);
