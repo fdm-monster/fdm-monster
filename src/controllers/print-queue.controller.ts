@@ -6,6 +6,7 @@ import { ROLES } from "@/constants/authorization.constants";
 import { PrintQueueService } from "@/services/print-queue.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
+import { ParamId } from "@/middleware/param-converter.middleware";
 
 @route(AppConstants.apiRoute + "/print-queue")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
@@ -26,8 +27,8 @@ export class PrintQueueController {
   @GET()
   async getGlobalQueue(req: Request, res: Response) {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const pageSize = parseInt(req.query.pageSize as string) || 50;
+      const page = Number.parseInt(req.query.page as string) || 1;
+      const pageSize = Number.parseInt(req.query.pageSize as string) || 50;
 
       if (page < 1 || pageSize < 1 || pageSize > 200) {
         res.status(400).send({ error: "Invalid page or pageSize parameters" });
@@ -79,13 +80,9 @@ export class PrintQueueController {
    */
   @GET()
   @route("/:printerId")
+  @before([ParamId("printerId")])
   async getQueue(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
-
-    if (isNaN(printerId)) {
-      res.status(400).send({ error: "Invalid printer ID" });
-      return;
-    }
+    const printerId = req.local.printerId;
 
     try {
       const queue = await this.printQueueService.getQueue(printerId);
@@ -107,15 +104,11 @@ export class PrintQueueController {
    */
   @POST()
   @route("/:printerId/add/:jobId")
+  @before([ParamId("printerId"), ParamId("jobId")])
   async addToQueue(req: Request, res: Response) {
-    const printerId = Number.parseInt(req.params.printerId);
-    const jobId = Number.parseInt(req.params.jobId);
+    const printerId = req.local.printerId;
+    const jobId = req.local.jobId;
     const position = req.body.position === undefined ? undefined : Number.parseInt(req.body.position);
-
-    if (Number.isNaN(printerId) || Number.isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid printer ID or job ID" });
-      return;
-    }
 
     try {
       await this.printQueueService.addToQueue(printerId, jobId, position);
@@ -144,14 +137,10 @@ export class PrintQueueController {
    */
   @PUT()
   @route("/:printerId/reorder")
+  @before([ParamId("printerId")])
   async reorderQueue(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
+    const printerId = req.local.printerId;
     const jobIds = req.body.jobIds;
-
-    if (isNaN(printerId)) {
-      res.status(400).send({ error: "Invalid printer ID" });
-      return;
-    }
 
     if (!Array.isArray(jobIds)) {
       res.status(400).send({ error: "jobIds must be an array" });
@@ -182,13 +171,9 @@ export class PrintQueueController {
    */
   @DELETE()
   @route("/:printerId/clear")
+  @before([ParamId("printerId")])
   async clearQueue(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
-
-    if (isNaN(printerId)) {
-      res.status(400).send({ error: "Invalid printer ID" });
-      return;
-    }
+    const printerId = req.local.printerId;
 
     try {
       await this.printQueueService.clearQueue(printerId);
@@ -212,14 +197,10 @@ export class PrintQueueController {
    */
   @DELETE()
   @route("/:printerId/:jobId")
+  @before([ParamId("printerId"), ParamId("jobId")])
   async removeFromQueue(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
-    const jobId = parseInt(req.params.jobId);
-
-    if (isNaN(printerId) || isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid printer ID or job ID" });
-      return;
-    }
+    const printerId = req.local.printerId;
+    const jobId = req.local.jobId;
 
     try {
       await this.printQueueService.removeFromQueue(jobId);
@@ -246,43 +227,9 @@ export class PrintQueueController {
    */
   @GET()
   @route("/:printerId/next")
+  @before([ParamId("printerId")])
   async getNextInQueue(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
-
-    if (isNaN(printerId)) {
-      res.status(400).send({ error: "Invalid printer ID" });
-      return;
-    }
-
-    try {
-      await this.printQueueService.clearQueue(printerId);
-
-      res.send({
-        message: "Queue cleared",
-        printerId,
-      });
-    } catch (error) {
-      this.logger.error(`Failed to clear queue for printer ${printerId}: ${error}`);
-      res.status(500).send({
-        error: "Failed to clear queue",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  }
-
-  /**
-   * Get next job in queue for printer
-   * GET /api/print-queue/:printerId/next
-   */
-  @GET()
-  @route("/:printerId/next")
-  async getNextInQueue(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
-
-    if (isNaN(printerId)) {
-      res.status(400).send({ error: "Invalid printer ID" });
-      return;
-    }
+    const printerId = req.local.printerId;
 
     try {
       const nextJob = await this.printQueueService.getNextInQueue(printerId);
@@ -303,13 +250,9 @@ export class PrintQueueController {
    */
   @POST()
   @route("/:printerId/process")
+  @before([ParamId("printerId")])
   async processQueue(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
-
-    if (isNaN(printerId)) {
-      res.status(400).send({ error: "Invalid printer ID" });
-      return;
-    }
+    const printerId = req.local.printerId;
 
     try {
       const nextJob = await this.printQueueService.processQueue(printerId);
@@ -343,14 +286,10 @@ export class PrintQueueController {
    */
   @POST()
   @route("/:printerId/submit/:jobId")
+  @before([ParamId("printerId"), ParamId("jobId")])
   async submitToPrinter(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
-    const jobId = parseInt(req.params.jobId);
-
-    if (isNaN(printerId) || isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid printer ID or job ID" });
-      return;
-    }
+    const printerId = req.local.printerId;
+    const jobId = req.local.jobId;
 
     try {
       await this.printQueueService.submitToPrinter(printerId, jobId);
