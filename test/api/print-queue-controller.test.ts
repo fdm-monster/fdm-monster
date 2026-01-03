@@ -3,12 +3,14 @@ import { createTestPrinter } from "./test-data/create-printer";
 import { DITokens } from "@/container.tokens";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { PrintQueueService } from "@/services/print-queue.service";
+import { FileStorageService } from "@/services/file-storage.service";
 import { AppConstants } from "@/server.constants";
 
 describe("PrintQueueController", () => {
   let testRequest: any;
   let printJobService: PrintJobService;
   let printQueueService: PrintQueueService;
+  let fileStorageService: FileStorageService;
   const baseRoute = `${AppConstants.apiRoute}/print-queue`;
 
   beforeAll(async () => {
@@ -16,6 +18,7 @@ describe("PrintQueueController", () => {
     testRequest = request;
     printJobService = container.resolve<PrintJobService>(DITokens.printJobService);
     printQueueService = container.resolve<PrintQueueService>(DITokens.printQueueService);
+    fileStorageService = container.resolve<FileStorageService>(DITokens.fileStorageService);
   });
 
   describe("GET /print-queue - Global Queue", () => {
@@ -665,6 +668,17 @@ describe("PrintQueueController", () => {
         maxLayerZ: null,
         totalLayers: null,
       });
+
+      // Create a test file in storage
+      const testFileContent = Buffer.from("; test gcode\nG28\nG1 X10 Y10\nM104 S0\nM140 S0\n");
+      const mockFile = {
+        originalname: "test-submit-queued.gcode",
+        buffer: testFileContent,
+      } as Express.Multer.File;
+      const fileStorageId = await fileStorageService.saveFile(mockFile);
+
+      job.fileStorageId = fileStorageId;
+      await printJobService.printJobRepository.save(job);
 
       // Add to queue first
       await printQueueService.addToQueue(printer.id, job.id);

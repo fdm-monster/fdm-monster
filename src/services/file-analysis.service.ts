@@ -20,6 +20,23 @@ interface ParserResult {
 export class FileAnalysisService {
   private readonly logger: LoggerService;
 
+  // File format constants
+  private readonly FILE_FORMATS = {
+    GCODE: "gcode" as const,
+    THREE_MF: "3mf" as const,
+    BGCODE: "bgcode" as const,
+  };
+
+  // File extension constants
+  private readonly EXTENSIONS = {
+    THREE_MF: ".3mf",
+    BGCODE: ".bgcode",
+    GCODE: ".gcode",
+    GCODE_SHORT: ".g",
+    GCODE_ALT: ".gco",
+    GCODE_THREE_MF: ".gcode.3mf",
+  };
+
   // Parser instances
   private readonly gcodeParser: GCodeParser;
   private readonly threemfParser: ThreeMFParser;
@@ -49,13 +66,13 @@ export class FileAnalysisService {
 
     try {
       switch (fileFormat) {
-        case "gcode":
+        case this.FILE_FORMATS.GCODE:
           result = await this.analyzeGCode(filePath);
           break;
-        case "3mf":
+        case this.FILE_FORMATS.THREE_MF:
           result = await this.analyze3MF(filePath);
           break;
-        case "bgcode":
+        case this.FILE_FORMATS.BGCODE:
           result = await this.analyzeBGCode(filePath);
           break;
         default:
@@ -142,14 +159,22 @@ export class FileAnalysisService {
   private getFileFormat(ext: string, filePath: string): FileFormatType {
     // Check for compound extensions first
     const lowerPath = filePath.toLowerCase();
-    if (lowerPath.endsWith(".gcode.3mf") || lowerPath.endsWith(".3mf")) return "3mf";
-    if (lowerPath.endsWith(".bgcode")) return "bgcode";
-    if (lowerPath.endsWith(".gcode") || lowerPath.endsWith(".g") || lowerPath.endsWith(".gco")) return "gcode";
+    if (lowerPath.endsWith(this.EXTENSIONS.GCODE_THREE_MF) || lowerPath.endsWith(this.EXTENSIONS.THREE_MF)) {
+      return this.FILE_FORMATS.THREE_MF;
+    }
+    if (lowerPath.endsWith(this.EXTENSIONS.BGCODE)) {
+      return this.FILE_FORMATS.BGCODE;
+    }
+    if (lowerPath.endsWith(this.EXTENSIONS.GCODE) || lowerPath.endsWith(this.EXTENSIONS.GCODE_SHORT) || lowerPath.endsWith(this.EXTENSIONS.GCODE_ALT)) {
+      return this.FILE_FORMATS.GCODE;
+    }
 
     // Fallback to extension check
-    if (ext === ".3mf") return "3mf";
-    if (ext === ".bgcode") return "bgcode";
-    if (ext === ".gcode" || ext === ".g" || ext === ".gco") return "gcode";
+    if (ext === this.EXTENSIONS.THREE_MF) return this.FILE_FORMATS.THREE_MF;
+    if (ext === this.EXTENSIONS.BGCODE) return this.FILE_FORMATS.BGCODE;
+    if (ext === this.EXTENSIONS.GCODE || ext === this.EXTENSIONS.GCODE_SHORT || ext === this.EXTENSIONS.GCODE_ALT) {
+      return this.FILE_FORMATS.GCODE;
+    }
 
     throw new Error(`Unknown file extension: "${ext}" (path: "${filePath}")`);
   }

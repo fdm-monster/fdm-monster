@@ -108,11 +108,11 @@ export class PrintQueueController {
   @POST()
   @route("/:printerId/add/:jobId")
   async addToQueue(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
-    const jobId = parseInt(req.params.jobId);
-    const position = req.body.position ? parseInt(req.body.position) : undefined;
+    const printerId = Number.parseInt(req.params.printerId);
+    const jobId = Number.parseInt(req.params.jobId);
+    const position = req.body.position === undefined ? undefined : Number.parseInt(req.body.position);
 
-    if (isNaN(printerId) || isNaN(jobId)) {
+    if (Number.isNaN(printerId) || Number.isNaN(jobId)) {
       res.status(400).send({ error: "Invalid printer ID or job ID" });
       return;
     }
@@ -132,40 +132,6 @@ export class PrintQueueController {
       this.logger.error(`Failed to add job ${jobId} to queue: ${error}`);
       res.status(500).send({
         error: "Failed to add to queue",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  }
-
-  /**
-   * Remove job from queue
-   * DELETE /api/print-queue/:printerId/:jobId
-   */
-  @DELETE()
-  @route("/:printerId/:jobId")
-  async removeFromQueue(req: Request, res: Response) {
-    const printerId = parseInt(req.params.printerId);
-    const jobId = parseInt(req.params.jobId);
-
-    if (isNaN(printerId) || isNaN(jobId)) {
-      res.status(400).send({ error: "Invalid printer ID or job ID" });
-      return;
-    }
-
-    try {
-      await this.printQueueService.removeFromQueue(jobId);
-      const queue = await this.printQueueService.getQueue(printerId);
-
-      res.send({
-        message: "Job removed from queue",
-        printerId,
-        jobId,
-        queue,
-      });
-    } catch (error) {
-      this.logger.error(`Failed to remove job ${jobId} from queue: ${error}`);
-      res.status(500).send({
-        error: "Failed to remove from queue",
         message: error instanceof Error ? error.message : "Unknown error",
       });
     }
@@ -217,6 +183,70 @@ export class PrintQueueController {
   @DELETE()
   @route("/:printerId/clear")
   async clearQueue(req: Request, res: Response) {
+    const printerId = parseInt(req.params.printerId);
+
+    if (isNaN(printerId)) {
+      res.status(400).send({ error: "Invalid printer ID" });
+      return;
+    }
+
+    try {
+      await this.printQueueService.clearQueue(printerId);
+
+      res.send({
+        message: "Queue cleared",
+        printerId,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to clear queue for printer ${printerId}: ${error}`);
+      res.status(500).send({
+        error: "Failed to clear queue",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
+  /**
+   * Remove job from queue
+   * DELETE /api/print-queue/:printerId/:jobId
+   */
+  @DELETE()
+  @route("/:printerId/:jobId")
+  async removeFromQueue(req: Request, res: Response) {
+    const printerId = parseInt(req.params.printerId);
+    const jobId = parseInt(req.params.jobId);
+
+    if (isNaN(printerId) || isNaN(jobId)) {
+      res.status(400).send({ error: "Invalid printer ID or job ID" });
+      return;
+    }
+
+    try {
+      await this.printQueueService.removeFromQueue(jobId);
+      const queue = await this.printQueueService.getQueue(printerId);
+
+      res.send({
+        message: "Job removed from queue",
+        printerId,
+        jobId,
+        queue,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to remove job ${jobId} from queue: ${error}`);
+      res.status(500).send({
+        error: "Failed to remove from queue",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
+  /**
+   * Get next job in queue for printer
+   * GET /api/print-queue/:printerId/next
+   */
+  @GET()
+  @route("/:printerId/next")
+  async getNextInQueue(req: Request, res: Response) {
     const printerId = parseInt(req.params.printerId);
 
     if (isNaN(printerId)) {
