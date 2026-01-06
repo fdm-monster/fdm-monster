@@ -41,6 +41,7 @@ export const getDefaultFrontendSettings = (): FrontendSettingsDto => ({
   gridRows: 2,
   largeTiles: false,
   tilePreferCancelOverQuickStop: false,
+  gridNameSortDirection: 'horizontal',
 });
 
 export const timeoutSettingKey = "timeout";
