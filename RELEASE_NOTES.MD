@@ -1,5 +1,9 @@
 # Develop
 
+## Feat
+
+- Add grid sorting option frontend settings
+
 # FDM Monster 2.0.0
 
 ## Feat

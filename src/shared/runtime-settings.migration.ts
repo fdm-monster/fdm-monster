@@ -35,6 +35,19 @@ export function migrateSettingsRuntime(knownSettings: Partial<Settings>): Settin
     jwtSecret: uuidv4(),
   };
 
+  if (entity[frontendSettingKey]) {
+    const defaultFrontendSettings = getDefaultFrontendSettings();
+
+    // Ensure all frontend settings have default values
+    entity[frontendSettingKey] = {
+      gridCols: entity[frontendSettingKey].gridCols ?? defaultFrontendSettings.gridCols,
+      gridRows: entity[frontendSettingKey].gridRows ?? defaultFrontendSettings.gridRows,
+      largeTiles: entity[frontendSettingKey].largeTiles ?? defaultFrontendSettings.largeTiles,
+      tilePreferCancelOverQuickStop: entity[frontendSettingKey].tilePreferCancelOverQuickStop ?? defaultFrontendSettings.tilePreferCancelOverQuickStop,
+      gridNameSortDirection: entity[frontendSettingKey].gridNameSortDirection ?? defaultFrontendSettings.gridNameSortDirection,
+    };
+  }
+
   if (entity[serverSettingsKey]) {
     const defaultServerSettings = getDefaultServerSettings();
 
