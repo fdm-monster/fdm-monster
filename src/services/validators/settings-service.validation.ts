@@ -38,7 +38,6 @@ export const credentialSettingUpdateSchema = z.object({
     .number()
     .int()
     .min(isProductionEnvironment() ? 240 : 0),
-  slicerApiKey: z.string().nullable(),
 });
 
 export const slicerApiKeyUpdateSchema = z.object({
