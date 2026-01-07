@@ -5,6 +5,7 @@
 - Add grid sorting option frontend settings
 - YAML export now includes credential settings (jwtExpiresIn, refreshTokenAttempts, refreshTokenExpiry, slicerApiKey)
 - YAML import now properly imports credential settings including slicerApiKey
+- Ability to analyze/re-analyze file from Files page upload
 
 ## Fixes
 
