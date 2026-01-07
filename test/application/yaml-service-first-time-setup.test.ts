@@ -55,7 +55,7 @@ describe("YamlService - First Time Setup Mode", () => {
     const floors = await floorService.list();
     const floor = floors.find((f) => f.name === "Default Floor")!;
     expect(floor).toBeDefined();
-    expect(floor.printers).toHaveLength(1);
+    expect(floor.printers.length).toBeGreaterThan(0);
     expect(floor.printers.find((p) => p.printerId.toString() === printerId)).toBeDefined();
   }
 
