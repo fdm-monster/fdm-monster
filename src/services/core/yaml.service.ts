@@ -528,7 +528,7 @@ export class YamlService {
       const printers = await this.printerService.list();
       dumpedObject.printers = printers.map((p) => {
         const printerId = p.id;
-        const { apiKey } = this.printerCache.getLoginDto(printerId);
+        const { apiKey, username, password } = this.printerCache.getLoginDto(printerId);
         return {
           id: printerId,
           disabledReason: p.disabledReason,
@@ -538,6 +538,8 @@ export class YamlService {
           name: p.name,
           printerURL: p.printerURL,
           apiKey,
+          username,
+          password,
         };
       });
     }

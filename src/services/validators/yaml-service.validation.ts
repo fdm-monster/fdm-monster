@@ -3,8 +3,10 @@ import {
   printerApiKeyValidator,
   printerEnabledValidator,
   printerNameValidator,
+  printerPasswordValidator,
   printerTypeValidator,
   printerUrlValidator,
+  printerUsernameValidator,
 } from "@/services/validators/printer-service.validation";
 import {
   floorOrderValidator,

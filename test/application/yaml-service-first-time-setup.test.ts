@@ -13,123 +13,99 @@ import { AwilixContainer } from "awilix";
 import { IRoleService } from "@/services/interfaces/role-service.interface";
 import { User } from "@/entities";
 
+interface TestServices {
+  yamlService: YamlService;
+  printerService: IPrinterService;
+  floorService: IFloorService;
+  settingsStore: SettingsStore;
+  userService: IUserService;
+  roleService: IRoleService;
+}
+
 describe("YamlService - First Time Setup Mode", () => {
   async function clearSettings(container: AwilixContainer, settingsStore: SettingsStore) {
-    // Clear TypeORM database
     const typeormService = container.resolve<TypeormService>(DITokens.typeormService);
     const dataSource = typeormService.getDataSource();
     if (dataSource) {
       await dataSource.getRepository(Settings).clear();
       await dataSource.getRepository(User).clear();
     }
-
-    // Reload settings to get a fresh copy with wizard incomplete
     await settingsStore.loadSettings();
   }
 
-  it("should import 1.9.1 mongodb full yaml with system data during first-time setup", async () => {
-    const { container } = await setupTestApp(true, undefined, true, true);
-    const yamlService: YamlService = container.resolve(DITokens.yamlService);
-    const printerService: IPrinterService = container.resolve(DITokens.printerService);
-    const floorService: IFloorService = container.resolve(DITokens.floorService);
-    const settingsStore: SettingsStore = container.resolve(DITokens.settingsStore);
-    const userService: IUserService = container.resolve(DITokens.userService);
-    const roleService = container.resolve<IRoleService>(DITokens.roleService);
+  function resolveServices(container: AwilixContainer): TestServices {
+    return {
+      yamlService: container.resolve(DITokens.yamlService),
+      printerService: container.resolve(DITokens.printerService),
+      floorService: container.resolve(DITokens.floorService),
+      settingsStore: container.resolve(DITokens.settingsStore),
+      userService: container.resolve(DITokens.userService),
+      roleService: container.resolve(DITokens.roleService),
+    };
+  }
 
-    // Clear settings to ensure fresh state for this test
-    await clearSettings(container, settingsStore);
-
-    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-mongodb-full.yaml"));
-
-    // Verify wizard is not completed at start
-    expect(settingsStore.isWizardCompleted()).toBe(false);
-
-    await yamlService.importYaml(buffer.toString());
-
-    // Verify printers were imported
+  async function verifyPrinters(printerService: IPrinterService) {
     const printers = await printerService.list();
     const printer = printers.find((p) => p.name === "Great Cultivator")!;
     expect(printer).toBeDefined();
+    return printer;
+  }
 
-    // Verify floors were imported
+  async function verifyFloors(floorService: IFloorService, printerId: string) {
     const floors = await floorService.list();
     const floor = floors.find((f) => f.name === "Default Floor")!;
     expect(floor).toBeDefined();
     expect(floor.printers).toHaveLength(1);
-    expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
+    expect(floor.printers.find((p) => p.printerId.toString() === printerId)).toBeDefined();
+  }
 
-    // Verify system data (settings, users) were imported
-    // Need to reload settings after import
+  async function verifySettings(settingsStore: SettingsStore, expectedLoginRequired: boolean) {
     await settingsStore.loadSettings();
     const settings = settingsStore.getSettings();
-    expect(await settingsStore.getLoginRequired()).toBe(true);
+    expect(await settingsStore.getLoginRequired()).toBe(expectedLoginRequired);
     expect(settingsStore.isWizardCompleted()).toBe(true);
     expect(settings.frontend.gridCols).toBe(2);
     expect(settings.frontend.gridRows).toBe(2);
+  }
 
-    // Verify users were imported
+  async function verifyUsersAndRoles(userService: IUserService, roleService: IRoleService) {
     const users = await userService.listUsers();
     expect(users.length).toBeGreaterThan(0);
     const adminUser = users.find((u) => u.username === "admin");
     expect(adminUser).toBeDefined();
     expect(adminUser?.isRootUser).toBe(true);
 
-    // Verify ADMIN role was imported
     const adminRole = await roleService.getRoleByName("ADMIN");
     expect(adminRole).toBeDefined();
     expect(adminRole?.name).toBe("ADMIN");
+  }
+
+  async function testYamlImport(yamlFileName: string, expectedLoginRequired: boolean) {
+    const { container } = await setupTestApp(true, undefined, true, true);
+    const services = resolveServices(container);
+
+    await clearSettings(container, services.settingsStore);
+
+    const buffer = readFileSync(join(__dirname, `./test-data/${yamlFileName}`));
+    expect(services.settingsStore.isWizardCompleted()).toBe(false);
+
+    await services.yamlService.importYaml(buffer.toString());
+
+    const printer = await verifyPrinters(services.printerService);
+    await verifyFloors(services.floorService, printer.id.toString());
+    await verifySettings(services.settingsStore, expectedLoginRequired);
+    await verifyUsersAndRoles(services.userService, services.roleService);
+  }
+
+  it("should import 1.9.1 mongodb full yaml with system data during first-time setup", async () => {
+    await testYamlImport("export-fdm-monster-1.9.1-mongodb-full.yaml", true);
   });
 
   it("should import 1.9.1 sqlite full yaml with system data during first-time setup", async () => {
-    const { container } = await setupTestApp(true, undefined, true, true);
-    const yamlService: YamlService = container.resolve(DITokens.yamlService);
-    const printerService: IPrinterService = container.resolve(DITokens.printerService);
-    const floorService: IFloorService = container.resolve(DITokens.floorService);
-    const settingsStore: SettingsStore = container.resolve(DITokens.settingsStore);
-    const userService: IUserService = container.resolve(DITokens.userService);
-    const roleService = container.resolve<IRoleService>(DITokens.roleService);
+    await testYamlImport("export-fdm-monster-1.9.1-sqlite-full.yaml", false);
+  });
 
-    // Clear settings to reset wizard status from previous test (in-memory database is shared)
-    await clearSettings(container, settingsStore);
-
-    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-1.9.1-sqlite-full.yaml"));
-
-    // Verify wizard is not completed at start
-    expect(settingsStore.isWizardCompleted()).toBe(false);
-
-    await yamlService.importYaml(buffer.toString());
-
-    // Verify printers were imported
-    const printers = await printerService.list();
-    const printer = printers.find((p) => p.name === "Great Cultivator")!;
-    expect(printer).toBeDefined();
-
-    // Verify floors were imported
-    const floors = await floorService.list();
-    const floor = floors.find((f) => f.name === "Default Floor")!;
-    expect(floor).toBeDefined();
-    expect(floor.printers).toHaveLength(1);
-    expect(floor.printers.find((p) => p.printerId.toString() === printer.id.toString())).toBeDefined();
-
-    // Verify system data (settings, users) were imported
-    // Need to reload settings after import
-    await settingsStore.loadSettings();
-    const settings = settingsStore.getSettings();
-    expect(await settingsStore.getLoginRequired()).toBe(false);
-    expect(settingsStore.isWizardCompleted()).toBe(true);
-    expect(settings.frontend.gridCols).toBe(2);
-    expect(settings.frontend.gridRows).toBe(2);
-
-    // Verify users were imported
-    const users = await userService.listUsers();
-    expect(users.length).toBeGreaterThan(0);
-    const adminUser = users.find((u) => u.username === "admin");
-    expect(adminUser).toBeDefined();
-    expect(adminUser?.isRootUser).toBe(true);
-
-    // Verify ADMIN role was imported
-    const adminRole = await roleService.getRoleByName("ADMIN");
-    expect(adminRole).toBeDefined();
-    expect(adminRole?.name).toBe("ADMIN");
+  it("should import 2.0.1 sqlite full yaml with system data during first-time setup", async () => {
+    await testYamlImport("export-fdm-monster-2.0.1-sqlite-full.yaml", false);
   });
 });

@@ -67,6 +67,9 @@ export class SettingsStore {
         slicerApiKey: settings[credentialSettingsKey].slicerApiKey
       },
       [serverSettingsKey]: {
+        loginRequired: settings[serverSettingsKey].loginRequired,
+        registration: settings[serverSettingsKey].registration,
+        sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
         experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport

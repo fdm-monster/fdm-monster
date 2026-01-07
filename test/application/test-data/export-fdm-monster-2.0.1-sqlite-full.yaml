@@ -65,6 +65,9 @@ tags:
       - printerId: 1
 settings:
   server:
+    loginRequired: false
+    registration: false
+    sentryDiagnosticsEnabled: false
     experimentalMoonrakerSupport: true
     experimentalPrusaLinkSupport: true
     experimentalBambuSupport: true

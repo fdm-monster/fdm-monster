@@ -9,6 +9,7 @@
 ## Fixes
 
 - YAML import restores credentials using sensitive settings method in SettingsStore
+- YAML export would not export printer username and password
 
 # FDM Monster 2.0.0
 
