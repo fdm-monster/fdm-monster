@@ -6,7 +6,7 @@ import {
 } from "@/constants/server-settings.constants";
 import { z } from "zod";
 import {
-  credentialCoreSettingUpdateSchema, credentialSettingSchema,
+  credentialSettingSchema,
   frontendSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
   wizardUpdateSchema,
