@@ -27,7 +27,21 @@ export const jwtSecretCredentialSettingUpdateSchema = z.object({
   jwtSecret: z.string().min(10),
 });
 
-export const credentialSettingUpdateSchema = z.object({
+export const credentialSettingSchema = z.object({
+  jwtExpiresIn: z
+    .number()
+    .int()
+    .min(isProductionEnvironment() ? 120 : 0)
+    .max(isProductionEnvironment() ? 7200 : Infinity),
+  refreshTokenAttempts: z.number().int().min(-1),
+  refreshTokenExpiry: z
+    .number()
+    .int()
+    .min(isProductionEnvironment() ? 240 : 0),
+  slicerApiKey: z.string().nullable(),
+});
+
+export const credentialCoreSettingUpdateSchema = z.object({
   jwtExpiresIn: z
     .number()
     .int()

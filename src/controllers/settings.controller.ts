@@ -4,7 +4,7 @@ import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  credentialSettingUpdateSchema,
+  credentialCoreSettingUpdateSchema,
   frontendSettingsUpdateSchema,
   moonrakerSupportSchema,
   prusaLinkSupportSchema,
@@ -153,7 +153,7 @@ export class SettingsController {
   @route("/credential")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateCredentialSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, credentialSettingUpdateSchema);
+    const validatedInput = await validateInput(req.body, credentialCoreSettingUpdateSchema);
     await this.settingsStore.updateCoreCredentialSettings(validatedInput);
     res.send();
   }

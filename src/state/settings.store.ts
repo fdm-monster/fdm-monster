@@ -14,7 +14,7 @@ import { ISettingsService } from "@/services/interfaces/settings.service.interfa
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { z } from "zod";
 import {
-  credentialSettingUpdateSchema,
+  credentialCoreSettingUpdateSchema,
   frontendSettingsUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
@@ -191,7 +191,7 @@ export class SettingsStore {
     return this.getSettings();
   }
 
-  async updateCoreCredentialSettings(credentialSettings: z.infer<typeof credentialSettingUpdateSchema>) {
+  async updateCoreCredentialSettings(credentialSettings: z.infer<typeof credentialCoreSettingUpdateSchema>) {
     this.settings = await this.settingsService.updateCoreCredentialSettings(credentialSettings);
   }
 

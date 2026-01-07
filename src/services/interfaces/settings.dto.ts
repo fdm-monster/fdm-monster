@@ -6,7 +6,7 @@ import {
 } from "@/constants/server-settings.constants";
 import { z } from "zod";
 import {
-  credentialSettingUpdateSchema,
+  credentialCoreSettingUpdateSchema, credentialSettingSchema,
   frontendSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
   wizardUpdateSchema,
@@ -25,7 +25,7 @@ export type WizardSettingsDto = z.infer<typeof wizardUpdateSchema>;
 
 export type FrontendSettingsDto = z.infer<typeof frontendSettingsUpdateSchema>;
 
-export type CredentialSettingsDto = z.infer<typeof credentialSettingUpdateSchema>;
+export type CredentialSettingsDto = z.infer<typeof credentialSettingSchema>;
 
 export type TimeoutSettingsDto = z.infer<typeof timeoutSettingsUpdateSchema>;
 
