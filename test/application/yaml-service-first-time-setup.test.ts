@@ -59,13 +59,18 @@ describe("YamlService - First Time Setup Mode", () => {
     expect(floor.printers.find((p) => p.printerId.toString() === printerId)).toBeDefined();
   }
 
-  async function verifySettings(settingsStore: SettingsStore, expectedLoginRequired: boolean) {
+  async function verifySettings(
+    settingsStore: SettingsStore,
+    expectedLoginRequired: boolean,
+    expectedGridCols: number,
+    expectedGridRows: number,
+  ) {
     await settingsStore.loadSettings();
     const settings = settingsStore.getSettings();
     expect(await settingsStore.getLoginRequired()).toBe(expectedLoginRequired);
     expect(settingsStore.isWizardCompleted()).toBe(true);
-    expect(settings.frontend.gridCols).toBe(2);
-    expect(settings.frontend.gridRows).toBe(2);
+    expect(settings.frontend.gridCols).toBe(expectedGridCols);
+    expect(settings.frontend.gridRows).toBe(expectedGridRows);
   }
 
   async function verifyUsersAndRoles(userService: IUserService, roleService: IRoleService) {
@@ -80,7 +85,12 @@ describe("YamlService - First Time Setup Mode", () => {
     expect(adminRole?.name).toBe("ADMIN");
   }
 
-  async function testYamlImport(yamlFileName: string, expectedLoginRequired: boolean) {
+  async function testYamlImport(
+    yamlFileName: string,
+    expectedLoginRequired: boolean,
+    expectedGridCols: number,
+    expectedGridRows: number,
+  ) {
     const { container } = await setupTestApp(true, undefined, true, true);
     const services = resolveServices(container);
 
@@ -93,19 +103,19 @@ describe("YamlService - First Time Setup Mode", () => {
 
     const printer = await verifyPrinters(services.printerService);
     await verifyFloors(services.floorService, printer.id.toString());
-    await verifySettings(services.settingsStore, expectedLoginRequired);
+    await verifySettings(services.settingsStore, expectedLoginRequired, expectedGridCols, expectedGridRows);
     await verifyUsersAndRoles(services.userService, services.roleService);
   }
 
   it("should import 1.9.1 mongodb full yaml with system data during first-time setup", async () => {
-    await testYamlImport("export-fdm-monster-1.9.1-mongodb-full.yaml", true);
+    await testYamlImport("export-fdm-monster-1.9.1-mongodb-full.yaml", true, 2, 2);
   });
 
   it("should import 1.9.1 sqlite full yaml with system data during first-time setup", async () => {
-    await testYamlImport("export-fdm-monster-1.9.1-sqlite-full.yaml", false);
+    await testYamlImport("export-fdm-monster-1.9.1-sqlite-full.yaml", false, 2, 2);
   });
 
   it("should import 2.0.1 sqlite full yaml with system data during first-time setup", async () => {
-    await testYamlImport("export-fdm-monster-2.0.1-sqlite-full.yaml", false);
+    await testYamlImport("export-fdm-monster-2.0.1-sqlite-full.yaml", false, 4, 4);
   });
 });
