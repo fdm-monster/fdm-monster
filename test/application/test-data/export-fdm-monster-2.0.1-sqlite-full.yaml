@@ -22,6 +22,8 @@ printers:
     name: Great Cultivator
     printerURL: http://localhost
     apiKey: ''
+    username: bambu_serial
+    password: bambu_access_code
   - id: 2
     disabledReason: null
     enabled: true
@@ -38,6 +40,8 @@ printers:
     name: Familiar Class
     printerURL: http://123asd
     apiKey: ''
+    username: maker
+    password: prusa_password
 floors:
   - id: 1
     order: 1
