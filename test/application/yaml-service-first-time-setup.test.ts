@@ -80,7 +80,7 @@ describe("YamlService - First Time Setup Mode", () => {
     expect(adminUser).toBeDefined();
     expect(adminUser?.isRootUser).toBe(true);
 
-    const adminRole = await roleService.getRoleByName("ADMIN");
+    const adminRole = roleService.getRoleByName("ADMIN");
     expect(adminRole).toBeDefined();
     expect(adminRole?.name).toBe("ADMIN");
   }
