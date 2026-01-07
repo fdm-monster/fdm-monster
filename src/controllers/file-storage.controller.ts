@@ -21,10 +21,6 @@ export class FileStorageController {
     this.logger = loggerFactory(FileStorageController.name);
   }
 
-  /**
-   * List all stored files with metadata
-   * GET /api/file-storage
-   */
   @GET()
   async listFiles(req: Request, res: Response) {
     try {
@@ -112,9 +108,9 @@ export class FileStorageController {
   @route("/:fileStorageId/thumbnail/:index")
   async getThumbnail(req: Request, res: Response) {
     const { fileStorageId, index } = req.params;
-    const thumbnailIndex = parseInt(index);
+    const thumbnailIndex = Number.parseInt(index);
 
-    if (isNaN(thumbnailIndex)) {
+    if (Number.isNaN(thumbnailIndex)) {
       res.status(400).send({ error: "Invalid thumbnail index" });
       return;
     }
@@ -128,7 +124,6 @@ export class FileStorageController {
       }
 
       // Determine content type from magic bytes
-      const isPNG = thumbnail[0] === 0x89 && thumbnail[1] === 0x50 && thumbnail[2] === 0x4E && thumbnail[3] === 0x47;
       const isJPG = thumbnail[0] === 0xFF && thumbnail[1] === 0xD8;
 
       let contentType = 'image/png';

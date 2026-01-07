@@ -1,4 +1,4 @@
-import { GET, POST, route } from "awilix-express";
+import { GET, POST, route, before } from "awilix-express";
 import { Request, Response } from "express";
 import { FileStorageService } from "@/services/file-storage.service";
 import { FileAnalysisService } from "@/services/file-analysis.service";
@@ -6,15 +6,16 @@ import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
+import { slicerApiKeyAuth } from "@/middleware/slicer-api-key.middleware";
 
 /**
  * OctoPrint-compatible API for PrusaSlicer and other slicer integration
  * Implements minimal OctoPrint API surface for file upload
  *
- * Note: version and server endpoints are public (like OctoPrint)
  * File operations require authentication
  */
 @route("/api")
+@before([slicerApiKeyAuth()])
 export class SlicerCompatController {
   private readonly logger: LoggerService;
 
