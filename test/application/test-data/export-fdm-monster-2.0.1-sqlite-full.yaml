@@ -1,0 +1,111 @@
+version: 2.0.1
+exportedAt: 2026-01-07T09:05:16.667Z
+databaseType: sqlite
+config:
+  exportPrinters: true
+  exportFloorGrid: true
+  exportFloors: true
+  exportTags: true
+  exportSettings: true
+  exportUsers: true
+  printerComparisonStrategiesByPriority:
+    - name
+    - url
+  floorComparisonStrategiesByPriority: floor
+  notes: ''
+printers:
+  - id: 1
+    disabledReason: null
+    enabled: true
+    printerType: 3
+    dateAdded: 1767449143574
+    name: Great Cultivator
+    printerURL: http://localhost
+    apiKey: ''
+  - id: 2
+    disabledReason: null
+    enabled: true
+    printerType: 1
+    dateAdded: 1767449143585
+    name: Enormous Knowledge
+    printerURL: https://asdasdasd
+    apiKey: ''
+  - id: 3
+    disabledReason: null
+    enabled: true
+    printerType: 2
+    dateAdded: 1767473283834
+    name: Familiar Class
+    printerURL: http://123asd
+    apiKey: ''
+floors:
+  - id: 1
+    order: 1
+    name: Default Floor
+    printers:
+      - printerId: 2
+        x: 0
+        'y': 0
+      - printerId: 3
+        x: 0
+        'y': 2
+      - printerId: 1
+        x: 1
+        'y': 0
+tags:
+  - name: FLoor1
+    id: 1
+    printers:
+      - printerId: 1
+      - printerId: 2
+  - name: Rack2
+    id: 2
+    printers:
+      - printerId: 3
+      - printerId: 1
+settings:
+  server:
+    experimentalMoonrakerSupport: true
+    experimentalPrusaLinkSupport: true
+    experimentalBambuSupport: true
+  wizard:
+    wizardCompleted: true
+    wizardCompletedAt: '2026-01-03T14:05:43.365Z'
+    wizardVersion: 1
+  frontend:
+    gridCols: 4
+    gridRows: 4
+    largeTiles: true
+    tilePreferCancelOverQuickStop: true
+    gridNameSortDirection: horizontal
+  timeout:
+    apiTimeout: 10000
+    apiUploadTimeout: 30000
+  credentials:
+    jwtExpiresIn: 3600
+    refreshTokenAttempts: -1
+    refreshTokenExpiry: 1209600
+    slicerApiKey: ec7cdc28-c649-4cd3-8ec4-dcfa34a03d1b
+users:
+  - id: 1
+    username: admin
+    isDemoUser: false
+    isRootUser: true
+    isVerified: true
+    needsPasswordChange: false
+    passwordHash: $2b$10$EFjlfG/Qjq3HIRnXympocOPhykVj8k092H6R3kXVOE.5iBXpoUm9W
+    createdAt: 2026-01-03T14:05:43.000Z
+    roles:
+      - ADMIN
+      - OPERATOR
+      - GUEST
+  - id: 2
+    username: mega
+    isDemoUser: false
+    isRootUser: true
+    isVerified: true
+    needsPasswordChange: false
+    passwordHash: $2b$10$d8CglPFW0ZxYOYkLruILVO2ND/uyBtdxcl8SAt4ftnPbDuW.V18S.
+    createdAt: 2026-01-03T14:05:43.000Z
+    roles:
+      - ADMIN

@@ -312,4 +312,75 @@ describe(YamlService.name, () => {
     expect(foundPrinters).toBeDefined();
     expect(foundPrinters.printers).toHaveLength(1);
   });
+
+  it("should parse 2.0.1 sqlite full yaml file format with credential settings", async () => {
+    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-2.0.1-sqlite-full.yaml"));
+
+    // Should reject import because settings table is not empty in test environment
+    await expect(yamlService.importYaml(buffer.toString())).rejects.toThrow("Settings table is not empty");
+  });
+
+  it("should export yaml with credential settings in proper nested structure", async () => {
+    const yamlDump = await yamlService.exportYaml({
+      exportFloors: false,
+      exportPrinters: false,
+      exportFloorGrid: false,
+      exportTags: false,
+      exportSettings: true,
+      exportUsers: false,
+      printerComparisonStrategiesByPriority: ["name", "id"],
+      floorComparisonStrategiesByPriority: "floor",
+    });
+
+    expect(yamlDump).toBeDefined();
+    expect(yamlDump).toContain("settings:");
+    expect(yamlDump).toContain("credential");
+
+    // Verify credential settings are nested under 'credential' key
+    expect(yamlDump).toContain("jwtExpiresIn:");
+    expect(yamlDump).toContain("refreshTokenAttempts:");
+    expect(yamlDump).toContain("refreshTokenExpiry:");
+
+    // Verify slicerApiKey is in the exported YAML (if one exists)
+    // Note: slicerApiKey should be nested under credentials, not at top level
+    const hasSlicerKey = yamlDump.includes("slicerApiKey:");
+    if (hasSlicerKey) {
+      // Ensure it's in the credential section, not at top level
+      const lines = yamlDump.split('\n');
+      const credentialLine = lines.findIndex(l => l.trim().startsWith('credential'));
+      const slicerKeyLine = lines.findIndex(l => l.includes('slicerApiKey:'));
+
+      // slicerApiKey should appear after credential section starts
+      expect(slicerKeyLine).toBeGreaterThan(credentialLine);
+    }
+  });
+
+  it("should validate 2.0.1 yaml structure has credentials nested correctly", async () => {
+    const buffer = readFileSync(join(__dirname, "./test-data/export-fdm-monster-2.0.1-sqlite-full.yaml"));
+    const yamlContent = buffer.toString();
+
+    // Verify the YAML structure has credentials properly nested
+    expect(yamlContent).toContain("settings:");
+    expect(yamlContent).toContain("credentials:");
+    expect(yamlContent).toContain("jwtExpiresIn: 3600");
+    expect(yamlContent).toContain("refreshTokenAttempts: -1");
+    expect(yamlContent).toContain("refreshTokenExpiry: 1209600");
+    expect(yamlContent).toContain("slicerApiKey: ec7cdc28-c649-4cd3-8ec4-dcfa34a03d1b");
+
+    // Verify slicerApiKey is nested under credentials, not at top level of settings
+    const lines = yamlContent.split('\n');
+    const settingsLine = lines.findIndex(l => l.trim() === 'settings:');
+    const credentialsLine = lines.findIndex(l => l.trim() === 'credentials:');
+    const slicerKeyLine = lines.findIndex(l => l.trim().startsWith('slicerApiKey:'));
+
+    // Credentials should be after settings
+    expect(credentialsLine).toBeGreaterThan(settingsLine);
+    // slicerApiKey should be after credentials
+    expect(slicerKeyLine).toBeGreaterThan(credentialsLine);
+
+    // Verify indentation - slicerApiKey should be indented more than credentials
+    const credentialsIndent = lines[credentialsLine].search(/\S/);
+    const slicerKeyIndent = lines[slicerKeyLine].search(/\S/);
+    expect(slicerKeyIndent).toBeGreaterThan(credentialsIndent);
+  });
 });

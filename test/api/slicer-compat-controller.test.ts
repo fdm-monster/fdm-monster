@@ -1,18 +1,21 @@
 import { setupTestApp } from "../test-server";
 import { DITokens } from "@/container.tokens";
 import { FileStorageService } from "@/services/file-storage.service";
+import { SettingsStore } from "@/state/settings.store";
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
 
 describe("SlicerCompatController", () => {
   let testRequest: any;
   let fileStorageService: FileStorageService;
+  let settingsStore: SettingsStore;
   const baseRoute = "/api";
 
   beforeAll(async () => {
     const { request, container } = await setupTestApp(false, undefined, true, false);
     testRequest = request;
     fileStorageService = container.resolve<FileStorageService>(DITokens.fileStorageService);
+    settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   });
 
   describe("GET /api/version - OctoPrint version endpoint", () => {
@@ -398,6 +401,236 @@ G1 X20 Y20 E5 F1500
         expect(res.status).toBe(201);
         expect(res.body.files.local.name).toBe(filename);
       }
+    });
+  });
+
+  describe("API Key Authentication", () => {
+    let validApiKey: string;
+
+    beforeAll(async () => {
+      // Generate a valid API key for testing
+      validApiKey = await settingsStore.generateSlicerApiKey();
+    });
+
+    afterAll(async () => {
+      // Clean up the API key
+      await settingsStore.deleteSlicerApiKey();
+    });
+
+    describe("POST /api/files/local with X-Api-Key header", () => {
+      it("should accept upload with valid X-Api-Key header", async () => {
+        const fileContent = "G28\nG1 X10 Y10\n";
+
+        const res = await testRequest
+          .post(`${baseRoute}/files/local`)
+          .set("Accept", "application/json")
+          .set("X-Api-Key", validApiKey)
+          .attach("file", Buffer.from(fileContent), "api-key-test.gcode");
+
+        expect(res.status).toBe(201);
+        expect(res.body.done).toBe(true);
+      });
+
+      it("should reject upload with invalid X-Api-Key header when login is required", async () => {
+        // Enable login requirement
+        await settingsStore.setLoginRequired(true);
+
+        try {
+          const fileContent = "G28\nG1 X10 Y10\n";
+
+          const res = await testRequest
+            .post(`${baseRoute}/files/local`)
+            .set("Accept", "application/json")
+            .set("X-Api-Key", "invalid-api-key")
+            .attach("file", Buffer.from(fileContent), "invalid-key-test.gcode");
+
+          expect(res.status).toBe(401);
+        } finally {
+          // Reset login requirement
+          await settingsStore.setLoginRequired(false);
+        }
+      });
+
+      it("should reject upload without any auth when login is required", async () => {
+        // Enable login requirement
+        await settingsStore.setLoginRequired(true);
+
+        try {
+          const fileContent = "G28\nG1 X10 Y10\n";
+
+          const res = await testRequest
+            .post(`${baseRoute}/files/local`)
+            .set("Accept", "application/json")
+            .attach("file", Buffer.from(fileContent), "no-auth-test.gcode");
+
+          expect(res.status).toBe(401);
+        } finally {
+          // Reset login requirement
+          await settingsStore.setLoginRequired(false);
+        }
+      });
+
+      it("should work with valid API key even when login is required", async () => {
+        // Enable login requirement
+        await settingsStore.setLoginRequired(true);
+
+        try {
+          const fileContent = "G28\nG1 X10 Y10\n";
+
+          const res = await testRequest
+            .post(`${baseRoute}/files/local`)
+            .set("Accept", "application/json")
+            .set("X-Api-Key", validApiKey)
+            .attach("file", Buffer.from(fileContent), "api-key-with-login.gcode");
+
+          expect(res.status).toBe(201);
+          expect(res.body.done).toBe(true);
+        } finally {
+          // Reset login requirement
+          await settingsStore.setLoginRequired(false);
+        }
+      });
+    });
+
+    describe("GET /api/files with X-Api-Key header", () => {
+      it("should list files with valid X-Api-Key header", async () => {
+        const res = await testRequest
+          .get(`${baseRoute}/files`)
+          .set("Accept", "application/json")
+          .set("X-Api-Key", validApiKey);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("files");
+      });
+
+      it("should reject list with invalid X-Api-Key when login is required", async () => {
+        await settingsStore.setLoginRequired(true);
+
+        try {
+          const res = await testRequest
+            .get(`${baseRoute}/files`)
+            .set("Accept", "application/json")
+            .set("X-Api-Key", "invalid-api-key");
+
+          expect(res.status).toBe(401);
+        } finally {
+          await settingsStore.setLoginRequired(false);
+        }
+      });
+    });
+
+    describe("Public endpoints should work without API key", () => {
+      it("GET /api/version should work without any auth", async () => {
+        await settingsStore.setLoginRequired(true);
+
+        try {
+          const res = await testRequest
+            .get(`${baseRoute}/version`)
+            .set("Accept", "application/json");
+
+          expect(res.status).toBe(200);
+          expect(res.body).toHaveProperty("api");
+        } finally {
+          await settingsStore.setLoginRequired(false);
+        }
+      });
+
+      it("GET /api/server should work without any auth", async () => {
+        await settingsStore.setLoginRequired(true);
+
+        try {
+          const res = await testRequest
+            .get(`${baseRoute}/server`)
+            .set("Accept", "application/json");
+
+          expect(res.status).toBe(200);
+          expect(res.body).toHaveProperty("version");
+        } finally {
+          await settingsStore.setLoginRequired(false);
+        }
+      });
+    });
+
+    describe("API key validation", () => {
+      it("should not accept empty API key", async () => {
+        await settingsStore.setLoginRequired(true);
+
+        try {
+          const fileContent = "G28\nG1 X10 Y10\n";
+
+          const res = await testRequest
+            .post(`${baseRoute}/files/local`)
+            .set("Accept", "application/json")
+            .set("X-Api-Key", "")
+            .attach("file", Buffer.from(fileContent), "empty-key-test.gcode");
+
+          expect(res.status).toBe(401);
+        } finally {
+          await settingsStore.setLoginRequired(false);
+        }
+      });
+
+      it("should accept newly regenerated API key", async () => {
+        const newApiKey = await settingsStore.generateSlicerApiKey();
+        const fileContent = "G28\nG1 X10 Y10\n";
+
+        const res = await testRequest
+          .post(`${baseRoute}/files/local`)
+          .set("Accept", "application/json")
+          .set("X-Api-Key", newApiKey)
+          .attach("file", Buffer.from(fileContent), "new-key-test.gcode");
+
+        expect(res.status).toBe(201);
+
+        // Update our validApiKey reference for subsequent tests
+        validApiKey = newApiKey;
+      });
+
+      it("should reject old API key after regeneration", async () => {
+        const oldKey = await settingsStore.generateSlicerApiKey();
+
+        // Generate a new key (invalidating the old one)
+        await settingsStore.generateSlicerApiKey();
+
+        await settingsStore.setLoginRequired(true);
+
+        try {
+          const fileContent = "G28\nG1 X10 Y10\n";
+
+          const res = await testRequest
+            .post(`${baseRoute}/files/local`)
+            .set("Accept", "application/json")
+            .set("X-Api-Key", oldKey)
+            .attach("file", Buffer.from(fileContent), "old-key-test.gcode");
+
+          expect(res.status).toBe(401);
+        } finally {
+          await settingsStore.setLoginRequired(false);
+        }
+      });
+
+      it("should reject requests after API key is deleted", async () => {
+        const tempKey = await settingsStore.generateSlicerApiKey();
+        await settingsStore.deleteSlicerApiKey();
+
+        await settingsStore.setLoginRequired(true);
+
+        try {
+          const fileContent = "G28\nG1 X10 Y10\n";
+
+          const res = await testRequest
+            .post(`${baseRoute}/files/local`)
+            .set("Accept", "application/json")
+            .set("X-Api-Key", tempKey)
+            .attach("file", Buffer.from(fileContent), "deleted-key-test.gcode");
+
+          expect(res.status).toBe(401);
+        } finally {
+          await settingsStore.setLoginRequired(false);
+          // Restore a key for subsequent tests
+          validApiKey = await settingsStore.generateSlicerApiKey();
+        }
+      });
     });
   });
 });

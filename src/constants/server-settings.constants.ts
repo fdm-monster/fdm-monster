@@ -33,6 +33,8 @@ export const getDefaultCredentialSettings = (): CredentialSettingsDto => ({
   refreshTokenAttempts: AppConstants.DEFAULT_REFRESH_TOKEN_ATTEMPTS,
   // Verification only, bringing into effect requires updating all stored refresh tokens
   refreshTokenExpiry: AppConstants.DEFAULT_REFRESH_TOKEN_EXPIRY,
+  // API key for slicer integration (PrusaSlicer, etc.)
+  slicerApiKey: null,
 });
 
 export const frontendSettingKey = "frontend";

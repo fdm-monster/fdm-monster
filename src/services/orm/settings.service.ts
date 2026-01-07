@@ -18,6 +18,7 @@ import {
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
   wizardUpdateSchema,
+  slicerApiKeyUpdateSchema,
 } from "@/services/validators/settings-service.validation";
 import { migrateSettingsRuntime } from "@/shared/runtime-settings.migration";
 import { validateInput } from "@/handlers/validators";
@@ -61,12 +62,20 @@ export class SettingsService extends BaseService(Settings, SettingsDto) implemen
     return entity;
   }
 
-  async updateCredentialSettings(update: z.infer<typeof credentialSettingUpdateSchema>) {
+  async updateCoreCredentialSettings(update: z.infer<typeof credentialSettingUpdateSchema>) {
     const validatedInput = await validateInput(update, credentialSettingUpdateSchema);
     const entity = await this.getOrCreate();
     entity[credentialSettingsKey].refreshTokenExpiry = validatedInput.refreshTokenExpiry;
     entity[credentialSettingsKey].refreshTokenAttempts = validatedInput.refreshTokenAttempts;
     entity[credentialSettingsKey].jwtExpiresIn = validatedInput.jwtExpiresIn;
+    await this.update(entity.id, entity);
+    return entity;
+  }
+
+  async updateSlicerApiKey(update: z.infer<typeof slicerApiKeyUpdateSchema>) {
+    const validatedInput = await validateInput(update, slicerApiKeyUpdateSchema);
+    const entity = await this.getOrCreate();
+    entity[credentialSettingsKey].slicerApiKey = validatedInput.slicerApiKey;
     await this.update(entity.id, entity);
     return entity;
   }

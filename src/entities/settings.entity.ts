@@ -28,6 +28,7 @@ export class Settings {
     jwtExpiresIn: number;
     refreshTokenAttempts: number;
     refreshTokenExpiry: number;
+    slicerApiKey: string | null;
   };
 
   @Column({ type: "simple-json", nullable: false })

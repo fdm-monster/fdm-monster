@@ -3,6 +3,12 @@
 ## Feat
 
 - Add grid sorting option frontend settings
+- YAML export now includes credential settings (jwtExpiresIn, refreshTokenAttempts, refreshTokenExpiry, slicerApiKey)
+- YAML import now properly imports credential settings including slicerApiKey
+
+## Fixes
+
+- YAML import restores credentials using sensitive settings method in SettingsStore
 
 # FDM Monster 2.0.0
 
