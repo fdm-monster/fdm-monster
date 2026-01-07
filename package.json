@@ -6,7 +6,7 @@
   },
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "bin": {
     "fdm-monster": "dist/index.js",
     "fdmm": "dist/index.js"
@@ -60,7 +60,7 @@
     "tr46": "6.0.0"
   },
   "dependencies": {
-    "@fdm-monster/client-next": "2.1.0",
+    "@fdm-monster/client-next": "2.1.5",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "10.32.1",
     "adm-zip": "0.5.16",
@@ -99,7 +99,7 @@
     "uuid": "11.1.0",
     "winston": "3.19.0",
     "winston-loki": "6.1.3",
-    "ws": "8.18.3",
+    "ws": "8.19.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
@@ -133,7 +133,7 @@
     "nock": "13.5.6",
     "openapi3-ts": "4.5.0",
     "selfsigned": "5.4.0",
-    "supertest": "7.1.4",
+    "supertest": "7.2.2",
     "swagger-ui-dist": "5.31.0",
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",

@@ -1,10 +1,10 @@
-import { GET, PATCH, PUT, route, before } from "awilix-express";
+import { DELETE, GET, PATCH, POST, PUT, route, before } from "awilix-express";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { AppConstants } from "@/server.constants";
 import { ROLES } from "@/constants/authorization.constants";
 import { validateInput } from "@/handlers/validators";
 import {
-  credentialSettingUpdateSchema,
+  credentialCoreSettingUpdateSchema,
   frontendSettingsUpdateSchema,
   moonrakerSupportSchema,
   prusaLinkSupportSchema,
@@ -153,8 +153,8 @@ export class SettingsController {
   @route("/credential")
   @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
   async updateCredentialSettings(req: Request, res: Response) {
-    const validatedInput = await validateInput(req.body, credentialSettingUpdateSchema);
-    await this.settingsStore.updateCredentialSettings(validatedInput);
+    const validatedInput = await validateInput(req.body, credentialCoreSettingUpdateSchema);
+    await this.settingsStore.updateCoreCredentialSettings(validatedInput);
     res.send();
   }
 
@@ -165,5 +165,31 @@ export class SettingsController {
     const validatedInput = await validateInput(req.body, timeoutSettingsUpdateSchema);
     const result = await this.settingsStore.updateTimeoutSettings(validatedInput);
     res.send(result);
+  }
+
+  @GET()
+  @route("/slicer-api-key")
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  async getSlicerApiKey(req: Request, res: Response) {
+    const apiKey = this.settingsStore.getSlicerApiKey();
+    res.send({ slicerApiKey: apiKey });
+  }
+
+  @POST()
+  @route("/slicer-api-key/regenerate")
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  async regenerateSlicerApiKey(req: Request, res: Response) {
+    const newApiKey = await this.settingsStore.generateSlicerApiKey();
+    this.logger.log("Slicer API key regenerated");
+    res.send({ slicerApiKey: newApiKey });
+  }
+
+  @DELETE()
+  @route("/slicer-api-key")
+  @before([authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
+  async deleteSlicerApiKey(req: Request, res: Response) {
+    await this.settingsStore.deleteSlicerApiKey();
+    this.logger.log("Slicer API key deleted");
+    res.send({ slicerApiKey: null });
   }
 }

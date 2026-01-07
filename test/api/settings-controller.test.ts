@@ -22,6 +22,8 @@ const credentialSettingsRoute = `${defaultRoute}/credential`;
 const experimentalMoonrakerSupport = `${defaultRoute}/experimental-moonraker-support`;
 const frontendSettingsRoute = `${defaultRoute}/frontend`;
 const sentryDiagnosticsRoute = `${defaultRoute}/sentry-diagnostics`;
+const slicerApiKeyRoute = `${defaultRoute}/slicer-api-key`;
+const regenerateSlicerApiKeyRoute = `${slicerApiKeyRoute}/regenerate`;
 
 beforeAll(async () => {
   ({ request } = await setupTestApp(true));
@@ -139,5 +141,71 @@ describe(SettingsController.name, () => {
         code: "too_small",
       },
     ]);
+  });
+
+  describe("Slicer API Key", () => {
+    it("should return null slicerApiKey when none exists", async () => {
+      const response = await request.get(slicerApiKeyRoute).send();
+      expectOkResponse(response);
+      expect(response.body).toMatchObject({
+        slicerApiKey: null,
+      });
+    });
+
+    it("should generate a new slicer API key", async () => {
+      const response = await request.post(regenerateSlicerApiKeyRoute).send();
+      expectOkResponse(response);
+      expect(response.body).toHaveProperty("slicerApiKey");
+      expect(response.body.slicerApiKey).toBeTruthy();
+      expect(typeof response.body.slicerApiKey).toBe("string");
+      // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      expect(response.body.slicerApiKey).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      );
+    });
+
+    it("should return existing slicer API key after generation", async () => {
+      // First generate a key
+      const generateResponse = await request.post(regenerateSlicerApiKeyRoute).send();
+      expectOkResponse(generateResponse);
+      const generatedKey = generateResponse.body.slicerApiKey;
+
+      // Then get the key
+      const getResponse = await request.get(slicerApiKeyRoute).send();
+      expectOkResponse(getResponse);
+      expect(getResponse.body.slicerApiKey).toBe(generatedKey);
+    });
+
+    it("should regenerate a different slicer API key", async () => {
+      // Generate first key
+      const firstResponse = await request.post(regenerateSlicerApiKeyRoute).send();
+      expectOkResponse(firstResponse);
+      const firstKey = firstResponse.body.slicerApiKey;
+
+      // Regenerate key
+      const secondResponse = await request.post(regenerateSlicerApiKeyRoute).send();
+      expectOkResponse(secondResponse);
+      const secondKey = secondResponse.body.slicerApiKey;
+
+      // Keys should be different
+      expect(secondKey).not.toBe(firstKey);
+    });
+
+    it("should delete slicer API key", async () => {
+      // First generate a key
+      await request.post(regenerateSlicerApiKeyRoute).send();
+
+      // Delete the key
+      const deleteResponse = await request.delete(slicerApiKeyRoute).send();
+      expectOkResponse(deleteResponse);
+      expect(deleteResponse.body).toMatchObject({
+        slicerApiKey: null,
+      });
+
+      // Verify it's deleted
+      const getResponse = await request.get(slicerApiKeyRoute).send();
+      expectOkResponse(getResponse);
+      expect(getResponse.body.slicerApiKey).toBeNull();
+    });
   });
 });

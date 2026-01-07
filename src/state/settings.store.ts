@@ -14,12 +14,13 @@ import { ISettingsService } from "@/services/interfaces/settings.service.interfa
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { z } from "zod";
 import {
-  credentialSettingUpdateSchema,
+  credentialCoreSettingUpdateSchema,
   frontendSettingsUpdateSchema,
   serverSettingsUpdateSchema,
   timeoutSettingsUpdateSchema,
 } from "@/services/validators/settings-service.validation";
 import { Settings } from "@/entities";
+import { v4 as uuidv4 } from "uuid";
 
 export class SettingsStore {
   private readonly logger: LoggerService;
@@ -63,8 +64,12 @@ export class SettingsStore {
         jwtExpiresIn: settings[credentialSettingsKey].jwtExpiresIn,
         refreshTokenAttempts: settings[credentialSettingsKey].refreshTokenAttempts,
         refreshTokenExpiry: settings[credentialSettingsKey].refreshTokenExpiry,
+        slicerApiKey: settings[credentialSettingsKey].slicerApiKey
       },
       [serverSettingsKey]: {
+        loginRequired: settings[serverSettingsKey].loginRequired,
+        registration: settings[serverSettingsKey].registration,
+        sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
         experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport
@@ -101,7 +106,7 @@ export class SettingsStore {
     }
 
     if (overrideJwtExpiresIn?.length) {
-      await this.updateCredentialSettings({
+      await this.updateCoreCredentialSettings({
         refreshTokenExpiry: credentialSettings.refreshTokenExpiry,
         refreshTokenAttempts: credentialSettings.refreshTokenAttempts,
         jwtExpiresIn: Number.parseInt(overrideJwtExpiresIn),
@@ -189,21 +194,16 @@ export class SettingsStore {
     return this.getSettings();
   }
 
-  async updateCredentialSettings(credentialSettings: z.infer<typeof credentialSettingUpdateSchema>) {
-    this.settings = await this.settingsService.updateCredentialSettings(credentialSettings);
+  async updateCoreCredentialSettings(credentialSettings: z.infer<typeof credentialCoreSettingUpdateSchema>) {
+    this.settings = await this.settingsService.updateCoreCredentialSettings(credentialSettings);
   }
 
-  async setRefreshTokenSettings({
-    refreshTokenAttempts,
-    refreshTokenExpiry,
-  }: {
-    refreshTokenAttempts: number;
-    refreshTokenExpiry: number;
-  }) {
+  async setRefreshTokenSettings({ refreshTokenAttempts, refreshTokenExpiry, }:
+                                { refreshTokenAttempts: number; refreshTokenExpiry: number; }) {
     this.throwIfSettingsUnset();
     this.settings![credentialSettingsKey].refreshTokenAttempts = refreshTokenAttempts;
     this.settings![credentialSettingsKey].refreshTokenExpiry = refreshTokenExpiry;
-    await this.updateCredentialSettings(this.settings![credentialSettingsKey]);
+    await this.updateCoreCredentialSettings(this.settings![credentialSettingsKey]);
   }
 
   async setSentryDiagnosticsEnabled(sentryDiagnosticsEnabled: boolean) {
@@ -239,6 +239,35 @@ export class SettingsStore {
   async updateFrontendSettings(frontendSettings: z.infer<typeof frontendSettingsUpdateSchema>) {
     this.settings = await this.settingsService.updateFrontendSettings(frontendSettings);
     return this.getSettings();
+  }
+
+  getSlicerApiKey() {
+    this.throwIfSettingsUnset();
+    return this.settings![credentialSettingsKey].slicerApiKey;
+  }
+
+  async generateSlicerApiKey() {
+    const newApiKey = uuidv4();
+    return this.setSlicerApiKey(newApiKey);
+  }
+
+  async setSlicerApiKey(apiKey: string) {
+    this.throwIfSettingsUnset();
+    this.settings = await this.settingsService.updateSlicerApiKey({ slicerApiKey: apiKey });
+    return apiKey;
+  }
+
+  async deleteSlicerApiKey() {
+    this.throwIfSettingsUnset();
+    this.settings = await this.settingsService.updateSlicerApiKey({ slicerApiKey: null });
+  }
+
+  validateSlicerApiKey(apiKey: string): boolean {
+    const storedKey = this.getSlicerApiKey();
+    if (!storedKey) {
+      return false;
+    }
+    return storedKey === apiKey;
   }
 
   private throwIfSettingsUnset() {

@@ -28,6 +28,7 @@ export class Settings {
     jwtExpiresIn: number;
     refreshTokenAttempts: number;
     refreshTokenExpiry: number;
+    slicerApiKey: string | null;
   };
 
   @Column({ type: "simple-json", nullable: false })
@@ -43,6 +44,7 @@ export class Settings {
     gridRows: number;
     largeTiles: boolean;
     tilePreferCancelOverQuickStop: boolean;
+    gridNameSortDirection?: 'horizontal' | 'vertical';
   };
 
   @Column({ type: "simple-json", nullable: false })

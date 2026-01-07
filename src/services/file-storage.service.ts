@@ -363,13 +363,14 @@ export class FileStorageService implements IFileStorageService {
       const thumbPath = join(thumbnailDir, filename);
 
       try {
-        // Decode base64 and write
         const buffer = Buffer.from(thumb.data, 'base64');
         await writeFile(thumbPath, buffer);
 
+        const relativePath = path.relative(this.storageBasePath, thumbPath);
+
         savedThumbnails.push({
           index: i,
-          path: thumbPath,
+          path: relativePath,
           filename,
           width: thumb.width || 0,
           height: thumb.height || 0,
@@ -503,7 +504,7 @@ export class FileStorageService implements IFileStorageService {
 
       return {
         fileStorageId,
-        fileName: metadata?._fileName || basename(filePath),
+        fileName: metadata?._originalFileName || basename(filePath),
         fileFormat: ext,
         fileSize: stats.size,
         fileHash: metadata?._fileHash || '',

@@ -7,6 +7,9 @@ import { FileStorageService } from "@/services/file-storage.service";
 import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
+import { FileAnalysisService } from "@/services/file-analysis.service";
+import { copyFileSync, existsSync, unlinkSync } from "node:fs";
+import { extname } from "node:path";
 
 @route(AppConstants.apiRoute + "/file-storage")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
@@ -17,14 +20,11 @@ export class FileStorageController {
     loggerFactory: ILoggerFactory,
     private readonly fileStorageService: FileStorageService,
     private readonly multerService: MulterService,
+    private readonly fileAnalysisService: FileAnalysisService,
   ) {
     this.logger = loggerFactory(FileStorageController.name);
   }
 
-  /**
-   * List all stored files with metadata
-   * GET /api/file-storage
-   */
   @GET()
   async listFiles(req: Request, res: Response) {
     try {
@@ -104,17 +104,61 @@ export class FileStorageController {
     }
   }
 
-  /**
-   * Get thumbnail for a file
-   * GET /api/file-storage/:fileStorageId/thumbnail/:index
-   */
+  @POST()
+  @route("/:fileStorageId/analyze")
+  async analyzeFile(req: Request, res: Response) {
+    const { fileStorageId } = req.params;
+
+    try {
+      const filePath = this.fileStorageService.getFilePath(fileStorageId);
+      const fileExists = await this.fileStorageService.fileExists(fileStorageId);
+      if (!fileExists) {
+        res.status(404).send({ error: "File not found" });
+        return;
+      }
+      this.logger.log(`Analyzing file: ${fileStorageId}`);
+
+      // Load existing metadata to preserve original filename
+      const existingMetadata = await this.fileStorageService.loadMetadata(fileStorageId);
+
+      const analysisResult = await this.fileAnalysisService.analyzeFile(filePath);
+      const metadata = analysisResult.metadata;
+      const thumbnails = analysisResult.thumbnails;
+
+      this.logger.log(`Analysis complete for ${fileStorageId}: format=${metadata.fileFormat}, layers=${metadata.totalLayers}, time=${metadata.gcodePrintTimeSeconds}s, thumbnails=${thumbnails.length}`);
+
+      const fileHash = await this.fileStorageService.calculateFileHash(filePath);
+      const originalFileName = existingMetadata?._originalFileName || fileStorageId;
+
+      metadata.fileName = originalFileName;
+
+      let thumbnailMetadata: any[] = [];
+      if (thumbnails.length > 0) {
+        thumbnailMetadata = await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails);
+        this.logger.log(`Saved ${thumbnailMetadata.length} thumbnails for ${fileStorageId}`);
+      }
+
+      await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, originalFileName, thumbnailMetadata);
+
+      res.send({
+        message: "File analyzed successfully",
+        fileStorageId,
+        metadata,
+        thumbnailCount: thumbnails.length,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to analyze file ${fileStorageId}: ${error}`);
+      res.status(500).send({ error: `Failed to analyze file: ${error}` });
+    }
+  }
+
   @GET()
   @route("/:fileStorageId/thumbnail/:index")
   async getThumbnail(req: Request, res: Response) {
     const { fileStorageId, index } = req.params;
-    const thumbnailIndex = parseInt(index);
+    const thumbnailIndex = Number.parseInt(index);
 
-    if (isNaN(thumbnailIndex)) {
+    if (Number.isNaN(thumbnailIndex)) {
       res.status(400).send({ error: "Invalid thumbnail index" });
       return;
     }
@@ -128,7 +172,6 @@ export class FileStorageController {
       }
 
       // Determine content type from magic bytes
-      const isPNG = thumbnail[0] === 0x89 && thumbnail[1] === 0x50 && thumbnail[2] === 0x4E && thumbnail[3] === 0x47;
       const isJPG = thumbnail[0] === 0xFF && thumbnail[1] === 0xD8;
 
       let contentType = 'image/png';
@@ -169,31 +212,59 @@ export class FileStorageController {
 
       const file = files[0];
 
-      // Calculate file hash
-      const fileHash = await this.fileStorageService.calculateFileHash(file.path);
+      // Get file extension and create temp path with extension
+      const ext = extname(file.originalname);
+      const tempPathWithExt = file.path + ext;
 
-      // Save file to storage
-      const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
-
-      this.logger.log(`Uploaded file ${file.originalname} as ${fileStorageId}`);
-
-      // Trigger async analysis
-      // This will be handled by the file analysis service
       try {
-        const filePath = this.fileStorageService.getFilePath(fileStorageId);
-        // Queue analysis task (would be handled by a background job system)
-        this.logger.log(`File uploaded successfully, analysis will be processed`);
-      } catch (analysisError) {
-        this.logger.warn(`Failed to trigger analysis: ${analysisError}`);
-      }
+        // Copy file with proper extension for analysis
+        copyFileSync(file.path, tempPathWithExt);
 
-      res.send({
-        message: "File uploaded successfully",
-        fileStorageId,
-        fileName: file.originalname,
-        fileSize: file.size,
-        fileHash,
-      });
+        // Calculate file hash
+        const fileHash = await this.fileStorageService.calculateFileHash(tempPathWithExt);
+
+        // Analyze the file before saving
+        this.logger.log(`Analyzing file: ${file.originalname} (ext: ${ext})`);
+        const analysisResult = await this.fileAnalysisService.analyzeFile(tempPathWithExt);
+        const metadata = analysisResult.metadata;
+        const thumbnails = analysisResult.thumbnails;
+
+        this.logger.log(
+          `Analysis complete: format=${metadata.fileFormat}, layers=${metadata.totalLayers}, ` +
+          `time=${metadata.gcodePrintTimeSeconds}s, filament=${metadata.filamentUsedGrams}g, ` +
+          `thumbnails=${thumbnails.length}`
+        );
+
+        // Save file to storage
+        const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
+        this.logger.log(`Uploaded file ${file.originalname} as ${fileStorageId}`);
+
+        // Save thumbnails
+        let thumbnailMetadata: any[] = [];
+        if (thumbnails.length > 0) {
+          thumbnailMetadata = await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails);
+          this.logger.log(`Saved ${thumbnailMetadata.length} thumbnail(s) for ${fileStorageId}`);
+        }
+
+        // Save metadata JSON with thumbnail index
+        await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
+        this.logger.log(`Saved metadata JSON for ${fileStorageId}`);
+
+        res.send({
+          message: "File uploaded successfully",
+          fileStorageId,
+          fileName: file.originalname,
+          fileSize: file.size,
+          fileHash,
+          metadata,
+          thumbnailCount: thumbnails.length,
+        });
+      } finally {
+        // Clean up temp file with extension
+        if (existsSync(tempPathWithExt)) {
+          unlinkSync(tempPathWithExt);
+        }
+      }
     } catch (error) {
       this.logger.error(`Failed to upload file: ${error}`);
       res.status(500).send({ error: "Failed to upload file" });
