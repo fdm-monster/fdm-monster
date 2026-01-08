@@ -8,7 +8,7 @@ import {
   PrinterMaintenanceLogDto,
   CompleteMaintenanceLogDto,
 } from "@/services/interfaces/printer-maintenance-log.dto";
-import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import { BadRequestException, NotFoundException } from "@/exceptions/runtime.exceptions";
 import { IPrinterService } from "@/services/interfaces/printer.service.interface";
 
 export class PrinterMaintenanceLogService {
@@ -54,7 +54,7 @@ export class PrinterMaintenanceLogService {
     });
 
     if (existingLog) {
-      throw new Error(`Printer ${printer.name} already has an active maintenance log`);
+      throw new BadRequestException(`Printer ${printer.name} already has an active maintenance log`);
     }
 
     const log = this.repository.create({
@@ -86,7 +86,7 @@ export class PrinterMaintenanceLogService {
     }
 
     if (log.completed) {
-      throw new Error(`Maintenance log ${logId} is already completed`);
+      throw new BadRequestException(`Maintenance log ${logId} is already completed`);
     }
 
     // Update metadata with completion notes

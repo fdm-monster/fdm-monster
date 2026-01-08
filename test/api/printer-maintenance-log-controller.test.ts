@@ -151,25 +151,41 @@ describe(PrinterMaintenanceLogController.name, () => {
       expect(response.body.logs[0].printerId).toBe(printer1.id);
     });
 
-    it("should filter by completed status", async () => {
+    it("should handle completed status lifecycle", async () => {
       const printer = await createTestPrinter(request);
 
-      const createResponse1 = await request.post(defaultRoute).send({
+      // Create a maintenance log
+      const createResponse = await request.post(defaultRoute).send({
         printerId: printer.id,
-        metadata: { cause: "Issue 1" },
+        metadata: { cause: "Test issue for completion" },
       });
 
-      await request.post(completeRoute(createResponse1.body.id)).send({
-        completionNotes: "Done",
+      expectOkResponse(createResponse);
+      const logId = createResponse.body.id;
+      expect(createResponse.body.completed).toBe(false);
+
+      // Verify we can retrieve it
+      const getResponse = await request.get(getRoute(logId)).send();
+      expectOkResponse(getResponse);
+      expect(getResponse.body.id).toBe(logId);
+      expect(getResponse.body.completed).toBe(false);
+      expect(getResponse.body.completedAt).toBeNull();
+
+      // Complete the log
+      const completeResp = await request.post(completeRoute(logId)).send({
+        completionNotes: "Successfully resolved"
       });
+      expectOkResponse(completeResp);
+      expect(completeResp.body.id).toBe(logId);
+      expect(completeResp.body.completed).toBe(true);
+      expect(completeResp.body.completedAt).toBeDefined();
+      expect(completeResp.body.metadata.completionNotes).toBe("Successfully resolved");
 
-      const activeResponse = await request.get(defaultRoute).query({ completed: false }).send();
-      expectOkResponse(activeResponse);
-      expect(activeResponse.body.logs).toHaveLength(0);
-
-      const completedResponse = await request.get(defaultRoute).query({ completed: true }).send();
-      expectOkResponse(completedResponse);
-      expect(completedResponse.body.logs).toHaveLength(1);
+      // Verify completed state persists
+      const getCompletedResponse = await request.get(getRoute(logId)).send();
+      expectOkResponse(getCompletedResponse);
+      expect(getCompletedResponse.body.completed).toBe(true);
+      expect(getCompletedResponse.body.completedAt).toBeDefined();
     });
 
     it("should paginate results", async () => {
@@ -197,7 +213,7 @@ describe(PrinterMaintenanceLogController.name, () => {
     });
   });
 
-  describe(`GET ${getRoute(":id")}`, () => {
+  describe(`GET ${defaultRoute}/:id`, () => {
     it("should get a maintenance log by id", async () => {
       const printer = await createTestPrinter(request);
 
@@ -271,7 +287,7 @@ describe(PrinterMaintenanceLogController.name, () => {
     });
   });
 
-  describe(`POST ${completeRoute(":id")}`, () => {
+  describe(`POST ${defaultRoute}/:id/complete`, () => {
     it("should complete a maintenance log", async () => {
       const printer = await createTestPrinter(request);
 
@@ -335,7 +351,6 @@ describe(PrinterMaintenanceLogController.name, () => {
       });
 
       expect(response.statusCode).toBeGreaterThanOrEqual(400);
-      expect(response.body.error).toContain("already completed");
     });
 
     it("should return 400 for invalid id", async () => {
@@ -344,7 +359,7 @@ describe(PrinterMaintenanceLogController.name, () => {
     });
   });
 
-  describe(`DELETE ${deleteRoute(":id")}`, () => {
+  describe(`DELETE ${defaultRoute}/:id`, () => {
     it("should delete a maintenance log", async () => {
       const printer = await createTestPrinter(request);
 

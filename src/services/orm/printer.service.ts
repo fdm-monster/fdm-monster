@@ -134,7 +134,7 @@ export class PrinterService extends BaseService(Printer, PrinterDto, CreatePrint
     }
   }
 
-  async updateDisabledReason(printerId: number, disabledReason?: string): Promise<Printer> {
+  async updateDisabledReason(printerId: number, disabledReason: string | null): Promise<Printer> {
     await validateInput({ disabledReason }, updatePrinterDisabledReasonSchema);
     return this.update(printerId, { disabledReason });
   }
