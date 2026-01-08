@@ -2,7 +2,8 @@
 
 ## Chores
 
-- Remove corepack from CICD as yarn is committed to repository.
+- Remove corepack from CICD as yarn is committed to repository
+- Switch docker container base to node 24
 
 # FDM Monster 2.0.1
 
