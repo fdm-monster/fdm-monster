@@ -62,7 +62,18 @@ describe("PrinterMaintenanceLog Entity Index Tests", () => {
       metadata: {},
     });
 
-    await repo.save(log1);
+    const savedLog1 = await repo.save(log1);
+
+    // Verify first log was saved successfully
+    expect(savedLog1.id).toBeDefined();
+    expect(savedLog1.printerId).toBe(testPrinter.id);
+    expect(savedLog1.completed).toBe(false);
+    expect(savedLog1.createdBy).toBe("test-user-1");
+
+    // Verify only one log exists in the database
+    const logsAfterFirst = await repo.find({ where: { printerId: testPrinter.id } });
+    expect(logsAfterFirst).toHaveLength(1);
+    expect(logsAfterFirst[0].id).toBe(savedLog1.id);
 
     const log2 = repo.create({
       printerId: testPrinter.id,
@@ -73,7 +84,17 @@ describe("PrinterMaintenanceLog Entity Index Tests", () => {
       metadata: {},
     });
 
-    await expect(repo.save(log2)).rejects.toThrow();
+    // Attempt to save second uncompleted log should throw a constraint error
+    await expect(repo.save(log2)).rejects.toThrow(/UNIQUE constraint failed|constraint/);
+
+    // Verify that only the first log still exists
+    const logsAfterAttempt = await repo.find({ where: { printerId: testPrinter.id } });
+    expect(logsAfterAttempt).toHaveLength(1);
+    expect(logsAfterAttempt[0].id).toBe(savedLog1.id);
+    expect(logsAfterAttempt[0].createdBy).toBe("test-user-1");
+
+    // Verify log2 was never assigned an ID
+    expect(log2.id).toBeUndefined();
   });
 
   it("should allow multiple completed maintenance logs for the same printer", async () => {
