@@ -1,5 +1,9 @@
 # Develop
 
+## Chores
+
+- Remove corepack from CICD as yarn is committed to repository.
+
 # FDM Monster 2.0.1
 
 ## Feat
