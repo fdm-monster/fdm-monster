@@ -34,7 +34,10 @@ print_warning() { echo -e "${YELLOW}!${NC} $1"; }
 print_info() { echo -e "${BLUE}ℹ${NC} $1"; }
 
 check_root() {
-    [ "$EUID" -eq 0 ] && { print_error "Do not run as root"; exit 1; }
+    if [ "$EUID" -eq 0 ]; then
+        print_error "Do not run as root"
+        exit 1
+    fi
 }
 
 detect_platform() {
@@ -288,8 +291,6 @@ main() {
         exit $?
     fi
 
-
-    print_error "Do not run as root"
     # Otherwise, run installer
     print_banner
     check_root
