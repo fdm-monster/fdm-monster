@@ -120,7 +120,7 @@ EOF
     fi
 
     # Install the package
-    yarn add "$NPM_PACKAGE" --production
+    yarn add "$NPM_PACKAGE"
 
     print_success "$NPM_PACKAGE installed"
 }
@@ -219,14 +219,22 @@ handle_command() {
                 tail -f "$DATA_DIR/media/logs/fdm-monster.log"
             fi
             ;;
-        update)
-            local VERSION="${2:-latest}"
-            print_info "Updating FDM Monster to version $VERSION..."
-            $0 stop
-            cd "$INSTALL_DIR"
-            yarn add "$NPM_PACKAGE@$VERSION" --production
-            $0 start
-            print_success "Updated to version $VERSION"
+        upgrade)
+            if [ -n "$2" ]; then
+                print_info "Upgrading FDM Monster to version $2..."
+                $0 stop
+                cd "$INSTALL_DIR"
+                yarn add "$NPM_PACKAGE@$2"
+                $0 start
+                print_success "Upgraded to version $2"
+            else
+                print_info "Upgrading FDM Monster to latest version..."
+                $0 stop
+                cd "$INSTALL_DIR"
+                yarn add "$NPM_PACKAGE"
+                $0 start
+                print_success "Upgraded to latest version"
+            fi
             ;;
         uninstall)
             print_warning "Uninstalling FDM Monster..."
@@ -243,7 +251,7 @@ handle_command() {
         *)
             echo "FDM Monster CLI"
             echo ""
-            echo "Usage: fdm-monster {start|stop|restart|logs|update [version]|uninstall}"
+            echo "Usage: fdm-monster {start|stop|restart|logs|upgrade [version]|uninstall}"
             echo "Alias: fdmm"
             echo ""
             echo "Commands:"
@@ -251,12 +259,12 @@ handle_command() {
             echo "  stop            - Stop FDM Monster"
             echo "  restart         - Restart FDM Monster"
             echo "  logs            - View logs"
-            echo "  update [ver]    - Update to latest or specified version"
+            echo "  upgrade [ver]   - Upgrade to latest or specified version"
             echo "  uninstall       - Remove FDM Monster"
             echo ""
             echo "Examples:"
-            echo "  fdmm update              # Update to latest"
-            echo "  fdmm update 1.2.3        # Update to specific version"
+            echo "  fdmm upgrade             # Upgrade to latest"
+            echo "  fdmm upgrade 1.2.3       # Upgrade to specific version"
             exit 1
             ;;
     esac
@@ -290,7 +298,7 @@ print_instructions() {
     echo -e "    ${YELLOW}fdmm stop${NC}              - Stop FDM Monster"
     echo -e "    ${YELLOW}fdmm restart${NC}           - Restart FDM Monster"
     echo -e "    ${YELLOW}fdmm logs${NC}              - View logs"
-    echo -e "    ${YELLOW}fdmm update [version]${NC}  - Update to latest or specified version"
+    echo -e "    ${YELLOW}fdmm upgrade [version]${NC} - Upgrade to latest or specified version"
     echo -e "    ${YELLOW}fdmm uninstall${NC}         - Remove FDM Monster"
     echo ""
     echo -e "  ${BLUE}Data directory:${NC} $DATA_DIR"
