@@ -1,13 +1,10 @@
 # Develop
 
-Fixes
-
-- PrintJob entity got in a migration loop
-
 ## Chores
 
 - Remove corepack from CICD as yarn is committed to repository
 - Switch docker container base to node 24
+- PrintJob entity printer relation improved
 
 # FDM Monster 2.0.1
 

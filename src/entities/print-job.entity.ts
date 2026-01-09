@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Relation,
+  UpdateDateColumn
+} from "typeorm";
 import { Printer } from "@/entities/printer.entity";
 
 // Job lifecycle states (printing/queue related only)
@@ -154,9 +163,9 @@ export class PrintJob {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Printer, { onDelete: "SET NULL" })
-  printer?: Printer;
-
+  @ManyToOne(() => Printer, { nullable: true, onDelete: "SET NULL" })
+  @JoinColumn({ name: "printerId" })
+  printer?: Relation<Printer>;
   @Column({ nullable: true })
   printerId: number | null;
 
