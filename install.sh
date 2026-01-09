@@ -14,7 +14,7 @@ NPM_PACKAGE="@fdm-monster/server"
 INSTALL_DIR="$HOME/.fdm-monster"
 DATA_DIR="$HOME/.fdm-monster-data"
 DEFAULT_PORT=4000
-INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/fdm-monster/fdm-monster/feat/one-script-install/install.sh"
+INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/fdm-monster/fdm-monster/main/install.sh"
 
 # Helper functions
 print_banner() {
