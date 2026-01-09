@@ -285,7 +285,7 @@ handle_command() {
             # Validate version if specified
             if [[ -n "$TARGET_VERSION" ]]; then
                 local MAJOR_VERSION=$(echo "$TARGET_VERSION" | cut -d'.' -f1)
-                if [[ "$MAJOR_VERSION" =~ ^[0-9]+$ ]] && [ "$MAJOR_VERSION" -lt 2 ]; then
+                if [[ "$MAJOR_VERSION" =~ ^[0-9]+$ ]] && [[ "$MAJOR_VERSION" -lt 2 ]]; then
                     print_error "Cannot upgrade to version $TARGET_VERSION - minimum supported version is 2.0.0"
                     exit 1
                 fi
