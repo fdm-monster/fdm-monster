@@ -359,6 +359,7 @@ print_instructions() {
     echo -e "    ${YELLOW}fdmm status${NC}            - Check if FDM Monster is running"
     echo -e "    ${YELLOW}fdmm logs${NC}              - View logs"
     echo -e "    ${YELLOW}fdmm upgrade [version]${NC} - Upgrade to latest or specified version"
+    echo -e "    ${YELLOW}fdmm backup${NC}            - Backup data directory"
     echo -e "    ${YELLOW}fdmm uninstall${NC}         - Remove FDM Monster"
     echo ""
     echo -e "  ${BLUE}Data directory:${NC} $DATA_DIR"
