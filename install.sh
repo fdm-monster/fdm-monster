@@ -13,6 +13,7 @@ NPM_PACKAGE="@fdm-monster/server"
 INSTALL_DIR="$HOME/.fdm-monster"
 DATA_DIR="$HOME/.fdm-monster-data"
 DEFAULT_PORT=4000
+INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/fdm-monster/fdm-monster/feat/one-script-install/install.sh"
 
 # Helper functions
 print_banner() {
@@ -168,7 +169,7 @@ create_cli_wrapper() {
     mkdir -p "$BIN_DIR"
 
     # Copy this script to become the CLI
-    cp "$0" "$BIN_DIR/fdm-monster" 2>/dev/null || curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster/feat/one-script-install/install.sh -o "$BIN_DIR/fdm-monster"
+    cp "$0" "$BIN_DIR/fdm-monster" 2>/dev/null || curl -fsSL "$INSTALL_SCRIPT_URL" -o "$BIN_DIR/fdm-monster"
     chmod +x "$BIN_DIR/fdm-monster"
 
     # Create short alias
@@ -276,6 +277,24 @@ handle_command() {
                 exit 1
             fi
             ;;
+        update-cli)
+            print_info "Updating FDM Monster CLI..."
+            local BIN_DIR="$HOME/.local/bin"
+            local TEMP_FILE="/tmp/fdm-monster-cli-update.sh"
+
+            curl -fsSL "$INSTALL_SCRIPT_URL" -o "$TEMP_FILE"
+
+            if [ $? -eq 0 ]; then
+                mv "$TEMP_FILE" "$BIN_DIR/fdm-monster"
+                chmod +x "$BIN_DIR/fdm-monster"
+                cp "$BIN_DIR/fdm-monster" "$BIN_DIR/fdmm"
+                chmod +x "$BIN_DIR/fdmm"
+                print_success "CLI updated successfully"
+            else
+                print_error "Failed to download CLI update"
+                exit 1
+            fi
+            ;;
         uninstall)
             print_warning "Uninstalling FDM Monster..."
             $0 stop
@@ -291,7 +310,7 @@ handle_command() {
         *)
             echo "FDM Monster CLI"
             echo ""
-            echo "Usage: fdm-monster {start|stop|restart|status|logs|upgrade [version]|backup|uninstall}"
+            echo "Usage: fdm-monster {start|stop|restart|status|logs|upgrade [version]|backup|update-cli|uninstall}"
             echo "Alias: fdmm"
             echo ""
             echo "Commands:"
@@ -302,6 +321,7 @@ handle_command() {
             echo "  logs            - View logs"
             echo "  upgrade [ver]   - Upgrade to latest or specified version"
             echo "  backup          - Backup data directory to ~/.fdm-monster-backups"
+            echo "  update-cli      - Update the CLI tool itself"
             echo "  uninstall       - Remove FDM Monster"
             echo ""
             echo "Examples:"
@@ -309,6 +329,7 @@ handle_command() {
             echo "  fdmm backup              # Create backup"
             echo "  fdmm upgrade             # Upgrade to latest"
             echo "  fdmm upgrade 1.2.3       # Upgrade to specific version"
+            echo "  fdmm update-cli          # Update CLI tool"
             exit 1
             ;;
     esac
@@ -344,13 +365,34 @@ wait_for_service() {
     print_info "Check logs with: fdm-monster logs"
 }
 
+get_network_addresses() {
+    # Get all non-loopback IPv4 addresses
+    if command -v ip &> /dev/null; then
+        ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v '127.0.0.1'
+    elif command -v ifconfig &> /dev/null; then
+        ifconfig | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v '127.0.0.1'
+    elif command -v hostname &> /dev/null; then
+        hostname -I 2>/dev/null | tr ' ' '\n' | grep -v '^$'
+    fi
+}
+
 print_instructions() {
     echo ""
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN}  Installation Complete!${NC}"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "  ${BLUE}Access FDM Monster at:${NC} ${GREEN}http://localhost:$DEFAULT_PORT${NC}"
+    echo -e "  ${BLUE}Access FDM Monster at:${NC}"
+    echo -e "    ${GREEN}http://localhost:$DEFAULT_PORT${NC}"
+
+    # Show network addresses if available
+    local ADDRESSES=$(get_network_addresses)
+    if [ -n "$ADDRESSES" ]; then
+        while IFS= read -r addr; do
+            [ -n "$addr" ] && echo -e "    ${GREEN}http://$addr:$DEFAULT_PORT${NC}"
+        done <<< "$ADDRESSES"
+    fi
+
     echo ""
     echo -e "  ${BLUE}Management commands:${NC} ${YELLOW}(use 'fdm-monster' or 'fdmm')${NC}"
     echo -e "    ${YELLOW}fdmm start${NC}             - Start FDM Monster"
@@ -360,6 +402,7 @@ print_instructions() {
     echo -e "    ${YELLOW}fdmm logs${NC}              - View logs"
     echo -e "    ${YELLOW}fdmm upgrade [version]${NC} - Upgrade to latest or specified version"
     echo -e "    ${YELLOW}fdmm backup${NC}            - Backup data directory"
+    echo -e "    ${YELLOW}fdmm update-cli${NC}        - Update CLI tool"
     echo -e "    ${YELLOW}fdmm uninstall${NC}         - Remove FDM Monster"
     echo ""
     echo -e "  ${BLUE}Data directory:${NC} $DATA_DIR"
