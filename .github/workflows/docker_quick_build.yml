@@ -41,11 +41,8 @@ jobs:
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
 
-      # New intended logic
-      # if branch is develop => push to dockerhub with tag 'develop'
-      # if branch is main => push to dockerhub with tag 'main'
-
-      - name: Tagging Strategy
+      # Regular develop build :: adds -develop tag to builds 
+      - name: Tagging Strategy - Regular build
         id: tagging_regular
         uses: HackerHappyHour/tagging-strategy@v3
         with:
@@ -56,8 +53,8 @@ jobs:
           extra_tags: |
             develop::${{ github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop' }}
       
-      # Added to support 4545 :: adds -mdns tag to builds 
-      - name: Tagging Strategy
+      # Added to support 4545 :: adds -develop-mdns tag to builds 
+      - name: Tagging Strategy - mDNS version
         id: tagging_mdns
         uses: HackerHappyHour/tagging-strategy@v3
         with:
