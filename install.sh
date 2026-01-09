@@ -8,6 +8,7 @@ set -e
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
 
 # Configuration
+CLI_VERSION="1.0.0"
 NODE_VERSION="24.12.0"
 NPM_PACKAGE="@fdm-monster/server"
 INSTALL_DIR="$HOME/.fdm-monster"
@@ -239,19 +240,32 @@ handle_command() {
             ;;
         upgrade)
             if [ -n "$2" ]; then
+                # Check if version is below 2.0.0
+                local MAJOR_VERSION=$(echo "$2" | cut -d'.' -f1)
+                if [[ "$MAJOR_VERSION" =~ ^[0-9]+$ ]] && [ "$MAJOR_VERSION" -lt 2 ]; then
+                    print_error "Cannot upgrade to version $2 - minimum supported version is 2.0.0"
+                    exit 1
+                fi
+
                 print_info "Upgrading FDM Monster to version $2..."
                 $0 stop
                 cd "$INSTALL_DIR"
                 YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE@$2"
                 $0 start
-                print_success "Upgraded to version $2"
+
+                # Get installed version
+                local INSTALLED_VERSION=$(node -p "require('./node_modules/$NPM_PACKAGE/package.json').version" 2>/dev/null || echo "unknown")
+                print_success "Upgraded to version $INSTALLED_VERSION"
             else
                 print_info "Upgrading FDM Monster to latest version..."
                 $0 stop
                 cd "$INSTALL_DIR"
                 YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE"
                 $0 start
-                print_success "Upgraded to latest version"
+
+                # Get installed version
+                local INSTALLED_VERSION=$(node -p "require('./node_modules/$NPM_PACKAGE/package.json').version" 2>/dev/null || echo "unknown")
+                print_success "Upgraded to version $INSTALLED_VERSION"
             fi
             ;;
         backup)
@@ -278,22 +292,33 @@ handle_command() {
             fi
             ;;
         update-cli)
-            print_info "Updating FDM Monster CLI..."
+            print_info "Updating FDM Monster CLI (current: v$CLI_VERSION)..."
             local BIN_DIR="$HOME/.local/bin"
             local TEMP_FILE="/tmp/fdm-monster-cli-update.sh"
 
             curl -fsSL "$INSTALL_SCRIPT_URL" -o "$TEMP_FILE"
 
             if [ $? -eq 0 ]; then
+                # Extract new version from downloaded script
+                local NEW_VERSION=$(grep '^CLI_VERSION=' "$TEMP_FILE" | cut -d'"' -f2)
+
                 mv "$TEMP_FILE" "$BIN_DIR/fdm-monster"
                 chmod +x "$BIN_DIR/fdm-monster"
                 cp "$BIN_DIR/fdm-monster" "$BIN_DIR/fdmm"
                 chmod +x "$BIN_DIR/fdmm"
-                print_success "CLI updated successfully"
+
+                if [ -n "$NEW_VERSION" ]; then
+                    print_success "CLI updated successfully to v$NEW_VERSION"
+                else
+                    print_success "CLI updated successfully"
+                fi
             else
                 print_error "Failed to download CLI update"
                 exit 1
             fi
+            ;;
+        version|--version|-v)
+            echo "FDM Monster CLI v$CLI_VERSION"
             ;;
         uninstall)
             print_warning "Uninstalling FDM Monster..."
@@ -303,14 +328,30 @@ handle_command() {
                 sudo rm -f /etc/systemd/system/fdm-monster.service
                 sudo systemctl daemon-reload
             fi
-            rm -rf "$INSTALL_DIR" "$DATA_DIR"
+
+            # Remove install directory and CLI
+            rm -rf "$INSTALL_DIR"
             rm -f "$HOME/.local/bin/fdm-monster" "$HOME/.local/bin/fdmm"
-            print_success "FDM Monster uninstalled"
+
+            # Ask about data directory
+            echo ""
+            echo -e "${YELLOW}Do you want to remove the data directory?${NC}"
+            echo -e "  ${BLUE}Location:${NC} $DATA_DIR"
+            echo -e "  ${BLUE}Contains:${NC} databases, logs, uploaded files"
+            read -p "Remove data directory? [y/N]: " -n 1 -r
+            echo ""
+
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                rm -rf "$DATA_DIR"
+                print_success "FDM Monster uninstalled (including data)"
+            else
+                print_success "FDM Monster uninstalled (data preserved at $DATA_DIR)"
+            fi
             ;;
         *)
-            echo "FDM Monster CLI"
+            echo "FDM Monster CLI v$CLI_VERSION"
             echo ""
-            echo "Usage: fdm-monster {start|stop|restart|status|logs|upgrade [version]|backup|update-cli|uninstall}"
+            echo "Usage: fdm-monster {start|stop|restart|status|logs|upgrade [version]|backup|update-cli|version|uninstall}"
             echo "Alias: fdmm"
             echo ""
             echo "Commands:"
@@ -322,6 +363,7 @@ handle_command() {
             echo "  upgrade [ver]   - Upgrade to latest or specified version"
             echo "  backup          - Backup data directory to ~/.fdm-monster-backups"
             echo "  update-cli      - Update the CLI tool itself"
+            echo "  version         - Show CLI version"
             echo "  uninstall       - Remove FDM Monster"
             echo ""
             echo "Examples:"
@@ -330,6 +372,7 @@ handle_command() {
             echo "  fdmm upgrade             # Upgrade to latest"
             echo "  fdmm upgrade 1.2.3       # Upgrade to specific version"
             echo "  fdmm update-cli          # Update CLI tool"
+            echo "  fdmm version             # Show CLI version"
             exit 1
             ;;
     esac
@@ -394,7 +437,7 @@ print_instructions() {
     fi
 
     echo ""
-    echo -e "  ${BLUE}Management commands:${NC} ${YELLOW}(use 'fdm-monster' or 'fdmm')${NC}"
+    echo -e "  ${BLUE}Management commands:${NC} ${YELLOW}(use 'fdm-monster' or 'fdmm' - CLI v$CLI_VERSION)${NC}"
     echo -e "    ${YELLOW}fdmm start${NC}             - Start FDM Monster"
     echo -e "    ${YELLOW}fdmm stop${NC}              - Stop FDM Monster"
     echo -e "    ${YELLOW}fdmm restart${NC}           - Restart FDM Monster"
@@ -403,6 +446,7 @@ print_instructions() {
     echo -e "    ${YELLOW}fdmm upgrade [version]${NC} - Upgrade to latest or specified version"
     echo -e "    ${YELLOW}fdmm backup${NC}            - Backup data directory"
     echo -e "    ${YELLOW}fdmm update-cli${NC}        - Update CLI tool"
+    echo -e "    ${YELLOW}fdmm version${NC}           - Show CLI version"
     echo -e "    ${YELLOW}fdmm uninstall${NC}         - Remove FDM Monster"
     echo ""
     echo -e "  ${BLUE}Data directory:${NC} $DATA_DIR"
