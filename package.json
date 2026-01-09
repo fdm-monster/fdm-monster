@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@fdm-monster/client-next": "2.2.0",
-    "@octokit/plugin-throttling": "8.2.0",
+    "@octokit/plugin-throttling": "11.0.3",
     "@sentry/node": "10.32.1",
     "adm-zip": "0.5.16",
     "awilix": "12.0.5",
@@ -86,7 +86,7 @@
     "luxon": "3.7.2",
     "mqtt": "5.14.1",
     "multer": "2.0.2",
-    "octokit": "3.2.2",
+    "octokit": "5.0.5",
     "passport": "0.7.0",
     "passport-anonymous": "1.0.1",
     "passport-jwt": "4.0.1",
