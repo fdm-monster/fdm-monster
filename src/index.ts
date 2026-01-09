@@ -7,9 +7,10 @@ import { DITokens } from "./container.tokens";
 import { ServerHost } from "@/server.host";
 import { LoggerService as Logger } from "@/handlers/logger";
 import { createStaticLogger } from "@/handlers/logging/static.logger";
+import { superRootPath } from "@/utils/fs.utils";
 
 dotenv.config({
-  path: process.env.ENV_FILE || join(__dirname, "../.env"),
+  path: process.env.ENV_FILE || join(superRootPath(), ".env"),
   quiet: true
 });
 

@@ -33,6 +33,9 @@ export function ensureDirExists(dir: string) {
   mkdirSync(dir, { recursive: true });
 }
 
-function superRootPath() {
+/**
+ * Root where code is hosted, avoid using excessively
+ */
+export function superRootPath() {
   return join(__dirname, "../..");
 }
