@@ -654,8 +654,8 @@ __metadata:
     ws: "npm:8.19.0"
     zod: "npm:3.25.76"
   bin:
-    fdm-monster: dist/index.js
-    fdmm: dist/index.js
+    fdm-monster-server: dist/index.js
+    fdmm-server: dist/index.js
   languageName: unknown
   linkType: soft
 

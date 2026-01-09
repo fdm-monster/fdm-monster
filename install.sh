@@ -28,18 +28,39 @@ print_banner() {
 
 EOF
     echo -e "${NC}${GREEN}FDM Monster One-Click Installer${NC}\n${BLUE}https://fdm-monster.net${NC}\n"
+    return 0
 }
 
-print_success() { echo -e "${GREEN}✓${NC} $1"; }
-print_error() { echo -e "${RED}✗${NC} $1"; }
-print_warning() { echo -e "${YELLOW}!${NC} $1"; }
-print_info() { echo -e "${BLUE}ℹ${NC} $1"; }
+print_success() {
+    local message="$1"
+    echo -e "${GREEN}✓${NC} $message"
+    return 0
+}
+
+print_error() {
+    local message="$1"
+    echo -e "${RED}✗${NC} $message"
+    return 0
+}
+
+print_warning() {
+    local message="$1"
+    echo -e "${YELLOW}!${NC} $message"
+    return 0
+}
+
+print_info() {
+    local message="$1"
+    echo -e "${BLUE}ℹ${NC} $message"
+    return 0
+}
 
 check_root() {
-    if [ "$EUID" -eq 0 ]; then
+    if [[ "$EUID" -eq 0 ]]; then
         print_error "Do not run as root"
         exit 1
     fi
+    return 0
 }
 
 detect_platform() {
@@ -57,6 +78,7 @@ detect_platform() {
     esac
 
     print_success "Detected platform: $OS/$ARCH"
+    return 0
 }
 
 install_nodejs() {
@@ -71,6 +93,7 @@ install_nodejs() {
     export PATH="$NODE_DIR/bin:$PATH"
 
     print_success "Node.js $NODE_VERSION installed"
+    return 0
 }
 
 ensure_nodejs() {
@@ -90,6 +113,7 @@ ensure_nodejs() {
     [ -f "$HOME/.zshrc" ] && SHELL_RC="$HOME/.zshrc"
     grep -q "$INSTALL_DIR/nodejs/bin" "$SHELL_RC" 2>/dev/null || \
         echo "export PATH=\"$INSTALL_DIR/nodejs/bin:\$PATH\"" >> "$SHELL_RC"
+    return 0
 }
 
 setup_yarn() {
@@ -102,6 +126,7 @@ setup_yarn() {
     corepack prepare yarn@stable --activate
 
     print_success "Yarn $(yarn --version) ready"
+    return 0
 }
 
 install_fdm_monster() {
@@ -131,6 +156,7 @@ EOF
     fi
 
     print_success "$NPM_PACKAGE installed"
+    return 0
 }
 
 create_systemd_service() {
@@ -169,6 +195,7 @@ EOF
     sudo systemctl start fdm-monster
 
     print_success "systemd service created and started"
+    return 0
 }
 
 create_cli_wrapper() {
@@ -197,6 +224,7 @@ create_cli_wrapper() {
     else
         print_success "CLI created at $BIN_DIR/fdm-monster (alias: fdmm)"
     fi
+    return 0
 }
 
 # CLI command handler
@@ -403,6 +431,8 @@ handle_command() {
             exit 1
             ;;
     esac
+
+    return 0
 }
 
 wait_for_service() {
@@ -433,6 +463,7 @@ wait_for_service() {
 
     echo ""
     print_info "Check logs with: fdm-monster logs"
+    return 0
 }
 
 get_network_addresses() {
@@ -444,6 +475,8 @@ get_network_addresses() {
     elif command -v hostname &> /dev/null; then
         hostname -I 2>/dev/null | tr ' ' '\n' | grep -v '^$'
     fi
+
+    return 0
 }
 
 print_instructions() {
@@ -485,6 +518,8 @@ print_instructions() {
     echo ""
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
+
+    return 0
 }
 
 # Main function - handles both install and CLI commands
@@ -506,6 +541,8 @@ main() {
     create_cli_wrapper
     wait_for_service
     print_instructions
+
+    return 0
 }
 
 # Run main function with all arguments
