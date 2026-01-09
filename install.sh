@@ -120,7 +120,7 @@ EOF
     fi
 
     # Install the package
-    yarn add "$NPM_PACKAGE"
+    YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE"
 
     print_success "$NPM_PACKAGE installed"
 }
@@ -224,14 +224,14 @@ handle_command() {
                 print_info "Upgrading FDM Monster to version $2..."
                 $0 stop
                 cd "$INSTALL_DIR"
-                yarn add "$NPM_PACKAGE@$2"
+                YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE@$2"
                 $0 start
                 print_success "Upgraded to version $2"
             else
                 print_info "Upgrading FDM Monster to latest version..."
                 $0 stop
                 cd "$INSTALL_DIR"
-                yarn add "$NPM_PACKAGE"
+                YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE"
                 $0 start
                 print_success "Upgraded to latest version"
             fi
