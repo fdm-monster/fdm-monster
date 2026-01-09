@@ -136,6 +136,7 @@ create_systemd_service() {
     print_info "Creating systemd service..."
 
     local SERVICE_FILE="/etc/systemd/system/fdm-monster.service"
+    local DATABASE_PATH="$DATA_DIR/database"
     sudo tee "$SERVICE_FILE" > /dev/null << EOF
 [Unit]
 Description=FDM Monster - 3D Printer Farm Manager
@@ -147,6 +148,7 @@ User=$USER
 WorkingDirectory=$DATA_DIR
 Environment="NODE_ENV=development"
 Environment="SERVER_PORT=$DEFAULT_PORT"
+Environment="DATABASE_PATH=$DATABASE_PATH"
 ExecStart=$INSTALL_DIR/nodejs/bin/node $INSTALL_DIR/node_modules/$NPM_PACKAGE/dist/index.js
 Restart=always
 RestartSec=10
