@@ -1,5 +1,9 @@
 # Develop
 
+## Features
+
+- Printer maintenance log
+
 ## Chores
 
 - Remove corepack from CICD as yarn is committed to repository

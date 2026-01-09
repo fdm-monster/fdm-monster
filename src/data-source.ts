@@ -8,7 +8,7 @@ import { Floor } from "@/entities/floor.entity";
 import { FloorPosition } from "@/entities/floor-position.entity";
 import { Printer } from "@/entities/printer.entity";
 import { Settings } from "@/entities/settings.entity";
-import { PrintJob, RefreshToken, User } from "@/entities";
+import { PrintJob, RefreshToken, User, PrinterMaintenanceLog } from "@/entities";
 import { CameraStream } from "@/entities/camera-stream.entity";
 import { Role } from "@/entities/role.entity";
 import { UserRole } from "@/entities/user-role.entity";
@@ -33,6 +33,7 @@ import { DropSettingsFileClean1767352862576 } from "@/migrations/1767352862576-D
 import { ChangeFloorNonUniqueOrder1767370191762 } from "@/migrations/1767370191762-ChangeFloorNonUniqueOrder";
 import { RenameGroupToTag1767432108916 } from "@/migrations/1767432108916-RenameGroupToTag";
 import { AddPrintJob1767451444137 } from "@/migrations/1767451444137-AddPrintJob";
+import { AddPrinterMaintenanceLog1767909428129 } from "@/migrations/1767909428129-AddPrinterMaintenanceLog";
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
@@ -61,7 +62,8 @@ export const AppDataSource = new DataSource({
     UserRole,
     Tag,
     PrinterTag,
-    PrintJob
+    PrintJob,
+    PrinterMaintenanceLog
   ],
   migrations: [
     InitSqlite1706829146617,
@@ -78,7 +80,8 @@ export const AppDataSource = new DataSource({
     DropSettingsFileClean1767352862576,
     ChangeFloorNonUniqueOrder1767370191762,
     RenameGroupToTag1767432108916,
-    AddPrintJob1767451444137
+    AddPrintJob1767451444137,
+    AddPrinterMaintenanceLog1767909428129
   ],
   subscribers: [],
 });
