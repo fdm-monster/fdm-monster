@@ -8,7 +8,7 @@ set -e
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
 
 # Configuration
-CLI_VERSION="1.0.3"
+CLI_VERSION="1.0.4"
 NODE_VERSION="24.12.0"
 NPM_PACKAGE="@fdm-monster/server"
 INSTALL_DIR="$HOME/.fdm-monster"
@@ -334,11 +334,18 @@ handle_command() {
             fi
             ;;
         update-cli)
+            local CUSTOM_URL="$2"
+            local UPDATE_URL="${CUSTOM_URL:-$INSTALL_SCRIPT_URL}"
+
             print_info "Updating FDM Monster CLI (current: v$CLI_VERSION)..."
+            if [[ -n "$CUSTOM_URL" ]]; then
+                print_info "Using custom URL: $CUSTOM_URL"
+            fi
+
             local BIN_DIR="$HOME/.local/bin"
             local TEMP_FILE="/tmp/fdm-monster-cli-update.sh"
 
-            curl -fsSL "$INSTALL_SCRIPT_URL" -o "$TEMP_FILE"
+            curl -fsSL "$UPDATE_URL" -o "$TEMP_FILE"
 
             if [[ $? -eq 0 ]]; then
                 # Extract new version from downloaded script
@@ -405,30 +412,31 @@ handle_command() {
         *)
             echo "FDM Monster CLI v$CLI_VERSION"
             echo ""
-            echo "Usage: fdm-monster {install|start|stop|restart|status|logs|upgrade [version]|backup|update-cli|version|uninstall}"
+            echo "Usage: fdm-monster {install|start|stop|restart|status|logs|upgrade [version]|backup|update-cli [url]|version|uninstall}"
             echo "Alias: fdmm"
             echo ""
             echo "Commands:"
-            echo "  install         - (Re)install FDM Monster"
-            echo "  start           - Start FDM Monster"
-            echo "  stop            - Stop FDM Monster"
-            echo "  restart         - Restart FDM Monster"
-            echo "  status          - Check if FDM Monster is running"
-            echo "  logs            - View logs"
-            echo "  upgrade [ver]   - Upgrade to latest or specified version"
-            echo "  backup          - Backup data directory to ~/.fdm-monster-backups"
-            echo "  update-cli      - Update the CLI tool itself"
-            echo "  version         - Show CLI version"
-            echo "  uninstall       - Remove FDM Monster"
+            echo "  install            - (Re)install FDM Monster"
+            echo "  start              - Start FDM Monster"
+            echo "  stop               - Stop FDM Monster"
+            echo "  restart            - Restart FDM Monster"
+            echo "  status             - Check if FDM Monster is running"
+            echo "  logs               - View logs"
+            echo "  upgrade [ver]      - Upgrade to latest or specified version"
+            echo "  backup             - Backup data directory to ~/.fdm-monster-backups"
+            echo "  update-cli [url]   - Update the CLI tool itself (optionally from custom URL)"
+            echo "  version            - Show CLI version"
+            echo "  uninstall          - Remove FDM Monster"
             echo ""
             echo "Examples:"
-            echo "  fdmm install             # (Re)install FDM Monster"
-            echo "  fdmm status              # Check status"
-            echo "  fdmm backup              # Create backup"
-            echo "  fdmm upgrade             # Upgrade to latest"
-            echo "  fdmm upgrade 1.2.3       # Upgrade to specific version"
-            echo "  fdmm update-cli          # Update CLI tool"
-            echo "  fdmm version             # Show CLI version"
+            echo "  fdmm install                              # (Re)install FDM Monster"
+            echo "  fdmm status                               # Check status"
+            echo "  fdmm backup                               # Create backup"
+            echo "  fdmm upgrade                              # Upgrade to latest"
+            echo "  fdmm upgrade 1.2.3                        # Upgrade to specific version"
+            echo "  fdmm update-cli                           # Update CLI tool from default URL"
+            echo "  fdmm update-cli https://example.com/cli   # Update CLI from custom URL"
+            echo "  fdmm version                              # Show CLI version"
             exit 1
             ;;
     esac
@@ -499,17 +507,17 @@ print_instructions() {
 
     echo ""
     echo -e "  ${BLUE}Management commands:${NC} ${YELLOW}(use 'fdm-monster' or 'fdmm' - CLI v$CLI_VERSION)${NC}"
-    echo -e "    ${YELLOW}fdmm install${NC}           - (Re)install FDM Monster"
-    echo -e "    ${YELLOW}fdmm start${NC}             - Start FDM Monster"
-    echo -e "    ${YELLOW}fdmm stop${NC}              - Stop FDM Monster"
-    echo -e "    ${YELLOW}fdmm restart${NC}           - Restart FDM Monster"
-    echo -e "    ${YELLOW}fdmm status${NC}            - Check if FDM Monster is running"
-    echo -e "    ${YELLOW}fdmm logs${NC}              - View logs"
-    echo -e "    ${YELLOW}fdmm upgrade [version]${NC} - Upgrade to latest or specified version"
-    echo -e "    ${YELLOW}fdmm backup${NC}            - Backup data directory"
-    echo -e "    ${YELLOW}fdmm update-cli${NC}        - Update CLI tool"
-    echo -e "    ${YELLOW}fdmm version${NC}           - Show CLI version"
-    echo -e "    ${YELLOW}fdmm uninstall${NC}         - Remove FDM Monster"
+    echo -e "    ${YELLOW}fdmm install${NC}              - (Re)install FDM Monster"
+    echo -e "    ${YELLOW}fdmm start${NC}                - Start FDM Monster"
+    echo -e "    ${YELLOW}fdmm stop${NC}                 - Stop FDM Monster"
+    echo -e "    ${YELLOW}fdmm restart${NC}              - Restart FDM Monster"
+    echo -e "    ${YELLOW}fdmm status${NC}               - Check if FDM Monster is running"
+    echo -e "    ${YELLOW}fdmm logs${NC}                 - View logs"
+    echo -e "    ${YELLOW}fdmm upgrade [version]${NC}    - Upgrade to latest or specified version"
+    echo -e "    ${YELLOW}fdmm backup${NC}               - Backup data directory"
+    echo -e "    ${YELLOW}fdmm update-cli [url]${NC}     - Update CLI tool (optionally from custom URL)"
+    echo -e "    ${YELLOW}fdmm version${NC}              - Show CLI version"
+    echo -e "    ${YELLOW}fdmm uninstall${NC}            - Remove FDM Monster"
     echo ""
     echo -e "  ${BLUE}Data directory:${NC} $DATA_DIR"
     echo -e "  ${BLUE}Install directory:${NC} $INSTALL_DIR"
