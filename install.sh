@@ -491,9 +491,9 @@ print_instructions() {
 
     # Show network addresses if available
     local ADDRESSES=$(get_network_addresses)
-    if [ -n "$ADDRESSES" ]; then
+    if [[ -n "$ADDRESSES" ]]; then
         while IFS= read -r addr; do
-            [ -n "$addr" ] && echo -e "    ${GREEN}http://$addr:$DEFAULT_PORT${NC}"
+            [[ -n "$addr" ]] && echo -e "    ${GREEN}http://$addr:$DEFAULT_PORT${NC}"
         done <<< "$ADDRESSES"
     fi
 
@@ -526,7 +526,7 @@ print_instructions() {
 # Main function - handles both install and CLI commands
 main() {
     # If called with a command argument, handle it as CLI
-    if [ $# -gt 0 ]; then
+    if [[ $# -gt 0 ]]; then
         handle_command "$@"
         exit $?
     fi
