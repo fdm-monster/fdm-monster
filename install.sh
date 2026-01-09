@@ -114,16 +114,13 @@ install_fdm_monster() {
 {
   "name": "fdm-monster-install",
   "private": true,
-  "packageManager": "yarn@stable",
-  "dependencies": {
-    "$NPM_PACKAGE": "latest"
-  }
+  "dependencies": {}
 }
 EOF
     fi
 
     # Install the package
-    yarn install --production
+    yarn add "$NPM_PACKAGE" --production
 
     print_success "$NPM_PACKAGE installed"
 }
