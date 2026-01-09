@@ -90,6 +90,18 @@ ensure_nodejs() {
         echo "export PATH=\"$INSTALL_DIR/nodejs/bin:\$PATH\"" >> "$SHELL_RC"
 }
 
+setup_yarn() {
+    print_info "Setting up Yarn via corepack..."
+
+    # Enable corepack
+    corepack enable
+
+    # Prepare yarn latest
+    corepack prepare yarn@stable --activate
+
+    print_success "Yarn $(yarn --version) ready"
+}
+
 install_fdm_monster() {
     print_info "Installing $NPM_PACKAGE..."
 
@@ -102,6 +114,7 @@ install_fdm_monster() {
 {
   "name": "fdm-monster-install",
   "private": true,
+  "packageManager": "yarn@stable",
   "dependencies": {
     "$NPM_PACKAGE": "latest"
   }
@@ -110,7 +123,7 @@ EOF
     fi
 
     # Install the package
-    npm install --omit=dev
+    yarn install --production
 
     print_success "$NPM_PACKAGE installed"
 }
@@ -161,6 +174,10 @@ create_cli_wrapper() {
     cp "$0" "$BIN_DIR/fdm-monster" 2>/dev/null || curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster/feat/one-script-install/install.sh -o "$BIN_DIR/fdm-monster"
     chmod +x "$BIN_DIR/fdm-monster"
 
+    # Create short alias
+    cp "$BIN_DIR/fdm-monster" "$BIN_DIR/fdmm"
+    chmod +x "$BIN_DIR/fdmm"
+
     # Add to PATH if needed
     if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
         local SHELL_RC="$HOME/.bashrc"
@@ -169,7 +186,7 @@ create_cli_wrapper() {
         export PATH="$PATH:$BIN_DIR"
     fi
 
-    print_success "CLI created at $BIN_DIR/fdm-monster"
+    print_success "CLI created at $BIN_DIR/fdm-monster (alias: fdmm)"
 }
 
 # CLI command handler
@@ -206,12 +223,13 @@ handle_command() {
             fi
             ;;
         update)
-            print_info "Updating FDM Monster..."
+            local VERSION="${2:-latest}"
+            print_info "Updating FDM Monster to version $VERSION..."
             $0 stop
             cd "$INSTALL_DIR"
-            npm install --omit=dev
+            yarn add "$NPM_PACKAGE@$VERSION" --production
             $0 start
-            print_success "Updated to latest version"
+            print_success "Updated to version $VERSION"
             ;;
         uninstall)
             print_warning "Uninstalling FDM Monster..."
@@ -222,21 +240,26 @@ handle_command() {
                 sudo systemctl daemon-reload
             fi
             rm -rf "$INSTALL_DIR" "$DATA_DIR"
-            rm -f "$HOME/.local/bin/fdm-monster"
+            rm -f "$HOME/.local/bin/fdm-monster" "$HOME/.local/bin/fdmm"
             print_success "FDM Monster uninstalled"
             ;;
         *)
             echo "FDM Monster CLI"
             echo ""
-            echo "Usage: fdm-monster {start|stop|restart|logs|update|uninstall}"
+            echo "Usage: fdm-monster {start|stop|restart|logs|update [version]|uninstall}"
+            echo "Alias: fdmm"
             echo ""
             echo "Commands:"
-            echo "  start      - Start FDM Monster"
-            echo "  stop       - Stop FDM Monster"
-            echo "  restart    - Restart FDM Monster"
-            echo "  logs       - View logs"
-            echo "  update     - Update to latest version"
-            echo "  uninstall  - Remove FDM Monster"
+            echo "  start           - Start FDM Monster"
+            echo "  stop            - Stop FDM Monster"
+            echo "  restart         - Restart FDM Monster"
+            echo "  logs            - View logs"
+            echo "  update [ver]    - Update to latest or specified version"
+            echo "  uninstall       - Remove FDM Monster"
+            echo ""
+            echo "Examples:"
+            echo "  fdmm update              # Update to latest"
+            echo "  fdmm update 1.2.3        # Update to specific version"
             exit 1
             ;;
     esac
@@ -265,13 +288,13 @@ print_instructions() {
     echo ""
     echo -e "  ${BLUE}Access FDM Monster at:${NC} ${GREEN}http://localhost:$DEFAULT_PORT${NC}"
     echo ""
-    echo -e "  ${BLUE}Management commands:${NC}"
-    echo -e "    ${YELLOW}fdm-monster start${NC}      - Start FDM Monster"
-    echo -e "    ${YELLOW}fdm-monster stop${NC}       - Stop FDM Monster"
-    echo -e "    ${YELLOW}fdm-monster restart${NC}    - Restart FDM Monster"
-    echo -e "    ${YELLOW}fdm-monster logs${NC}       - View logs"
-    echo -e "    ${YELLOW}fdm-monster update${NC}     - Update to latest version"
-    echo -e "    ${YELLOW}fdm-monster uninstall${NC}  - Remove FDM Monster"
+    echo -e "  ${BLUE}Management commands:${NC} ${YELLOW}(use 'fdm-monster' or 'fdmm')${NC}"
+    echo -e "    ${YELLOW}fdmm start${NC}             - Start FDM Monster"
+    echo -e "    ${YELLOW}fdmm stop${NC}              - Stop FDM Monster"
+    echo -e "    ${YELLOW}fdmm restart${NC}           - Restart FDM Monster"
+    echo -e "    ${YELLOW}fdmm logs${NC}              - View logs"
+    echo -e "    ${YELLOW}fdmm update [version]${NC}  - Update to latest or specified version"
+    echo -e "    ${YELLOW}fdmm uninstall${NC}         - Remove FDM Monster"
     echo ""
     echo -e "  ${BLUE}Data directory:${NC} $DATA_DIR"
     echo -e "  ${BLUE}Install directory:${NC} $INSTALL_DIR"
@@ -287,7 +310,7 @@ print_instructions() {
 main() {
     # If called with a command argument, handle it as CLI
     if [ $# -gt 0 ]; then
-        handle_command "$1"
+        handle_command "$@"
         exit $?
     fi
 
@@ -296,6 +319,7 @@ main() {
     check_root
     detect_platform
     ensure_nodejs
+    setup_yarn
     install_fdm_monster
     create_systemd_service
     create_cli_wrapper
