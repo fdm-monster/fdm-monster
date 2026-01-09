@@ -57,13 +57,12 @@ jobs:
             develop::${{ github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop' }}
       
       # Added to support 4545 :: adds -mdns tag to builds 
-      
       - name: Tagging Strategy
         id: tagging_mdns
         uses: HackerHappyHour/tagging-strategy@v3
         with:
           image_name: fdmmonster/fdm-monster
-          tag_name: ${{ env.SERVER_VERSION }}-develop
+          tag_name: ${{ env.SERVER_VERSION }}-develop-mdns
           tags: |
             %X.Y.Z%-mdns
           extra_tags: |
@@ -76,6 +75,7 @@ jobs:
           echo '${{ github.ref_type }}'
           echo '${{ github.event.pull_request.base.ref }}'
           echo '${{ steps.tagging_regular.outputs.tags }}'
+          echo '${{ steps.tagging_mdns.outputs.tags }}'
 
       # Speed up the build next time
       - name: Cache Docker layers
