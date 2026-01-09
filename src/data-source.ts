@@ -2,8 +2,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import dotenv from "dotenv";
 import { join } from "node:path";
-import { AppConstants } from "@/server.constants";
-import { superRootPath } from "./utils/fs.utils";
+import { getDatabaseFilePath } from "./utils/fs.utils";
 import { Floor } from "@/entities/floor.entity";
 import { FloorPosition } from "@/entities/floor-position.entity";
 import { Printer } from "@/entities/printer.entity";
@@ -37,17 +36,14 @@ import { AddPrinterMaintenanceLog1767909428129 } from "@/migrations/176790942812
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
-    path: join(superRootPath(), ".env"),
+    path: process.env.ENV_FILE || join("../.env"),
+    quiet: true
   });
 }
 
-const dbFolder = process.env[AppConstants.DATABASE_PATH] ?? "./database";
-const dbFile = process.env[AppConstants.DATABASE_FILE] ?? "./fdm-monster.sqlite";
-const dbName = dbFile === ":memory:" ? dbFile : join(superRootPath(), dbFolder, dbFile);
-
 export const AppDataSource = new DataSource({
   type: "better-sqlite3",
-  database: dbName,
+  database: getDatabaseFilePath(),
   synchronize: false,
   logging: false,
   entities: [

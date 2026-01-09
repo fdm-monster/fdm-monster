@@ -6,10 +6,10 @@
   },
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "bin": {
-    "fdm-monster": "dist/index.js",
-    "fdmm": "dist/index.js"
+    "fdm-monster-server": "dist/index.js",
+    "fdmm-server": "dist/index.js"
   },
   "description": "FDM Monster is a bulk OctoPrint, Klipper, PrusaLink and BambuLab manager to set up, configure and monitor 3D printers. Our aim is to provide neat overview over your farm.",
   "main": "dist/index.js",

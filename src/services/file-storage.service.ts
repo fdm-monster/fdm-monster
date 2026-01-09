@@ -3,7 +3,7 @@ import { PrintJob } from "@/entities/print-job.entity";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { AppConstants } from "@/server.constants";
-import { superRootPath } from "@/utils/fs.utils";
+import { getMediaPath } from "@/utils/fs.utils";
 import path, { basename, extname, join } from "node:path";
 import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access } from "node:fs/promises";
 import { createHash } from "node:crypto";
@@ -37,7 +37,7 @@ export class FileStorageService implements IFileStorageService {
     this.printJobRepository = typeormService.getDataSource().getRepository(PrintJob);
     this.logger = loggerFactory(FileStorageService.name);
 
-    this.storageBasePath = join(superRootPath(), AppConstants.defaultPrintFilesStorage);
+    this.storageBasePath = join(getMediaPath(), AppConstants.defaultPrintFilesStorage);
   }
 
   async ensureStorageDirectories() {

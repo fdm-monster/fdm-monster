@@ -42,6 +42,13 @@ Here is a list of features that make FDM Monster stand out:
 
 ## Installation methods ⚙️
 
+### Quick Install (Linux)
+```bash
+curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster/main/install.sh | bash
+```
+
+### Other Methods
+- [One-Click Linux Install](https://docs.fdm-monster.net/installing/one-click-linux)
 - [Docker image](https://hub.docker.com/r/fdmmonster/fdm-monster)
 - [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 - [Unraid Community App](https://unraid.net/community/apps?q=fdm+monster)

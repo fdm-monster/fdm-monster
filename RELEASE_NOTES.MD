@@ -1,8 +1,16 @@
 # Develop
 
+# FDM Monster 2.0.2
+
 ## Features
 
 - Printer maintenance log
+- Added ENV_FILE env variable to override path for .env file
+- Added MEDIA_PATH env variable to override media storage folder
+
+## Fixes
+
+- DATABASE_PATH env variable will now respect its value if set, instead of forcing it to be relative
 
 ## Chores
 
