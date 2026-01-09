@@ -143,7 +143,7 @@ After=network.target
 Type=simple
 User=$USER
 WorkingDirectory=$DATA_DIR
-Environment="NODE_ENV=production"
+Environment="NODE_ENV=development"
 Environment="SERVER_PORT=$DEFAULT_PORT"
 ExecStart=$INSTALL_DIR/nodejs/bin/node $INSTALL_DIR/node_modules/$NPM_PACKAGE/dist/index.js
 Restart=always
