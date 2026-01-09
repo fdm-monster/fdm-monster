@@ -124,6 +124,19 @@ EOF
     # Install the package
     YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE"
 
+    # Create symlink for .env file (app looks in node_modules/@fdm-monster/server/.env)
+    local ENV_FILE="$INSTALL_DIR/.env"
+    local ENV_SYMLINK="$INSTALL_DIR/node_modules/$NPM_PACKAGE/.env"
+
+    # Create empty .env in install dir if it doesn't exist
+    if [ ! -f "$ENV_FILE" ]; then
+        touch "$ENV_FILE"
+    fi
+
+    # Create symlink in package directory pointing to install dir .env
+    ln -sf "$ENV_FILE" "$ENV_SYMLINK"
+    print_success ".env symlink created"
+
     print_success "$NPM_PACKAGE installed"
 }
 
@@ -136,7 +149,6 @@ create_systemd_service() {
     print_info "Creating systemd service..."
 
     local SERVICE_FILE="/etc/systemd/system/fdm-monster.service"
-    local DATABASE_PATH="$DATA_DIR/database"
     sudo tee "$SERVICE_FILE" > /dev/null << EOF
 [Unit]
 Description=FDM Monster - 3D Printer Farm Manager
@@ -146,9 +158,10 @@ After=network.target
 Type=simple
 User=$USER
 WorkingDirectory=$DATA_DIR
-Environment="NODE_ENV=development2"
+Environment="NODE_ENV=development"
 Environment="SERVER_PORT=$DEFAULT_PORT"
-Environment="DATABASE_PATH=$DATABASE_PATH"
+Environment="DATABASE_PATH=$DATA_DIR/database"
+Environment="DATABASE_PATH=$DATA_DIR/media"
 ExecStart=$INSTALL_DIR/nodejs/bin/node $INSTALL_DIR/node_modules/$NPM_PACKAGE/dist/index.js
 Restart=always
 RestartSec=10
@@ -326,6 +339,18 @@ handle_command() {
         version|--version|-v)
             echo "FDM Monster CLI v$CLI_VERSION"
             ;;
+        install)
+            print_banner
+            check_root
+            detect_platform
+            ensure_nodejs
+            setup_yarn
+            install_fdm_monster
+            create_systemd_service
+            create_cli_wrapper
+            wait_for_service
+            print_instructions
+            ;;
         uninstall)
             print_warning "Uninstalling FDM Monster..."
             $0 stop
@@ -357,10 +382,11 @@ handle_command() {
         *)
             echo "FDM Monster CLI v$CLI_VERSION"
             echo ""
-            echo "Usage: fdm-monster {start|stop|restart|status|logs|upgrade [version]|backup|update-cli|version|uninstall}"
+            echo "Usage: fdm-monster {install|start|stop|restart|status|logs|upgrade [version]|backup|update-cli|version|uninstall}"
             echo "Alias: fdmm"
             echo ""
             echo "Commands:"
+            echo "  install         - (Re)install FDM Monster"
             echo "  start           - Start FDM Monster"
             echo "  stop            - Stop FDM Monster"
             echo "  restart         - Restart FDM Monster"
@@ -373,6 +399,7 @@ handle_command() {
             echo "  uninstall       - Remove FDM Monster"
             echo ""
             echo "Examples:"
+            echo "  fdmm install             # (Re)install FDM Monster"
             echo "  fdmm status              # Check status"
             echo "  fdmm backup              # Create backup"
             echo "  fdmm upgrade             # Upgrade to latest"
@@ -444,6 +471,7 @@ print_instructions() {
 
     echo ""
     echo -e "  ${BLUE}Management commands:${NC} ${YELLOW}(use 'fdm-monster' or 'fdmm' - CLI v$CLI_VERSION)${NC}"
+    echo -e "    ${YELLOW}fdmm install${NC}           - (Re)install FDM Monster"
     echo -e "    ${YELLOW}fdmm start${NC}             - Start FDM Monster"
     echo -e "    ${YELLOW}fdmm stop${NC}              - Stop FDM Monster"
     echo -e "    ${YELLOW}fdmm restart${NC}           - Restart FDM Monster"

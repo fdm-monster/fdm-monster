@@ -1,17 +1,19 @@
+import dotenv from "dotenv";
+import { join } from "node:path";
 import { captureException, flush } from "@sentry/node";
 import { setupEnvConfig } from "./server.env";
 import { setupServer } from "./server.core";
 import { DITokens } from "./container.tokens";
 import { ServerHost } from "@/server.host";
-import { config } from "dotenv";
 import { LoggerService as Logger } from "@/handlers/logger";
-import { join } from "node:path";
-import { superRootPath } from "@/utils/fs.utils";
 import { createStaticLogger } from "@/handlers/logging/static.logger";
 
-config({ path: join(superRootPath(), "./.env") });
-createStaticLogger({ enableFileLogs: true });
+dotenv.config({
+  path: process.env.ENV_FILE || join(__dirname, "../.env"),
+  quiet: true
+});
 
+createStaticLogger({ enableFileLogs: true });
 const logger = new Logger("FDM-Environment");
 logger.log("✓ Parsed environment with (optional) .env file, created static logger");
 

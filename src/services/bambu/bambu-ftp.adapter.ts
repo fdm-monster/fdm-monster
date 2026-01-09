@@ -8,7 +8,7 @@ import { writeFileSync, unlinkSync, createReadStream, mkdirSync, existsSync } fr
 import { join } from "node:path";
 import { Readable } from "node:stream";
 import { AppConstants } from "@/server.constants";
-import { superRootPath } from "@/utils/fs.utils";
+import { getMediaPath } from "@/utils/fs.utils";
 
 /**
  * Adapter for Bambu Lab FTP file operations
@@ -125,7 +125,7 @@ export class BambuFtpAdapter {
    * Get the file storage path for temporary files
    */
   private getFileStoragePath(filename: string): string {
-    const storagePath = join(superRootPath(), AppConstants.defaultFileUploadsStorage);
+    const storagePath = join(getMediaPath(), AppConstants.defaultFileUploadsStorage);
 
     // Ensure directory exists
     if (!existsSync(storagePath)) {
