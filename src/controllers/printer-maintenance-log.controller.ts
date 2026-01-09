@@ -1,8 +1,8 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { Request, Response } from "express";
-import { authorizeRoles, authenticate } from "@/middleware/authenticate";
-import { ROLES } from "@/constants/authorization.constants";
+import { authenticate, permission } from "@/middleware/authenticate";
+import { PERMS } from "@/constants/authorization.constants";
 import { PrinterMaintenanceLogService } from "@/services/orm/printer-maintenance-log.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
@@ -15,7 +15,7 @@ import {
 import { ParamId } from "@/middleware/param-converter.middleware";
 
 @route(AppConstants.apiRoute + "/printer-maintenance-log")
-@before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
+@before([authenticate()])
 export class PrinterMaintenanceLogController {
   private readonly logger: LoggerService;
 
@@ -28,6 +28,7 @@ export class PrinterMaintenanceLogController {
 
   @GET()
   @route("/")
+  @before([permission(PERMS.PrinterMaintenanceLog.List)])
   async list(req: Request, res: Response) {
     const query = await validateInput(req.query, getMaintenanceLogsQuerySchema);
     const result = await this.printerMaintenanceLogService.list(query);
@@ -42,7 +43,7 @@ export class PrinterMaintenanceLogController {
 
   @GET()
   @route("/:id")
-  @before([ParamId("id")])
+  @before([permission(PERMS.PrinterMaintenanceLog.Get), ParamId("id")])
   async get(req: Request, res: Response) {
     const logId = req.params.id as unknown as number;
     const log = await this.printerMaintenanceLogService.get(logId);
@@ -51,7 +52,7 @@ export class PrinterMaintenanceLogController {
 
   @GET()
   @route("/printer/:printerId/active")
-  @before([ParamId("printerId")])
+  @before([permission(PERMS.PrinterMaintenanceLog.Get), ParamId("printerId")])
   async getActiveByPrinterId(req: Request, res: Response) {
     const printerId = req.params.printerId as unknown as number;
     const log = await this.printerMaintenanceLogService.getActiveByPrinterId(printerId);
@@ -60,6 +61,7 @@ export class PrinterMaintenanceLogController {
 
   @POST()
   @route("/")
+  @before([permission(PERMS.PrinterMaintenanceLog.Create)])
   async create(req: Request, res: Response) {
     const data = await validateInput(req.body, createMaintenanceLogSchema);
     const userId = req.user?.id ?? null;
@@ -71,7 +73,7 @@ export class PrinterMaintenanceLogController {
 
   @POST()
   @route("/:id/complete")
-  @before([ParamId("id")])
+  @before([permission(PERMS.PrinterMaintenanceLog.Complete), ParamId("id")])
   async complete(req: Request, res: Response) {
     const logId = req.params.id as unknown as number;
     const data = await validateInput(req.body, completeMaintenanceLogSchema);
@@ -84,7 +86,7 @@ export class PrinterMaintenanceLogController {
 
   @DELETE()
   @route("/:id")
-  @before([ParamId("id")])
+  @before([permission(PERMS.PrinterMaintenanceLog.Delete), ParamId("id")])
   async delete(req: Request, res: Response) {
     const logId = req.params.id as unknown as number;
     await this.printerMaintenanceLogService.delete(logId);
