@@ -158,7 +158,7 @@ create_cli_wrapper() {
     mkdir -p "$BIN_DIR"
 
     # Copy this script to become the CLI
-    cp "$0" "$BIN_DIR/fdm-monster" 2>/dev/null || curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster/main/install.sh -o "$BIN_DIR/fdm-monster"
+    cp "$0" "$BIN_DIR/fdm-monster" 2>/dev/null || curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster/feat/one-script-install/install.sh -o "$BIN_DIR/fdm-monster"
     chmod +x "$BIN_DIR/fdm-monster"
 
     # Add to PATH if needed
