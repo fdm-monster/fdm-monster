@@ -1,5 +1,11 @@
 # Develop
 
+# FDM Monster 2.0.3
+
+Hotfix release
+
+- Client wasn't updated to 2.2.0
+
 # FDM Monster 2.0.2
 
 ## Features
