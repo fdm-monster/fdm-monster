@@ -253,6 +253,29 @@ handle_command() {
                 print_success "Upgraded to latest version"
             fi
             ;;
+        backup)
+            local BACKUP_DIR="$HOME/.fdm-monster-backups"
+            local TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+            local BACKUP_FILE="$BACKUP_DIR/fdm-monster-$TIMESTAMP.tar.gz"
+
+            mkdir -p "$BACKUP_DIR"
+
+            if [ ! -d "$DATA_DIR" ]; then
+                print_error "Data directory does not exist: $DATA_DIR"
+                exit 1
+            fi
+
+            print_info "Backing up FDM Monster data..."
+            tar -czf "$BACKUP_FILE" -C "$(dirname "$DATA_DIR")" "$(basename "$DATA_DIR")" 2>/dev/null
+
+            if [ $? -eq 0 ]; then
+                local SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
+                print_success "Backup created: $BACKUP_FILE ($SIZE)"
+            else
+                print_error "Backup failed"
+                exit 1
+            fi
+            ;;
         uninstall)
             print_warning "Uninstalling FDM Monster..."
             $0 stop
@@ -268,7 +291,7 @@ handle_command() {
         *)
             echo "FDM Monster CLI"
             echo ""
-            echo "Usage: fdm-monster {start|stop|restart|status|logs|upgrade [version]|uninstall}"
+            echo "Usage: fdm-monster {start|stop|restart|status|logs|upgrade [version]|backup|uninstall}"
             echo "Alias: fdmm"
             echo ""
             echo "Commands:"
@@ -278,10 +301,12 @@ handle_command() {
             echo "  status          - Check if FDM Monster is running"
             echo "  logs            - View logs"
             echo "  upgrade [ver]   - Upgrade to latest or specified version"
+            echo "  backup          - Backup data directory to ~/.fdm-monster-backups"
             echo "  uninstall       - Remove FDM Monster"
             echo ""
             echo "Examples:"
             echo "  fdmm status              # Check status"
+            echo "  fdmm backup              # Create backup"
             echo "  fdmm upgrade             # Upgrade to latest"
             echo "  fdmm upgrade 1.2.3       # Upgrade to specific version"
             exit 1
