@@ -8,7 +8,7 @@ set -e
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
 
 # Configuration
-CLI_VERSION="1.0.1"
+CLI_VERSION="1.0.2"
 NODE_VERSION="24.12.0"
 NPM_PACKAGE="@fdm-monster/server"
 INSTALL_DIR="$HOME/.fdm-monster"
@@ -243,34 +243,36 @@ handle_command() {
             fi
             ;;
         upgrade)
-            if [ -n "$2" ]; then
-                # Check if version is below 2.0.0
-                local MAJOR_VERSION=$(echo "$2" | cut -d'.' -f1)
+            local TARGET_VERSION="$2"
+            local VERSION_DISPLAY="latest version"
+
+            # Validate version if specified
+            if [ -n "$TARGET_VERSION" ]; then
+                local MAJOR_VERSION=$(echo "$TARGET_VERSION" | cut -d'.' -f1)
                 if [[ "$MAJOR_VERSION" =~ ^[0-9]+$ ]] && [ "$MAJOR_VERSION" -lt 2 ]; then
-                    print_error "Cannot upgrade to version $2 - minimum supported version is 2.0.0"
+                    print_error "Cannot upgrade to version $TARGET_VERSION - minimum supported version is 2.0.0"
                     exit 1
                 fi
-
-                print_info "Upgrading FDM Monster to version $2..."
-                $0 stop
-                cd "$INSTALL_DIR"
-                YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE@$2"
-                $0 start
-
-                # Get installed version
-                local INSTALLED_VERSION=$(node -p "require('./node_modules/$NPM_PACKAGE/package.json').version" 2>/dev/null || echo "unknown")
-                print_success "Upgraded to version $INSTALLED_VERSION"
-            else
-                print_info "Upgrading FDM Monster to latest version..."
-                $0 stop
-                cd "$INSTALL_DIR"
-                YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE"
-                $0 start
-
-                # Get installed version
-                local INSTALLED_VERSION=$(node -p "require('./node_modules/$NPM_PACKAGE/package.json').version" 2>/dev/null || echo "unknown")
-                print_success "Upgraded to version $INSTALLED_VERSION"
+                VERSION_DISPLAY="version $TARGET_VERSION"
             fi
+
+            print_info "Upgrading FDM Monster to $VERSION_DISPLAY..."
+            $0 stop
+            cd "$INSTALL_DIR"
+
+            # Install package with or without version
+            if [ -n "$TARGET_VERSION" ]; then
+                YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE@$TARGET_VERSION"
+            else
+                YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE"
+            fi
+
+            # Recreate systemd service with updated configuration
+            create_systemd_service
+
+            # Get and display installed version
+            local INSTALLED_VERSION=$(node -p "require('./node_modules/$NPM_PACKAGE/package.json').version" 2>/dev/null || echo "unknown")
+            print_success "Upgraded to version $INSTALLED_VERSION"
             ;;
         backup)
             local BACKUP_DIR="$HOME/.fdm-monster-backups"
