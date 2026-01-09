@@ -212,6 +212,23 @@ handle_command() {
                 $0 stop && sleep 2 && $0 start
             fi
             ;;
+        status)
+            if command -v systemctl &> /dev/null; then
+                sudo systemctl status fdm-monster
+            else
+                if pgrep -f "$NPM_PACKAGE/dist/index.js" > /dev/null; then
+                    print_success "FDM Monster is running (PID: $(pgrep -f "$NPM_PACKAGE/dist/index.js"))"
+                    if curl -s "http://localhost:$DEFAULT_PORT" > /dev/null 2>&1; then
+                        print_success "Service is responding at http://localhost:$DEFAULT_PORT"
+                    else
+                        print_warning "Process is running but not responding on port $DEFAULT_PORT"
+                    fi
+                else
+                    print_error "FDM Monster is not running"
+                    exit 1
+                fi
+            fi
+            ;;
         logs)
             if command -v systemctl &> /dev/null; then
                 journalctl -u fdm-monster -f
@@ -251,18 +268,20 @@ handle_command() {
         *)
             echo "FDM Monster CLI"
             echo ""
-            echo "Usage: fdm-monster {start|stop|restart|logs|upgrade [version]|uninstall}"
+            echo "Usage: fdm-monster {start|stop|restart|status|logs|upgrade [version]|uninstall}"
             echo "Alias: fdmm"
             echo ""
             echo "Commands:"
             echo "  start           - Start FDM Monster"
             echo "  stop            - Stop FDM Monster"
             echo "  restart         - Restart FDM Monster"
+            echo "  status          - Check if FDM Monster is running"
             echo "  logs            - View logs"
             echo "  upgrade [ver]   - Upgrade to latest or specified version"
             echo "  uninstall       - Remove FDM Monster"
             echo ""
             echo "Examples:"
+            echo "  fdmm status              # Check status"
             echo "  fdmm upgrade             # Upgrade to latest"
             echo "  fdmm upgrade 1.2.3       # Upgrade to specific version"
             exit 1
@@ -282,6 +301,21 @@ wait_for_service() {
     done
 
     print_warning "Service did not respond within 10 seconds"
+    print_info "Checking service status..."
+    echo ""
+
+    if command -v systemctl &> /dev/null; then
+        sudo systemctl status fdm-monster --no-pager
+    else
+        if pgrep -f "$NPM_PACKAGE/dist/index.js" > /dev/null; then
+            print_info "Process is running (PID: $(pgrep -f "$NPM_PACKAGE/dist/index.js"))"
+            print_info "Service may still be initializing"
+        else
+            print_error "Process is not running"
+        fi
+    fi
+
+    echo ""
     print_info "Check logs with: fdm-monster logs"
 }
 
@@ -297,6 +331,7 @@ print_instructions() {
     echo -e "    ${YELLOW}fdmm start${NC}             - Start FDM Monster"
     echo -e "    ${YELLOW}fdmm stop${NC}              - Stop FDM Monster"
     echo -e "    ${YELLOW}fdmm restart${NC}           - Restart FDM Monster"
+    echo -e "    ${YELLOW}fdmm status${NC}            - Check if FDM Monster is running"
     echo -e "    ${YELLOW}fdmm logs${NC}              - View logs"
     echo -e "    ${YELLOW}fdmm upgrade [version]${NC} - Upgrade to latest or specified version"
     echo -e "    ${YELLOW}fdmm uninstall${NC}         - Remove FDM Monster"
