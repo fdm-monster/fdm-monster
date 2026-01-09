@@ -162,30 +162,32 @@ EOF
     print_success "systemd service created and started"
 }
 
-
 create_cli_wrapper() {
     print_info "Creating CLI wrapper..."
 
     local BIN_DIR="$HOME/.local/bin"
     mkdir -p "$BIN_DIR"
 
-    # Copy this script to become the CLI
     cp "$0" "$BIN_DIR/fdm-monster" 2>/dev/null || curl -fsSL "$INSTALL_SCRIPT_URL" -o "$BIN_DIR/fdm-monster"
     chmod +x "$BIN_DIR/fdm-monster"
 
-    # Create short alias
     cp "$BIN_DIR/fdm-monster" "$BIN_DIR/fdmm"
     chmod +x "$BIN_DIR/fdmm"
 
-    # Add to PATH if needed
     if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
         local SHELL_RC="$HOME/.bashrc"
         [ -f "$HOME/.zshrc" ] && SHELL_RC="$HOME/.zshrc"
-        echo "export PATH=\"\$PATH:$BIN_DIR\"" >> "$SHELL_RC"
-        export PATH="$PATH:$BIN_DIR"
-    fi
 
-    print_success "CLI created at $BIN_DIR/fdm-monster (alias: fdmm)"
+        echo "export PATH=\"\$PATH:$BIN_DIR\"" >> "$SHELL_RC"
+
+        print_success "CLI installed! To use immediately, copy and run:"
+        echo ""
+        echo -e "\033[1;32m    export PATH=\"\$PATH:$BIN_DIR\"\033[0m"
+        echo ""
+        print_info "(Or restart your terminal)"
+    else
+        print_success "CLI created at $BIN_DIR/fdm-monster (alias: fdmm)"
+    fi
 }
 
 # CLI command handler
