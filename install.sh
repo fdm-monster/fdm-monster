@@ -34,6 +34,7 @@ print_warning() { echo -e "${YELLOW}!${NC} $1"; }
 print_info() { echo -e "${BLUE}ℹ${NC} $1"; }
 
 check_root() {
+  print_error "Do not run as root"
     [ "$EUID" -eq 0 ] && { print_error "Do not run as root"; exit 1; }
 }
 
