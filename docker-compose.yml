@@ -15,7 +15,7 @@ services:
   # docker build --platform linux/amd64,linux/arm64 -t 1.5.0-alpha . -f .\docker\Dockerfile
   fdm-monster:
     container_name: fdm-monster
-    image: fdmmonster/fdm-monster:2.0.0
+    image: fdmmonster/fdm-monster:2.0.2
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -26,6 +26,9 @@ services:
         window: 120s
     ports:
       - "4000:4000"
+    environment:
+      - MEDIA_PATH=/app/media
+      - DATABASE_PATH=/app/database
     volumes:
       - fdmm-media:/app/media
       - fdmm-database:/app/database
@@ -46,6 +49,8 @@ services:
     environment:
       - NODE_ENV=development
       - SERVER_PORT=4001
+      - MEDIA_PATH=/app/media
+      - DATABASE_PATH=/app/database
     volumes:
       - ./fdm-monster-alpha/media/:/app/media
       - ./fdm-monster-alpha/database/:/app/database
