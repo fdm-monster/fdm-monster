@@ -75,7 +75,22 @@ jobs:
             %X.Y%::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
             %X.Y.Z%
           extra_tags: |
-            latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}            
+            latest::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}      
+
+      # Added to support 4545  :: adds -mdns tag to builds 
+        
+      - name: Tagging Strategy mDNS
+        id: tagging_mdns
+        uses: HackerHappyHour/tagging-strategy@v3
+        with:
+          image_name: fdmmonster/fdm-monster
+          tag_name: ${{ env.SERVER_VERSION }}
+          tags: |
+            %X%-mdns::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y%-mdns::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
+            %X.Y.Z%-mdns
+          extra_tags: |
+            latest-mdns::${{ !contains(env.SERVER_VERSION, 'rc') && !contains(env.SERVER_VERSION, 'unstable') }}
 
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
