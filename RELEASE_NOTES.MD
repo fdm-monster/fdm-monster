@@ -1,5 +1,9 @@
 # Develop
 
+Fixes
+
+- PrintJob entity got in a migration loop
+
 ## Chores
 
 - Remove corepack from CICD as yarn is committed to repository
