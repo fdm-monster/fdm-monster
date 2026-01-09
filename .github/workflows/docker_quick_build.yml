@@ -68,11 +68,11 @@ jobs:
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
         run: |
-          echo '${{ github.ref }}'
-          echo '${{ github.ref_type }}'
-          echo '${{ github.event.pull_request.base.ref }}'
-          echo '${{ steps.tagging_regular.outputs.tags }}'
-          echo '${{ steps.tagging_mdns.outputs.tags }}'
+          echo "GitHub Ref: ${{ github.ref }}"
+          echo "Ref Type: ${{ github.ref_type }}"
+          echo "PR Base Ref: ${{ github.event.pull_request.base.ref }}"
+          echo "Regular image tags: ${{ steps.tagging_regular.outputs.tags }}"
+          echo "mDNS image tags: ${{ steps.tagging_mdns.outputs.tags }}"
 
       # Speed up the build next time
       - name: Cache Docker layers
