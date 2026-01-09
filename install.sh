@@ -273,15 +273,15 @@ handle_command() {
 wait_for_service() {
     print_info "Waiting for FDM Monster to start..."
 
-    for i in {1..30}; do
+    for i in {1..10}; do
         if curl -s "http://localhost:$DEFAULT_PORT" > /dev/null 2>&1; then
             print_success "FDM Monster is ready!"
             return 0
         fi
-        sleep 2
+        sleep 1
     done
 
-    print_warning "Service did not respond within 60 seconds"
+    print_warning "Service did not respond within 10 seconds"
     print_info "Check logs with: fdm-monster logs"
 }
 
