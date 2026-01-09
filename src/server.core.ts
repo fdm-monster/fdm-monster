@@ -10,7 +10,7 @@ import { interceptRoles, validateWizardCompleted } from "./middleware/global.mid
 import { initializePassportStrategies } from "./middleware/passport";
 import { ensureDirExists, getDatabaseFolder, getMediaPath } from "@/utils/fs.utils";
 import { Counter } from "prom-client";
-import { LoggerService as Logger, LoggerService } from "@/handlers/logger";
+import { LoggerService } from "@/handlers/logger";
 
 const httpRequestsTotal = new Counter({
   name: "http_requests_total",
@@ -18,7 +18,7 @@ const httpRequestsTotal = new Counter({
 });
 
 export async function setupServer() {
-  const logger = new Logger("FDM-ServerCore");
+  const logger = new LoggerService("FDM-ServerCore");
   const httpServer = express();
 
   const databasePath = getDatabaseFolder();

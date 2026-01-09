@@ -124,18 +124,11 @@ EOF
     # Install the package
     YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE"
 
-    # Create symlink for .env file (app looks in node_modules/@fdm-monster/server/.env)
+    # Create .env file in install dir if it doesn't exist
     local ENV_FILE="$INSTALL_DIR/.env"
-    local ENV_SYMLINK="$INSTALL_DIR/node_modules/$NPM_PACKAGE/.env"
-
-    # Create empty .env in install dir if it doesn't exist
     if [ ! -f "$ENV_FILE" ]; then
         touch "$ENV_FILE"
     fi
-
-    # Create symlink in package directory pointing to install dir .env
-    ln -sf "$ENV_FILE" "$ENV_SYMLINK"
-    print_success ".env symlink created"
 
     print_success "$NPM_PACKAGE installed"
 }
@@ -160,8 +153,9 @@ User=$USER
 WorkingDirectory=$DATA_DIR
 Environment="NODE_ENV=development"
 Environment="SERVER_PORT=$DEFAULT_PORT"
+Environment="ENV_FILE=$INSTALL_DIR/.env"
 Environment="DATABASE_PATH=$DATA_DIR/database"
-Environment="DATABASE_PATH=$DATA_DIR/media"
+Environment="MEDIA_PATH=$DATA_DIR/media"
 ExecStart=$INSTALL_DIR/nodejs/bin/node $INSTALL_DIR/node_modules/$NPM_PACKAGE/dist/index.js
 Restart=always
 RestartSec=10
