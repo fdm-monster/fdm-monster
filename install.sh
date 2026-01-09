@@ -18,7 +18,7 @@ DEFAULT_PORT=4000
 print_banner() {
     echo -e "${BLUE}"
     cat << "EOF"
-    ___________  __  ___   __  ___                 __
+    ___________ __  ___   __  ___                 __
    / ____/ __ \/  |/  /  /  |/  /___  ____  _____/ /____  _____
   / /_  / / / / /|_/ /  / /|_/ / __ \/ __ \/ ___/ __/ _ \/ ___/
  / __/ / /_/ / /  / /  / /  / / /_/ / / / (__  ) /_/  __/ /
@@ -34,7 +34,6 @@ print_warning() { echo -e "${YELLOW}!${NC} $1"; }
 print_info() { echo -e "${BLUE}ℹ${NC} $1"; }
 
 check_root() {
-  print_error "Do not run as root"
     [ "$EUID" -eq 0 ] && { print_error "Do not run as root"; exit 1; }
 }
 
@@ -289,6 +288,8 @@ main() {
         exit $?
     fi
 
+
+    print_error "Do not run as root"
     # Otherwise, run installer
     print_banner
     check_root
