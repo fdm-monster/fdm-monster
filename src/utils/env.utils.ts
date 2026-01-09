@@ -1,9 +1,10 @@
 import { AppConstants } from "@/server.constants";
 
-export function getEnvOrDefault(key: any, defaultVal: any) {
-  const val = process.env[key];
-  if (!val?.length) return defaultVal;
-  return val;
+export function getEnvOrDefault<T>(key: string, defaultValue: T) {
+  if (!Object.keys(process.env).includes(key) || !process.env[key]?.length) {
+    return defaultValue;
+  }
+  return process.env[key] as T;
 }
 
 export function isDevelopmentEnvironment() {

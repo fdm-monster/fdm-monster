@@ -1,12 +1,11 @@
 import AdmZip from "adm-zip";
-import { join } from "path";
-import { readdirSync } from "fs";
-import { superRootPath } from "@/utils/fs.utils";
+import { join } from "node:path";
+import { rmSync, readdirSync } from "node:fs";
 import { AppConstants } from "@/server.constants";
 import { isParsableDate } from "@/utils/time.utils";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { rmSync } from "node:fs";
+import { getMediaPath } from "@/utils/fs.utils";
 
 export class LogDumpService {
   private readonly logger: LoggerService;
@@ -17,7 +16,7 @@ export class LogDumpService {
 
   async deleteOlderThanWeekAndMismatchingLogFiles() {
     this.logger.log("Cleaning log files");
-    const path = join(superRootPath(), AppConstants.defaultLogsFolder);
+    const path = join(getMediaPath(), AppConstants.defaultLogsFolder);
     const dirEntries = readdirSync(path, { withFileTypes: true });
     const files = dirEntries.filter((dirent) => dirent.isFile()).map((dirent) => dirent.name);
 
@@ -75,11 +74,11 @@ export class LogDumpService {
   async dumpZip() {
     this.logger.log("Dumping logs as ZIP");
     const zip = new AdmZip();
-    const path = join(superRootPath(), AppConstants.defaultLogsFolder);
+    const path = join(getMediaPath(), AppConstants.defaultLogsFolder);
     zip.addLocalFolder(path, "/logs", (filename) => filename.endsWith(".log"));
 
     const outputPath = join(
-      superRootPath(),
+      getMediaPath(),
       AppConstants.defaultLogZipsFolder,
       `logs-${AppConstants.serverRepoName}.zip`,
     );

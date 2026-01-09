@@ -11,7 +11,7 @@ export class PrinterDto {
   id: number;
   name: string;
   enabled: boolean;
-  disabledReason?: string;
+  disabledReason: string | null;
   dateAdded?: number;
   apiKey?: string;
   username?: string;

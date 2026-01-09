@@ -35,10 +35,8 @@ export class Printer {
   })
   enabled: boolean;
 
-  @Column({
-    nullable: true,
-  })
-  disabledReason?: string;
+  @Column({ type: "varchar", nullable: true, })
+  disabledReason: string | null;
 
   @Column({
     nullable: true,

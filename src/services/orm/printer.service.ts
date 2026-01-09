@@ -16,7 +16,11 @@ import EventEmitter2 from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
-import { createPrinterSchema } from "@/services/validators/printer-service.validation";
+import {
+  createPrinterSchema,
+  updatePrinterDisabledReasonSchema,
+  updatePrinterEnabledSchema
+} from "@/services/validators/printer-service.validation";
 import { PrinterType } from "@/services/printer-api.interface";
 import { z } from "zod";
 
@@ -130,11 +134,13 @@ export class PrinterService extends BaseService(Printer, PrinterDto, CreatePrint
     }
   }
 
-  updateDisabledReason(printerId: number, disabledReason?: string): Promise<Printer> {
+  async updateDisabledReason(printerId: number, disabledReason: string | null): Promise<Printer> {
+    await validateInput({ disabledReason }, updatePrinterDisabledReasonSchema);
     return this.update(printerId, { disabledReason });
   }
 
-  updateEnabled(printerId: number, enabled: boolean): Promise<Printer> {
+  async updateEnabled(printerId: number, enabled: boolean): Promise<Printer> {
+    await validateInput({ enabled }, updatePrinterEnabledSchema);
     return this.update(printerId, { enabled });
   }
 

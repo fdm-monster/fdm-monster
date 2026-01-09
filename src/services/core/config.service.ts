@@ -1,4 +1,5 @@
 import { AppConstants } from "@/server.constants";
+import { getEnvOrDefault } from "@/utils/env.utils";
 
 export interface IConfigService {
   get<T>(key: string, defaultValue?: T): T | undefined;
@@ -10,16 +11,13 @@ export interface IConfigService {
 
 export class ConfigService implements IConfigService {
   get<T>(key: string, defaultValue?: T) {
-    if (!Object.keys(process.env).includes(key) || !process.env[key]?.length) {
-      return defaultValue;
-    }
-    return process.env[key] as T;
+    return getEnvOrDefault(key, defaultValue);
   }
 
   getOrThrow(key: string) {
     const val = this.get(key);
     if (!val) {
-      throw Error(`Environment variable with key ${key} was not defined.`);
+      throw new Error(`Environment variable with key ${key} was not defined.`);
     }
   }
 

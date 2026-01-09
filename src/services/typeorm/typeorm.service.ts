@@ -5,7 +5,7 @@ import { AppDataSource } from "@/data-source";
 export class TypeormService {
   loaded = false;
   private dataSource?: DataSource;
-  private logger = new LoggerService(TypeormService.name);
+  private readonly logger = new LoggerService(TypeormService.name);
 
   public hasConnected() {
     if (!this.dataSource) {
@@ -25,12 +25,12 @@ export class TypeormService {
 
   public async createConnection() {
     const dataSource = this.loadDataSources();
-    if (!dataSource.isInitialized) {
-      const connection = await dataSource.initialize();
-      await connection.runMigrations({ transaction: "all" });
-      this.logger.log("Typeorm connection initialized");
-    } else {
+    if (dataSource.isInitialized) {
       this.logger.log("Typeorm connection already initialized, skipping");
+    } else {
+      const connection = await dataSource.initialize();
+      const migrations = await connection.runMigrations({ transaction: "all" });
+      this.logger.log(`Typeorm connection initialized - ${migrations.length} migrations executed`);
     }
     this.loaded = true;
   }

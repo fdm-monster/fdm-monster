@@ -16,6 +16,7 @@ export const PERM_GROUP = {
   Jobs: "Jobs",
   Floors: "Floors",
   ServerInfo: "ServerInfo",
+  PrinterMaintenanceLog: "PrinterMaintenanceLog",
 } as const;
 
 export type PermissionGroup = (typeof PERM_GROUP)[keyof typeof PERM_GROUP];
@@ -48,6 +49,14 @@ export const PERMS = {
   [PERM_GROUP.ServerInfo]: {
     Default: "ServerInfo.Default",
     Get: "ServerInfo.Get",
+  },
+  [PERM_GROUP.PrinterMaintenanceLog]: {
+    Default: "PrinterMaintenanceLog.Default",
+    List: "PrinterMaintenanceLog.List",
+    Get: "PrinterMaintenanceLog.Get",
+    Create: "PrinterMaintenanceLog.Create",
+    Complete: "PrinterMaintenanceLog.Complete",
+    Delete: "PrinterMaintenanceLog.Delete",
   },
 } as const;
 
@@ -85,12 +94,14 @@ export const ROLE_PERMS: Record<RoleName, PermissionName[]> = {
     allPerms(PERM_GROUP.PrinterFiles),
     allPerms(PERM_GROUP.PrinterSettings),
     allPerms(PERM_GROUP.ServerInfo),
+    allPerms(PERM_GROUP.PrinterMaintenanceLog),
   ),
   [ROLES.OPERATOR]: union(
     allPerms(PERM_GROUP.Jobs),
     allPerms(PERM_GROUP.Floors),
     allPerms(PERM_GROUP.PrinterFiles),
     allPerms(PERM_GROUP.PrinterSettings),
+    allPerms(PERM_GROUP.PrinterMaintenanceLog),
   ),
   [ROLES.GUEST]: [],
 };
