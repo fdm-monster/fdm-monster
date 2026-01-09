@@ -99,7 +99,7 @@ install_nodejs() {
 ensure_nodejs() {
     if command -v node &> /dev/null; then
         local CURRENT_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
-        if [ "$CURRENT_VERSION" -ge 22 ]; then
+        if [[ "$CURRENT_VERSION" -ge 22 ]]; then
             print_success "Node.js $(node -v) detected"
             return 0
         fi
@@ -110,7 +110,7 @@ ensure_nodejs() {
 
     # Persist PATH for future sessions
     local SHELL_RC="$HOME/.bashrc"
-    [ -f "$HOME/.zshrc" ] && SHELL_RC="$HOME/.zshrc"
+    [[ -f "$HOME/.zshrc" ]] && SHELL_RC="$HOME/.zshrc"
     grep -q "$INSTALL_DIR/nodejs/bin" "$SHELL_RC" 2>/dev/null || \
         echo "export PATH=\"$INSTALL_DIR/nodejs/bin:\$PATH\"" >> "$SHELL_RC"
     return 0
@@ -136,7 +136,7 @@ install_fdm_monster() {
     cd "$INSTALL_DIR"
 
     # Create package.json if it doesn't exist
-    if [ ! -f "package.json" ]; then
+    if [[ ! -f "package.json" ]]; then
         cat > package.json << EOF
 {
   "name": "fdm-monster-install",
@@ -151,7 +151,7 @@ EOF
 
     # Create .env file in install dir if it doesn't exist
     local ENV_FILE="$INSTALL_DIR/.env"
-    if [ ! -f "$ENV_FILE" ]; then
+    if [[ ! -f "$ENV_FILE" ]]; then
         touch "$ENV_FILE"
     fi
 
@@ -212,7 +212,7 @@ create_cli_wrapper() {
 
     if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
         local SHELL_RC="$HOME/.bashrc"
-        [ -f "$HOME/.zshrc" ] && SHELL_RC="$HOME/.zshrc"
+        [[ -f "$HOME/.zshrc" ]] && SHELL_RC="$HOME/.zshrc"
 
         echo "export PATH=\"\$PATH:$BIN_DIR\"" >> "$SHELL_RC"
 
@@ -229,7 +229,8 @@ create_cli_wrapper() {
 
 # CLI command handler
 handle_command() {
-    case "$1" in
+    local command_arg="$1"
+    case "$command_arg" in
         start)
             if command -v systemctl &> /dev/null; then
                 sudo systemctl start fdm-monster
@@ -282,7 +283,7 @@ handle_command() {
             local VERSION_DISPLAY="latest version"
 
             # Validate version if specified
-            if [ -n "$TARGET_VERSION" ]; then
+            if [[ -n "$TARGET_VERSION" ]]; then
                 local MAJOR_VERSION=$(echo "$TARGET_VERSION" | cut -d'.' -f1)
                 if [[ "$MAJOR_VERSION" =~ ^[0-9]+$ ]] && [ "$MAJOR_VERSION" -lt 2 ]; then
                     print_error "Cannot upgrade to version $TARGET_VERSION - minimum supported version is 2.0.0"
@@ -296,7 +297,7 @@ handle_command() {
             cd "$INSTALL_DIR"
 
             # Install package with or without version
-            if [ -n "$TARGET_VERSION" ]; then
+            if [[ -n "$TARGET_VERSION" ]]; then
                 YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE@$TARGET_VERSION"
             else
                 YARN_NODE_LINKER=node-modules yarn add "$NPM_PACKAGE"
@@ -316,7 +317,7 @@ handle_command() {
 
             mkdir -p "$BACKUP_DIR"
 
-            if [ ! -d "$DATA_DIR" ]; then
+            if [[ ! -d "$DATA_DIR" ]]; then
                 print_error "Data directory does not exist: $DATA_DIR"
                 exit 1
             fi
@@ -324,7 +325,7 @@ handle_command() {
             print_info "Backing up FDM Monster data..."
             tar -czf "$BACKUP_FILE" -C "$(dirname "$DATA_DIR")" "$(basename "$DATA_DIR")" 2>/dev/null
 
-            if [ $? -eq 0 ]; then
+            if [[ $? -eq 0 ]]; then
                 local SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
                 print_success "Backup created: $BACKUP_FILE ($SIZE)"
             else
@@ -339,7 +340,7 @@ handle_command() {
 
             curl -fsSL "$INSTALL_SCRIPT_URL" -o "$TEMP_FILE"
 
-            if [ $? -eq 0 ]; then
+            if [[ $? -eq 0 ]]; then
                 # Extract new version from downloaded script
                 local NEW_VERSION=$(grep '^CLI_VERSION=' "$TEMP_FILE" | cut -d'"' -f2)
 
@@ -348,7 +349,7 @@ handle_command() {
                 cp "$BIN_DIR/fdm-monster" "$BIN_DIR/fdmm"
                 chmod +x "$BIN_DIR/fdmm"
 
-                if [ -n "$NEW_VERSION" ]; then
+                if [[ -n "$NEW_VERSION" ]]; then
                     print_success "CLI updated successfully to v$NEW_VERSION"
                 else
                     print_success "CLI updated successfully"
