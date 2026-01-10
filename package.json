@@ -6,7 +6,7 @@
   },
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "bin": {
     "fdm-monster-server": "dist/index.js",
     "fdmm-server": "dist/index.js"
