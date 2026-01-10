@@ -596,7 +596,7 @@ __metadata:
     "@types/lodash": "npm:4.17.22"
     "@types/luxon": "npm:3.7.1"
     "@types/multer": "npm:2.0.0"
-    "@types/node": "npm:24.10.5"
+    "@types/node": "npm:24.10.6"
     "@types/passport-anonymous": "npm:1.0.5"
     "@types/passport-jwt": "npm:4.0.1"
     "@types/semver": "npm:7.7.1"
@@ -3088,12 +3088,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:24.10.5":
-  version: 24.10.5
-  resolution: "@types/node@npm:24.10.5"
+"@types/node@npm:24.10.6":
+  version: 24.10.6
+  resolution: "@types/node@npm:24.10.6"
   dependencies:
     undici-types: "npm:~7.16.0"
-  checksum: 10c0/d0d3601de8611d7d6b79086e4ecfc16e2a4b9d77194758dac8d600e1439cd65932fee2909c7eaf3822392a6c8e8b2eeaba5d4a5649d5212f78c8034cd855d9fe
+  checksum: 10c0/4c93fb9c4ad38ef0738a34815d84bb091cf6e7af7d51d58f20a8600a8a189edbf0fb54c4f86e344b2199db7bda04fecf17c9d171055ff7a9aa8333b3b96fce4c
   languageName: node
   linkType: hard
 
