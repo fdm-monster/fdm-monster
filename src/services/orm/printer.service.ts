@@ -89,24 +89,26 @@ export class PrinterService extends BaseService(Printer, PrinterDto, CreatePrint
       apiKey,
       enabled,
       printerType,
-      password,
-      username,
+      password: password ?? undefined,
+      username: username ?? undefined,
     });
     this.eventEmitter2.emit(printerEvents.printerUpdated, { printer } satisfies PrinterUpdatedEvent);
     return updatedPrinter;
   }
 
-  async batchImport(printers: z.infer<typeof createPrinterSchema>[]): Promise<Printer[]> {
+  async batchImport(printers: Partial<Printer>[]): Promise<Printer[]> {
     if (!printers?.length) return [];
 
-    this.logger.log("Validation passed");
+    const validatedPrinters = [];
     for (let printer of printers) {
-      await this.validateAndDefault(printer);
+      const validated = await this.validateAndDefault(printer as z.infer<typeof createPrinterSchema>);
+      validatedPrinters.push(validated);
     }
 
+    this.logger.log("Validation passed");
     // We've passed validation completely - creation will likely succeed
     const newPrinters = [];
-    for (let printer of printers) {
+    for (let printer of validatedPrinters) {
       const createdPrinter = await this.create(printer, false);
       newPrinters.push(createdPrinter);
     }

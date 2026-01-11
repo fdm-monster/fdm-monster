@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  printerApiKeyValidator,
+  printerApiKeyValidator, printerDisabledReasonValidator,
   printerEnabledValidator,
   printerNameValidator,
   printerPasswordValidator,
@@ -50,7 +50,7 @@ export const importPrinterPositionsSchema = z.object({
 
 export const importPrintersFloorsYamlSchema = z.object({
   version: z.string().optional(),
-  exportedAt: z.date().optional(),
+  exportedAt: z.any().optional(),
   databaseType: z.enum(["mongo", "sqlite"]).default("sqlite"),
   config: z.object({
     exportPrinters: z.boolean(),
@@ -76,6 +76,7 @@ export const importPrintersFloorsYamlSchema = z.object({
         username: printerUsernameValidator.optional(),
         password: printerPasswordValidator.optional(),
         enabled: printerEnabledValidator,
+        disabledReason: printerDisabledReasonValidator.optional(),
         name: printerNameValidator,
         // Legacy properties
         printerName: z.string().optional(),
@@ -84,6 +85,9 @@ export const importPrintersFloorsYamlSchema = z.object({
             name: z.string().optional(),
           })
           .optional(),
+        feedRate: z.string().nullable().optional(),
+        flowRate: z.string().nullable().optional(),
+        assignee: z.string().nullable().optional(),
       }),
     )
     .min(0)

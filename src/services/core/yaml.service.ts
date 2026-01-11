@@ -484,8 +484,10 @@ export class YamlService {
     const updateByNameTags = [];
     for (const tag of upsertTags) {
       const comparedProperty = tag.name.toLowerCase();
-      const foundIndex = names.findIndex((n) => n === comparedProperty);
-      if (foundIndex !== -1) {
+      const foundIndex = names.indexOf(comparedProperty);
+      if (foundIndex === -1) {
+        insertTags.push(tag);
+      } else {
         if (!ids[foundIndex]) {
           throw new Error("IDS not found, tag name");
         }
@@ -495,8 +497,6 @@ export class YamlService {
           value: tag,
         });
         break;
-      } else {
-        insertTags.push(tag);
       }
     }
 
@@ -540,6 +540,9 @@ export class YamlService {
           apiKey,
           username,
           password,
+          assignee: p.assignee,
+          flowRate: p.flowRate,
+          feedRate: p.feedRate
         };
       });
     }

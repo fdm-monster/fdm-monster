@@ -56,8 +56,8 @@ export class TestPrinterSocketStore {
       printerId: testPrinterId,
       loginDto: {
         apiKey: printer.apiKey,
-        username: printer.username,
-        password: printer.password,
+        username: printer.username ?? undefined,
+        password: printer.password ?? undefined,
         printerURL: printer.printerURL,
         printerType: printer.printerType,
       },
