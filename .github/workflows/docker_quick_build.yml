@@ -41,11 +41,8 @@ jobs:
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
 
-      # New intended logic
-      # if branch is develop => push to dockerhub with tag 'develop'
-      # if branch is main => push to dockerhub with tag 'main'
-
-      - name: Tagging Strategy
+      # Regular develop build :: adds -develop tag to builds 
+      - name: Tagging Strategy - Regular build
         id: tagging_regular
         uses: HackerHappyHour/tagging-strategy@v3
         with:
@@ -55,14 +52,28 @@ jobs:
             %X.Y.Z%
           extra_tags: |
             develop::${{ github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop' }}
+      
+      # Added to support 4545 :: adds -develop-mdns tag to builds 
+      - name: Tagging Strategy - mDNS version
+        id: tagging_mdns
+        uses: HackerHappyHour/tagging-strategy@v3
+        with:
+          image_name: fdmmonster/fdm-monster
+          # The tag_name: ... -develop will be processed by tags
+          tag_name: ${{ env.SERVER_VERSION }}-develop
+          tags: |
+            %X.Y.Z%-mdns
+          extra_tags: |
+            develop-mdns::${{ github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop' }}
 
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"
         run: |
-          echo '${{ github.ref }}'
-          echo '${{ github.ref_type }}'
-          echo '${{ github.event.pull_request.base.ref }}'
-          echo '${{ steps.tagging_regular.outputs.tags }}'
+          echo "GitHub Ref: ${{ github.ref }}"
+          echo "Ref Type: ${{ github.ref_type }}"
+          echo "PR Base Ref: ${{ github.event.pull_request.base.ref }}"
+          echo "Regular image tags: ${{ steps.tagging_regular.outputs.tags }}"
+          echo "mDNS image tags: ${{ steps.tagging_mdns.outputs.tags }}"
 
       # Speed up the build next time
       - name: Cache Docker layers
@@ -84,6 +95,20 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
           file: ./docker/Dockerfile
           tags: ${{ steps.tagging_regular.outputs.tags }}
+          labels: ${{ needs.meta.outputs.labels }}
+          
+      # Added to support 4545 :: build the mDSN image
+      # Clone the repo and build the image with mDNS
+      - name: Build and push mDNS
+        id: docker_build_mdns
+        uses: docker/build-push-action@v6
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          context: "{{defaultContext}}"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          file: ./docker/Dockerfile-mdns
+          tags: ${{ steps.tagging_mdns.outputs.tags }}
           labels: ${{ needs.meta.outputs.labels }}
 
       # Show image digest output
