@@ -44,7 +44,7 @@ Here is a list of features that make FDM Monster stand out:
 
 ### Quick Install (Linux)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster-scripts/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster-scripts/main/install/linux/install.sh | bash
 ```
 
 ### Other Methods
