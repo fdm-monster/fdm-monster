@@ -1,5 +1,9 @@
 # Develop
 
+## Fixes
+
+- YAML import was too strict for printer properties: disabledReason, username and password. feedRate, flowRate and assignee are now also imported
+
 # FDM Monster 2.0.3
 
 Hotfix release
