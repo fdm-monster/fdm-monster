@@ -39,7 +39,6 @@ export class PrintJobAnalysisTask implements TaskService {
       });
 
       if (pendingJobs.length === 0) {
-        this.logger.debug("No pending print jobs to analyze");
         return;
       }
 
