@@ -2916,14 +2916,14 @@ __metadata:
   linkType: hard
 
 "@types/express-serve-static-core@npm:*, @types/express-serve-static-core@npm:^5.0.0":
-  version: 5.1.0
-  resolution: "@types/express-serve-static-core@npm:5.1.0"
+  version: 5.1.1
+  resolution: "@types/express-serve-static-core@npm:5.1.1"
   dependencies:
     "@types/node": "npm:*"
     "@types/qs": "npm:*"
     "@types/range-parser": "npm:*"
     "@types/send": "npm:*"
-  checksum: 10c0/1918233c68a0c69695f78331af1aed5fb5190f91da6309318f700adeb78573be840b5d206cb8eda804b65a9989fdeccdaaf84c1e95adc3615052749224b64519
+  checksum: 10c0/ee88216e114368ef06bcafeceb74a7e8671b90900fb0ab1d49ff41542c3a344231ef0d922bf63daa79f0585f3eebe2ce5ec7f83facc581eff8bcdb136a225ef3
   languageName: node
   linkType: hard
 
@@ -3080,11 +3080,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=10.0.0, @types/node@npm:>=13.7.0":
-  version: 25.0.4
-  resolution: "@types/node@npm:25.0.4"
+  version: 25.0.6
+  resolution: "@types/node@npm:25.0.6"
   dependencies:
     undici-types: "npm:~7.16.0"
-  checksum: 10c0/2882a2e986b1aed993c63a6d53b04d1518430e3ec7e8620bd925d1f48632c262ea3ecd3b2201f5c57cff61dd477269762fea5acceae7f4e77de6037399c3f06c
+  checksum: 10c0/4ee3b6b606bc28f6840c04d58769e1e75dd8085149908956c874c85f8f8c890990701bcbe783fc2d14017817861dc07fcf23de6fc2805fe491f84eae717b5705
   languageName: node
   linkType: hard
 
@@ -4242,9 +4242,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001759":
-  version: 1.0.30001763
-  resolution: "caniuse-lite@npm:1.0.30001763"
-  checksum: 10c0/4524f6ae15a18c8510849e43baed01441940c50cab29687cba62dde6354a49549d5bcb7f79b864dadf3f0c8c342038c63131cdb64af382a501593106b1d0028b
+  version: 1.0.30001764
+  resolution: "caniuse-lite@npm:1.0.30001764"
+  checksum: 10c0/3fbc2bcb35792bd860e20210283e7c700aab10c5af435dbb8bfbf952edccaa3e7de8b479af0f600c4d23f269dbc166e16b7b72df5cd1981653b252174c9cbfa8
   languageName: node
   linkType: hard
 
@@ -6668,9 +6668,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.11.1":
-  version: 1.12.33
-  resolution: "libphonenumber-js@npm:1.12.33"
-  checksum: 10c0/8a2ae4884da48bb28bf3651ff23bb896eb5f12ea0600bb1ca321538458805f5f22b860ff6eaaed42f897212fa9edfa1d62fe1fa0755a44c707cc465a7975c246
+  version: 1.12.34
+  resolution: "libphonenumber-js@npm:1.12.34"
+  checksum: 10c0/306a2ae0f6fb09a039a3dd33524502bdb082dea78f59069367cde9c6e56b1c432e1bb5c591238fd0b4aaef3495c4c02d140a4361049061425532dd682dc35818
   languageName: node
   linkType: hard
 
