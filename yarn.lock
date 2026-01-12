@@ -638,7 +638,7 @@ __metadata:
     passport-jwt: "npm:4.0.1"
     prom-client: "npm:15.1.3"
     reflect-metadata: "npm:0.2.2"
-    selfsigned: "npm:5.4.0"
+    selfsigned: "npm:5.5.0"
     semver: "npm:7.7.3"
     socket.io: "npm:4.8.3"
     supertest: "npm:7.2.2"
@@ -8180,13 +8180,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"selfsigned@npm:5.4.0":
-  version: 5.4.0
-  resolution: "selfsigned@npm:5.4.0"
+"selfsigned@npm:5.5.0":
+  version: 5.5.0
+  resolution: "selfsigned@npm:5.5.0"
   dependencies:
     "@peculiar/x509": "npm:^1.14.2"
     pkijs: "npm:^3.3.3"
-  checksum: 10c0/e3d09986ccb8c52a70e04d38d6a617b74f8f069acd90adf3b907deef3570090591168c69a48e475a9c4ff104e3715168d4fca16c63ff174f5239d0385bc2f943
+  checksum: 10c0/a31e9d928e22cd6f4e14759a099feba79d9d789c852c7cf65ff8e2f62d7f6313fe477639590e7ed06115b4516a4bebbe0dec5d072a2d01cc372a9cfd58eb893b
   languageName: node
   linkType: hard
 
