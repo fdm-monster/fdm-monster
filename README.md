@@ -42,6 +42,13 @@ Here is a list of features that make FDM Monster stand out:
 
 ## Installation methods ⚙️
 
+### Quick Install (Linux)
+```bash
+curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster-scripts/main/install/linux/install.sh | bash
+```
+
+### Other Methods
+ 
 - [Docker image](https://hub.docker.com/r/fdmmonster/fdm-monster)
 - [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 - [Unraid Community App](https://unraid.net/community/apps?q=fdm+monster)
@@ -73,9 +80,21 @@ Please consider sponsoring FDM Monster to help this project! You can find the [G
 
 Thanks to the following parties for their financial support:
 
-| Tier 1 | Tier 2 | Tier 3 | Tier 4 | One time |
-|--------|--------|--------|--------|-----------|
-|  | [thatguymendel](https://github.com/thatguymendel) | [MrHitchcock](https://github.com/MrHitchcock) | [doucettom](https://github.com/doucettom) | [th3dstudio](https://github.com/th3dstudio) |
+### Tier 1
+- (empty)
+
+### Tier 2
+- [thatguymendel](https://github.com/thatguymendel)
+
+### Tier 3
+- [MrHitchcock](https://github.com/MrHitchcock)
+- [That Guy Jaysen](https://github.com/thatguy-jaysenodell)
+
+### Tier 4
+- [doucettom](https://github.com/doucettom)
+
+### One Time
+- [th3dstudio](https://github.com/th3dstudio)
 
 
 ## Contributors ✨
@@ -147,23 +166,21 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 
 ### Development Progress
 
-- [x] :rocket: Docker amd64 image
-- [x] :rocket: Quick copy paste of FDM Monster printers
+- [x] :rocket: Docker amd64 and arm64 image
+- [x] :rocket: Quick duplication of FDM Monster printers
 - [x] 🛡️ Complete API test coverage
 - [x] :rocket: Floor management
-- [x] Auto-clean old OctoPrint files (opt-in and configurable) 
-- [x] :rocket: Windows and Linux Service
-- [x] Printer completion/failure tracking (with statistics page)
+- [x] :rocket: Linux 1-click install
+- [x] Printer Job History
 - [x] Printer placement using drag n drop 
 - [x] 🔌 Raspberry Pi image (https://github.com/fdm-monster/MonsterPi)
 - [x] :rocket: Documentation (https://docs.fdm-monster.net)
-- [x] 🛡️ Login and user management
+- [x] 🛡️ Login and User management (with roles)
 - [x] OctoFarm printer import 
-- [x] Klipper and Moonraker API integration
+- [x] OctoPrint, Bambu, PrusaLink Klipper and Moonraker API integration
 - [x] GCode Thumbnail support
-- [x] `.bgcode` support
-- [x] Modernized UI layout and tile design
-- [x] History and statistics
+- [x] `.gcode`, `.bgcode` and `.gcode.3mf` support
+- [x] Modern UI layout and tile design
 - [x] Print Queue
 - [x] Extended webcam integration
 - [ ] Spoolman integration

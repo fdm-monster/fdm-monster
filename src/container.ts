@@ -3,6 +3,7 @@ import { asClass, asFunction, asValue, createContainer, InjectionMode } from "aw
 import { ToadScheduler } from "toad-scheduler";
 import { DITokens } from "./container.tokens";
 import { PrinterService } from "./services/orm/printer.service";
+import { PrinterMaintenanceLogService } from "./services/orm/printer-maintenance-log.service";
 import { SettingsStore } from "./state/settings.store";
 import { ServerReleaseService } from "./services/core/server-release.service";
 import { TaskManagerService } from "./services/task-manager.service";
@@ -99,6 +100,7 @@ export function configureContainer() {
     [di.floorPositionService]: asClass(FloorPositionService).singleton(),
     [di.cameraStreamService]: asClass(CameraStreamService).singleton(),
     [di.printerService]: asClass(PrinterService),
+    [di.printerMaintenanceLogService]: asClass(PrinterMaintenanceLogService),
     [di.printerTagService]: asClass(PrinterTagService),
     [di.refreshTokenService]: asClass(RefreshTokenService).singleton(),
     [di.userService]: asClass(UserService).singleton(),

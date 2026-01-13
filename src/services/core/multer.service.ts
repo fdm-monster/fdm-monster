@@ -1,7 +1,7 @@
 import multer, { diskStorage, memoryStorage } from "multer";
 import { extname, join } from "node:path";
 import { existsSync, readdirSync, rmSync } from "node:fs";
-import { superRootPath } from "@/utils/fs.utils";
+import { getMediaPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
 import { Request, Response } from "express";
@@ -25,7 +25,7 @@ export class MulterService {
   }
 
   public clearUploadsFolder() {
-    const fileUploadsPath = join(superRootPath(), AppConstants.defaultFileUploadsStorage);
+    const fileUploadsPath = join(getMediaPath(), AppConstants.defaultFileUploadsStorage);
     if (!existsSync(fileUploadsPath)) return;
 
     const files = readdirSync(fileUploadsPath, { withFileTypes: true })
@@ -100,7 +100,7 @@ export class MulterService {
     return multer({
       storage: storeAsFile
         ? diskStorage({
-            destination: join(superRootPath(), AppConstants.defaultFileUploadsStorage),
+            destination: join(getMediaPath(), AppConstants.defaultFileUploadsStorage),
           })
         : memoryStorage(),
     }).any();

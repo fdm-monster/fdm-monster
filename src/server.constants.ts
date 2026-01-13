@@ -3,21 +3,23 @@ export const AppConstants = {
   VERSION_KEY: "npm_package_version",
   SERVER_PORT_KEY: "SERVER_PORT",
   DATABASE_PATH: "DATABASE_PATH",
+  defaultDatabasePath: "./database",
   DATABASE_FILE: "DATABASE_FILE",
+  defaultDatabaseFile: "./fdm-monster.sqlite",
 
   pm2ServiceName: "FDM",
   logAppName: "fdm-monster",
 
-  // @Deprecated: old storage path
-  defaultFileStorageFolder: "./media",
-  defaultLogsFolder: "./media/logs",
-  defaultLogZipsFolder: "./media/log-zips",
+  MEDIA_PATH: "MEDIA_PATH",
+  defaultBaseMediaPath: "./media",
+  defaultLogsFolder: "logs",
+  defaultLogZipsFolder: "log-zips",
   // New place for all downloads, files etc
-  defaultClientBundleStorage: "./media/client-dist",
-  defaultClientBundleZipsStorage: "./media/client-dist-zips",
-  defaultPrinterThumbnailsStorage: "./media/printer-thumbnails",
-  defaultFileUploadsStorage: "./media/file-uploads",
-  defaultPrintFilesStorage: "./media/files",
+  defaultClientBundleStorage: "client-dist",
+  defaultClientBundleZipsStorage: "client-dist-zips",
+  defaultPrinterThumbnailsStorage: "printer-thumbnails",
+  defaultFileUploadsStorage: "file-uploads",
+  defaultPrintFilesStorage: "files",
   defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
   defaultAcceptedBambuExtensions: [".gcode", ".3mf"],
   defaultServerPort: 4000,
@@ -67,10 +69,11 @@ export const AppConstants = {
   clientPackageName: "@fdm-monster/client-next",
   clientRepoName: "fdm-monster-client-next",
   githubUrl: "https://github.com/fdm-monster/fdm-monster",
+  docsUrl: "https://docs.fdm-monster.net",
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "2.1.5",
+  defaultClientMinimum: "2.2.0",
 
   // Websocket values
   defaultWebsocketHandshakeTimeout: 3000,

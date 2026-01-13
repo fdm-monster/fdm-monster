@@ -10,10 +10,10 @@ const octoPrintApiKeySchema = z
 
 export const printerApiKeyValidator = z.string().optional();
 export const printerNameValidator = z.string();
-export const printerUsernameValidator = z.string();
-export const printerPasswordValidator = z.string();
+export const printerUsernameValidator = z.string().nullable();
+export const printerPasswordValidator = z.string().nullable();
 export const printerEnabledValidator = z.boolean();
-export const printerDisabledReasonValidator = z.string().optional();
+export const printerDisabledReasonValidator = z.string().nullable();
 export const printerUrlValidator = z.string().url();
 export const printerTypeValidator = z.nativeEnum(PrinterTypesEnum);
 export const printerDateAddedValidator = z.number().optional();
@@ -88,5 +88,4 @@ export const updatePrinterEnabledSchema = z.object({
 
 export const updatePrinterDisabledReasonSchema = z.object({
   disabledReason: printerDisabledReasonValidator,
-  enabled: printerEnabledValidator.optional(),
 });

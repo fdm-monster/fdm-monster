@@ -25,7 +25,7 @@ export const printerResolveMiddleware = (key = "id") => {
     let scopedPrinter = undefined;
     let loginDto = undefined;
 
-    const printerIdParam = req.params[key];
+    const printerIdParam = req.params[key] as string;
     if (printerIdParam) {
       const printerId = Number.parseInt(printerIdParam, 10);
       scopedPrinter = printerCache.getCachedPrinterOrThrow(printerId);

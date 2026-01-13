@@ -8,9 +8,7 @@ import { configureContainer } from "./container";
 import { interceptDatabaseError } from "./middleware/database";
 import { interceptRoles, validateWizardCompleted } from "./middleware/global.middleware";
 import { initializePassportStrategies } from "./middleware/passport";
-import { AppConstants } from "@/server.constants";
-import { join } from "path";
-import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
+import { ensureDirExists, getDatabaseFolder, getMediaPath } from "@/utils/fs.utils";
 import { Counter } from "prom-client";
 import { LoggerService } from "@/handlers/logger";
 
@@ -20,10 +18,16 @@ const httpRequestsTotal = new Counter({
 });
 
 export async function setupServer() {
+  const logger = new LoggerService("FDM-ServerCore");
   const httpServer = express();
 
-  const dbFolder = process.env[AppConstants.DATABASE_PATH] ?? "./database";
-  ensureDirExists(join(superRootPath(), dbFolder));
+  const databasePath = getDatabaseFolder();
+  ensureDirExists(databasePath);
+  logger.log(`Expecting database at path ${databasePath}`);
+
+  const mediaPath = getMediaPath();
+  ensureDirExists(mediaPath);
+  logger.log(`Expecting media at path ${mediaPath}`);
 
   const container = configureContainer();
   initializePassportStrategies(passport, container);

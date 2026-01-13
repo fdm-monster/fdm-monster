@@ -6,7 +6,7 @@ import { ExceptionFilter } from "./middleware/exception.filter";
 import { fetchServerPort } from "./server.env";
 import { NotFoundException } from "./exceptions/runtime.exceptions";
 import { AppConstants } from "./server.constants";
-import { superRootPath } from "./utils/fs.utils";
+import { getMediaPath, superRootPath } from "./utils/fs.utils";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
 import { IConfigService } from "@/services/core/config.service";
@@ -70,7 +70,7 @@ export class ServerHost {
       this.logger.log("Swagger/OpenAPI documentation enabled");
     }
 
-    const bundleDistPath = join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist");
+    const bundleDistPath = join(getMediaPath(), AppConstants.defaultClientBundleStorage, "dist");
     const backupClientPath = join(superRootPath(), "node_modules", AppConstants.clientPackageName, "dist");
 
     // Serve the main bundle

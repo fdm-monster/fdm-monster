@@ -2,7 +2,7 @@ import { SwaggerGenerator } from "./generator";
 import { Application, static as expressStatic } from "express";
 import { join, dirname } from "node:path";
 import { AppConstants } from "@/server.constants";
-import { superRootPath, ensureDirExists } from "@/utils/fs.utils";
+import { ensureDirExists, getMediaPath } from "@/utils/fs.utils";
 import { LoggerService } from "@/handlers/logger";
 import { writeFile } from "node:fs/promises";
 
@@ -68,7 +68,7 @@ export async function setupSwagger(app: Application, logger: LoggerService) {
 
   if (generateJsonFile) {
     try {
-      const mediaPath = join(superRootPath(), AppConstants.defaultFileStorageFolder);
+      const mediaPath = getMediaPath();
       ensureDirExists(mediaPath);
 
       const swaggerJsonPath = join(mediaPath, "swagger.json");

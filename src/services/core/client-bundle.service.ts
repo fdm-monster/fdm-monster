@@ -1,8 +1,8 @@
 import AdmZip from "adm-zip";
-import { join } from "path";
+import { join } from "node:path";
 import { existsSync, writeFileSync } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
-import { ensureDirExists, superRootPath } from "@/utils/fs.utils";
+import { ensureDirExists, getMediaPath } from "@/utils/fs.utils";
 import { checkVersionSatisfiesMinimum, getMaximumOfVersionsSafe } from "@/utils/semver.utils";
 import { AppConstants } from "@/server.constants";
 import { GithubService } from "@/services/core/github.service";
@@ -26,7 +26,6 @@ export class ClientBundleService {
   private readonly logger: LoggerService;
   private readonly githubOwner = AppConstants.orgName;
   private readonly githubRepo = AppConstants.clientRepoName;
-  private readonly storageRoot = superRootPath();
   private readonly minVersion = AppConstants.defaultClientMinimum;
 
   constructor(
@@ -37,11 +36,11 @@ export class ClientBundleService {
   }
 
   get clientPackageJsonPath() {
-    return join(superRootPath(), AppConstants.defaultClientBundleStorage, "package.json");
+    return join(getMediaPath(), AppConstants.defaultClientBundleStorage, "package.json");
   }
 
   get clientIndexHtmlPath() {
-    return join(superRootPath(), AppConstants.defaultClientBundleStorage, "dist/index.html");
+    return join(getMediaPath(), AppConstants.defaultClientBundleStorage, "dist/index.html");
   }
 
   async getReleases() {
@@ -90,7 +89,7 @@ export class ClientBundleService {
 
     // Client files existence check
     if (!existingVersion || !this.doesClientIndexHtmlExist()) {
-      const reason = !existingVersion ? "Client package.json does not exist" : "Client index.html could not be found";
+      const reason = existingVersion ? "Client index.html could not be found" : "Client package.json does not exist";
 
       return this.createResponse(
         true,
@@ -227,18 +226,18 @@ export class ClientBundleService {
   private async downloadZip(assetId: number, assetName: string): Promise<string> {
     const assetResult = await this.githubService.requestAsset(this.githubOwner, this.githubRepo, assetId);
 
-    const dir = join(this.storageRoot, AppConstants.defaultClientBundleZipsStorage);
-    ensureDirExists(dir);
+    const distZipPath = join(getMediaPath(), AppConstants.defaultClientBundleZipsStorage);
+    ensureDirExists(distZipPath);
 
-    const path = join(dir, assetName);
+    const path = join(distZipPath, assetName);
     writeFileSync(path, Buffer.from(assetResult.data));
-    this.logger.log(`Downloaded client ZIP to ${dir}`);
+    this.logger.log(`Downloaded client ZIP to ${distZipPath}`);
 
     return path;
   }
 
   private async extractZip(zipPath: string): Promise<void> {
-    const distPath = join(this.storageRoot, AppConstants.defaultClientBundleStorage);
+    const distPath = join(getMediaPath(), AppConstants.defaultClientBundleStorage);
     ensureDirExists(distPath);
 
     // Clear the directory

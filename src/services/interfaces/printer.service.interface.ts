@@ -26,5 +26,5 @@ export interface IPrinterService<KeyType = number, Entity = Printer> {
 
   updateFlowRate(printerId: KeyType, flowRate?: number): Promise<Entity>;
 
-  updateDisabledReason(printerId: KeyType, disabledReason?: string): Promise<Entity>;
+  updateDisabledReason(printerId: KeyType, disabledReason: string | null): Promise<Entity>;
 }

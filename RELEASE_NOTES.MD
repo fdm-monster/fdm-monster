@@ -1,5 +1,33 @@
 # Develop
 
+## Fixes
+
+- YAML import was too strict for printer properties: disabledReason, username and password. feedRate, flowRate and assignee are now also imported
+
+# FDM Monster 2.0.3
+
+Hotfix release
+
+- Client wasn't updated to 2.2.0
+
+# FDM Monster 2.0.2
+
+## Features
+
+- Printer maintenance log
+- Added ENV_FILE env variable to override path for .env file
+- Added MEDIA_PATH env variable to override media storage folder
+
+## Fixes
+
+- DATABASE_PATH env variable will now respect its value if set, instead of forcing it to be relative
+
+## Chores
+
+- Remove corepack from CICD as yarn is committed to repository
+- Switch docker container base to node 24
+- PrintJob entity printer relation improved
+
 # FDM Monster 2.0.1
 
 ## Feat
