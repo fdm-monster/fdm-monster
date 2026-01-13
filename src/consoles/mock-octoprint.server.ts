@@ -388,7 +388,7 @@ app.post("/api/login", async (req, res) => {
 
 // POST /api/files/local/:path - Select file and optionally start print (postSelectPrintFile)
 app.post("/api/files/local/:path(*)", express.json(), (req, res) => {
-  const filePath = req.params.path;
+  const filePath = req.params["path(*)"];
   const { command, print } = req.body;
 
   console.log(`[PORT ${ port }] POST /api/files/local/${ filePath } - command: ${ command }, print: ${ print }`);

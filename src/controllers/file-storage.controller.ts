@@ -57,7 +57,7 @@ export class FileStorageController {
   @GET()
   @route("/:fileStorageId")
   async getFileMetadata(req: Request, res: Response) {
-    const { fileStorageId } = req.params;
+    const { fileStorageId } = req.params as { fileStorageId: string };
 
     try {
       const file = await this.fileStorageService.getFileInfo(fileStorageId);
@@ -91,7 +91,7 @@ export class FileStorageController {
   @DELETE()
   @route("/:fileStorageId")
   async deleteFile(req: Request, res: Response) {
-    const { fileStorageId } = req.params;
+    const { fileStorageId } = req.params as { fileStorageId: string };
 
     try {
       await this.fileStorageService.deleteFile(fileStorageId);
@@ -107,7 +107,7 @@ export class FileStorageController {
   @POST()
   @route("/:fileStorageId/analyze")
   async analyzeFile(req: Request, res: Response) {
-    const { fileStorageId } = req.params;
+    const { fileStorageId } = req.params as { fileStorageId: string };
 
     try {
       const filePath = this.fileStorageService.getFilePath(fileStorageId);
@@ -155,7 +155,7 @@ export class FileStorageController {
   @GET()
   @route("/:fileStorageId/thumbnail/:index")
   async getThumbnail(req: Request, res: Response) {
-    const { fileStorageId, index } = req.params;
+    const { fileStorageId, index } = req.params as { fileStorageId: string; index: string };
     const thumbnailIndex = Number.parseInt(index);
 
     if (Number.isNaN(thumbnailIndex)) {
