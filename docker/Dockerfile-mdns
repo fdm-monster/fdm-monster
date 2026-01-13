@@ -14,7 +14,7 @@ FROM node:24-bookworm-slim AS production
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y ca-certificates curl libnss-mdns &&
-  sed -i 's/^#enable-dbus=.*/enable-dbus=false/' /etc/avahi/avahi-daemon.conf && \
+  sed -i 's|^#enable-dbus=.*|enable-dbus=false|' /etc/avahi/avahi-daemon.conf && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN yarn global add pm2
