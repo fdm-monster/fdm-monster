@@ -31,6 +31,6 @@ COPY .env.template \
     .dockerignore ./
 COPY --from=build /build/dist/ ./dist/
 
-COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["bash", "/usr/local/bin/entrypoint.sh"]
+COPY docker/entrypoint-mdns.sh /usr/local/bin/entrypoint-mdns.sh
+RUN chmod +x /usr/local/bin/entrypoint-mdns.sh
+ENTRYPOINT ["bash", "/usr/local/bin/entrypoint-mdns.sh"]
