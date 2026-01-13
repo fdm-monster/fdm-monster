@@ -59,6 +59,7 @@ services:
 
   fdm-monster-develop:
     container_name: fdm-monster-develop
+    profiles: [develop]
     image: fdmmonster/fdm-monster:develop
     build:
       context: .
