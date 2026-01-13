@@ -39,6 +39,7 @@ services:
   #  https://docs.docker.com/engine/network/drivers/macvlan/ for details
   fdm-monster-mdns:
     container_name: fdm-monster-mdns
+    profiles: [mdns]
     image: fdmmonster/fdm-monster-mdns:2.0.0
     build:
       context: .
