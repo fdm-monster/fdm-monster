@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 jobs:
   checkversion:
     runs-on: ubuntu-latest
@@ -59,7 +60,7 @@ jobs:
         run: |
           echo "SERVER_VERSION=$(npm pkg get version | sed 's/"//g')" >> $GITHUB_ENV
 
-      # Regular develop build :: adds -develop tag to builds 
+      # Regular build
       - name: Tagging Strategy Regular
         id: tagging_regular
         uses: HackerHappyHour/tagging-strategy@v3
@@ -117,6 +118,20 @@ jobs:
           file: ./docker/Dockerfile
           tags: ${{ steps.tagging_regular.outputs.tags }}
           labels: ${{ needs.meta.outputs.labels }}
+
+      # Added to support 4545 :: build the mDSN image
+      # Clone the repo and build the image with mDNS
+      - name: Build and push mDNS
+        id: docker_build_mdns
+        uses: docker/build-push-action@v6
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          context: "{{defaultContext}}"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          file: ./docker/Dockerfile-mdns
+          tags: ${{ steps.tagging_mdns.outputs.tags }}
+          labels: ${{ needs.meta.outputs.labels }}          
 
       # Show image digest output
       - name: Image digest
