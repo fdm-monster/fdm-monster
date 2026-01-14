@@ -1,5 +1,9 @@
 # Develop
 
+## Feature
+
+- Added mdns based Docker image for advanced users, who want to enable mDNS with Docker and a Docker bridge network connected to a MAC-VLAN.
+
 ## Fixes
 
 - YAML import was too strict for printer properties: disabledReason, username and password. feedRate, flowRate and assignee are now also imported
