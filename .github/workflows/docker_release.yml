@@ -119,7 +119,7 @@ jobs:
           tags: ${{ steps.tagging_regular.outputs.tags }}
           labels: ${{ needs.meta.outputs.labels }}
 
-      # Added to support 4545 :: build the mDSN image
+      # Added to support 4545 :: build the mDNS image
       # Clone the repo and build the image with mDNS
       - name: Build and push mDNS
         id: docker_build_mdns
