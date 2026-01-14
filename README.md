@@ -44,11 +44,11 @@ Here is a list of features that make FDM Monster stand out:
 
 ### Quick Install (Linux)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster-scripts/main/install/linux/install.sh | bash
 ```
 
 ### Other Methods
-- [One-Click Linux Install](https://docs.fdm-monster.net/installing/one-click-linux)
+ 
 - [Docker image](https://hub.docker.com/r/fdmmonster/fdm-monster)
 - [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 - [Unraid Community App](https://unraid.net/community/apps?q=fdm+monster)
@@ -166,23 +166,21 @@ the [CONTRIBUTING](CONTRIBUTING.md) file.
 
 ### Development Progress
 
-- [x] :rocket: Docker amd64 image
-- [x] :rocket: Quick copy paste of FDM Monster printers
+- [x] :rocket: Docker amd64 and arm64 image
+- [x] :rocket: Quick duplication of FDM Monster printers
 - [x] 🛡️ Complete API test coverage
 - [x] :rocket: Floor management
-- [x] Auto-clean old OctoPrint files (opt-in and configurable) 
-- [x] :rocket: Windows and Linux Service
-- [x] Printer completion/failure tracking (with statistics page)
+- [x] :rocket: Linux 1-click install
+- [x] Printer Job History
 - [x] Printer placement using drag n drop 
 - [x] 🔌 Raspberry Pi image (https://github.com/fdm-monster/MonsterPi)
 - [x] :rocket: Documentation (https://docs.fdm-monster.net)
-- [x] 🛡️ Login and user management
+- [x] 🛡️ Login and User management (with roles)
 - [x] OctoFarm printer import 
-- [x] Klipper and Moonraker API integration
+- [x] OctoPrint, Bambu, PrusaLink Klipper and Moonraker API integration
 - [x] GCode Thumbnail support
-- [x] `.bgcode` support
-- [x] Modernized UI layout and tile design
-- [x] History and statistics
+- [x] `.gcode`, `.bgcode` and `.gcode.3mf` support
+- [x] Modern UI layout and tile design
 - [x] Print Queue
 - [x] Extended webcam integration
 - [ ] Spoolman integration

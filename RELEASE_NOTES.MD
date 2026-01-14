@@ -1,5 +1,20 @@
 # Develop
 
+# FDM Monster 2.0.4
+
+## Feature
+
+- Added mdns based Docker image for advanced users, who want to enable mDNS with Docker and a Docker bridge network connected to a MAC-VLAN.
+
+## Fixes
+
+- YAML import was too strict for printer properties: disabledReason, username and password. feedRate, flowRate and assignee are now also imported
+
+## Chore
+
+- Remove unnecessary debug logging for job analysis service when it had nothing to do
+- Remove install.sh
+
 # FDM Monster 2.0.3
 
 Hotfix release

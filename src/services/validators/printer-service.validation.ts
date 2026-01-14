@@ -10,8 +10,8 @@ const octoPrintApiKeySchema = z
 
 export const printerApiKeyValidator = z.string().optional();
 export const printerNameValidator = z.string();
-export const printerUsernameValidator = z.string();
-export const printerPasswordValidator = z.string();
+export const printerUsernameValidator = z.string().nullable();
+export const printerPasswordValidator = z.string().nullable();
 export const printerEnabledValidator = z.boolean();
 export const printerDisabledReasonValidator = z.string().nullable();
 export const printerUrlValidator = z.string().url();

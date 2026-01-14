@@ -33,8 +33,35 @@ services:
       - fdmm-media:/app/media
       - fdmm-database:/app/database
 
+  # This section requires an explict docker network that allows the container to
+  #  utilize an IP directly on the host interface. Reference macvlan setup at
+  #  https://docs.docker.com/engine/network/drivers/macvlan/ for details
+  fdm-monster-mdns:
+    container_name: fdm-monster-mdns
+    profiles: [mdns]
+    image: fdmmonster/fdm-monster:develop-mdns
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-mdns
+    restart: unless-stopped
+    deploy:
+      restart_policy:
+        delay: 5s
+        #max_attempts: 3
+        window: 120s
+    networks:
+      fdmm_docker_bridge: # rename to mach your config option below
+        #ipv4_address: <REPLACE WITH IP ADDRESS> # Uncommend and set valid ip address
+                                                 # As is uses next available address
+                                                 # from macvln ip-range
+                                                 # Refer to docker documentation
+    volumes:
+      - fdmm-media:/app/media
+      - fdmm-database:/app/database
+
   fdm-monster-develop:
     container_name: fdm-monster-develop
+    profiles: [develop]
     image: fdmmonster/fdm-monster:develop
     build:
       context: .
@@ -60,3 +87,8 @@ volumes:
     name: fdmm-media
   fdmm-database:
     name: fdmm-database
+
+networks:
+  fdmm_docker_bridge:   # edit to suite as this is internal config
+    external: true
+    name: fdmm_docker_bridge # must match your macvlan bridge name
