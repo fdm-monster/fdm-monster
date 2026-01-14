@@ -1,0 +1,36 @@
+FROM node:24-bookworm-slim AS build
+WORKDIR /build
+
+COPY .yarn/releases ./.yarn/releases
+COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
+
+RUN yarn install --immutable
+
+COPY src/ ./src/
+
+RUN yarn run build
+
+FROM node:24-bookworm-slim AS production
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y ca-certificates curl libnss-mdns && \
+  sed -i 's|^#enable-dbus=.*|enable-dbus=false|' /etc/avahi/avahi-daemon.conf && \
+  apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN yarn global add pm2
+COPY .yarn/releases ./.yarn/releases
+
+COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
+RUN yarn workspaces focus --all --production
+
+COPY .env.template \
+    README.md \
+    LICENSE CODE_OF_CONDUCT.md \
+    CONTRIBUTING.md \
+    SECURITY.md \
+    .dockerignore ./
+COPY --from=build /build/dist/ ./dist/
+
+COPY docker/entrypoint-mdns.sh /usr/local/bin/entrypoint-mdns.sh
+RUN chmod +x /usr/local/bin/entrypoint-mdns.sh
+ENTRYPOINT ["bash", "/usr/local/bin/entrypoint-mdns.sh"]
