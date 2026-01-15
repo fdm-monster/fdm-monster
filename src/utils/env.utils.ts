@@ -1,4 +1,13 @@
 import { AppConstants } from "@/server.constants";
+import dotenv from "dotenv";
+import { join } from "node:path";
+import { superRootPath } from "@/utils/fs.utils";
+
+if (process.env.NODE_ENV !== "test") {
+  dotenv.config({
+    path: process.env.ENV_FILE || join(superRootPath(), ".env")
+  });
+}
 
 export function getEnvOrDefault<T>(key: string, defaultValue: T) {
   if (!Object.keys(process.env).includes(key) || !process.env[key]?.length) {

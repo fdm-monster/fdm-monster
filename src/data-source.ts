@@ -1,7 +1,5 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import dotenv from "dotenv";
-import { join } from "node:path";
 import { getDatabaseFilePath } from "./utils/fs.utils";
 import { Floor } from "@/entities/floor.entity";
 import { FloorPosition } from "@/entities/floor-position.entity";
@@ -34,16 +32,11 @@ import { RenameGroupToTag1767432108916 } from "@/migrations/1767432108916-Rename
 import { AddPrintJob1767451444137 } from "@/migrations/1767451444137-AddPrintJob";
 import { AddPrinterMaintenanceLog1767909428129 } from "@/migrations/1767909428129-AddPrinterMaintenanceLog";
 
-if (process.env.NODE_ENV !== "test") {
-  dotenv.config({
-    path: process.env.ENV_FILE || join("../.env"),
-    quiet: true
-  });
-}
+const databaseFilePath = getDatabaseFilePath();
 
 export const AppDataSource = new DataSource({
   type: "better-sqlite3",
-  database: getDatabaseFilePath(),
+  database: databaseFilePath,
   synchronize: false,
   logging: false,
   entities: [

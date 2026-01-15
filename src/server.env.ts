@@ -14,7 +14,7 @@ export function setupEnvConfig() {
     process.env[AppConstants.NODE_ENV_KEY] = newEnvName;
     logger.warn(`NODE_ENV=${ environment } was not set, or not known. Defaulting to NODE_ENV=${ newEnvName }`);
   } else {
-    logger.log(`✓ NODE_ENV variable correctly set (${ environment })!`);
+    logger.log(`✓ NODE_ENV variable correctly set (${ environment })`);
   }
 
   ensurePackageVersionSet();
