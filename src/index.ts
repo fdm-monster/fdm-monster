@@ -9,11 +9,6 @@ import { LoggerService as Logger } from "@/handlers/logger";
 import { createStaticLogger } from "@/handlers/logging/static.logger";
 import { superRootPath } from "@/utils/fs.utils";
 
-dotenv.config({
-  path: process.env.ENV_FILE || join(superRootPath(), ".env"),
-  quiet: true
-});
-
 createStaticLogger({ enableFileLogs: true });
 const logger = new Logger("FDM-Environment");
 logger.log("✓ Parsed environment with (optional) .env file, created static logger");
