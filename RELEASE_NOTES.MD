@@ -2,6 +2,12 @@
 
 # FDM Monster 2.0.4
 
+## Hotfix
+
+- DATABASE_FILE and DATABASE_PATH weren't picked up from .env as dotenv path was wrong
+
+# FDM Monster 2.0.4
+
 ## Feature
 
 - Added mdns based Docker image for advanced users, who want to enable mDNS with Docker and a Docker bridge network connected to a MAC-VLAN.
