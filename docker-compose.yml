@@ -47,7 +47,6 @@ services:
     deploy:
       restart_policy:
         delay: 5s
-        #max_attempts: 3
         window: 120s
     networks:
       fdmm_docker_bridge: # rename to mach your config option below
