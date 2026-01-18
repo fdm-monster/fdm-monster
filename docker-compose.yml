@@ -12,6 +12,16 @@ services:
       - ./mosquitto/log:/mosquitto/log
       - ./mosquitto/certs:/mosquitto/certs
 
+  # docker compose run --rm -it libbgcode bgcode /bgcode-files/679de1fe-9a4d-fe7e-6903-2bfb8ac9919f.bgcode
+  libbgcode:
+    image: libbgcode
+    build:
+      context: .
+      dockerfile: Dockerfile.bgcode
+    restart: unless-stopped
+    volumes:
+      - ./media/files/bgcode/:/bgcode-files/
+
   # docker build --platform linux/amd64,linux/arm64 -t 1.5.0-alpha . -f .\docker\Dockerfile
   fdm-monster:
     container_name: fdm-monster

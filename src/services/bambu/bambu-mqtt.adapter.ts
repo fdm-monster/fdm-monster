@@ -161,10 +161,12 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
       this.mqttClient = mqtt.connect(mqttUrl, {
         username: "bblp",
         password: accessCode,
-        clientId: `fdm_monster_${ serial }_${ Date.now() }`,
+        protocolVersion: 4,
+        clientId: "bblp-client-fdmm",
         protocol: "mqtts",
+        clean: true,
         connectTimeout: timeout,
-        reconnectPeriod: 0,
+        reconnectPeriod: 5000,
         keepalive: 60,
         rejectUnauthorized: false,
       });
