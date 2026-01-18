@@ -21,6 +21,8 @@ import {
   BgCodeChecksumTypeSize,
   BgCodeBlockParameterSizes
 } from "./bgcode.types.mts";
+import { inflateSync } from "node:zlib";
+import { HeatshrinkDecoder } from "./heatshrink-decoder.mjs";
 
 export async function parseFileHeader(fileHandle: FileHandle): Promise<{
   magic: string;
@@ -180,16 +182,13 @@ export function decompressBlock(
   switch (info.kind) {
     case "none":
       return data;
+    case "deflate":
+      return inflateSync(data);
+    case "heatshrink":
+      const decoder = new HeatshrinkDecoder(info.window, info.lookahead);
+      return decoder.decompress(data);
     default:
-      throw new Error("Compression type not implemented yet");
-    // case "deflate":
-    //   return inflate(data);
-    // case "heatshrink":
-    //   return heatshrinkDecompress(
-    //     data,
-    //     info.window,
-    //     info.lookahead
-    //   );
+      throw new Error(`Unknown compression type: ${info.kind}`);
   }
 }
 
