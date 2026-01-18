@@ -2,10 +2,30 @@ import { BGCodeParser } from "@/utils/parsers/bgcode.parser";
 import * as path from "path";
 import * as fs from "fs/promises";
 
-/**
- * Console script to decode and display BGCode file metadata
- * Usage: yarn console:bgcode-decoder [file-path] [--extract-gcode] [--output output.gcode]
- */
+function formatValue(value: string | string[] | number | number[] | null | undefined): string {
+  if (!value) return "N/A";
+  if (Array.isArray(value)) return value.join(', ');
+  return String(value);
+}
+
+function formatNumber(value: number | number[] | null | undefined, suffix: string = '', decimals?: number): string {
+  if (!value) return "N/A";
+  if (Array.isArray(value)) {
+    const formatted = value.map(v => decimals !== undefined ? v.toFixed(decimals) : String(v));
+    return formatted.join(', ') + suffix;
+  }
+  const formatted = decimals !== undefined ? value.toFixed(decimals) : String(value);
+  return formatted + suffix;
+}
+
+function formatNumberScaled(value: number | number[] | null | undefined, scale: number, decimals: number, suffix: string): string {
+  if (!value) return "N/A";
+  if (Array.isArray(value)) {
+    const formatted = value.map(v => (v / scale).toFixed(decimals));
+    return formatted.join(', ') + suffix;
+  }
+  return (value / scale).toFixed(decimals) + suffix;
+}
 
 async function decodeBGCode(filePath: string, extractGCode: boolean = false, outputPath?: string) {
   try {
@@ -72,31 +92,15 @@ async function decodeBGCode(filePath: string, extractGCode: boolean = false, out
     console.log(`  Bed Temperature: ${result.normalized.bedTemperature ? `${result.normalized.bedTemperature}°C` : "N/A"}`);
 
     console.log("\nFilament Information:");
-    console.log(`  Filament Type: ${result.normalized.filamentType || "N/A"}`);
-    console.log(`  Nozzle Diameter: ${result.normalized.nozzleDiameterMm ? `${result.normalized.nozzleDiameterMm} mm` : "N/A"}`);
-    console.log(`  Filament Diameter: ${result.normalized.filamentDiameterMm ? `${result.normalized.filamentDiameterMm} mm` : "N/A"}`);
-    console.log(`  Filament Density: ${result.normalized.filamentDensityGramsCm3 ? `${result.normalized.filamentDensityGramsCm3} g/cm³` : "N/A"}`);
-    console.log(`  Filament Used (Length): ${result.normalized.filamentUsedMm ? `${(result.normalized.filamentUsedMm / 1000).toFixed(2)} m` : "N/A"}`);
-    console.log(`  Filament Used (Volume): ${result.normalized.filamentUsedCm3 ? `${result.normalized.filamentUsedCm3.toFixed(2)} cm³` : "N/A"}`);
-    console.log(`  Filament Used (Weight): ${result.normalized.filamentUsedGrams ? `${result.normalized.filamentUsedGrams.toFixed(2)} g` : "N/A"}`);
+    console.log(`  Filament Type: ${formatValue(result.normalized.filamentType)}`);
+    console.log(`  Nozzle Diameter: ${formatNumber(result.normalized.nozzleDiameterMm, ' mm')}`);
+    console.log(`  Filament Diameter: ${formatNumber(result.normalized.filamentDiameterMm, ' mm')}`);
+    console.log(`  Filament Density: ${formatNumber(result.normalized.filamentDensityGramsCm3, ' g/cm³')}`);
+    console.log(`  Filament Used (Length): ${formatNumberScaled(result.normalized.filamentUsedMm, 1000, 2, ' m')}`);
+    console.log(`  Filament Used (Volume): ${formatNumber(result.normalized.filamentUsedCm3, ' cm³', 2)}`);
+    console.log(`  Filament Used (Weight): ${formatNumber(result.normalized.filamentUsedGrams, ' g', 2)}`);
     console.log(`  Total Filament Used: ${result.normalized.totalFilamentUsedGrams ? `${result.normalized.totalFilamentUsedGrams.toFixed(2)} g` : "N/A"}`);
 
-    // Write G-code to file if extracted and output path provided
-    if (extractGCode && result.gcode) {
-      const defaultOutput = filePath.replace(/\.bgcode$/i, ".gcode");
-      const finalOutput = outputPath || defaultOutput;
-
-      console.log("\n\nG-CODE EXTRACTION:");
-      console.log("----------------------------------------");
-      console.log(`G-code size: ${result.gcode.length} bytes (${(result.gcode.length / 1024).toFixed(2)} KB)`);
-      console.log(`Lines of G-code: ${result.gcode.split('\n').length}`);
-      console.log(`Writing to: ${finalOutput}`);
-
-      await fs.writeFile(finalOutput, result.gcode, "utf8");
-      console.log("✓ G-code file written successfully!");
-    } else if (extractGCode && !result.gcode) {
-      console.log("\n\n⚠ No G-code extracted (file may use unsupported compression)");
-    }
 
     console.log("\n========================================");
     console.log("Decoding complete!");

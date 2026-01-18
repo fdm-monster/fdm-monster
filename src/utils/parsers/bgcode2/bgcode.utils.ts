@@ -7,7 +7,7 @@ import {
   BGCODE_MAX_CHECKSUM_TYPE,
   BGCODE_MAX_COMPRESSION,
   BGCODE_MIN_BLOCK_HEADER_SIZE, BGCODE_PARAMETER_THUMBNAIL_MAX_FORMAT
-} from "./bgcode.constants.mts";
+} from "./bgcode.constants";
 import { FileHandle } from "node:fs/promises";
 import {
   type BgCodeBlockHeader,
@@ -20,9 +20,9 @@ import {
   BgCodeCompressionName,
   BgCodeChecksumTypeSize,
   BgCodeBlockParameterSizes
-} from "./bgcode.types.mts";
+} from "./bgcode.types";
 import { inflateSync } from "node:zlib";
-import { HeatshrinkDecoder } from "./heatshrink-decoder.mjs";
+import { HeatshrinkDecoder } from "./heatshrink-decoder";
 
 export async function parseFileHeader(fileHandle: FileHandle): Promise<{
   magic: string;
@@ -188,7 +188,7 @@ export function decompressBlock(
       const decoder = new HeatshrinkDecoder(info.window, info.lookahead);
       return decoder.decompress(data);
     default:
-      throw new Error(`Unknown compression type: ${info.kind}`);
+      throw new Error(`Unknown compression type: ${compression}`);
   }
 }
 
@@ -247,4 +247,83 @@ function calculateThumbnailFormat(formatParameter: number) {
     throw new Error(`Thumbnail format type ${ formatParameter } exceeds max ${ BGCODE_PARAMETER_THUMBNAIL_MAX_FORMAT }`);
   }
   return formatParameter;
+}
+
+export async function extractMetadataFromBlocks(
+  fileHandle: FileHandle,
+  blockHeaders: BgCodeBlockHeader[]
+): Promise<Record<string, string>> {
+  const metadata: Record<string, string> = {};
+
+  const metadataBlocks = blockHeaders.filter(b =>
+    b.type === BgCodeBlockTypes.FileMetadata ||
+    b.type === BgCodeBlockTypes.SlicerMetadata ||
+    b.type === BgCodeBlockTypes.PrinterMetadata ||
+    b.type === BgCodeBlockTypes.PrintMetadata
+  );
+
+  for (const header of metadataBlocks) {
+    const blockData = await getBlockData(fileHandle, header);
+    const data = decompressBlock(header.compression, blockData);
+    const text = data.toString("utf8");
+    extractMetadataFromText(text, metadata);
+  }
+
+  return metadata;
+}
+
+const METADATA_KEY_NORMALIZATION: Record<string, string> = {
+  'producer': 'producer',
+  'produced on': 'produced_on',
+  'print time': 'print_time',
+  'estimated printing time (silent mode)': 'estimated_printing_time_silent_mode',
+  'estimated printing time (normal mode)': 'estimated_printing_time_normal_mode',
+  'layer height': 'layer_height',
+  'first layer height': 'first_layer_height',
+  'initial layer height': 'initial_layer_height',
+  'nozzle diameter': 'nozzle_diameter',
+  'filament diameter': 'filament_diameter',
+  'filament density': 'filament_density',
+  'filament used [mm]': 'filament_used_mm',
+  'filament used [cm3]': 'filament_used_cm3',
+  'filament used [g]': 'filament_used_g',
+  'bed temperature': 'bed_temperature',
+  'temperature': 'temperature',
+  'fill density': 'fill_density',
+  'filament type': 'filament_type',
+  'printer model': 'printer_model',
+  'max layer z': 'max_layer_z',
+  'total layers': 'total_layers',
+  'layer count': 'layer_count',
+};
+
+function extractMetadataFromText(text: string, metadata: Record<string, string>): void {
+  const lines = text.split('\n');
+
+  for (const line of lines) {
+    const keyValuePair = parseMetadataLine(line);
+    if (!keyValuePair) {
+      continue;
+    }
+
+    const { key, value } = keyValuePair;
+    metadata[key] = value;
+  }
+}
+
+function parseMetadataLine(line: string): { key: string; value: string } | null {
+  const equalIndex = line.indexOf('=');
+  if (equalIndex === -1) {
+    return null;
+  }
+
+  const rawKey = line.substring(0, equalIndex).trim().toLowerCase();
+  const value = line.substring(equalIndex + 1).trim();
+
+  if (!rawKey || !value) {
+    return null;
+  }
+
+  const normalizedKey = METADATA_KEY_NORMALIZATION[rawKey] || rawKey.replace(/\s+/g, '_');
+  return { key: normalizedKey, value };
 }

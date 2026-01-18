@@ -1,13 +1,13 @@
 import { open, writeFile } from "node:fs/promises";
-import { decompressBlock, getBlockData, parseBlockHeaders, parseFileHeader } from "./bgcode.utils.mts";
-import { BgCodeBlockTypes, BgCodeThumbnailParameters } from "./bgcode.types.mts";
-import { processThumbnail } from "./bgcode-thumbnail.parser.mjs";
+import { decompressBlock, getBlockData, parseBlockHeaders, parseFileHeader } from "@/utils/parsers/bgcode2/bgcode.utils";
+import { BgCodeBlockTypes, BgCodeThumbnailParameters } from "@/utils/parsers/bgcode2/bgcode.types";
+import { processThumbnail } from "@/utils/parsers/bgcode2/bgcode-thumbnail.parser";
 
 interface DGCodeParseResult {
 
 }
 
-export class BgcodeParser {
+export class BgcodeParser2 {
   async parse(filePath: string, extractGcode: boolean): Promise<DGCodeParseResult> {
     const fileHandle = await open(filePath, "r");
     const { size } = await fileHandle.stat();
@@ -18,13 +18,7 @@ export class BgcodeParser {
     }
 
     const blockHeaders = await parseBlockHeaders(fileHandle, size, checksumType, true);
-    // let i = 0;
-    // for (const blockHeader of blockHeaders) {
-    //   i++;
-    //   console.log(`Block ${ i } type ${blockHeader.type} parametersSize ${blockHeader.parametersSize} headerSize ${blockHeader.headerSize} dataSize ${blockHeader.uncompressedSize} ${blockHeader.compressedSize}=${blockHeader.dataSize} compression ${ blockHeader.compression }`);
-    // }
 
-    // Decode and dump INI encoded metadata blocks
     const metadataBlocks = blockHeaders.filter(b =>
       b.type === BgCodeBlockTypes.FileMetadata ||
       b.type === BgCodeBlockTypes.PrinterMetadata ||

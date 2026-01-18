@@ -27,6 +27,15 @@ export const BgCodeBlockTypes = {
 
 export type BgCodeBlockType = typeof BgCodeBlockTypes[keyof typeof BgCodeBlockTypes];
 
+export const BgCodeBlockTypeName: Record<BgCodeBlockType, string> = {
+  [BgCodeBlockTypes.FileMetadata]: "FileMetadata",
+  [BgCodeBlockTypes.GCode]: "GCode",
+  [BgCodeBlockTypes.SlicerMetadata]: "SlicerMetadata",
+  [BgCodeBlockTypes.PrinterMetadata]: "PrinterMetadata",
+  [BgCodeBlockTypes.PrintMetadata]: "PrintMetadata",
+  [BgCodeBlockTypes.Thumbnail]: "Thumbnail",
+};
+
 export const BgCodeBlockParameterSizes = {
   [BgCodeBlockTypes.FileMetadata]: 2,
   [BgCodeBlockTypes.GCode]: 2,
@@ -86,6 +95,18 @@ export const BgCodeThumbnailFormats = {
 }
 
 export type BgCodeThumbnailFormat = typeof BgCodeThumbnailFormats[keyof typeof BgCodeThumbnailFormats];
+
+export const BgCodeThumbnailFormatName: Record<BgCodeThumbnailFormat, string> = {
+  [BgCodeThumbnailFormats.PNG]: "PNG",
+  [BgCodeThumbnailFormats.JPG]: "JPG",
+  [BgCodeThumbnailFormats.QOI]: "QOI",
+};
+
+export const BgCodeThumbnailFormatExtension: Record<BgCodeThumbnailFormat, string> = {
+  [BgCodeThumbnailFormats.PNG]: "png",
+  [BgCodeThumbnailFormats.JPG]: "jpg",
+  [BgCodeThumbnailFormats.QOI]: "qoi",
+};
 
 export interface BgCodeThumbnailParameters {
   format: BgCodeThumbnailFormat,

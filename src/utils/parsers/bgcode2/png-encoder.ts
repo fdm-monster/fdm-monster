@@ -3,8 +3,7 @@
  * Creates PNG files from RGBA pixel data
  */
 
-import { deflateSync } from 'zlib';
-import { createHash } from 'crypto';
+import { deflateSync } from 'node:zlib';
 
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
@@ -33,7 +32,6 @@ function writeChunk(type: string, data: Buffer): Buffer {
 }
 
 export function encodePNG(width: number, height: number, rgba: Buffer): Buffer {
-  // IHDR chunk
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(width, 0);
   ihdr.writeUInt32BE(height, 4);

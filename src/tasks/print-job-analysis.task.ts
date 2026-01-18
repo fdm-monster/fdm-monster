@@ -14,7 +14,7 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
  */
 export class PrintJobAnalysisTask implements TaskService {
   logger: LoggerService;
-  private printJobRepository: Repository<PrintJob>;
+  private readonly printJobRepository: Repository<PrintJob>;
 
   constructor(
     loggerFactory: ILoggerFactory,
