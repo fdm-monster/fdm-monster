@@ -52,6 +52,7 @@ curl -fsSL https://raw.githubusercontent.com/fdm-monster/fdm-monster-scripts/mai
 - [Docker image](https://hub.docker.com/r/fdmmonster/fdm-monster)
 - [Raspberry Pi image MonsterPi](https://docs.fdm-monster.net/guides/monsterpi)
 - [Unraid Community App](https://unraid.net/community/apps?q=fdm+monster)
+- [Kubernetes](/kubernetes/)
 
 Would you like to add a method of running FDM Monster? Please reach out or create an issue/pull-request!
 
