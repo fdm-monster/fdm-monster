@@ -82,13 +82,15 @@ export class GCodeParser {
     await this.extractMetadataFromStart(filePath, metadata);
 
     // Read from end of file (footer often has summary metadata - filament, time, etc.)
-    await this.extractMetadataFromEnd(filePath, metadata);
+    // skip it for now
+    // await this.extractMetadataFromEnd(filePath, metadata);
 
     return metadata;
   }
 
   private async extractMetadataFromStart(filePath: string, metadata: Record<string, string>): Promise<void> {
     let linesRead = 0;
+    let parseLine = 1;
 
     const fileStream = createReadStream(filePath);
     const rl = readline.createInterface({
@@ -97,9 +99,14 @@ export class GCodeParser {
     });
 
     for await (const line of rl) {
-      if (linesRead >= this.maxHeaderLinesToRead) break;
-      linesRead++;
+      //
+      //if (linesRead >= this.maxHeaderLinesToRead) break;
+      //linesRead++;
+      if (line.match(/EXECUTABLE_BLOCK_START/)) parseLine =0;
+      if (line.match(/EXECUTABLE_BLOCK_END/)) parseLine =1;
 
+      // next line if we are in the executable block
+      if (parseLine === 0) continue;
       this.parseMetadataLine(line, metadata);
     }
 
