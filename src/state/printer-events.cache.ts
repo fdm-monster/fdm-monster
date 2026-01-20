@@ -15,6 +15,7 @@ import { LoggerService } from "@/handlers/logger";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
+import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
 
 export type WsMessageWithoutEventAndPlugin = Exclude<WsMessage, "event" | "plugin">;
 export type PrinterEventsCacheDto = Record<WsMessageWithoutEventAndPlugin, any>;
@@ -76,15 +77,20 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async setSubState(printerId: number, label: WsMessageWithoutEventAndPlugin, substateName: string, payload: any) {
+  async setEventPartial(printerId: number, label: WsMessageWithoutEventAndPlugin, payload: any, keysToUpdate: string[]) {
     const ref = await this.getOrCreateEvents(printerId);
     if (!ref[label]) {
-      ref[label] = {};
+      ref[label] = {
+        payload: {},
+        receivedAt: Date.now(),
+      };
     }
-    ref[label][substateName] = {
-      payload,
-      receivedAt: Date.now(),
-    };
+
+    for (const key of keysToUpdate) {
+      ref[label].payload[key] = payload[key];
+    }
+
+    ref[label].receivedAt = Date.now();
     await this.setKeyValue(printerId, ref);
   }
 
@@ -105,16 +111,24 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
       const printer = await this.printerCache.getValue(printerId);
       return printer?.name;
     } catch (error) {
-      this.logger.debug(`Could not get printer name for ${printerId}: ${error}`);
+      this.logger.debug(`Could not get printer name for ${ printerId }: ${ error }`);
       return undefined;
     }
   }
 
   private async onOctoPrintSocketMessage(e: OctoPrintEventDto) {
-    const printerId = e.printerId as number;
+    const printerId = e.printerId;
     if (e.event === messages.current && e.payload) {
-      await this.setEvent(printerId, messages.current, e.payload);
-      const payload = e.payload as any;
+      const payload = e.payload as CurrentMessageDto;
+
+      const keysToUpdate = ['state', 'job', 'progress', 'currentZ', 'offsets', 'resends'];
+
+      if (Array.isArray(payload.temps) && payload.temps.length > 0) {
+        keysToUpdate.push('temps');
+      }
+
+      await this.setEventPartial(printerId, messages.current, payload, keysToUpdate);
+
       const flags = payload?.state?.flags;
       const filePath = payload?.job?.file?.path;
       const completion = payload?.progress?.completion;
@@ -124,14 +138,13 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
         const printerName = await this.getPrinterName(printerId);
         const job = await this.printJobService.markStarted(printerId, filePath, printerName);
 
-        // Update printer thumbnail from this job
         if (job) {
           await this.printerThumbnailCache.handleJobStarted(printerId, job.id);
         }
 
         // Trigger file download and analysis if we don't have the file locally
         if (job && !job.fileStorageId && job.analysisState === "NOT_ANALYZED") {
-          this.logger.log(`Job ${job.id} has no local file - triggering download and analysis`);
+          this.logger.log(`Job ${ job.id } has no local file - triggering download and analysis`);
           await this.printJobService.triggerFileAnalysis(job.id);
         }
 
@@ -155,16 +168,16 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
       if (typeof completion === "number" && filePath) {
         await this.printJobService.markProgress(printerId, filePath, completion);
       }
-      if ((flags?.finished || flags?.error) && filePath) {
-        const reason = flags?.error ? "Error" : "Finished";
-        if (flags?.finished) {
+      if ((flags?.finishing || flags?.error || flags?.cancelling) && filePath) {
+        if (flags?.finishing) {
           const job = await this.printJobService.markFinished(printerId, filePath);
-          // Update printer thumbnail from completed job
           if (job) {
             await this.printerThumbnailCache.handleJobCompleted(printerId, job.id);
           }
+        } else if (flags?.cancelling) {
+          await this.printJobService.markFailed(printerId, filePath, "Cancelled");
         } else {
-          await this.printJobService.markFailed(printerId, filePath, reason);
+          await this.printJobService.markFailed(printerId, filePath, "Error");
         }
       }
     }
@@ -187,14 +200,13 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
         const printerName = await this.getPrinterName(printerId);
         const job = await this.printJobService.markStarted(printerId, filename, printerName);
 
-        // Update printer thumbnail from this job
         if (job) {
           await this.printerThumbnailCache.handleJobStarted(printerId, job.id);
         }
 
         // Trigger file download and analysis if needed
         if (job && !job.fileStorageId && job.analysisState === "NOT_ANALYZED") {
-          this.logger.log(`Job ${job.id} has no local file - triggering download and analysis`);
+          this.logger.log(`Job ${ job.id } has no local file - triggering download and analysis`);
           await this.printJobService.triggerFileAnalysis(job.id);
         }
       }
@@ -227,14 +239,13 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
         const printerName = await this.getPrinterName(printerId);
         const job = await this.printJobService.markStarted(printerId, filename, printerName);
 
-        // Update printer thumbnail from this job
         if (job) {
           await this.printerThumbnailCache.handleJobStarted(printerId, job.id);
         }
 
         // Trigger file download and analysis if needed
         if (job && !job.fileStorageId && job.analysisState === "NOT_ANALYZED") {
-          this.logger.log(`Job ${job.id} has no local file - triggering download and analysis`);
+          this.logger.log(`Job ${ job.id } has no local file - triggering download and analysis`);
           await this.printJobService.triggerFileAnalysis(job.id);
         }
       }
@@ -281,7 +292,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
         // Trigger file download and analysis if needed
         if (job && !job.fileStorageId && job.analysisState === "NOT_ANALYZED") {
-          this.logger.log(`Job ${job.id} has no local file - triggering download and analysis`);
+          this.logger.log(`Job ${ job.id } has no local file - triggering download and analysis`);
           await this.printJobService.triggerFileAnalysis(job.id);
         }
 
@@ -322,7 +333,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
         // Check if there's an active print job - if so, it was cancelled
         const activeJob = await this.printJobService.getActivePrintJob(printerId);
         if (activeJob && activeJob.status === "PRINTING") {
-          this.logger.log(`Print job ${activeJob.id} transitioned to IDLE - marking as cancelled`);
+          this.logger.log(`Print job ${ activeJob.id } transitioned to IDLE - marking as cancelled`);
           await this.printJobService.handlePrintCancelled(printerId, "Print stopped");
         }
       } else if (state === "ERROR" && filename) {
