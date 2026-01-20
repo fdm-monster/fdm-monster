@@ -77,15 +77,20 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async setSubState(printerId: number, label: WsMessageWithoutEventAndPlugin, substateName: string, payload: any) {
+  async setEventPartial(printerId: number, label: WsMessageWithoutEventAndPlugin, payload: any, keysToUpdate: string[]) {
     const ref = await this.getOrCreateEvents(printerId);
     if (!ref[label]) {
-      ref[label] = {};
+      ref[label] = {
+        payload: {},
+        receivedAt: Date.now(),
+      };
     }
-    ref[label][substateName] = {
-      payload,
-      receivedAt: Date.now(),
-    };
+
+    for (const key of keysToUpdate) {
+      ref[label].payload[key] = payload[key];
+    }
+
+    ref[label].receivedAt = Date.now();
     await this.setKeyValue(printerId, ref);
   }
 
@@ -115,13 +120,14 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     const printerId = e.printerId;
     if (e.event === messages.current && e.payload) {
       const payload = e.payload as CurrentMessageDto;
-      const { logs, messages: msgs, temps, ...filteredPayload } = payload;
 
-      await this.setEvent(printerId, messages.current, filteredPayload);
+      const keysToUpdate = ['state', 'job', 'progress', 'currentZ', 'offsets', 'resends'];
 
-      if (temps && Array.isArray(temps) && temps.length > 0) {
-        await this.setSubState(printerId, messages.current, "temps", temps);
+      if (Array.isArray(payload.temps) && payload.temps.length > 0) {
+        keysToUpdate.push('temps');
       }
+
+      await this.setEventPartial(printerId, messages.current, payload, keysToUpdate);
 
       const flags = payload?.state?.flags;
       const filePath = payload?.job?.file?.path;

@@ -35,3 +35,5 @@ coverage
 test/requests/*.env.json
 
 mosquitto/
+bambu-link/
+setups/
