@@ -1,5 +1,11 @@
 # Develop
 
+# FDM Monster 2.0.6
+
+## Hotfix
+
+- OctoPrint temperatures were flashing on the printer grid. 
+
 # FDM Monster 2.0.5
 
 ## Hotfix
