@@ -187,7 +187,6 @@ export class FileStorageController {
       }
 
       // Determine content type from magic bytes
-      const isPNG = thumbnail[0] === 0x89 && thumbnail[1] === 0x50 && thumbnail[2] === 0x4E && thumbnail[3] === 0x47;
       const isJPG = thumbnail[0] === 0xFF && thumbnail[1] === 0xD8;
       const isQOI = thumbnail[0] === 0x71 && thumbnail[1] === 0x6F && thumbnail[2] === 0x69 && thumbnail[3] === 0x66;
 
