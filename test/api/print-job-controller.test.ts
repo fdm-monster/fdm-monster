@@ -94,7 +94,7 @@ describe("PrintJobController", () => {
           .set("Accept", "application/json");
 
         expect(res.status).toBe(400);
-        expect(res.body.error).toContain("Can only mark UNKNOWN jobs");
+        expect(res.body.error).toContain("Can only mark jobs which are not \"PENDING\" | \"QUEUED\" as completed");
       });
     });
 
