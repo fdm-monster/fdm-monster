@@ -154,7 +154,7 @@ export class FileStorageController {
 
   @GET()
   @route("/:fileStorageId/thumbnail/:index")
-  async getThumbnail(req: Request, res: Response) {
+  async getThumbnailByIndex(req: Request, res: Response) {
     const { fileStorageId, index } = req.params as { fileStorageId: string; index: string };
     const thumbnailIndex = Number.parseInt(index);
 
@@ -172,16 +172,21 @@ export class FileStorageController {
       }
 
       // Determine content type from magic bytes
+      const isPNG = thumbnail[0] === 0x89 && thumbnail[1] === 0x50 && thumbnail[2] === 0x4E && thumbnail[3] === 0x47;
       const isJPG = thumbnail[0] === 0xFF && thumbnail[1] === 0xD8;
+      const isQOI = thumbnail[0] === 0x71 && thumbnail[1] === 0x6F && thumbnail[2] === 0x69 && thumbnail[3] === 0x66;
 
-      let contentType = 'image/png';
-      if (isJPG) contentType = 'image/jpeg';
+      // QOI format not supported by browser
+      if (isQOI) {
+        res.status(404).send({ error: "Thumbnail format not supported (QOI)" });
+        return;
+      }
 
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour cache
-      res.setHeader('ETag', `"${fileStorageId}-${thumbnailIndex}"`);
-
-      res.send(thumbnail);
+      const mimeType = isJPG ? 'image/jpeg' : 'image/png';
+      const base64 = thumbnail.toString('base64');
+      res.send({
+        thumbnailBase64: `data:${mimeType};base64,${base64}`,
+      });
     } catch (error) {
       this.logger.error(`Failed to get thumbnail ${thumbnailIndex} for ${fileStorageId}: ${error}`);
       res.status(500).send({ error: "Failed to get thumbnail" });

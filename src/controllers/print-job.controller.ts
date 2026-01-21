@@ -10,7 +10,7 @@ import { FileAnalysisService } from "@/services/file-analysis.service";
 import { FileStorageService } from "@/services/file-storage.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
-import { ParamId, ParamInt } from "@/middleware/param-converter.middleware";
+import { ParamId } from "@/middleware/param-converter.middleware";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 
 @route(AppConstants.apiRoute + "/print-jobs")
@@ -471,85 +471,6 @@ export class PrintJobController {
         error: "Delete failed",
         message: error instanceof Error ? error.message : "Unknown error",
       });
-    }
-  }
-
-  @GET()
-  @route("/:id/thumbnails")
-  @before([ParamId("id")])
-  async getThumbnails(req: Request, res: Response) {
-    const jobId = req.local.id;
-    const job = await this.printJobService.getJobByIdOrFail(jobId);
-
-    if (!job.fileStorageId) {
-      res.send({ jobId, thumbnails: [] });
-      return;
-    }
-
-    try {
-
-      // Load metadata to get thumbnail details
-      const metadata = await this.fileStorageService.loadMetadata(job.fileStorageId);
-      const thumbnailMetadata = metadata?._thumbnails || [];
-
-      res.send({
-        jobId,
-        fileStorageId: job.fileStorageId,
-        thumbnails: thumbnailMetadata.map((thumb: any) => ({
-          index: thumb.index,
-          url: `/api/print-jobs/${jobId}/thumbnails/${thumb.index}`,
-          filename: thumb.filename,
-          width: thumb.width,
-          height: thumb.height,
-          format: thumb.format,
-          size: thumb.size,
-        })),
-      });
-    } catch (error) {
-      this.logger.error(`Failed to get thumbnails for job ${jobId}: ${error}`);
-      res.status(500).send({ error: "Failed to get thumbnails" });
-    }
-  }
-
-  @GET()
-  @route("/:id/thumbnails/:index")
-  @before([ParamId("id"), ParamInt("index")])
-  async getThumbnail(req: Request, res: Response) {
-    const jobId = req.local.id;
-    const index = req.local.index;
-    const job = await this.printJobService.getJobByIdOrFail(jobId);
-
-    if (!job.fileStorageId) {
-      throw new NotFoundException("Job has no stored file");
-    }
-
-    try {
-
-      const thumbnail = await this.fileStorageService.getThumbnail(job.fileStorageId, index);
-
-      if (!thumbnail) {
-        throw new NotFoundException(`Thumbnail ${index} not found`);
-      }
-
-      // Determine content type from magic bytes
-      const isPNG = thumbnail[0] === 0x89 && thumbnail[1] === 0x50 && thumbnail[2] === 0x4E && thumbnail[3] === 0x47;
-      const isJPG = thumbnail[0] === 0xFF && thumbnail[1] === 0xD8;
-      const isQOI = thumbnail[0] === 0x71 && thumbnail[1] === 0x6F && thumbnail[2] === 0x69 && thumbnail[3] === 0x66; // 'qoif'
-
-      let contentType = 'image/png'; // default
-      if (isPNG) contentType = 'image/png';
-      else if (isJPG) contentType = 'image/jpeg';
-      else if (isQOI) contentType = 'image/qoi';
-
-      // Set headers BEFORE sending
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour cache
-      res.setHeader('ETag', `"${job.fileStorageId}-${index}"`);
-      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // Allow cross-origin access
-      res.send(thumbnail);
-    } catch (error) {
-      this.logger.error(`Failed to get thumbnail ${index} for job ${jobId}: ${error}`);
-      res.status(500).send({ error: "Failed to get thumbnail" });
     }
   }
 
