@@ -31,17 +31,25 @@ export class FileStorageController {
       const files = await this.fileStorageService.listAllFiles();
 
       res.send({
-        files: files.map(file => ({
-          fileStorageId: file.fileStorageId,
-          fileName: file.fileName,
-          fileFormat: file.fileFormat,
-          fileSize: file.fileSize,
-          fileHash: file.fileHash,
-          createdAt: file.createdAt,
-          thumbnailCount: file.thumbnailCount,
-          thumbnailsUrl: file.thumbnailCount > 0 ? `/api/file-storage/${file.fileStorageId}/thumbnail/0` : null,
-          metadata: file.metadata,
-        })),
+        files: files.map(file => {
+          const thumbnails = (file.metadata?._thumbnails || []).map((thumb: any) => ({
+            index: thumb.index,
+            width: thumb.width,
+            height: thumb.height,
+            format: thumb.format,
+            size: thumb.size,
+          }));
+          return {
+            fileStorageId: file.fileStorageId,
+            fileName: file.fileName,
+            fileFormat: file.fileFormat,
+            fileSize: file.fileSize,
+            fileHash: file.fileHash,
+            createdAt: file.createdAt,
+            thumbnails,
+            metadata: file.metadata,
+          };
+        }),
         totalCount: files.length,
       });
     } catch (error) {
@@ -67,6 +75,14 @@ export class FileStorageController {
         return;
       }
 
+      const thumbnails = (file.metadata?._thumbnails || []).map((thumb: any) => ({
+        index: thumb.index,
+        width: thumb.width,
+        height: thumb.height,
+        format: thumb.format,
+        size: thumb.size,
+      }));
+
       res.send({
         fileStorageId: file.fileStorageId,
         fileName: file.fileName,
@@ -74,8 +90,7 @@ export class FileStorageController {
         fileSize: file.fileSize,
         fileHash: file.fileHash,
         createdAt: file.createdAt,
-        thumbnailCount: file.thumbnailCount,
-        thumbnailsUrl: file.thumbnailCount > 0 ? `/api/file-storage/${file.fileStorageId}/thumbnail/0` : null,
+        thumbnails,
         metadata: file.metadata,
       });
     } catch (error) {

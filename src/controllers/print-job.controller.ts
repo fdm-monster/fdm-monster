@@ -64,7 +64,26 @@ export class PrintJobController {
       pageSize,
     );
 
-    res.send({ items, count, pages: Math.ceil(count / pageSize) });
+    const itemsWithThumbnails = await Promise.all(
+      items.map(async (job) => {
+        let thumbnails: any[] = [];
+        if (job.fileStorageId) {
+          try {
+            const metadata = await this.fileStorageService.loadMetadata(job.fileStorageId);
+            thumbnails = (metadata?._thumbnails || []).map((thumb: any) => ({
+              index: thumb.index,
+              width: thumb.width,
+              height: thumb.height,
+              format: thumb.format,
+              size: thumb.size,
+            }));
+          } catch {}
+        }
+        return { ...job, thumbnails };
+      })
+    );
+
+    res.send({ items: itemsWithThumbnails, count, pages: Math.ceil(count / pageSize) });
   }
 
   @GET()
@@ -76,17 +95,21 @@ export class PrintJobController {
     const job = await this.printJobService.getJobByIdOrFail(jobId, ['printer']);
 
     try {
-      // Get thumbnail count if available
-      let thumbnailCount = 0;
+      let thumbnails: any[] = [];
       if (job.fileStorageId) {
-        const thumbnails = await this.fileStorageService.listThumbnails(job.fileStorageId);
-        thumbnailCount = thumbnails.length;
+        const metadata = await this.fileStorageService.loadMetadata(job.fileStorageId);
+        thumbnails = (metadata?._thumbnails || []).map((thumb: any) => ({
+          index: thumb.index,
+          width: thumb.width,
+          height: thumb.height,
+          format: thumb.format,
+          size: thumb.size,
+        }));
       }
 
       res.send({
         ...job,
-        thumbnailCount,
-        thumbnailsUrl: thumbnailCount > 0 ? `/api/print-jobs/${jobId}/thumbnails` : null,
+        thumbnails,
       });
     } catch (error) {
       this.logger.error(`Failed to get job ${jobId}: ${error}`);
@@ -102,10 +125,9 @@ export class PrintJobController {
     const job = await this.printJobService.getJobByIdOrFail(jobId);
 
     try {
-      // Only allow marking UNKNOWN jobs as completed
-      if (job.status !== "UNKNOWN") {
+      if (["PENDING", "QUEUED"].includes(job.status)) {
         res.status(400).send({
-          error: "Can only mark UNKNOWN jobs as completed",
+          error: "Can only mark jobs which are not \"PENDING\" | \"QUEUED\" as completed",
           currentStatus: job.status,
           suggestion: "This endpoint is for resolving jobs with unknown state",
         });
@@ -114,7 +136,6 @@ export class PrintJobController {
 
       this.logger.log(`Manually marking job ${jobId} as COMPLETED (was UNKNOWN)`);
 
-      // Mark as completed
       job.status = "COMPLETED";
       job.endedAt = new Date();
       job.progress = 100;
