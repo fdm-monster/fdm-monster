@@ -87,7 +87,7 @@ describe("PrintJobController", () => {
         const job = await printJobService.markStarted(printer.id, "test-printing-completed.gcode");
 
         job.status = "QUEUED";
-        await printJobService.printJobRepository.save(job!);
+        await printJobService.printJobRepository.save(job);
 
         const res = await testRequest
           .post(`${baseRoute}/${job!.id}/set-completed`)
