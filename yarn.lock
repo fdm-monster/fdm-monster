@@ -614,7 +614,7 @@ __metadata:
     class-validator: "npm:0.14.3"
     connect-history-api-fallback: "npm:2.0.0"
     cookie-parser: "npm:1.4.7"
-    cors: "npm:2.8.5"
+    cors: "npm:2.8.6"
     cross-env: "npm:10.1.0"
     dotenv: "npm:17.2.3"
     eventemitter2: "npm:6.4.9"
@@ -4558,7 +4558,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cors@npm:2.8.5, cors@npm:~2.8.5":
+"cors@npm:2.8.6":
+  version: 2.8.6
+  resolution: "cors@npm:2.8.6"
+  dependencies:
+    object-assign: "npm:^4"
+    vary: "npm:^1"
+  checksum: 10c0/ab2bc57b8af8ef8476682a59647f7c55c1a7d406b559ac06119aa1c5f70b96d35036864d197b24cf86e228e4547231088f1f94ca05061dbb14d89cc0bc9d4cab
+  languageName: node
+  linkType: hard
+
+"cors@npm:~2.8.5":
   version: 2.8.5
   resolution: "cors@npm:2.8.5"
   dependencies:
