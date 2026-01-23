@@ -184,7 +184,7 @@ export class BambuApiStub implements IPrinterApi {
   async getFile(path: string): Promise<FileDto> {
     this.logger.debug(`[STUB] Getting file info: ${path}`, this.logMeta());
     await this.ensureFtpConnected();
-    const files = await this.client.ftp.listFiles("/sdcard");
+    const files = await this.client.ftp.listFiles("/");
 
     const file = files.find((f) => f.name === path || f.name.endsWith(path));
     if (!file) {
@@ -201,7 +201,7 @@ export class BambuApiStub implements IPrinterApi {
   async getFiles(): Promise<FileDto[]> {
     this.logger.debug("[STUB] Getting files list", this.logMeta());
     await this.ensureFtpConnected();
-    const files = await this.client.ftp.listFiles("/sdcard");
+    const files = await this.client.ftp.listFiles("/");
 
     return files.map((file) => ({
       path: file.name,
@@ -261,7 +261,7 @@ export class BambuApiStub implements IPrinterApi {
   async deleteFile(path: string): Promise<void> {
     this.logger.log(`[STUB] Deleting file: ${path}`, this.logMeta());
     await this.ensureFtpConnected();
-    await this.client.ftp.deleteFile(`/sdcard/${path}`);
+    await this.client.ftp.deleteFile(`/cache/${path}`);
   }
 
   deleteFolder(path: string): Promise<void> {
