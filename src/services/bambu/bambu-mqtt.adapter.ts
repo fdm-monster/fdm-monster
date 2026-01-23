@@ -310,10 +310,8 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
   async startPrint(filename: string): Promise<void> {
     await this.sendCommand({
       print: {
-        command: "project_file",
+        command: "gcode_file",
         param: filename,
-        url: `file:///cache/${ filename }`,
-        subtask_name: filename,
         sequence_id: this.sequenceIdCounter++,
       },
     });

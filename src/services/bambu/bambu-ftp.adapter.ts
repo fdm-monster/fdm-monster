@@ -104,6 +104,7 @@ export class BambuFtpAdapter {
     try {
       this.logger.log(`Connecting ftp ${dirPath}`);
       const files = await this.ftpClient!.list(dirPath);
+      console.log(JSON.stringify(files));
       this.logger.debug(`Listed ${files.length} files in ${dirPath}`);
       return files;
     } catch (error) {

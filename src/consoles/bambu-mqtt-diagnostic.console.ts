@@ -301,6 +301,7 @@ function printMenu() {
   console.log("  [c] Clear screen              [j] Show raw JSON");
   console.log("  [p] Pause print               [u] Resume print");
   console.log("  [x] Stop print                [g] Send GCode");
+  console.log("  [h] Home X (G28 X)            [t] Start print (file path)");
   console.log(`  [l] Toggle dump (${dumpEnabled ? "ON" : "OFF"})           [f] Show dump file path`);
   console.log("  [q] Quit");
   console.log("------------------------------------------------------------------");
@@ -529,6 +530,32 @@ async function handleCommand(input: string) {
       log("Sending stop command...", "INFO");
       await sendPrintCommand("stop");
       break;
+
+    case "h":
+      log("Sending G28 X (home X axis)...", "INFO");
+      await sendGcode("G28 X");
+      break;
+
+    case "t":
+      rl.question("Enter file path (e.g. cache/file.gcode): ", async (filePath) => {
+        if (filePath.trim()) {
+          log(`Starting print: ${filePath.trim()}`, "INFO");
+          await sendPrintCommand("project_file", {
+            param: `Metadata/plate_1.gcode`,
+            url: `file:///sdcard/${filePath.trim()}`,
+            subtask_name: path.basename(filePath.trim()),
+            bed_leveling: true,
+            flow_cali: true,
+            vibration_cali: true,
+            layer_inspect: false,
+            use_ams: true,
+          });
+        } else {
+          log("No file path entered", "WARN");
+        }
+        printMenu();
+      });
+      return;
 
     case "g":
       rl.question("Enter GCode: ", async (gcode) => {
