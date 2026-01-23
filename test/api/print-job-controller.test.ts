@@ -82,16 +82,19 @@ describe("PrintJobController", () => {
         expect(updatedJob?.progress).toBe(100);
       });
 
-      it("should reject marking non-UNKNOWN job as COMPLETED", async () => {
+      it("should reject marking QUEUED job as COMPLETED", async () => {
         const printer = await createTestPrinter(testRequest);
         const job = await printJobService.markStarted(printer.id, "test-printing-completed.gcode");
+
+        job.status = "QUEUED";
+        await printJobService.printJobRepository.save(job);
 
         const res = await testRequest
           .post(`${baseRoute}/${job!.id}/set-completed`)
           .set("Accept", "application/json");
 
         expect(res.status).toBe(400);
-        expect(res.body.error).toContain("Can only mark UNKNOWN jobs");
+        expect(res.body.error).toContain("Can only mark jobs which are not \"PENDING\" | \"QUEUED\" as completed");
       });
     });
 
