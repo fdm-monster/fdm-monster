@@ -140,7 +140,7 @@ export class BambuApi implements IPrinterApi {
   async startPrint(path: string): Promise<void> {
     this.logger.log(`Starting print: ${path}`, this.logMeta());
     const mqttAdapter = this.getMqttAdapter();
-    await mqttAdapter.startPrint(path);
+    await mqttAdapter.startPrint("/model/" + path);
   }
 
   async pausePrint(): Promise<void> {
@@ -203,7 +203,7 @@ export class BambuApi implements IPrinterApi {
   async getFiles(): Promise<FileDto[]> {
     this.logger.debug("Listing files", this.logMeta());
     await this.ensureFtpConnected();
-    const files = await this.client.ftp.listFiles("/cache");
+    const files = await this.client.ftp.listFiles("/model");
 
     return files
       .filter((f) => f.isFile) // Only files, not directories
