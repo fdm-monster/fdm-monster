@@ -113,6 +113,8 @@ let nozzleTemp = 25;
 let bedTemp = 25;
 let printStartTime = 0;
 const PRINT_DURATION = 20; // 20 seconds
+let hasReceivedPushall = false; // Don't publish until client requests it
+let publishInterval: NodeJS.Timeout | null = null;
 
 // Generate TLS certificates and start server
 (async () => {
@@ -156,22 +158,9 @@ const PRINT_DURATION = 20; // 20 seconds
     rejectUnauthorized: false,
   });
 
-  mqttClient.on("connect", () => {
-    console.log(`[BAMBU MOCK MQTT] Connected to MQTT broker at localhost:${mqttPort}`);
-    console.log(`[BAMBU MOCK MQTT] Publishing to topic: device/${serial}/report`);
+  const reportTopic = `device/${serial}/report`;
 
-    const reportTopic = `device/${serial}/report`;
-    const requestTopic = `device/${serial}/request`;
-
-    mqttClient.subscribe(requestTopic, (err) => {
-      if (err) {
-        console.error(`[BAMBU MOCK MQTT] Failed to subscribe to ${requestTopic}:`, err);
-      } else {
-        console.log(`[BAMBU MOCK MQTT] Subscribed to topic: ${requestTopic}`);
-      }
-    });
-
-    const publishState = () => {
+  const publishState = (sequenceId?: number | string) => {
       // Clear finished state after it's been sent
       if (isFinished) {
         isFinished = false;
@@ -215,7 +204,9 @@ const PRINT_DURATION = 20; // 20 seconds
 
       const fileName = isFinished ? finishedFileName : currentPrintFile;
       const hasJob = isPrinting || isFinished;
-      const printingLabel = isPaused ? "paused" : (isFinished ? "finished" : "printing");
+      const finishedLabel = isFinished ? "finished" : "printing";
+      const printingLabel = isPaused ? "paused" : finishedLabel;
+      const progressOrFinished = isFinished ? 100 : printProgress;
 
       const state = {
         print: {
@@ -230,7 +221,7 @@ const PRINT_DURATION = 20; // 20 seconds
           gcode_state: gcodeState,
           gcode_file: fileName || "",
           wifi_signal: "-45dBm",
-          layer_num: hasJob ? Math.floor((isFinished ? 100 : printProgress) / 2) : 0,
+          layer_num: hasJob ? Math.floor(progressOrFinished / 2) : 0,
           total_layer_num: hasJob ? 50 : 0,
           subtask_name: fileName || "",
           heatbreak_fan_speed: isPrinting ? "5000" : "0",
@@ -243,7 +234,7 @@ const PRINT_DURATION = 20; // 20 seconds
           lifecycle: "product",
           command: "push_status",
           msg: 0,
-          sequence_id: String(Date.now()),
+          sequence_id: sequenceId ? String(Date.now()) : String(sequenceId),
         },
       };
 
@@ -254,19 +245,61 @@ const PRINT_DURATION = 20; // 20 seconds
       });
     };
 
-    setInterval(publishState, MESSAGE_INTERVAL);
+  mqttClient.on("connect", () => {
+    console.log(`[BAMBU MOCK MQTT] Connected to MQTT broker at localhost:${mqttPort}`);
+    console.log(`[BAMBU MOCK MQTT] Publishing to topic: device/${serial}/report`);
 
+    // Real Bambu printers use the same /report topic for both commands and state updates
+    mqttClient.subscribe(reportTopic, (err) => {
+      if (err) {
+        console.error(`[BAMBU MOCK MQTT] Failed to subscribe to ${reportTopic}:`, err);
+      } else {
+        console.log(`[BAMBU MOCK MQTT] Subscribed to topic: ${reportTopic}`);
+      }
+    });
+
+    // Send immediate status update on connection (like real printers do)
+    console.log(`[BAMBU MOCK MQTT] Sending initial status update`);
     publishState();
+
+    // If we haven't received pushall yet, wait for it
+    if (!hasReceivedPushall) {
+      console.log(`[BAMBU MOCK MQTT] Waiting for pushall command to start periodic updates...`);
+    }
   });
 
   mqttClient.on("message", (topic, message) => {
     try {
       const payload = JSON.parse(message.toString());
+
+      // Skip our own published status messages (push_status)
+      if (payload.print?.command === "push_status") {
+        return;
+      }
+
       console.log(`[BAMBU MOCK MQTT] Received command on ${topic}:`, JSON.stringify(payload));
+
+      // Handle pushall command (initialization)
+      if (payload.pushing?.command === "pushall") {
+        const sequenceId = payload.pushing.sequence_id;
+        console.log(`[BAMBU MOCK MQTT] Received pushall command with sequence_id: ${sequenceId}`);
+
+        if (hasReceivedPushall) {
+          publishState(sequenceId);
+        } else {
+          hasReceivedPushall = true;
+          console.log(`[BAMBU MOCK MQTT] Starting periodic state publishing every ${ MESSAGE_INTERVAL }ms`);
+
+          publishState(sequenceId);
+          publishInterval = setInterval(publishState, MESSAGE_INTERVAL);
+        }
+        return;
+      }
 
       if (payload.print?.command) {
         const command = payload.print.command;
-        console.log(`[BAMBU MOCK MQTT] Processing command: ${command}`);
+        const sequenceId = payload.print.sequence_id;
+        console.log(`[BAMBU MOCK MQTT] Processing command: ${command} with sequence_id: ${sequenceId}`);
 
         if (command === "project_file" || command === "start") {
           // Extract filename from command
@@ -314,6 +347,10 @@ const PRINT_DURATION = 20; // 20 seconds
             }, MESSAGE_INTERVAL * 2);
           }
         }
+
+        // Send immediate response with matching sequence_id
+        console.log(`[BAMBU MOCK MQTT] Sending response with sequence_id: ${sequenceId}`);
+        publishState(sequenceId);
       }
     } catch (error) {
       console.error(`[BAMBU MOCK MQTT] Error processing message:`, error);
@@ -331,6 +368,11 @@ const PRINT_DURATION = 20; // 20 seconds
   process.on("SIGINT", async () => {
     console.log("\n[BAMBU MOCK] Shutting down gracefully...");
 
+    if (publishInterval) {
+      clearInterval(publishInterval);
+      publishInterval = null;
+    }
+
     if (mqttClient.connected) {
       console.log("[BAMBU MOCK MQTT] Disconnecting MQTT client...");
       await mqttClient.endAsync();
@@ -345,6 +387,11 @@ const PRINT_DURATION = 20; // 20 seconds
 
   process.on("SIGTERM", async () => {
     console.log("\n[BAMBU MOCK] Received SIGTERM. Shutting down...");
+
+    if (publishInterval) {
+      clearInterval(publishInterval);
+      publishInterval = null;
+    }
 
     if (mqttClient.connected) {
       await mqttClient.endAsync();
