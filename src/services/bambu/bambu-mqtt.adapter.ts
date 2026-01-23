@@ -462,9 +462,11 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     const hasError = !isConnected || state.print_error !== 0;
 
     const isPausedText = isPaused ? "Paused" : "Printing";
+
+    const onlineText = isPrinting ? isPausedText : "Operational";
     return {
       state: {
-        text: isConnected ? (isPrinting ? isPausedText : "Operational") : "Offline",
+        text: isConnected ? onlineText : "Offline",
         flags: {
           operational: isConnected,
           printing: isConnected && isPrinting && !isPaused,

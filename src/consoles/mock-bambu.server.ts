@@ -204,7 +204,9 @@ let publishInterval: NodeJS.Timeout | null = null;
 
       const fileName = isFinished ? finishedFileName : currentPrintFile;
       const hasJob = isPrinting || isFinished;
-      const printingLabel = isPaused ? "paused" : (isFinished ? "finished" : "printing");
+      const finishedLabel = isFinished ? "finished" : "printing";
+      const printingLabel = isPaused ? "paused" : finishedLabel;
+      const progressOrFinished = isFinished ? 100 : printProgress;
 
       const state = {
         print: {
@@ -219,7 +221,7 @@ let publishInterval: NodeJS.Timeout | null = null;
           gcode_state: gcodeState,
           gcode_file: fileName || "",
           wifi_signal: "-45dBm",
-          layer_num: hasJob ? Math.floor((isFinished ? 100 : printProgress) / 2) : 0,
+          layer_num: hasJob ? Math.floor(progressOrFinished / 2) : 0,
           total_layer_num: hasJob ? 50 : 0,
           subtask_name: fileName || "",
           heatbreak_fan_speed: isPrinting ? "5000" : "0",
@@ -232,7 +234,7 @@ let publishInterval: NodeJS.Timeout | null = null;
           lifecycle: "product",
           command: "push_status",
           msg: 0,
-          sequence_id: sequenceId !== undefined ? String(sequenceId) : String(Date.now()),
+          sequence_id: sequenceId ? String(Date.now()) : String(sequenceId),
         },
       };
 
@@ -282,18 +284,14 @@ let publishInterval: NodeJS.Timeout | null = null;
         const sequenceId = payload.pushing.sequence_id;
         console.log(`[BAMBU MOCK MQTT] Received pushall command with sequence_id: ${sequenceId}`);
 
-        if (!hasReceivedPushall) {
-          hasReceivedPushall = true;
-          console.log(`[BAMBU MOCK MQTT] Starting periodic state publishing every ${MESSAGE_INTERVAL}ms`);
-
-          // Send immediate response with matching sequence_id
+        if (hasReceivedPushall) {
           publishState(sequenceId);
-
-          // Start periodic publishing
-          publishInterval = setInterval(publishState, MESSAGE_INTERVAL);
         } else {
-          // Already started, just send immediate response
+          hasReceivedPushall = true;
+          console.log(`[BAMBU MOCK MQTT] Starting periodic state publishing every ${ MESSAGE_INTERVAL }ms`);
+
           publishState(sequenceId);
+          publishInterval = setInterval(publishState, MESSAGE_INTERVAL);
         }
         return;
       }
