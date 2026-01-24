@@ -9,6 +9,7 @@ import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access }
 import { createHash } from "node:crypto";
 import { readFileSync, existsSync } from "node:fs";
 
+// edited by claude on 2026.01.24.09.30
 export interface IFileStorageService {
   saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
   getFile(fileStorageId: string): Promise<Buffer>;
@@ -22,7 +23,10 @@ export interface IFileStorageService {
   saveThumbnails(fileStorageId: string, thumbnails: Array<{data?: string; format?: string; width?: number; height?: number}>): Promise<Array<{index: number; path: string; filename: string; width: number; height: number; format: string; size: number}>>;
   getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null>;
   listThumbnails(fileStorageId: string): Promise<string[]>;
+  updateFileMetadata(fileStorageId: string, updates: {fileName?: string; metadata?: any}): Promise<void>;
+  batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; metadata?: any}>): Promise<{success: Array<{fileStorageId: string}>; failed: Array<{fileStorageId: string; error: string}>}>;
 }
+// End of Claude's edit
 
 /**
  * Service for managing print job file storage with optional queue support
@@ -517,5 +521,75 @@ export class FileStorageService implements IFileStorageService {
       return null;
     }
   }
+
+  // edited by claude on 2026.01.24.09.30
+  /**
+   * Update file metadata (fileName path and/or custom metadata fields)
+   * Only updates the metadata JSON, does not move the physical file
+   */
+  async updateFileMetadata(fileStorageId: string, updates: {fileName?: string; metadata?: any}): Promise<void> {
+    const filePath = await this.findFilePath(fileStorageId);
+    if (!filePath) {
+      throw new Error(`File ${fileStorageId} not found`);
+    }
+
+    // Load existing metadata
+    const existingMetadata = await this.loadMetadata(fileStorageId);
+    if (!existingMetadata) {
+      throw new Error(`Metadata for ${fileStorageId} not found`);
+    }
+
+    // Merge updates into existing metadata
+    const updatedMetadata = {
+      ...existingMetadata,
+      ...(updates.metadata || {}),
+    };
+
+    // Update fileName if provided
+    if (updates.fileName !== undefined) {
+      updatedMetadata._originalFileName = updates.fileName;
+      updatedMetadata.fileName = updates.fileName;
+    }
+
+    // Save updated metadata
+    const metadataPath = filePath + ".json";
+    await writeFile(metadataPath, JSON.stringify(updatedMetadata, null, 2), "utf8");
+    this.logger.log(`Updated metadata for ${fileStorageId}`);
+  }
+
+  /**
+   * Batch update file metadata for multiple files
+   * Returns success/failure results for each file
+   */
+  async batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; metadata?: any}>): Promise<{
+    success: Array<{fileStorageId: string}>;
+    failed: Array<{fileStorageId: string; error: string}>;
+  }> {
+    const results = {
+      success: [] as Array<{fileStorageId: string}>,
+      failed: [] as Array<{fileStorageId: string; error: string}>,
+    };
+
+    for (const update of updates) {
+      try {
+        await this.updateFileMetadata(update.fileStorageId, {
+          fileName: update.fileName,
+          metadata: update.metadata,
+        });
+        results.success.push({ fileStorageId: update.fileStorageId });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        results.failed.push({
+          fileStorageId: update.fileStorageId,
+          error: errorMessage,
+        });
+        this.logger.warn(`Failed to update ${update.fileStorageId}: ${errorMessage}`);
+      }
+    }
+
+    this.logger.log(`Batch update complete: ${results.success.length} succeeded, ${results.failed.length} failed`);
+    return results;
+  }
+  // End of Claude's edit
 }
 

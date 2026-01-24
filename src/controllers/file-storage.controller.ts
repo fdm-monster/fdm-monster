@@ -1,4 +1,5 @@
-import { before, DELETE, GET, POST, route } from "awilix-express";
+// edited by claude on 2026.01.24.09.30
+import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { Request, Response } from "express";
 import { authorizeRoles, authenticate } from "@/middleware/authenticate";
@@ -10,6 +11,9 @@ import { LoggerService } from "@/handlers/logger";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { extname } from "node:path";
+import { validateInput } from "@/handlers/validators";
+import { updateFileMetadataSchema, batchUpdateFileMetadataSchema } from "./validation/file-storage-controller.validation";
+// End of Claude's edit
 
 @route(AppConstants.apiRoute + "/file-storage")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
@@ -98,6 +102,61 @@ export class FileStorageController {
       res.status(500).send({ error: "Failed to get file metadata" });
     }
   }
+
+  // edited by claude on 2026.01.24.09.30
+  /**
+   * Update file metadata (fileName path and/or custom metadata)
+   * PATCH /api/file-storage/:fileStorageId
+   */
+  @PATCH()
+  @route("/:fileStorageId")
+  async updateFileMetadata(req: Request, res: Response) {
+    const { fileStorageId } = req.params as { fileStorageId: string };
+
+    try {
+      const validatedData = validateInput(updateFileMetadataSchema, req.body);
+
+      await this.fileStorageService.updateFileMetadata(fileStorageId, {
+        fileName: validatedData.fileName,
+        metadata: validatedData.metadata,
+      });
+
+      // Return updated file info
+      const updatedFile = await this.fileStorageService.getFileInfo(fileStorageId);
+
+      if (!updatedFile) {
+        res.status(404).send({ error: "File not found after update" });
+        return;
+      }
+
+      const thumbnails = (updatedFile.metadata?._thumbnails || []).map((thumb: any) => ({
+        index: thumb.index,
+        width: thumb.width,
+        height: thumb.height,
+        format: thumb.format,
+        size: thumb.size,
+      }));
+
+      res.send({
+        fileStorageId: updatedFile.fileStorageId,
+        fileName: updatedFile.fileName,
+        fileFormat: updatedFile.fileFormat,
+        fileSize: updatedFile.fileSize,
+        fileHash: updatedFile.fileHash,
+        createdAt: updatedFile.createdAt,
+        thumbnails,
+        metadata: updatedFile.metadata,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to update file metadata for ${fileStorageId}: ${error}`);
+      if (error instanceof Error && error.message.includes("not found")) {
+        res.status(404).send({ error: error.message });
+      } else {
+        res.status(500).send({ error: "Failed to update file metadata" });
+      }
+    }
+  }
+  // End of Claude's edit
 
   /**
    * Delete a stored file and its thumbnails
@@ -206,6 +265,35 @@ export class FileStorageController {
       res.status(500).send({ error: "Failed to get thumbnail" });
     }
   }
+
+  // edited by claude on 2026.01.24.09.30
+  /**
+   * Batch update file metadata for multiple files
+   * PATCH /api/file-storage/batch
+   */
+  @PATCH()
+  @route("/batch")
+  async batchUpdateFileMetadata(req: Request, res: Response) {
+    try {
+      const validatedData = validateInput(batchUpdateFileMetadataSchema, req.body);
+
+      const result = await this.fileStorageService.batchUpdateFileMetadata(validatedData.updates);
+
+      this.logger.log(`Batch update completed: ${result.success.length} succeeded, ${result.failed.length} failed`);
+
+      res.send({
+        message: "Batch update completed",
+        successCount: result.success.length,
+        failedCount: result.failed.length,
+        success: result.success,
+        failed: result.failed,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to batch update file metadata: ${error}`);
+      res.status(500).send({ error: "Failed to batch update file metadata" });
+    }
+  }
+  // End of Claude's edit
 
   /**
    * Upload a file to storage and analyze it
