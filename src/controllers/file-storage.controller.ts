@@ -114,7 +114,7 @@ export class FileStorageController {
     const { fileStorageId } = req.params as { fileStorageId: string };
 
     try {
-      const validatedData = validateInput(updateFileMetadataSchema, req.body);
+      const validatedData = await validateInput(req.body, updateFileMetadataSchema);
 
       await this.fileStorageService.updateFileMetadata(fileStorageId, {
         fileName: validatedData.fileName,
@@ -275,7 +275,7 @@ export class FileStorageController {
   @route("/batch")
   async batchUpdateFileMetadata(req: Request, res: Response) {
     try {
-      const validatedData = validateInput(batchUpdateFileMetadataSchema, req.body);
+      const validatedData = await validateInput(req.body, batchUpdateFileMetadataSchema);
 
       const result = await this.fileStorageService.batchUpdateFileMetadata(validatedData.updates);
 
