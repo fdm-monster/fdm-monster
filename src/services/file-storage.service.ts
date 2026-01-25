@@ -23,8 +23,8 @@ export interface IFileStorageService {
   saveThumbnails(fileStorageId: string, thumbnails: Array<{data?: string; format?: string; width?: number; height?: number}>): Promise<Array<{index: number; path: string; filename: string; width: number; height: number; format: string; size: number}>>;
   getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null>;
   listThumbnails(fileStorageId: string): Promise<string[]>;
-  updateFileMetadata(fileStorageId: string, updates: {fileName?: string; metadata?: any}): Promise<void>;
-  batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; metadata?: any}>): Promise<{success: Array<{fileStorageId: string}>; failed: Array<{fileStorageId: string; error: string}>}>;
+  updateFileMetadata(fileStorageId: string, updates: {fileName?: string; path?: string; metadata?: any}): Promise<void>;
+  batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; path?: string; metadata?: any}>): Promise<{success: Array<{fileStorageId: string}>; failed: Array<{fileStorageId: string; error: string}>}>;
 }
 // End of Claude's edit
 
@@ -527,7 +527,7 @@ export class FileStorageService implements IFileStorageService {
    * Update file metadata (fileName path and/or custom metadata fields)
    * Only updates the metadata JSON, does not move the physical file
    */
-  async updateFileMetadata(fileStorageId: string, updates: {fileName?: string; metadata?: any}): Promise<void> {
+  async updateFileMetadata(fileStorageId: string, updates: {fileName?: string; path?: string; metadata?: any}): Promise<void> {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) {
       throw new Error(`File ${fileStorageId} not found`);
@@ -551,6 +551,13 @@ export class FileStorageService implements IFileStorageService {
       updatedMetadata.fileName = updates.fileName;
     }
 
+    // edited by claude on 2026.01.24.17.45 - Add path field support
+    // Update path if provided (virtual folder organization)
+    if (updates.path !== undefined) {
+      updatedMetadata._path = updates.path;
+    }
+    // End of Claude's edit
+
     // Save updated metadata
     const metadataPath = filePath + ".json";
     await writeFile(metadataPath, JSON.stringify(updatedMetadata, null, 2), "utf8");
@@ -561,7 +568,7 @@ export class FileStorageService implements IFileStorageService {
    * Batch update file metadata for multiple files
    * Returns success/failure results for each file
    */
-  async batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; metadata?: any}>): Promise<{
+  async batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; path?: string; metadata?: any}>): Promise<{
     success: Array<{fileStorageId: string}>;
     failed: Array<{fileStorageId: string; error: string}>;
   }> {
@@ -574,6 +581,7 @@ export class FileStorageService implements IFileStorageService {
       try {
         await this.updateFileMetadata(update.fileStorageId, {
           fileName: update.fileName,
+          path: update.path, // edited by claude on 2026.01.24.17.45 - Add path field support
           metadata: update.metadata,
         });
         results.success.push({ fileStorageId: update.fileStorageId });

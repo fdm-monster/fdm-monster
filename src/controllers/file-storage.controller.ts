@@ -118,6 +118,7 @@ export class FileStorageController {
 
       await this.fileStorageService.updateFileMetadata(fileStorageId, {
         fileName: validatedData.fileName,
+        path: validatedData.path, // edited by claude on 2026.01.24.17.45 - Add path field support
         metadata: validatedData.metadata,
       });
 
