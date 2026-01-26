@@ -69,7 +69,7 @@ export class PrusaLinkApi implements IPrinterApi {
     await this.getVersion();
   }
 
-  async getFiles(): Promise<FileDto[]> {
+  async getFiles(recursive = true): Promise<FileDto[]> {
     const response = await this.client.get<PL_FileResponseDto>("/api/files");
     return response.data.files
       .filter((dir) => dir.path === "/usb")[0]

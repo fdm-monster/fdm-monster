@@ -199,7 +199,7 @@ export class BambuApiStub implements IPrinterApi {
     };
   }
 
-  async getFiles(): Promise<FileDto[]> {
+  async getFiles(recursive = true): Promise<FileDto[]> {
     this.logger.debug("[STUB] Getting files list", this.logMeta());
     await this.ensureFtpConnected();
     const files = await this.client.ftp.listFiles("/");

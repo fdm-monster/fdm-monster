@@ -130,7 +130,7 @@ export class MoonrakerApi implements IPrinterApi {
     return { size: file.size, path, date: file.modified };
   }
 
-  async getFiles(): Promise<FileDto[]> {
+  async getFiles(recursive = true): Promise<FileDto[]> {
     const files = await this.client.getServerFilesList(this.login);
     return files.data.result.map((f) => ({ size: f.size, path: f.path, date: f.modified }));
   }
