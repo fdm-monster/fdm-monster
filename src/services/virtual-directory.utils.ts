@@ -199,7 +199,7 @@ export function buildDirectoryTree(
     if (!path) continue;
 
     const parts = path.split("/");
-    const name = parts.at(-1);
+    const name = parts.at(-1)?.toString() || "";
     const parentPath = parts.slice(0, -1).join("/");
 
     const node: TreeNode = {
