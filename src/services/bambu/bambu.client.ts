@@ -35,9 +35,6 @@ export class BambuClient {
     this.ftpAdapter = bambuFtpAdapter;
   }
 
-  /**
-   * Connect to Bambu Lab printer FTP
-   */
   async connect(login: LoginDto): Promise<void> {
     const host = this.extractHost(login.printerURL);
     const accessCode = login.password || "";
@@ -59,9 +56,6 @@ export class BambuClient {
     }
   }
 
-  /**
-   * Disconnect from printer FTP
-   */
   async disconnect(): Promise<void> {
     this.logger.log("Disconnecting from Bambu Lab printer FTP");
     await this.ftpAdapter.disconnect();
@@ -69,23 +63,14 @@ export class BambuClient {
     this.logger.log("Disconnected from Bambu Lab printer FTP");
   }
 
-  /**
-   * Get FTP adapter for direct access
-   */
   get ftp(): BambuFtpAdapter {
     return this.ftpAdapter;
   }
 
-  /**
-   * Check if FTP client is connected
-   */
   get isConnected(): boolean {
     return this.connected && this.ftpAdapter.isConnected;
   }
 
-  /**
-   * Extract host from printer URL (remove protocol, port, etc.)
-   */
   private extractHost(printerURL: string): string {
     try {
       const url = new URL(printerURL);
@@ -99,12 +84,7 @@ export class BambuClient {
     }
   }
 
-  /**
-   * Get API version (for compatibility with existing interface)
-   * Note: Bambu Lab printers don't have a traditional API version endpoint
-   */
   async getApiVersion(_login: LoginDto, _timeout?: number): Promise<{ version: string }> {
-    // Return a static version for now
     return { version: "bambu-1.0" };
   }
 }
