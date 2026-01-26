@@ -21,16 +21,11 @@ export interface BambuEventDto {
   printerType: typeof BambuType;
 }
 
-/**
- * Adapter for Bambu Lab MQTT communication
- * Implements direct MQTT connection to Bambu Lab printers
- */
 export class BambuMqttAdapter implements IWebsocketAdapter {
   protected readonly logger: LoggerService;
   private readonly settingsStore: SettingsStore;
   private readonly eventEmitter2: EventEmitter2;
 
-  // IWebsocketAdapter required properties
   public readonly printerType = BambuType;
   public printerId?: number;
   public socketState: SocketState = SOCKET_STATE.unopened;
@@ -54,13 +49,11 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     this.logger = loggerFactory(BambuMqttAdapter.name);
   }
 
-  // IWebsocketAdapter required methods
   registerCredentials(socketLogin: ISocketLogin): void {
     const { printerId, loginDto } = socketLogin;
     this.printerId = printerId;
     this.login = loginDto;
 
-    // Extract connection details from loginDto
     this.host = loginDto.printerURL?.replace(/^https?:\/\//, "");
     this.accessCode = loginDto.password || null;
     this.serial = loginDto.username || null;
@@ -76,7 +69,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
   }
 
   needsReauth(): boolean {
-    return false; // Bambu doesn't require reauth like OctoPrint
+    return false;
   }
 
   isClosedOrAborted(): boolean {
@@ -84,7 +77,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
   }
 
   async reauthSession(): Promise<void> {
-    // Bambu doesn't need reauthentication
     this.logger.debug("reauthSession called but not needed for Bambu");
   }
 
@@ -122,9 +114,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     this.eventsAllowed = false;
   }
 
-  /**
-   * Connect to printer MQTT broker
-   */
   connect(host: string, accessCode: string, serial: string): void {
     if (this.mqttClient?.connected) {
       this.logger.debug("MQTT already connected");
@@ -236,7 +225,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
         this.updateApiState(API_STATE.noResponse);
         this.logger.warn("MQTT client offline - automatic reconnection will be attempted");
 
-        // Emit offline state to frontend
         if (this.lastState) {
           const offlineMessage = this.transformStateToCurrentMessage(this.lastState);
           this.emitEvent("current", { ...offlineMessage, print: this.lastState }).catch(() => {});
@@ -251,9 +239,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     }
   }
 
-  /**
-   * Disconnect MQTT
-   */
   async disconnect(): Promise<void> {
     if (!this.mqttClient) {
       this.updateSocketState(SOCKET_STATE.closed);
@@ -276,16 +261,10 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     });
   }
 
-  /**
-   * Get last received printer state
-   */
   getLastState(): PrintData | null {
     return this.lastState;
   }
 
-  /**
-   * Send pushall command to start receiving printer data
-   */
   private async sendPushallCommand(): Promise<void> {
     const payload = {
       pushing: {
@@ -303,9 +282,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     this.logger.debug("Connected to printer via MQTT");
   }
 
-  /**
-   * Send command to printer via MQTT
-   */
   async sendCommand(payload: Record<string, any>): Promise<void> {
     if (!this.mqttClient?.connected) {
       throw new Error("MQTT not connected");
@@ -324,31 +300,46 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
           this.logger.error("Failed to send command:", err);
           reject(err);
         } else {
-          this.logger.debug(`Command sent: ${message}`);
+          this.logger.debug(`Command sent: ${ message }`);
           resolve();
         }
       });
     });
   }
 
-  /**
-   * Start print job
-   */
-  async startPrint(filename: string): Promise<void> {
+  async startPrint(filename: string, subtask_name?: string, amsMapping?: number[], plateNumber: number = 1): Promise<void> {
     await this.sendCommand({
       print: {
         command: "project_file",
-        param: filename,
-        url: `file:///sdcard/${ filename }`,
-        subtask_name: filename,
+        param: `Metadata/plate_${plateNumber}.gcode`,
+        project_id: "0", // Always 0 for local prints
+        profile_id: "0", // Always 0 for local prints
+        task_id: "0", // Always 0 for local prints
+        subtask_id: "0", // Always 0 for local prints
+        subtask_name: subtask_name ?? filename,
+
+        file: "", // Filename to print, not needed when "url" is specified with filepath
+        url: `file:///${ filename }`, // URL to print. Root path, protocol can vary. E.g., if sd card, "ftp:///myfile.3mf", "ftp:///cache/myotherfile.3mf"
+        md5: "",
+
+        timelapse: true,
+        bed_type: "auto", // Always "auto" for local prints
+        bed_levelling: true,
+        flow_cali: true,
+        vibration_cali: true,
+        layer_inspect: true,
+
+        // AMS mapping: array where each index represents a filament color in your gcode
+        // and the value is the AMS slot number (0-3) to use, or -1 to skip
+        // Example: [0, 2, -1, 1] means: color 0 uses slot 0, color 1 uses slot 2, color 2 skipped, color 3 uses slot 1
+        ams_mapping: amsMapping ? amsMapping.join(",") : "", // Convert [0, 1, 2, 3] to "0,1,2,3"
+        use_ams: !!amsMapping && amsMapping.length > 0,
+
         sequence_id: this.sequenceIdCounter++,
       },
     });
   }
 
-  /**
-   * Pause print
-   */
   async pausePrint(): Promise<void> {
     await this.sendCommand({
       print: {
@@ -358,9 +349,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     });
   }
 
-  /**
-   * Resume print
-   */
   async resumePrint(): Promise<void> {
     await this.sendCommand({
       print: {
@@ -370,9 +358,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     });
   }
 
-  /**
-   * Stop/cancel print
-   */
   async stopPrint(): Promise<void> {
     await this.sendCommand({
       print: {
@@ -382,9 +367,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     });
   }
 
-  /**
-   * Send custom GCode
-   */
   async sendGcode(gcode: string): Promise<void> {
     await this.sendCommand({
       print: {
@@ -395,32 +377,20 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     });
   }
 
-  /**
-   * Reset socket state
-   */
   resetSocketState(): void {
     this.lastState = null;
   }
 
-  /**
-   * Update socket state and emit event
-   */
   private updateSocketState(state: SocketState): void {
     this.socketState = state;
     this.emitEventSync(WsMessage.WS_STATE_UPDATED, state);
   }
 
-  /**
-   * Update API state and emit event
-   */
   private updateApiState(state: ApiState): void {
     this.apiState = state;
     this.emitEventSync(WsMessage.API_STATE_UPDATED, state);
   }
 
-  /**
-   * Emit event (async)
-   */
   private async emitEvent(event: string, payload?: any): Promise<void> {
     if (!this.eventsAllowed) {
       return;
@@ -434,9 +404,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     } as BambuEventDto);
   }
 
-  /**
-   * Emit event (sync)
-   */
   private emitEventSync(event: string, payload: any): void {
     if (!this.eventsAllowed) {
       return;
@@ -450,9 +417,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     } as BambuEventDto);
   }
 
-  /**
-   * Transform Bambu state to frontend-compatible format
-   */
   private transformStateToCurrentMessage(state: PrintData): any {
     const isPrinting = state.gcode_state === "PRINTING" || state.mc_print_stage === "printing";
     const isPaused = state.mc_print_stage === "paused";
@@ -514,9 +478,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     };
   }
 
-  /**
-   * Handle incoming MQTT message
-   */
   private handleMessage(topic: string, message: Buffer): void {
     try {
       const payload = JSON.parse(message.toString());
@@ -546,9 +507,6 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     }
   }
 
-  /**
-   * Cleanup MQTT client
-   */
   private cleanup(): void {
     if (this.mqttClient) {
       this.mqttClient.removeAllListeners();
