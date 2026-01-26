@@ -122,11 +122,10 @@ export class BambuFtpAdapter {
     return join(storagePath, filename);
   }
 
-  async uploadFile(fileBuffer: Buffer, filename: string, progressToken?: string): Promise<void> {
+  async uploadFile(fileBuffer: Buffer, remotePath: string, progressToken?: string): Promise<void> {
     this.ensureConnected();
 
-    const remotePath = `/${filename}`;
-    const tempPath = this.getFileStoragePath(`bambu-upload-${Date.now()}-${filename}`);
+    const tempPath = this.getFileStoragePath(`bambu-upload-${Date.now()}-${remotePath}`);
 
     try {
       writeFileSync(tempPath, fileBuffer);
@@ -142,7 +141,7 @@ export class BambuFtpAdapter {
       }
 
       // Upload file
-      this.logger.log(`Uploading ${filename} to ${remotePath}`);
+      this.logger.log(`Uploading ${tempPath} to ${remotePath}`);
       await this.ftpClient!.uploadFrom(tempPath, remotePath);
 
       // Stop tracking progress
@@ -152,12 +151,12 @@ export class BambuFtpAdapter {
         this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
       }
 
-      this.logger.log(`File uploaded successfully: ${filename}`);
+      this.logger.log(`File uploaded successfully: ${remotePath}`);
     } catch (error) {
       if (progressToken) {
         this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (error as Error)?.message);
       }
-      this.logger.error(`Upload failed for ${filename}:`, error);
+      this.logger.error(`Upload failed for ${remotePath}:`, error);
       throw error;
     } finally {
       // Clean up temp file
