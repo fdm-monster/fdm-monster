@@ -119,7 +119,7 @@ export interface IPrinterApi {
 
   getFile(path: string): Promise<FileDto>;
 
-  getFiles(): Promise<FileDto[]>;
+  getFiles(recursive?: boolean): Promise<FileDto[]>;
 
   downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream>;
 
