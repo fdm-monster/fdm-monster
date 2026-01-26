@@ -8,6 +8,9 @@ import path, { basename, extname, join } from "node:path";
 import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { readFileSync, existsSync } from "node:fs";
+// edited by claude on 2026.01.25.13.30
+import { createVirtualDirectory, listVirtualDirectories, deleteVirtualDirectory, buildDirectoryTree } from "./virtual-directory.utils";
+// End of Claude's edit
 
 // edited by claude on 2026.01.24.09.30
 export interface IFileStorageService {
@@ -25,6 +28,12 @@ export interface IFileStorageService {
   listThumbnails(fileStorageId: string): Promise<string[]>;
   updateFileMetadata(fileStorageId: string, updates: {fileName?: string; path?: string; metadata?: any}): Promise<void>;
   batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; path?: string; metadata?: any}>): Promise<{success: Array<{fileStorageId: string}>; failed: Array<{fileStorageId: string; error: string}>}>;
+  // edited by claude on 2026.01.25.13.30 - Virtual directory support
+  createVirtualDirectory(virtualPath: string): Promise<Array<{ path: string; markerId: string }>>; // edited by claude on 2026.01.25.15.00
+  listVirtualDirectories(): Promise<Array<{markerId: string; path: string; createdAt: string}>>;
+  deleteVirtualDirectory(markerId: string): Promise<boolean>;
+  getDirectoryTree(): Promise<any>;
+  // End of Claude's edit
 }
 // End of Claude's edit
 
@@ -432,6 +441,7 @@ export class FileStorageService implements IFileStorageService {
 
   /**
    * List all stored files with metadata
+   * edited by claude on 2026.01.25.13.30 - Skip directory markers
    */
   async listAllFiles(): Promise<Array<{
     fileStorageId: string;
@@ -461,6 +471,11 @@ export class FileStorageService implements IFileStorageService {
           // Load metadata
           const metadata = await this.loadMetadata(fileId);
 
+          // edited by claude on 2026.01.25.13.30
+          // Skip directory markers (JSON-only files with type: "directory")
+          if (metadata?.type === 'directory') continue;
+          // End of Claude's edit
+
           // Count thumbnails
           const thumbnails = await this.listThumbnails(fileId);
 
@@ -483,6 +498,7 @@ export class FileStorageService implements IFileStorageService {
     // Sort by creation date, newest first
     return files.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
+  // End of Claude's edit
 
   /**
    * Get file information with metadata
@@ -597,6 +613,56 @@ export class FileStorageService implements IFileStorageService {
 
     this.logger.log(`Batch update complete: ${results.success.length} succeeded, ${results.failed.length} failed`);
     return results;
+  }
+  // End of Claude's edit
+
+  // edited by claude on 2026.01.25.13.30
+  /**
+   * Create a virtual directory (marker file)
+   * edited by claude on 2026.01.25.15.00 - Now creates all intermediate path markers
+   * Returns array of created markers with path and markerId
+   */
+  async createVirtualDirectory(virtualPath: string): Promise<Array<{ path: string; markerId: string }>> {
+    const createdMarkers = await createVirtualDirectory(this.storageBasePath, virtualPath);
+    this.logger.log(`Created virtual directory: ${virtualPath} (${createdMarkers.length} markers created)`);
+    return createdMarkers;
+  }
+  // End of Claude's edit
+
+  /**
+   * List all virtual directory markers
+   */
+  async listVirtualDirectories(): Promise<Array<{markerId: string; path: string; createdAt: string}>> {
+    const markers = await listVirtualDirectories(this.storageBasePath);
+    return markers.map(m => ({
+      markerId: m._fileStorageId,
+      path: m.path,
+      createdAt: m.createdAt,
+    }));
+  }
+
+  /**
+   * Delete a virtual directory marker
+   */
+  async deleteVirtualDirectory(markerId: string): Promise<boolean> {
+    const deleted = await deleteVirtualDirectory(this.storageBasePath, markerId);
+    if (deleted) {
+      this.logger.log(`Deleted virtual directory marker: ${markerId}`);
+    } else {
+      this.logger.warn(`Virtual directory marker not found: ${markerId}`);
+    }
+    return deleted;
+  }
+
+  /**
+   * Build complete directory tree from files and virtual directories
+   */
+  async getDirectoryTree(): Promise<any> {
+    const files = await this.listAllFiles();
+    const virtualDirs = await listVirtualDirectories(this.storageBasePath);
+
+    const tree = buildDirectoryTree(files, virtualDirs);
+    return tree;
   }
   // End of Claude's edit
 }

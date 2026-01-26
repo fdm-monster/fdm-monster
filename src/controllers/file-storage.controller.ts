@@ -62,6 +62,100 @@ export class FileStorageController {
     }
   }
 
+  // edited by claude on 2026.01.25.14.00
+  // Specific routes must come BEFORE parameterized routes like /:fileStorageId
+  /**
+   * Get directory tree structure
+   * GET /api/file-storage/directory-tree
+   */
+  @GET()
+  @route("/directory-tree")
+  async getDirectoryTree(req: Request, res: Response) {
+    try {
+      const tree = await this.fileStorageService.getDirectoryTree();
+      res.send({ tree });
+    } catch (error) {
+      this.logger.error(`Failed to build directory tree: ${error}`);
+      res.status(500).send({ error: "Failed to build directory tree" });
+    }
+  }
+
+  /**
+   * List all virtual directories
+   * GET /api/file-storage/virtual-directories
+   */
+  @GET()
+  @route("/virtual-directories")
+  async listVirtualDirectories(req: Request, res: Response) {
+    try {
+      const directories = await this.fileStorageService.listVirtualDirectories();
+      res.send({ directories, count: directories.length });
+    } catch (error) {
+      this.logger.error(`Failed to list virtual directories: ${error}`);
+      res.status(500).send({ error: "Failed to list virtual directories" });
+    }
+  }
+
+  /**
+   * Create a virtual directory
+   * POST /api/file-storage/virtual-directories
+   * edited by claude on 2026.01.25.15.00 - Now returns all created markers for nested paths
+   */
+  @POST()
+  @route("/virtual-directories")
+  async createVirtualDirectory(req: Request, res: Response) {
+    const { path: virtualPath } = req.body;
+
+    if (!virtualPath || typeof virtualPath !== "string") {
+      res.status(400).send({ error: "Invalid path" });
+      return;
+    }
+
+    try {
+      const createdMarkers = await this.fileStorageService.createVirtualDirectory(virtualPath);
+      const leafMarker = createdMarkers[createdMarkers.length - 1];
+
+      this.logger.log(`Created virtual directory: ${virtualPath} (${createdMarkers.length} markers)`);
+
+      res.send({
+        message: "Virtual directory created",
+        markerId: leafMarker.markerId, // Deepest folder's markerId for backward compatibility
+        path: virtualPath,
+        createdMarkers // All created markers including intermediates
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create virtual directory: ${error}`);
+      res.status(500).send({ error: "Failed to create virtual directory" });
+    }
+  }
+  // End of Claude's edit
+
+  /**
+   * Delete a virtual directory
+   * DELETE /api/file-storage/virtual-directories/:markerId
+   */
+  @DELETE()
+  @route("/virtual-directories/:markerId")
+  async deleteVirtualDirectory(req: Request, res: Response) {
+    const { markerId } = req.params as { markerId: string };
+
+    try {
+      const deleted = await this.fileStorageService.deleteVirtualDirectory(markerId);
+
+      if (!deleted) {
+        res.status(404).send({ error: "Virtual directory not found" });
+        return;
+      }
+
+      this.logger.log(`Deleted virtual directory: ${markerId}`);
+      res.send({ message: "Virtual directory deleted", markerId });
+    } catch (error) {
+      this.logger.error(`Failed to delete virtual directory ${markerId}: ${error}`);
+      res.status(500).send({ error: "Failed to delete virtual directory" });
+    }
+  }
+  // End of Claude's edit
+
   /**
    * Get file metadata
    * GET /api/file-storage/:fileStorageId
