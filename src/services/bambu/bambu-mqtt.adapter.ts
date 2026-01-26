@@ -300,18 +300,41 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
           this.logger.error("Failed to send command:", err);
           reject(err);
         } else {
-          this.logger.debug(`Command sent: ${message}`);
+          this.logger.debug(`Command sent: ${ message }`);
           resolve();
         }
       });
     });
   }
 
-  async startPrint(filename: string): Promise<void> {
+  async startPrint(filename: string, subtask_name?: string, amsMapping?: number[], plateNumber: number = 1): Promise<void> {
     await this.sendCommand({
       print: {
-        command: "gcode_file",
-        param: filename,
+        command: "project_file",
+        param: `Metadata/plate_${plateNumber}.gcode`,
+        project_id: "0", // Always 0 for local prints
+        profile_id: "0", // Always 0 for local prints
+        task_id: "0", // Always 0 for local prints
+        subtask_id: "0", // Always 0 for local prints
+        subtask_name: subtask_name ?? filename,
+
+        file: "", // Filename to print, not needed when "url" is specified with filepath
+        url: `file:///${ filename }`, // URL to print. Root path, protocol can vary. E.g., if sd card, "ftp:///myfile.3mf", "ftp:///cache/myotherfile.3mf"
+        md5: "",
+
+        timelapse: true,
+        bed_type: "auto", // Always "auto" for local prints
+        bed_levelling: true,
+        flow_cali: true,
+        vibration_cali: true,
+        layer_inspect: true,
+
+        // AMS mapping: array where each index represents a filament color in your gcode
+        // and the value is the AMS slot number (0-3) to use, or -1 to skip
+        // Example: [0, 2, -1, 1] means: color 0 uses slot 0, color 1 uses slot 2, color 2 skipped, color 3 uses slot 1
+        ams_mapping: amsMapping ? amsMapping.join(",") : "", // Convert [0, 1, 2, 3] to "0,1,2,3"
+        use_ams: !!amsMapping && amsMapping.length > 0,
+
         sequence_id: this.sequenceIdCounter++,
       },
     });
