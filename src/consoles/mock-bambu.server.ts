@@ -64,11 +64,6 @@ if (!fs.existsSync(ftpDir)) {
   fs.mkdirSync(ftpDir, { recursive: true });
 }
 
-if (!fs.existsSync(ftpDir)) {
-  console.log(`[BAMBU MOCK] Creating ftp directory: ${ftpDir}`);
-  fs.mkdirSync(ftpDir, { recursive: true });
-}
-
 /**
  * Generate a self-signed certificate for TLS
  * Matches real Bambu Lab printer FTP behavior (implicit TLS on port 990)
