@@ -137,7 +137,7 @@ export class PrinterFilesController {
     const failedFiles = [];
     const succeededFiles = [];
 
-    const nonRecursiveFiles = await this.printerApi.getFiles();
+    const nonRecursiveFiles = await this.printerApi.getFiles(false);
     for (let file of nonRecursiveFiles) {
       try {
         const encodedFilePath = encodeURIComponent(file.path);
