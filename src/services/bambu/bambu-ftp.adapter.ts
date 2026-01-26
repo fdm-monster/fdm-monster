@@ -104,7 +104,6 @@ export class BambuFtpAdapter {
     try {
       this.logger.log(`Connecting ftp ${dirPath}`);
       const files = await this.ftpClient!.list(dirPath);
-      console.log(JSON.stringify(files));
       this.logger.debug(`Listed ${files.length} files in ${dirPath}`);
       return files;
     } catch (error) {
@@ -126,7 +125,7 @@ export class BambuFtpAdapter {
   async uploadFile(fileBuffer: Buffer, filename: string, progressToken?: string): Promise<void> {
     this.ensureConnected();
 
-    const remotePath = `/cache/${filename}`;
+    const remotePath = `/${filename}`;
     const tempPath = this.getFileStoragePath(`bambu-upload-${Date.now()}-${filename}`);
 
     try {

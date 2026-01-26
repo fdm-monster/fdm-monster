@@ -261,7 +261,7 @@ export class BambuApiStub implements IPrinterApi {
   async deleteFile(path: string): Promise<void> {
     this.logger.log(`[STUB] Deleting file: ${path}`, this.logMeta());
     await this.ensureFtpConnected();
-    await this.client.ftp.deleteFile(`/cache/${path}`);
+    await this.client.ftp.deleteFile(`/${path}`);
   }
 
   deleteFolder(path: string): Promise<void> {
