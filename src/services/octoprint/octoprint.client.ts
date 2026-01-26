@@ -8,7 +8,7 @@ import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
+import { flattenOctoPrintFiles, normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
 import { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
 import { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
 import { VersionDto } from "@/services/octoprint/dto/server/version.dto";
@@ -139,14 +139,19 @@ export class OctoprintClient extends OctoprintRoutes {
   async getLocalFiles(login: LoginDto, recursive = false) {
     const response = await this.createClient(login).get<OctoprintFilesResponseDto>(this.apiGetFiles(recursive));
 
-    return (
-      // Filter out folders
-      response?.data?.files
-        ?.filter((f) => f.date && f.type === "machinecode")
-        .map((f) => {
-          return normalizePrinterFile(f);
-        }) || []
-    );
+    if (!response?.data?.files) {
+      return [];
+    }
+
+    if (recursive) {
+      // Use recursive flattening to handle nested folder structure
+      return flattenOctoPrintFiles(response.data.files);
+    } else {
+      // Non-recursive: only process top-level files
+      return response.data.files
+        .filter((f) => f.date && f.type === "machinecode")
+        .map((f) => normalizePrinterFile(f));
+    }
   }
 
   async getFile(login: LoginDto, path: string) {
