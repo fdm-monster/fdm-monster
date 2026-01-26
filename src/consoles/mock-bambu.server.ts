@@ -58,16 +58,10 @@ console.log(`[BAMBU MOCK]   Access Code: ${accessCode}`);
 console.log(`[BAMBU MOCK]   Username: bblp`);
 
 const ftpDir = path.join(os.tmpdir(), "bambu-mock-ftp", serial);
-const sdcardDir = path.join(ftpDir, "sdcard");
 
 if (!fs.existsSync(ftpDir)) {
   console.log(`[BAMBU MOCK] Creating FTP directory: ${ftpDir}`);
   fs.mkdirSync(ftpDir, { recursive: true });
-}
-
-if (!fs.existsSync(sdcardDir)) {
-  console.log(`[BAMBU MOCK] Creating sdcard directory: ${sdcardDir}`);
-  fs.mkdirSync(sdcardDir, { recursive: true });
 }
 
 /**
@@ -113,13 +107,15 @@ let nozzleTemp = 25;
 let bedTemp = 25;
 let printStartTime = 0;
 const PRINT_DURATION = 20; // 20 seconds
+let hasReceivedPushall = false; // Don't publish until client requests it
+let publishInterval: NodeJS.Timeout | null = null;
 
 // Generate TLS certificates and start server
 (async () => {
   const tlsCerts = await generateSelfSignedCert();
 
   const ftpServer = new FtpSrv({
-    url: `ftp://0.0.0.0:${port}`,
+    url: `ftps://0.0.0.0:${port}`,  // ftps:// for IMPLICIT TLS
     pasv_url: "127.0.0.1",
     pasv_min: 1024,
     pasv_max: 1048,
@@ -145,7 +141,7 @@ const PRINT_DURATION = 20; // 20 seconds
   });
 
   ftpServer.listen().then(() => {
-    console.log(`[BAMBU MOCK FTP] FTP server is running on port ${port}`);
+    console.log(`[BAMBU MOCK FTP] FTP server is running on port ${port} with implicit TLS`);
     console.log(`[BAMBU MOCK FTP] FTP directory: ${ftpDir}`);
   });
 
@@ -156,123 +152,142 @@ const PRINT_DURATION = 20; // 20 seconds
     rejectUnauthorized: false,
   });
 
+  const reportTopic = `device/${serial}/report`;
+
+  const publishState = (sequenceId?: number | string) => {
+    if (isFinished) {
+      isFinished = false;
+      finishedFileName = "";
+      currentPrintFile = "";
+      printProgress = 0;
+    } else if (isPrinting && !isPaused) {
+      const elapsedSeconds = (Date.now() - printStartTime) / 1000;
+      printProgress = Math.min((elapsedSeconds / PRINT_DURATION) * 100, 100);
+
+      if (printProgress < 10) {
+        nozzleTemp = Math.min(nozzleTemp + 10, 220);
+        bedTemp = Math.min(bedTemp + 5, 60);
+      } else {
+        nozzleTemp = 220;
+        bedTemp = 60;
+      }
+
+      if (printProgress >= 100) {
+        isFinished = true;
+        finishedFileName = currentPrintFile;
+        isPrinting = false;
+        printProgress = 100;
+        console.log(`[BAMBU MOCK MQTT] Print completed: ${currentPrintFile}`);
+      }
+    }
+
+    if (!isPrinting && !isFinished && nozzleTemp > 25) {
+      nozzleTemp = Math.max(nozzleTemp - 2, 25);
+      bedTemp = Math.max(bedTemp - 1, 25);
+    }
+
+    let gcodeState = "IDLE";
+    if (isFinished) gcodeState = "FINISHED";
+    else if (isPrinting && isPaused) gcodeState = "PAUSE";
+    else if (isPrinting) gcodeState = "PRINTING";
+
+    const fileName = isFinished ? finishedFileName : currentPrintFile;
+    const hasJob = isPrinting || isFinished;
+    const finishedLabel = isFinished ? "finished" : "printing";
+    const printingLabel = isPaused ? "paused" : finishedLabel;
+    const progressOrFinished = isFinished ? 100 : printProgress;
+
+    const state = {
+      print: {
+        nozzle_temper: Math.round(nozzleTemp),
+        nozzle_target_temper: isPrinting ? 220 : 0,
+        bed_temper: Math.round(bedTemp),
+        bed_target_temper: isPrinting ? 60 : 0,
+        chamber_temper: 30,
+        mc_percent: isFinished ? 100 : Math.round(printProgress),
+        mc_remaining_time: hasJob ? Math.round(Math.max(0, (PRINT_DURATION - (Date.now() - printStartTime) / 1000) / 60)) : 0,
+        mc_print_stage: hasJob ? printingLabel : "idle",
+        gcode_state: gcodeState,
+        gcode_file: fileName || "",
+        wifi_signal: "-45dBm",
+        layer_num: hasJob ? Math.floor(progressOrFinished / 2) : 0,
+        total_layer_num: hasJob ? 50 : 0,
+        subtask_name: fileName || "",
+        heatbreak_fan_speed: isPrinting ? "5000" : "0",
+        cooling_fan_speed: isPrinting ? "8000" : "0",
+        big_fan1_speed: isPrinting ? "3000" : "0",
+        big_fan2_speed: isPrinting ? "3000" : "0",
+        spd_lvl: 2,
+        spd_mag: 100,
+        print_error: 0,
+        lifecycle: "product",
+        command: "push_status",
+        msg: 0,
+        sequence_id: sequenceId ? String(Date.now()) : String(sequenceId),
+      },
+    };
+
+    mqttClient.publish(reportTopic, JSON.stringify(state), { qos: 0 }, (err) => {
+      if (err) {
+        console.error(`[BAMBU MOCK MQTT] Failed to publish state:`, err);
+      }
+    });
+  };
+
   mqttClient.on("connect", () => {
     console.log(`[BAMBU MOCK MQTT] Connected to MQTT broker at localhost:${mqttPort}`);
     console.log(`[BAMBU MOCK MQTT] Publishing to topic: device/${serial}/report`);
 
-    const reportTopic = `device/${serial}/report`;
-    const requestTopic = `device/${serial}/request`;
-
-    mqttClient.subscribe(requestTopic, (err) => {
+    mqttClient.subscribe(reportTopic, (err) => {
       if (err) {
-        console.error(`[BAMBU MOCK MQTT] Failed to subscribe to ${requestTopic}:`, err);
+        console.error(`[BAMBU MOCK MQTT] Failed to subscribe to ${reportTopic}:`, err);
       } else {
-        console.log(`[BAMBU MOCK MQTT] Subscribed to topic: ${requestTopic}`);
+        console.log(`[BAMBU MOCK MQTT] Subscribed to topic: ${reportTopic}`);
       }
     });
 
-    const publishState = () => {
-      // Clear finished state after it's been sent
-      if (isFinished) {
-        isFinished = false;
-        finishedFileName = "";
-        currentPrintFile = "";
-        printProgress = 0;
-      } else if (isPrinting && !isPaused) {
-        // Calculate progress based on elapsed time (20 second print)
-        const elapsedSeconds = (Date.now() - printStartTime) / 1000;
-        printProgress = Math.min((elapsedSeconds / PRINT_DURATION) * 100, 100);
-
-        // Heat up quickly at start, then maintain
-        if (printProgress < 10) {
-          nozzleTemp = Math.min(nozzleTemp + 10, 220);
-          bedTemp = Math.min(bedTemp + 5, 60);
-        } else {
-          nozzleTemp = 220;
-          bedTemp = 60;
-        }
-
-        if (printProgress >= 100) {
-          // Set finished state before clearing print state
-          isFinished = true;
-          finishedFileName = currentPrintFile;
-          isPrinting = false;
-          printProgress = 100;
-          console.log(`[BAMBU MOCK MQTT] Print completed: ${currentPrintFile}`);
-        }
-      }
-
-      if (!isPrinting && !isFinished && nozzleTemp > 25) {
-        nozzleTemp = Math.max(nozzleTemp - 2, 25);
-        bedTemp = Math.max(bedTemp - 1, 25);
-      }
-
-      // Determine gcode_state
-      let gcodeState = "IDLE";
-      if (isFinished) gcodeState = "FINISHED";
-      else if (isPrinting && isPaused) gcodeState = "PAUSE";
-      else if (isPrinting) gcodeState = "PRINTING";
-
-      const fileName = isFinished ? finishedFileName : currentPrintFile;
-      const hasJob = isPrinting || isFinished;
-      const printingLabel = isPaused ? "paused" : (isFinished ? "finished" : "printing");
-
-      const state = {
-        print: {
-          nozzle_temper: Math.round(nozzleTemp),
-          nozzle_target_temper: isPrinting ? 220 : 0,
-          bed_temper: Math.round(bedTemp),
-          bed_target_temper: isPrinting ? 60 : 0,
-          chamber_temper: 30,
-          mc_percent: isFinished ? 100 : Math.round(printProgress),
-          mc_remaining_time: hasJob ? Math.round(Math.max(0, (PRINT_DURATION - (Date.now() - printStartTime) / 1000) / 60)) : 0, // In minutes
-          mc_print_stage: hasJob ? printingLabel : "idle",
-          gcode_state: gcodeState,
-          gcode_file: fileName || "",
-          wifi_signal: "-45dBm",
-          layer_num: hasJob ? Math.floor((isFinished ? 100 : printProgress) / 2) : 0,
-          total_layer_num: hasJob ? 50 : 0,
-          subtask_name: fileName || "",
-          heatbreak_fan_speed: isPrinting ? "5000" : "0",
-          cooling_fan_speed: isPrinting ? "8000" : "0",
-          big_fan1_speed: isPrinting ? "3000" : "0",
-          big_fan2_speed: isPrinting ? "3000" : "0",
-          spd_lvl: 2,
-          spd_mag: 100,
-          print_error: 0,
-          lifecycle: "product",
-          command: "push_status",
-          msg: 0,
-          sequence_id: String(Date.now()),
-        },
-      };
-
-      mqttClient.publish(reportTopic, JSON.stringify(state), { qos: 0 }, (err) => {
-        if (err) {
-          console.error(`[BAMBU MOCK MQTT] Failed to publish state:`, err);
-        }
-      });
-    };
-
-    setInterval(publishState, MESSAGE_INTERVAL);
-
+    console.log(`[BAMBU MOCK MQTT] Sending initial status update`);
     publishState();
+
+    if (!hasReceivedPushall) {
+      console.log(`[BAMBU MOCK MQTT] Waiting for pushall command to start periodic updates...`);
+    }
   });
 
   mqttClient.on("message", (topic, message) => {
     try {
       const payload = JSON.parse(message.toString());
+
+      if (payload.print?.command === "push_status") {
+        return;
+      }
+
       console.log(`[BAMBU MOCK MQTT] Received command on ${topic}:`, JSON.stringify(payload));
+
+      if (payload.pushing?.command === "pushall") {
+        const sequenceId = payload.pushing.sequence_id;
+        console.log(`[BAMBU MOCK MQTT] Received pushall command with sequence_id: ${sequenceId}`);
+
+        if (hasReceivedPushall) {
+          publishState(sequenceId);
+        } else {
+          hasReceivedPushall = true;
+          console.log(`[BAMBU MOCK MQTT] Starting periodic state publishing every ${ MESSAGE_INTERVAL }ms`);
+
+          publishState(sequenceId);
+          publishInterval = setInterval(publishState, MESSAGE_INTERVAL);
+        }
+        return;
+      }
 
       if (payload.print?.command) {
         const command = payload.print.command;
-        console.log(`[BAMBU MOCK MQTT] Processing command: ${command}`);
+        const sequenceId = payload.print.sequence_id;
+        console.log(`[BAMBU MOCK MQTT] Processing command: ${command} with sequence_id: ${sequenceId}`);
 
         if (command === "project_file" || command === "start") {
-          // Extract filename from command
           const filename = payload.print.param || payload.print.subtask_name || "unknown.gcode";
 
-          // Validate file extension (only .gcode and .3mf files)
           if (filename.endsWith(".gcode") || filename.endsWith(".3mf")) {
             isPrinting = true;
             isPaused = false;
@@ -291,7 +306,6 @@ const PRINT_DURATION = 20; // 20 seconds
         } else if (command === "resume") {
           if (isPrinting && isPaused) {
             isPaused = false;
-            // Adjust start time to account for pause duration
             const pausedProgress = printProgress;
             printStartTime = Date.now() - (pausedProgress / 100) * PRINT_DURATION * 1000;
             console.log(`[BAMBU MOCK MQTT] Resuming print from ${Math.round(pausedProgress)}%`);
@@ -302,11 +316,8 @@ const PRINT_DURATION = 20; // 20 seconds
             isPrinting = false;
             isPaused = false;
             printProgress = 0;
-            // Keep filename for one more state update so backend can identify which job was cancelled
-            // Real Bambu printers send IDLE state with the filename still present
             console.log(`[BAMBU MOCK MQTT] Stopping print: ${stoppedFile}`);
 
-            // Clear filename after a short delay to simulate real behavior
             setTimeout(() => {
               if (!isPrinting) {
                 currentPrintFile = "";
@@ -314,6 +325,9 @@ const PRINT_DURATION = 20; // 20 seconds
             }, MESSAGE_INTERVAL * 2);
           }
         }
+
+        console.log(`[BAMBU MOCK MQTT] Sending response with sequence_id: ${sequenceId}`);
+        publishState(sequenceId);
       }
     } catch (error) {
       console.error(`[BAMBU MOCK MQTT] Error processing message:`, error);
@@ -331,6 +345,11 @@ const PRINT_DURATION = 20; // 20 seconds
   process.on("SIGINT", async () => {
     console.log("\n[BAMBU MOCK] Shutting down gracefully...");
 
+    if (publishInterval) {
+      clearInterval(publishInterval);
+      publishInterval = null;
+    }
+
     if (mqttClient.connected) {
       console.log("[BAMBU MOCK MQTT] Disconnecting MQTT client...");
       await mqttClient.endAsync();
@@ -345,6 +364,11 @@ const PRINT_DURATION = 20; // 20 seconds
 
   process.on("SIGTERM", async () => {
     console.log("\n[BAMBU MOCK] Received SIGTERM. Shutting down...");
+
+    if (publishInterval) {
+      clearInterval(publishInterval);
+      publishInterval = null;
+    }
 
     if (mqttClient.connected) {
       await mqttClient.endAsync();

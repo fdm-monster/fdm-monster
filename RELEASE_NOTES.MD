@@ -1,5 +1,13 @@
 # Develop
 
+# FDM Monster 2.0.7
+
+## Fixes
+
+- Improves Bambu FTP file handling and print commands (file paths corrected for listings and print commands)
+- Handles initial Bambu printer status correctly by adding `pushall` MQTT command
+- Simplifies thumbnail handling for files and jobs with structured thumbnails array including dimensions, format, and size
+
 # FDM Monster 2.0.6
 
 ## Hotfix

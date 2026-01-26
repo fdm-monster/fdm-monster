@@ -31,17 +31,25 @@ export class FileStorageController {
       const files = await this.fileStorageService.listAllFiles();
 
       res.send({
-        files: files.map(file => ({
-          fileStorageId: file.fileStorageId,
-          fileName: file.fileName,
-          fileFormat: file.fileFormat,
-          fileSize: file.fileSize,
-          fileHash: file.fileHash,
-          createdAt: file.createdAt,
-          thumbnailCount: file.thumbnailCount,
-          thumbnailsUrl: file.thumbnailCount > 0 ? `/api/file-storage/${file.fileStorageId}/thumbnail/0` : null,
-          metadata: file.metadata,
-        })),
+        files: files.map(file => {
+          const thumbnails = (file.metadata?._thumbnails || []).map((thumb: any) => ({
+            index: thumb.index,
+            width: thumb.width,
+            height: thumb.height,
+            format: thumb.format,
+            size: thumb.size,
+          }));
+          return {
+            fileStorageId: file.fileStorageId,
+            fileName: file.fileName,
+            fileFormat: file.fileFormat,
+            fileSize: file.fileSize,
+            fileHash: file.fileHash,
+            createdAt: file.createdAt,
+            thumbnails,
+            metadata: file.metadata,
+          };
+        }),
         totalCount: files.length,
       });
     } catch (error) {
@@ -67,6 +75,14 @@ export class FileStorageController {
         return;
       }
 
+      const thumbnails = (file.metadata?._thumbnails || []).map((thumb: any) => ({
+        index: thumb.index,
+        width: thumb.width,
+        height: thumb.height,
+        format: thumb.format,
+        size: thumb.size,
+      }));
+
       res.send({
         fileStorageId: file.fileStorageId,
         fileName: file.fileName,
@@ -74,8 +90,7 @@ export class FileStorageController {
         fileSize: file.fileSize,
         fileHash: file.fileHash,
         createdAt: file.createdAt,
-        thumbnailCount: file.thumbnailCount,
-        thumbnailsUrl: file.thumbnailCount > 0 ? `/api/file-storage/${file.fileStorageId}/thumbnail/0` : null,
+        thumbnails,
         metadata: file.metadata,
       });
     } catch (error) {
@@ -154,7 +169,7 @@ export class FileStorageController {
 
   @GET()
   @route("/:fileStorageId/thumbnail/:index")
-  async getThumbnail(req: Request, res: Response) {
+  async getThumbnailByIndex(req: Request, res: Response) {
     const { fileStorageId, index } = req.params as { fileStorageId: string; index: string };
     const thumbnailIndex = Number.parseInt(index);
 
@@ -173,15 +188,19 @@ export class FileStorageController {
 
       // Determine content type from magic bytes
       const isJPG = thumbnail[0] === 0xFF && thumbnail[1] === 0xD8;
+      const isQOI = thumbnail[0] === 0x71 && thumbnail[1] === 0x6F && thumbnail[2] === 0x69 && thumbnail[3] === 0x66;
 
-      let contentType = 'image/png';
-      if (isJPG) contentType = 'image/jpeg';
+      // QOI format not supported by browser
+      if (isQOI) {
+        res.status(404).send({ error: "Thumbnail format not supported (QOI)" });
+        return;
+      }
 
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour cache
-      res.setHeader('ETag', `"${fileStorageId}-${thumbnailIndex}"`);
-
-      res.send(thumbnail);
+      const mimeType = isJPG ? 'image/jpeg' : 'image/png';
+      const base64 = thumbnail.toString('base64');
+      res.send({
+        thumbnailBase64: `data:${mimeType};base64,${base64}`,
+      });
     } catch (error) {
       this.logger.error(`Failed to get thumbnail ${thumbnailIndex} for ${fileStorageId}: ${error}`);
       res.status(500).send({ error: "Failed to get thumbnail" });

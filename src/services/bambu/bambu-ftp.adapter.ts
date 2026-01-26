@@ -9,11 +9,8 @@ import { join } from "node:path";
 import { Readable } from "node:stream";
 import { AppConstants } from "@/server.constants";
 import { getMediaPath } from "@/utils/fs.utils";
+import { errorSummary } from "@/utils/error.utils";
 
-/**
- * Adapter for Bambu Lab FTP file operations
- * Implements direct FTP connection using basic-ftp
- */
 export class BambuFtpAdapter {
   protected readonly logger: LoggerService;
 
@@ -68,11 +65,10 @@ export class BambuFtpAdapter {
         port: 990,
         user: "bblp",
         password: sanitizedAccessCode,
-        secure: true, // Use explicit TLS (FTPES/AUTH TLS)
+        secure: 'implicit',
         secureOptions: {
-          rejectUnauthorized: false,
-          minVersion: "TLSv1.2",
-          maxVersion: "TLSv1.3",
+          checkServerIdentity: () => { return undefined; },
+          rejectUnauthorized:  false,
         },
       });
 
@@ -86,9 +82,6 @@ export class BambuFtpAdapter {
     }
   }
 
-  /**
-   * Disconnect FTP
-   */
   async disconnect(): Promise<void> {
     if (!this.ftpClient) {
       return;
@@ -105,29 +98,23 @@ export class BambuFtpAdapter {
     }
   }
 
-  /**
-   * List files in directory
-   */
   async listFiles(dirPath: string = "/"): Promise<FileInfo[]> {
     this.ensureConnected();
 
     try {
+      this.logger.log(`Connecting ftp ${dirPath}`);
       const files = await this.ftpClient!.list(dirPath);
       this.logger.debug(`Listed ${files.length} files in ${dirPath}`);
       return files;
     } catch (error) {
-      this.logger.error(`Failed to list files in ${dirPath}:`, error);
+      this.logger.error(`Failed to list files in ${dirPath}: ${errorSummary(error)}`);
       throw error;
     }
   }
 
-  /**
-   * Get the file storage path for temporary files
-   */
   private getFileStoragePath(filename: string): string {
     const storagePath = join(getMediaPath(), AppConstants.defaultFileUploadsStorage);
 
-    // Ensure directory exists
     if (!existsSync(storagePath)) {
       mkdirSync(storagePath, { recursive: true });
     }
@@ -135,21 +122,15 @@ export class BambuFtpAdapter {
     return join(storagePath, filename);
   }
 
-  /**
-   * Upload file to printer
-   */
-  async uploadFile(fileBuffer: Buffer, filename: string, progressToken?: string): Promise<void> {
+  async uploadFile(fileBuffer: Buffer, remotePath: string, progressToken?: string): Promise<void> {
     this.ensureConnected();
 
-    const remotePath = `/sdcard/${filename}`;
-    const tempPath = this.getFileStoragePath(`bambu-upload-${Date.now()}-${filename}`);
+    const tempPath = this.getFileStoragePath(`bambu-upload-${Date.now()}-${remotePath}`);
 
     try {
-      // Write buffer to temp file
       writeFileSync(tempPath, fileBuffer);
       this.logger.debug(`Wrote temp file: ${tempPath}`);
 
-      // Track progress
       if (progressToken) {
         this.ftpClient!.trackProgress((info) => {
           this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, {
@@ -160,7 +141,7 @@ export class BambuFtpAdapter {
       }
 
       // Upload file
-      this.logger.log(`Uploading ${filename} to ${remotePath}`);
+      this.logger.log(`Uploading ${tempPath} to ${remotePath}`);
       await this.ftpClient!.uploadFrom(tempPath, remotePath);
 
       // Stop tracking progress
@@ -170,12 +151,12 @@ export class BambuFtpAdapter {
         this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
       }
 
-      this.logger.log(`File uploaded successfully: ${filename}`);
+      this.logger.log(`File uploaded successfully: ${remotePath}`);
     } catch (error) {
       if (progressToken) {
         this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (error as Error)?.message);
       }
-      this.logger.error(`Upload failed for ${filename}:`, error);
+      this.logger.error(`Upload failed for ${remotePath}:`, error);
       throw error;
     } finally {
       // Clean up temp file
@@ -188,9 +169,6 @@ export class BambuFtpAdapter {
     }
   }
 
-  /**
-   * Download file from printer to local path
-   */
   async downloadFile(remotePath: string, localPath: string): Promise<void> {
     this.ensureConnected();
 
@@ -204,10 +182,6 @@ export class BambuFtpAdapter {
     }
   }
 
-  /**
-   * Download file from printer and return as a readable stream
-   * Downloads to the media folder first, then returns a read stream
-   */
   async downloadFileAsStream(remotePath: string): Promise<{ stream: Readable; tempPath: string; cleanup: () => void }> {
     this.ensureConnected();
 
@@ -230,26 +204,19 @@ export class BambuFtpAdapter {
         }
       };
 
-      // Auto-cleanup when stream ends or errors
       stream.on("close", cleanup);
       stream.on("error", cleanup);
 
       return { stream, tempPath, cleanup };
     } catch (error) {
-      // Clean up temp file on error
       try {
         unlinkSync(tempPath);
-      } catch {
-        // Ignore cleanup errors
-      }
+      } catch {}
       this.logger.error(`Download failed for ${remotePath}:`, error);
       throw error;
     }
   }
 
-  /**
-   * Delete file from printer
-   */
   async deleteFile(remotePath: string): Promise<void> {
     this.ensureConnected();
 
@@ -263,40 +230,26 @@ export class BambuFtpAdapter {
     }
   }
 
-  /**
-   * Get connection status
-   */
   get isConnected(): boolean {
     return this.ftpClient != null && !this.ftpClient.closed;
   }
 
-  /**
-   * Ensure FTP is connected
-   */
   private ensureConnected(): void {
     if (!this.isConnected) {
       throw new Error("FTP not connected. Call connect() first.");
     }
   }
 
-  /**
-   * Cleanup FTP client
-   */
   private cleanup(): void {
     this.ftpClient = null;
   }
 
-  /**
-   * Sanitize and validate host input
-   */
   private sanitizeHost(host: string): string {
     if (!host?.length) {
       throw new Error("Host must be a non-empty string");
     }
 
-    // Trim whitespace
     const trimmed = host.trim();
-
     if (trimmed.length === 0) {
       throw new Error("Host cannot be empty");
     }
