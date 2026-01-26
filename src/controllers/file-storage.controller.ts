@@ -113,8 +113,7 @@ export class FileStorageController {
 
     try {
       const createdMarkers = await this.fileStorageService.createVirtualDirectory(virtualPath);
-      //const leafMarker = createdMarkers[createdMarkers.length - 1];
-      const leafMarker = createdMarkers.at(-1); // SonarQube demand
+      const leafMarker = createdMarkers[createdMarkers.length - 1];
 
       this.logger.log(`Created virtual directory: ${virtualPath} (${createdMarkers.length} markers)`);
 
