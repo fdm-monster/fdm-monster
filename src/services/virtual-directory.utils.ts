@@ -194,12 +194,12 @@ export function buildDirectoryTree(
 
   // edited by claude on 2026.01.25.14.30
   // Create directory nodes
-  const sortedPaths = Array.from(allPaths).sort();
+  const sortedPaths = Array.from(allPaths).sort((a,b) => a.localeCompare(b));
   for (const path of sortedPaths) {
     if (!path) continue;
 
     const parts = path.split("/");
-    const name = parts[parts.length - 1];
+    const name = parts.at(-1);
     const parentPath = parts.slice(0, -1).join("/");
 
     const node: TreeNode = {
