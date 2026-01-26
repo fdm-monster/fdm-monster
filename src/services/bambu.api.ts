@@ -140,7 +140,7 @@ export class BambuApi implements IPrinterApi {
   async startPrint(path: string): Promise<void> {
     this.logger.log(`Starting print: ${path}`, this.logMeta());
     const mqttAdapter = this.getMqttAdapter();
-    await mqttAdapter.startPrint("/" + path);
+    await mqttAdapter.startPrint(path);
   }
 
   async pausePrint(): Promise<void> {
