@@ -6,7 +6,7 @@
   },
   "author": "David Zwart",
   "license": "AGPL-3.0-or-later",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "bin": {
     "fdm-monster-server": "dist/index.js",
     "fdmm-server": "dist/index.js"
@@ -44,7 +44,6 @@
   },
   "keywords": [
     "fdm-monster",
-    "fdm-connector",
     "octoprint",
     "moonraker",
     "klipper",
@@ -54,13 +53,16 @@
     "3d printing",
     "pi",
     "node",
-    "vue"
+    "vue",
+    "MonsterPi",
+    "RaspberryPi",
+    "Unraid"
   ],
   "resolutions": {
     "tr46": "6.0.0"
   },
   "dependencies": {
-    "@fdm-monster/client-next": "2.2.6",
+    "@fdm-monster/client-next": "2.2.7",
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "10.36.0",
     "adm-zip": "0.5.16",
