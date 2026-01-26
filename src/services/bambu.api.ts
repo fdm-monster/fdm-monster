@@ -200,7 +200,7 @@ export class BambuApi implements IPrinterApi {
     };
   }
 
-  async getFiles(): Promise<FileDto[]> {
+  async getFiles(recursive = true): Promise<FileDto[]> {
     this.logger.debug("Listing files", this.logMeta());
     await this.ensureFtpConnected();
     const files = await this.client.ftp.listFiles("/sdcard");
