@@ -1,0 +1,21 @@
+# Claude Rules for fdm-monster
+
+**Master Rules Location**: `.AI-support/CLAUDE_RULES.md`
+
+Please read and follow all rules defined in:
+`/Users/jaysen/git/fdm-monster/.AI-support/CLAUDE_RULES.md`
+
+---
+
+## Quick Reference
+
+1. **Edit Documentation (MANDATORY)**: Mark all code changes with timestamps
+2. **File Organization**: Create separate files for new functionality (`.utils.ts`, `.composable.ts` suffixes)
+3. **Code Style**: TypeScript, Composition API, explicit imports
+4. **Documentation Files**: Never create proactively unless requested
+5. **Communication**: Concise, direct, no preamble/postamble
+6. **Task Management**: Use TodoWrite for 3+ step tasks
+7. **Rule Conflicts**: Ask for clarification if request conflicts with rules
+8. **Rule Updates**: Request approval before updating rules
+
+For complete details, see: `.AI-support/CLAUDE_RULES.md`

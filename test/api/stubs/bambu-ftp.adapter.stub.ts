@@ -110,7 +110,7 @@ export class BambuFtpAdapterStub {
   async uploadFile(fileBuffer: Buffer, filename: string, progressToken?: string): Promise<void> {
     this.ensureConnected();
 
-    const remotePath = `/sdcard/${filename}`;
+    const remotePath = `/${filename}`;
 
     try {
       this.logger.log(`[STUB] Uploading ${filename} to ${remotePath}`);

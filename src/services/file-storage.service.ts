@@ -8,7 +8,11 @@ import path, { basename, extname, join } from "node:path";
 import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { readFileSync, existsSync } from "node:fs";
+// edited by claude on 2026.01.25.13.30
+import { createVirtualDirectory, listVirtualDirectories, deleteVirtualDirectory, buildDirectoryTree } from "./virtual-directory.utils";
+// End of Claude's edit
 
+// edited by claude on 2026.01.24.09.30
 export interface IFileStorageService {
   saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
   getFile(fileStorageId: string): Promise<Buffer>;
@@ -22,7 +26,16 @@ export interface IFileStorageService {
   saveThumbnails(fileStorageId: string, thumbnails: Array<{data?: string; format?: string; width?: number; height?: number}>): Promise<Array<{index: number; path: string; filename: string; width: number; height: number; format: string; size: number}>>;
   getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null>;
   listThumbnails(fileStorageId: string): Promise<string[]>;
+  updateFileMetadata(fileStorageId: string, updates: {fileName?: string; path?: string; metadata?: any}): Promise<void>;
+  batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; path?: string; metadata?: any}>): Promise<{success: Array<{fileStorageId: string}>; failed: Array<{fileStorageId: string; error: string}>}>;
+  // edited by claude on 2026.01.25.13.30 - Virtual directory support
+  createVirtualDirectory(virtualPath: string): Promise<Array<{ path: string; markerId: string }>>; // edited by claude on 2026.01.25.15.00
+  listVirtualDirectories(): Promise<Array<{markerId: string; path: string; createdAt: string}>>;
+  deleteVirtualDirectory(markerId: string): Promise<boolean>;
+  getDirectoryTree(): Promise<any>;
+  // End of Claude's edit
 }
+// End of Claude's edit
 
 /**
  * Service for managing print job file storage with optional queue support
@@ -428,6 +441,7 @@ export class FileStorageService implements IFileStorageService {
 
   /**
    * List all stored files with metadata
+   * edited by claude on 2026.01.25.13.30 - Skip directory markers
    */
   async listAllFiles(): Promise<Array<{
     fileStorageId: string;
@@ -457,6 +471,11 @@ export class FileStorageService implements IFileStorageService {
           // Load metadata
           const metadata = await this.loadMetadata(fileId);
 
+          // edited by claude on 2026.01.25.13.30
+          // Skip directory markers (JSON-only files with type: "directory")
+          if (metadata?.type === 'directory') continue;
+          // End of Claude's edit
+
           // Count thumbnails
           const thumbnails = await this.listThumbnails(fileId);
 
@@ -479,6 +498,7 @@ export class FileStorageService implements IFileStorageService {
     // Sort by creation date, newest first
     return files.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
+  // End of Claude's edit
 
   /**
    * Get file information with metadata
@@ -517,5 +537,133 @@ export class FileStorageService implements IFileStorageService {
       return null;
     }
   }
+
+  // edited by claude on 2026.01.24.09.30
+  /**
+   * Update file metadata (fileName path and/or custom metadata fields)
+   * Only updates the metadata JSON, does not move the physical file
+   */
+  async updateFileMetadata(fileStorageId: string, updates: {fileName?: string; path?: string; metadata?: any}): Promise<void> {
+    const filePath = await this.findFilePath(fileStorageId);
+    if (!filePath) {
+      throw new Error(`File ${fileStorageId} not found`);
+    }
+
+    // Load existing metadata
+    const existingMetadata = await this.loadMetadata(fileStorageId);
+    if (!existingMetadata) {
+      throw new Error(`Metadata for ${fileStorageId} not found`);
+    }
+
+    // Merge updates into existing metadata
+    const updatedMetadata = {
+      ...existingMetadata,
+      ...(updates.metadata || {}),
+    };
+
+    // Update fileName if provided
+    if (updates.fileName !== undefined) {
+      updatedMetadata._originalFileName = updates.fileName;
+      updatedMetadata.fileName = updates.fileName;
+    }
+
+    // edited by claude on 2026.01.24.17.45 - Add path field support
+    // Update path if provided (virtual folder organization)
+    if (updates.path !== undefined) {
+      updatedMetadata._path = updates.path;
+    }
+    // End of Claude's edit
+
+    // Save updated metadata
+    const metadataPath = filePath + ".json";
+    await writeFile(metadataPath, JSON.stringify(updatedMetadata, null, 2), "utf8");
+    this.logger.log(`Updated metadata for ${fileStorageId}`);
+  }
+
+  /**
+   * Batch update file metadata for multiple files
+   * Returns success/failure results for each file
+   */
+  async batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; path?: string; metadata?: any}>): Promise<{
+    success: Array<{fileStorageId: string}>;
+    failed: Array<{fileStorageId: string; error: string}>;
+  }> {
+    const results = {
+      success: [] as Array<{fileStorageId: string}>,
+      failed: [] as Array<{fileStorageId: string; error: string}>,
+    };
+
+    for (const update of updates) {
+      try {
+        await this.updateFileMetadata(update.fileStorageId, {
+          fileName: update.fileName,
+          path: update.path, // edited by claude on 2026.01.24.17.45 - Add path field support
+          metadata: update.metadata,
+        });
+        results.success.push({ fileStorageId: update.fileStorageId });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        results.failed.push({
+          fileStorageId: update.fileStorageId,
+          error: errorMessage,
+        });
+        this.logger.warn(`Failed to update ${update.fileStorageId}: ${errorMessage}`);
+      }
+    }
+
+    this.logger.log(`Batch update complete: ${results.success.length} succeeded, ${results.failed.length} failed`);
+    return results;
+  }
+  // End of Claude's edit
+
+  // edited by claude on 2026.01.25.13.30
+  /**
+   * Create a virtual directory (marker file)
+   * edited by claude on 2026.01.25.15.00 - Now creates all intermediate path markers
+   * Returns array of created markers with path and markerId
+   */
+  async createVirtualDirectory(virtualPath: string): Promise<Array<{ path: string; markerId: string }>> {
+    const createdMarkers = await createVirtualDirectory(this.storageBasePath, virtualPath);
+    this.logger.log(`Created virtual directory: ${virtualPath} (${createdMarkers.length} markers created)`);
+    return createdMarkers;
+  }
+  // End of Claude's edit
+
+  /**
+   * List all virtual directory markers
+   */
+  async listVirtualDirectories(): Promise<Array<{markerId: string; path: string; createdAt: string}>> {
+    const markers = await listVirtualDirectories(this.storageBasePath);
+    return markers.map(m => ({
+      markerId: m._fileStorageId,
+      path: m.path,
+      createdAt: m.createdAt,
+    }));
+  }
+
+  /**
+   * Delete a virtual directory marker
+   */
+  async deleteVirtualDirectory(markerId: string): Promise<boolean> {
+    const deleted = await deleteVirtualDirectory(this.storageBasePath, markerId);
+    if (deleted) {
+      this.logger.log(`Deleted virtual directory marker: ${markerId}`);
+    } else {
+      this.logger.warn(`Virtual directory marker not found: ${markerId}`);
+    }
+    return deleted;
+  }
+
+  /**
+   * Build complete directory tree from files and virtual directories
+   */
+  async getDirectoryTree(): Promise<any> {
+    const files = await this.listAllFiles();
+    const virtualDirs = await listVirtualDirectories(this.storageBasePath);
+
+    const tree = buildDirectoryTree(files, virtualDirs);
+    return tree;
+  }
+  // End of Claude's edit
 }
 
