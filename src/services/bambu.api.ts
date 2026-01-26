@@ -140,7 +140,7 @@ export class BambuApi implements IPrinterApi {
   async startPrint(path: string): Promise<void> {
     this.logger.log(`Starting print: ${path}`, this.logMeta());
     const mqttAdapter = this.getMqttAdapter();
-    await mqttAdapter.startPrint("/model/" + path);
+    await mqttAdapter.startPrint("/" + path);
   }
 
   async pausePrint(): Promise<void> {
@@ -203,7 +203,7 @@ export class BambuApi implements IPrinterApi {
   async getFiles(): Promise<FileDto[]> {
     this.logger.debug("Listing files", this.logMeta());
     await this.ensureFtpConnected();
-    const files = await this.client.ftp.listFiles("/model");
+    const files = await this.client.ftp.listFiles("/");
 
     return files
       .filter((f) => f.isFile) // Only files, not directories
@@ -219,16 +219,13 @@ export class BambuApi implements IPrinterApi {
 
     await this.ensureFtpConnected();
 
-    // Ensure path starts with /cache/
-    const remotePath = path.startsWith("/cache/") ? path : `/cache/${path}`;
-
-    const { stream, tempPath } = await this.client.ftp.downloadFileAsStream(remotePath);
+    const { stream, tempPath } = await this.client.ftp.downloadFileAsStream(path);
 
     // Get file size from the temp file
     const stats = statSync(tempPath);
 
     // Extract filename from path for Content-Disposition header
-    const filename = remotePath.split("/").pop() || "download";
+    const filename = path.split("/").pop() || "download";
 
     // Create an AxiosResponse-like structure
     const response: AxiosResponse<NodeJS.ReadableStream> = {
@@ -293,7 +290,7 @@ export class BambuApi implements IPrinterApi {
   async deleteFile(path: string): Promise<void> {
     this.logger.log(`Deleting file: ${path}`, this.logMeta());
     await this.ensureFtpConnected();
-    await this.client.ftp.deleteFile(`/cache/${path}`);
+    await this.client.ftp.deleteFile(`/${path}`);
   }
 
   deleteFolder(path: string): Promise<void> {
