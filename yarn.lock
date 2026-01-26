@@ -6811,9 +6811,9 @@ __metadata:
   linkType: hard
 
 "lru-cache@npm:^11.0.0, lru-cache@npm:^11.1.0, lru-cache@npm:^11.2.1":
-  version: 11.2.4
-  resolution: "lru-cache@npm:11.2.4"
-  checksum: 10c0/4a24f9b17537619f9144d7b8e42cd5a225efdfd7076ebe7b5e7dc02b860a818455201e67fbf000765233fe7e339d3c8229fc815e9b58ee6ede511e07608c19b2
+  version: 11.2.5
+  resolution: "lru-cache@npm:11.2.5"
+  checksum: 10c0/cc98958d25dddf1c8a8cbdc49588bd3b24450e8dfa78f32168fd188a20d4a0331c7406d0f3250c86a46619ee288056fd7a1195e8df56dc8a9592397f4fbd8e1d
   languageName: node
   linkType: hard
 
@@ -7213,11 +7213,11 @@ __metadata:
   linkType: hard
 
 "nan@npm:^2.14.0":
-  version: 2.24.0
-  resolution: "nan@npm:2.24.0"
+  version: 2.25.0
+  resolution: "nan@npm:2.25.0"
   dependencies:
     node-gyp: "npm:latest"
-  checksum: 10c0/6f9828a15464999ccefcae61b0f94f1f37067048a56363966e892cc6a194e3500966ae6964dd5a6a8acc5e1a849d60d620b120a84bc66c60445379a930c5b0f8
+  checksum: 10c0/add28b255a880f705f937b6276550ebc09274e8ea9d0e8f598f286c817aedfba22223844297840e597a478d7264537294f8c1eda0eb33a228b7aee57ecf52d45
   languageName: node
   linkType: hard
 
