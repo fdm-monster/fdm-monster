@@ -41,27 +41,28 @@ export interface BaseMetadata {
 
   // Print time estimates
   gcodePrintTimeSeconds: number | null;
+  gcodePrintTimeSecondsSilent?: number | null;
 
-  // Filament specification
-  nozzleDiameterMm: number | null;
-  filamentDiameterMm: number | null;
-  filamentDensityGramsCm3: number | null;
+  // Filament specification (single or array for MMU)
+  nozzleDiameterMm: number | number[] | null;
+  filamentDiameterMm: number | number[] | null;
+  filamentDensityGramsCm3: number | number[] | null;
 
-  // Filament usage
-  filamentUsedMm: number | null;
-  filamentUsedCm3: number | null;
-  filamentUsedGrams: number | null;
+  // Filament usage (single or array for MMU)
+  filamentUsedMm: number | number[] | null;
+  filamentUsedCm3: number | number[] | null;
+  filamentUsedGrams: number | number[] | null;
   totalFilamentUsedGrams: number | null;
 
-  // Print settings
+  // Print settings (single or array for MMU)
   layerHeight: number | null;
   firstLayerHeight: number | null;
-  bedTemperature: number | null;
-  nozzleTemperature: number | null;
+  bedTemperature: number | number[] | null;
+  nozzleTemperature: number | number[] | null;
   fillDensity: string | null;
 
-  // Printer/Slicer info
-  filamentType: string | null;
+  // Printer/Slicer info (single or array for MMU)
+  filamentType: string | string[] | null;
   printerModel: string | null;
   slicerVersion: string | null;
   maxLayerZ: number | null;
@@ -111,6 +112,7 @@ export interface BGCodeMetadata extends BaseMetadata {
   producer?: string;
   producedOn?: string;
   checksumType?: string;
+  isMmu?: boolean;
 
   thumbnails?: Array<{
     width: number;
