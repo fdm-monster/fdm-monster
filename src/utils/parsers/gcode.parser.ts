@@ -2,6 +2,8 @@ import * as fs from "node:fs/promises";
 import * as readline from "node:readline";
 import { createReadStream } from "node:fs";
 import { GCodeMetadata } from "@/entities/print-job.entity";
+import { decodeQOI } from "../bgcode/qoi-decoder";
+import { encodePNG } from "../bgcode/png-encoder";
 
 interface GCodeParseResult {
   raw: {
@@ -233,16 +235,30 @@ export class GCodeParser {
 
       if (inThumbnail) {
         if (line.match(/;\s*thumbnail end/i)) {
+          let base64Data = thumbnailData.join("");
+          let format = currentFormat.toUpperCase();
+
+          if (format === "QOI") {
+            try {
+              const qoiBuffer = Buffer.from(base64Data, 'base64');
+              const decoded = decodeQOI(qoiBuffer);
+              const pngBuffer = encodePNG(decoded.width, decoded.height, decoded.data);
+              base64Data = pngBuffer.toString('base64');
+              format = "PNG";
+            } catch {
+              // Keep original QOI if conversion fails
+            }
+          }
+
           thumbnails.push({
             width: currentWidth,
             height: currentHeight,
-            format: currentFormat.toUpperCase(),
-            data: thumbnailData.join(""),
+            format,
+            data: base64Data,
           });
           inThumbnail = false;
           thumbnailData = [];
         } else if (line.startsWith(";")) {
-          // Extract base64 data
           const data = line.substring(1).trim();
           if (data) {
             thumbnailData.push(data);

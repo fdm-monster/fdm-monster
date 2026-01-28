@@ -118,7 +118,7 @@ export interface BGCodeMetadata extends BaseMetadata {
     width: number;
     height: number;
     format: string;
-    size: number;
+    dataLength: number;
   }>;
 
   blocks?: Array<{

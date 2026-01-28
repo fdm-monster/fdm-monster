@@ -62,7 +62,6 @@ export class PrintQueueService implements IPrintQueueService {
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(PrintQueueService.name);
 
-    // Register event handler for job submission
     this.eventEmitter2.on("printQueue.jobSubmitted", (event: { printerId: number; jobId: number; fileName: string; fileStorageId?: string; queuePosition?: number | null }) => {
       this.handleJobSubmission(event.printerId, event.jobId, event.fileName, event.fileStorageId, event.queuePosition).catch((error) => {
         this.logger.error(`Failed to handle job submission for job ${event.jobId}`, error);
@@ -94,9 +93,6 @@ export class PrintQueueService implements IPrintQueueService {
     return { connected: true };
   }
 
-  /**
-   * Add job to print queue for specific printer
-   */
   async addToQueue(printerId: number, jobId: number, position?: number): Promise<void> {
     const job = await this.printJobRepository.findOne({ where: { id: jobId } });
     if (!job) {
@@ -104,11 +100,6 @@ export class PrintQueueService implements IPrintQueueService {
     }
 
     this.ensurePrinterAssignment(job, printerId);
-
-    // Always ensure printerName is set
-    if (!job.printerName) {
-      job.printerName = printer.name;
-    }
 
     if (position === undefined || position === null) {
       const maxPosition = await this.getMaxQueuePosition(printerId);
@@ -144,7 +135,6 @@ export class PrintQueueService implements IPrintQueueService {
     }
     await this.printJobRepository.save(job);
 
-    // Compact queue positions
     if (oldPosition !== null && printerId) {
       await this.compactQueuePositions(printerId, oldPosition);
     }
@@ -191,6 +181,7 @@ export class PrintQueueService implements IPrintQueueService {
       skip: skip,
     });
   }
+
 
   async getNextInQueue(printerId: number): Promise<PrintJob | null> {
     return this.printJobRepository.findOne({
@@ -263,6 +254,7 @@ export class PrintQueueService implements IPrintQueueService {
     }
   }
 
+
   private async getMaxQueuePosition(printerId: number): Promise<number | null> {
     const result = await this.printJobRepository
       .createQueryBuilder("job")
@@ -307,6 +299,7 @@ export class PrintQueueService implements IPrintQueueService {
       job.queuePosition = null;
       await this.compactQueuePositions(printerId, oldPosition);
     }
+
 
     // Update status but keep in queue until submission succeeds
     job.status = "PRINTING";

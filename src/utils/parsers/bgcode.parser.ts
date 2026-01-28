@@ -90,7 +90,12 @@ export class BGCodeParser {
         slicerVersion: metadata.producer || null,
         maxLayerZ: this.parseFloat(metadata.max_layer_z),
         totalLayers: this.parseInt(metadata.total_layers || metadata.layer_count),
-        thumbnails: thumbnails.length > 0 ? thumbnails : undefined,
+        thumbnails: thumbnails.length > 0 ? thumbnails.map(t => ({
+          width: t.width,
+          height: t.height,
+          format: t.format,
+          dataLength: t.data?.length || 0,
+        })) : undefined,
         blocks: blockHeaders.map(b => ({
           type: BgCodeBlockTypeName[b.type] || `Unknown(${ b.type })`,
           compressedSize: b.compressedSize,
