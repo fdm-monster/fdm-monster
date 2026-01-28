@@ -69,9 +69,6 @@ export class PrintQueueService implements IPrintQueueService {
     this.logger.log("Print queue service initialized");
   }
 
-  /**
-   * Add job to print queue for specific printer
-   */
   async addToQueue(printerId: number, jobId: number, position?: number): Promise<void> {
     const job = await this.printJobRepository.findOne({ where: { id: jobId } });
     if (!job) {

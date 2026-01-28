@@ -202,7 +202,12 @@ export class PrintJobController {
       job.endedAt = endedAt;
       job.statusReason = "Manually marked as failed by user";
 
-      if (!job.statistics) {
+      if (job.statistics) {
+        job.statistics.endedAt = endedAt;
+        job.statistics.actualPrintTimeSeconds = actualTimeSeconds;
+        job.statistics.failureReason = "Manually marked as failed by user";
+        job.statistics.failureTime = endedAt;
+      } else {
         job.statistics = {
           startedAt: job.startedAt,
           endedAt,
@@ -211,11 +216,6 @@ export class PrintJobController {
           failureReason: "Manually marked as failed by user",
           failureTime: endedAt,
         };
-      } else {
-        job.statistics.endedAt = endedAt;
-        job.statistics.actualPrintTimeSeconds = actualTimeSeconds;
-        job.statistics.failureReason = "Manually marked as failed by user";
-        job.statistics.failureTime = endedAt;
       }
 
       await this.printJobService.printJobRepository.save(job);
@@ -267,16 +267,16 @@ export class PrintJobController {
       job.endedAt = endedAt;
       job.statusReason = "Manually marked as cancelled by user";
 
-      if (!job.statistics) {
+      if (job.statistics) {
+        job.statistics.endedAt = endedAt;
+        job.statistics.actualPrintTimeSeconds = actualTimeSeconds;
+      } else {
         job.statistics = {
           startedAt: job.startedAt,
           endedAt,
           actualPrintTimeSeconds: actualTimeSeconds,
           progress: job.progress,
         };
-      } else {
-        job.statistics.endedAt = endedAt;
-        job.statistics.actualPrintTimeSeconds = actualTimeSeconds;
       }
 
       await this.printJobService.printJobRepository.save(job);

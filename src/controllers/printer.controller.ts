@@ -286,17 +286,17 @@ export class PrinterController {
             throw new FailedDependencyException("Printer service unreachable", e.response?.status);
           }
           default: {
-            if (!e.response?.status) {
+            if (e.response?.status) {
+              throw new FailedDependencyException(
+                `Reaching Printer service failed with status (code ${ e.code })`,
+                e.response?.status,
+              );
+            } else {
               // F.e. http://localhost:1324
               // ENOTFOUND: DNS problem
               // ECONNREFUSED: Port has no socket bound
               // ERR_BAD_REQUEST
-              throw new FailedDependencyException(`Reaching Printer service failed without status (code ${e.code})`);
-            } else {
-              throw new FailedDependencyException(
-                `Reaching Printer service failed with status (code ${e.code})`,
-                e.response?.status,
-              );
+              throw new FailedDependencyException(`Reaching Printer service failed without status (code ${ e.code })`);
             }
           }
         }
