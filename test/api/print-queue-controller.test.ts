@@ -6,6 +6,7 @@ import { PrintQueueService } from "@/services/print-queue.service";
 import { FileStorageService } from "@/services/file-storage.service";
 import { AppConstants } from "@/server.constants";
 import { asValue } from "awilix";
+import { Readable } from "node:stream";
 
 describe("PrintQueueController", () => {
   let testRequest: any;
@@ -30,7 +31,7 @@ describe("PrintQueueController", () => {
       getFilePath: jest.fn().mockReturnValue("/mock/path/file.gcode"),
       getFileSize: jest.fn().mockReturnValue(1024),
       readFile: jest.fn().mockReturnValue(Buffer.from("; mock gcode\nG28\n")),
-      readFileStream: jest.fn().mockReturnValue(require("stream").Readable.from([Buffer.from("; test gcode\nG28\n")])),
+      readFileStream: jest.fn().mockReturnValue(Readable.from([Buffer.from("; test gcode\nG28\n")])),
     };
 
     const { request, container } = await setupTestApp(false, {
