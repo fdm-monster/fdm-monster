@@ -7,6 +7,7 @@ import { LoggerService } from "@/handlers/logger";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { FileStorageService } from "@/services/file-storage.service";
 import { captureException } from "@sentry/node";
+import { statSync } from "node:fs";
 
 export interface QueuedJob {
   id: number;
