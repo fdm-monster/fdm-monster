@@ -4,17 +4,16 @@ import { DITokens } from "@/container.tokens";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { PrintQueueService } from "@/services/print-queue.service";
 import { FileStorageService } from "@/services/file-storage.service";
-import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { AppConstants } from "@/server.constants";
 import { asValue } from "awilix";
+import { Readable } from "node:stream";
 
 describe("PrintQueueController", () => {
   let testRequest: any;
   let printJobService: PrintJobService;
   let printQueueService: PrintQueueService;
   let fileStorageService: FileStorageService;
-  let printerApiFactory: PrinterApiFactory;
-  const baseRoute = `${AppConstants.apiRoute}/print-queue`;
+  const baseRoute = `${ AppConstants.apiRoute }/print-queue`;
 
   beforeAll(async () => {
     // Mock printer API factory to prevent actual file uploads
@@ -30,7 +29,9 @@ describe("PrintQueueController", () => {
       saveFile: jest.fn().mockResolvedValue("mock-file-storage-id"),
       ensureStorageDirectories: jest.fn().mockResolvedValue(undefined),
       getFilePath: jest.fn().mockReturnValue("/mock/path/file.gcode"),
+      getFileSize: jest.fn().mockReturnValue(1024),
       readFile: jest.fn().mockReturnValue(Buffer.from("; mock gcode\nG28\n")),
+      readFileStream: jest.fn().mockReturnValue(Readable.from([Buffer.from("; test gcode\nG28\n")])),
     };
 
     const { request, container } = await setupTestApp(false, {
@@ -42,7 +43,6 @@ describe("PrintQueueController", () => {
     printJobService = container.resolve<PrintJobService>(DITokens.printJobService);
     printQueueService = container.resolve<PrintQueueService>(DITokens.printQueueService);
     fileStorageService = container.resolve<FileStorageService>(DITokens.fileStorageService);
-    printerApiFactory = container.resolve<PrinterApiFactory>(DITokens.printerApiFactory);
   });
 
   describe("GET /print-queue - Global Queue", () => {

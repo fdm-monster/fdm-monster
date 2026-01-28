@@ -5,6 +5,7 @@ import {
   PartialReprintFileDto,
   PrinterType,
   ReprintState,
+  UploadFileInput,
 } from "@/services/printer-api.interface";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
@@ -220,37 +221,17 @@ export class BambuApiStub implements IPrinterApi {
     throw new Error("Method not implemented");
   }
 
-  async uploadFile(
-    fileOrBuffer: Buffer | Express.Multer.File,
-    startPrint: boolean,
-    uploadToken?: string,
-  ): Promise<void> {
-    let fileBuffer: Buffer;
-    let filename: string;
-
-    // Get file buffer and name
-    if (Buffer.isBuffer(fileOrBuffer)) {
-      this.logger.log("[STUB] Using file directly from memory buffer for upload");
-      fileBuffer = fileOrBuffer;
-      filename = `upload_${Date.now()}.3mf`; // Default name for buffer uploads
-    } else {
-      const filePath = fileOrBuffer.path;
-      filename = fileOrBuffer.originalname;
-      this.logger.log(`[STUB] Reading file from disk for upload: ${filePath}`);
-      // In stub mode, create a mock buffer instead of reading from disk
-      fileBuffer = Buffer.from(`[STUB] Mock file content for ${filename}`);
-    }
-
-    this.logger.log(`[STUB] Uploading file: ${filename} (${fileBuffer.length} bytes)`, this.logMeta());
+  async uploadFile(input: UploadFileInput): Promise<void> {
+    this.logger.log(`[STUB] Uploading file: ${input.fileName} (${input.contentLength} bytes)`, this.logMeta());
 
     try {
       await this.ensureFtpConnected();
-      await this.client.ftp.uploadFile(fileBuffer, filename, uploadToken);
+      await this.client.ftp.uploadFile(input.stream, input.fileName, input.uploadToken);
 
-      if (startPrint) {
-        this.logger.log(`[STUB] Starting print after upload: ${filename}`, this.logMeta());
+      if (input.startPrint) {
+        this.logger.log(`[STUB] Starting print after upload: ${input.fileName}`, this.logMeta());
         const mqttAdapter = this.getMqttAdapter();
-        await mqttAdapter.startPrint(filename);
+        await mqttAdapter.startPrint(input.fileName);
       }
     } catch (error) {
       this.logger.error(`[STUB] Upload failed: ${(error as Error).message}`, this.logMeta());

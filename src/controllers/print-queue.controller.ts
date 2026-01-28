@@ -20,10 +20,6 @@ export class PrintQueueController {
     this.logger = loggerFactory(PrintQueueController.name);
   }
 
-  /**
-   * Get global queue across all printers with pagination
-   * GET /api/print-queue?page=1&pageSize=50
-   */
   @GET()
   async getGlobalQueue(req: Request, res: Response) {
     try {
@@ -74,10 +70,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Get queue for specific printer
-   * GET /api/print-queue/:printerId
-   */
   @GET()
   @route("/:printerId")
   @before([ParamId("printerId")])
@@ -97,11 +89,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Add job to printer queue
-   * POST /api/print-queue/:printerId/add/:jobId
-   * Body: { position?: number }
-   */
   @POST()
   @route("/:printerId/add/:jobId")
   @before([ParamId("printerId"), ParamId("jobId")])
@@ -130,11 +117,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Reorder queue for a printer
-   * PUT /api/print-queue/:printerId/reorder
-   * Body: { jobIds: number[] }
-   */
   @PUT()
   @route("/:printerId/reorder")
   @before([ParamId("printerId")])
@@ -165,10 +147,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Clear all jobs from printer queue
-   * DELETE /api/print-queue/:printerId/clear
-   */
   @DELETE()
   @route("/:printerId/clear")
   @before([ParamId("printerId")])
@@ -191,10 +169,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Remove job from queue
-   * DELETE /api/print-queue/:printerId/:jobId
-   */
   @DELETE()
   @route("/:printerId/:jobId")
   @before([ParamId("printerId"), ParamId("jobId")])
@@ -221,10 +195,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Get next job in queue for printer
-   * GET /api/print-queue/:printerId/next
-   */
   @GET()
   @route("/:printerId/next")
   @before([ParamId("printerId")])
@@ -244,10 +214,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Process queue - start next job
-   * POST /api/print-queue/:printerId/process
-   */
   @POST()
   @route("/:printerId/process")
   @before([ParamId("printerId")])
@@ -280,10 +246,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Submit job directly to printer for immediate printing
-   * POST /api/print-queue/:printerId/submit/:jobId
-   */
   @POST()
   @route("/:printerId/submit/:jobId")
   @before([ParamId("printerId"), ParamId("jobId")])

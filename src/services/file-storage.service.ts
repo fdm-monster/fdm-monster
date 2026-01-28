@@ -7,13 +7,15 @@ import { getMediaPath } from "@/utils/fs.utils";
 import path, { basename, extname, join } from "node:path";
 import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, createReadStream, statSync } from "node:fs";
+import { Readable } from "node:stream";
 
 export interface IFileStorageService {
   saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
   getFile(fileStorageId: string): Promise<Buffer>;
   deleteFile(fileStorageId: string): Promise<void>;
   getFilePath(fileStorageId: string): string;
+  getFileSize(fileStorageId: string): number;
   calculateFileHash(filePath: string): Promise<string>;
   saveMetadata(fileStorageId: string, metadata: any, fileHash?: string, originalFileName?: string, thumbnailMetadata?: any[]): Promise<void>;
   loadMetadata(fileStorageId: string): Promise<any | null>;
@@ -51,12 +53,24 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  /**
-   * Read file from storage
-   */
-  readFile(fileStorageId: string): Buffer {
+  readFileStream(fileStorageId: string): Readable {
     const filePath = this.getFilePath(fileStorageId);
-    return readFileSync(filePath);
+    const stream = createReadStream(filePath);
+
+    stream.on("error", err => {
+      this.logger.error(
+        `Failed to read file ${fileStorageId}: ${err.message}`,
+        err,
+      );
+    });
+
+    return stream;
+  }
+
+  getFileSize(fileStorageId: string): number {
+    const filePath = this.getFilePath(fileStorageId);
+    const stats = statSync(filePath);
+    return stats.size;
   }
 
   /**

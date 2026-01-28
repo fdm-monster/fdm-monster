@@ -4,6 +4,20 @@ import { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.d
 import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
 import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto";
+import { z } from "zod";
+import { Readable } from "node:stream";
+
+export const uploadFileInputSchema = z.object({
+  stream: z.custom<Readable>((val) => {
+    return val && typeof val === "object" && "pipe" in val && typeof val.pipe === "function";
+  }, "Must be a readable stream"),
+  fileName: z.string().min(1),
+  contentLength: z.number().int().positive(),
+  startPrint: z.boolean(),
+  uploadToken: z.string().optional(),
+});
+
+export type UploadFileInput = z.infer<typeof uploadFileInputSchema>;
 
 export const OctoprintType = 0;
 export const MoonrakerType = 1;
@@ -111,7 +125,7 @@ export interface IPrinterApi {
 
   getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string>;
 
-  uploadFile(fileOrBuffer: Buffer | Express.Multer.File, startPrint: boolean, uploadToken?: string): Promise<void>;
+  uploadFile(input: UploadFileInput): Promise<void>;
 
   deleteFile(path: string): Promise<void>;
 

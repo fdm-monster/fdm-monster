@@ -1,5 +1,16 @@
 # Develop
 
+## Refactor
+
+- Refactored printer file upload system to use native streams across all printer API implementations (OctoPrint, Moonraker, PrusaLink, Bambu)
+- Introduced Zod schema validation for upload file parameters with `UploadFileInput` type
+- Added `getFileSize()` method to FileStorageService for consistent file size retrieval
+- Improved memory efficiency for large file uploads by eliminating buffer conversions where possible
+  - OctoPrint: Native multipart/form-data streaming with `knownLength` optimization
+  - Moonraker: Native multipart/form-data streaming with `knownLength` optimization
+  - PrusaLink: Native streaming via `application/octet-stream` PUT requests
+  - Bambu: Native FTP streaming using basic-ftp's `uploadFrom()` with stream support
+
 # FDM Monster 2.0.7
 
 ## Fixes

@@ -1,4 +1,4 @@
-import { IPrinterApi, OctoprintType, PrinterType, ReprintState } from "@/services/printer-api.interface";
+import { IPrinterApi, OctoprintType, PrinterType, ReprintState, UploadFileInput, uploadFileInputSchema } from "@/services/printer-api.interface";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { NotImplementedException } from "@/exceptions/runtime.exceptions";
@@ -110,8 +110,9 @@ export class OctoprintApi implements IPrinterApi {
     return await this.client.getFileChunk(this.login, path, startBytes, endBytes);
   }
 
-  async uploadFile(fileOrBuffer: Buffer | Express.Multer.File, startPrint: boolean, uploadToken?: string) {
-    await this.client.uploadFileAsMultiPart(this.login, fileOrBuffer, startPrint, uploadToken);
+  async uploadFile(input: UploadFileInput) {
+    const validated = uploadFileInputSchema.parse(input);
+    await this.client.uploadFileAsMultiPart(this.login, validated.stream, validated.fileName, validated.contentLength, validated.startPrint, validated.uploadToken);
   }
 
   async deleteFile(path: string) {
