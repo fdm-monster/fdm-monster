@@ -12,6 +12,11 @@ export interface ThumbnailProcessResult {
   converted?: boolean;
 }
 
+export function convertQoiToPng(qoiBuffer: Buffer): Buffer {
+  const decoded = decodeQOI(qoiBuffer);
+  return encodePNG(decoded.width, decoded.height, decoded.data);
+}
+
 export function processThumbnail(data: Buffer, parameters: BgCodeThumbnailParameters): ThumbnailProcessResult {
   switch (parameters.format) {
     case BgCodeThumbnailFormats.PNG:
@@ -27,8 +32,7 @@ export function processThumbnail(data: Buffer, parameters: BgCodeThumbnailParame
       };
 
     case BgCodeThumbnailFormats.QOI:
-      const decoded = decodeQOI(data);
-      const pngData = encodePNG(decoded.width, decoded.height, decoded.data);
+      const pngData = convertQoiToPng(data);
       return {
         extension: BgCodeThumbnailFormatExtension[BgCodeThumbnailFormats.PNG],
         data: pngData,

@@ -2,8 +2,7 @@ import * as fs from "node:fs/promises";
 import * as readline from "node:readline";
 import { createReadStream } from "node:fs";
 import { GCodeMetadata } from "@/entities/print-job.entity";
-import { decodeQOI } from "../bgcode/qoi-decoder";
-import { encodePNG } from "../bgcode/png-encoder";
+import { convertQoiToPng } from "../bgcode/bgcode-thumbnail.parser";
 
 interface GCodeParseResult {
   raw: {
@@ -241,8 +240,7 @@ export class GCodeParser {
           if (format === "QOI") {
             try {
               const qoiBuffer = Buffer.from(base64Data, 'base64');
-              const decoded = decodeQOI(qoiBuffer);
-              const pngBuffer = encodePNG(decoded.width, decoded.height, decoded.data);
+              const pngBuffer = convertQoiToPng(qoiBuffer);
               base64Data = pngBuffer.toString('base64');
               format = "PNG";
             } catch {
