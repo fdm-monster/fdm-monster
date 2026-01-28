@@ -1,5 +1,16 @@
 # Develop
 
+# FDM Monster 2.0.8
+
+## Features
+
+- Enhanced BGCode parser with MMU (Multi-Material Unit) support
+  - Detects MMU configurations by analyzing metadata fields for multiple values
+  - Parses filament data as arrays for MMU prints (per-extruder values)
+  - Provides `totalFilamentUsedGrams` for sum of all extruders in MMU mode
+  - Extracts thumbnails from BGCode files with QOI and Heatshrink decompression
+  - Supports comprehensive metadata including print times, temperatures, and layer information
+
 ## Refactor
 
 - Refactored printer file upload system to use native streams across all printer API implementations (OctoPrint, Moonraker, PrusaLink, Bambu)
@@ -10,6 +21,7 @@
   - Moonraker: Native multipart/form-data streaming with `knownLength` optimization
   - PrusaLink: Native streaming via `application/octet-stream` PUT requests
   - Bambu: Native FTP streaming using basic-ftp's `uploadFrom()` with stream support
+- Simplified print queue service by removing redundant comments and extracting printer assignment logic
 
 # FDM Monster 2.0.7
 

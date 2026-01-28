@@ -2,30 +2,16 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import AdmZip from "adm-zip";
 import { ThreeMFMetadata } from "@/entities/print-job.entity";
+import { ParsedThumbnail } from "./parser.types";
+import { getImageDimensions } from "../image-dimensions";
 
 interface ThreeMFParseResult {
   raw: {
-    _thumbnails?: Array<{
-      width: number;
-      height: number;
-      format: string;
-      path?: string;
-    }>;
-    plates?: any[];
+    _thumbnails?: ParsedThumbnail[];
+    plates?: ThreeMFMetadata["plates"];
   };
   normalized: ThreeMFMetadata;
-  plates?: Array<{
-    plateNumber: number;
-    gcodePrintTimeSeconds: number | null;
-    filamentUsedGrams: number | null;
-    totalLayers: number | null;
-    objects: Array<{ name: string; bbox?: number[] }>;
-    thumbnails?: Array<{
-      path: string;
-      size: number;
-      type: string;
-    }>;
-  }>;
+  plates?: ThreeMFMetadata["plates"];
 }
 
 /**
@@ -153,6 +139,12 @@ export class ThreeMFParser {
       slicerVersion: topLevelSlicerVersion,
       maxLayerZ: topLevelMaxZ,
       totalLayers: topLevelLayers,
+      thumbnails: thumbnails.length > 0 ? thumbnails.map(t => ({
+        width: t.width,
+        height: t.height,
+        format: t.format,
+        dataLength: t.data?.length || 0,
+      })) : undefined,
       plates: plates.length > 0 ? plates : undefined,
     };
 
@@ -219,19 +211,8 @@ export class ThreeMFParser {
     return metadata;
   }
 
-  private extractPlates(zipEntries: AdmZip.IZipEntry[]): Array<{
-    plateNumber: number;
-    gcodePrintTimeSeconds: number | null;
-    filamentUsedGrams: number | null;
-    totalLayers: number | null;
-    objects: Array<{ name: string; bbox?: number[] }>;
-    thumbnails?: Array<{
-      path: string;
-      size: number;
-      type: string;
-    }>;
-  }> {
-    const plates: Array<any> = [];
+  private extractPlates(zipEntries: AdmZip.IZipEntry[]): NonNullable<ThreeMFMetadata["plates"]> {
+    const plates: NonNullable<ThreeMFMetadata["plates"]> = [];
 
     // Look for Bambu Lab plate structure (but not .gcode.md5 files)
     const plateEntries = zipEntries.filter(e => e.entryName.match(/Metadata\/plate_\d+\.gcode$/)  && !e.entryName.endsWith('.md5'));
@@ -259,7 +240,27 @@ export class ThreeMFParser {
         (e.entryName.endsWith(".png") || e.entryName.endsWith(".jpg"))
       );
 
-      // Map Bambu G-code header keys to our expected keys
+      const plateThumbnails: ParsedThumbnail[] = plateThumbs.map(t => {
+        const format = t.entryName.endsWith(".png") ? "PNG" : "JPG";
+        const imageData = t.getData();
+
+        const sizeMatch = t.entryName.match(/(\d+)x(\d+)/);
+        let width = sizeMatch ? Number.parseInt(sizeMatch[1]) : 0;
+        let height = sizeMatch ? Number.parseInt(sizeMatch[2]) : 0;
+
+        if (width === 0 || height === 0) {
+          const dimensions = getImageDimensions(imageData, format);
+          width = dimensions.width;
+          height = dimensions.height;
+        }
+
+        return {
+          width,
+          height,
+          format,
+          data: imageData.toString("base64"),
+        };
+      });
       const printTime = this.parseTime(
         metadata.model_printing_time ||
         metadata.total_estimated_time ||
@@ -316,12 +317,13 @@ export class ThreeMFParser {
         fillDensity: metadata.sparse_infill_density || metadata.infill_density || metadata.fill_density || null,
         filamentType: metadata.filament_type || null,
         printerModel: metadata.printer_model || null,
-        objects: [], // Could be extracted from 3dmodel.model XML
-        thumbnails: plateThumbs.map(t => ({
-          path: t.entryName,
-          size: t.getData().length,
-          type: t.entryName.endsWith(".png") ? "PNG" : "JPG",
-        })),
+        objects: [],
+        thumbnails: plateThumbnails.length > 0 ? plateThumbnails.map(t => ({
+          width: t.width,
+          height: t.height,
+          format: t.format,
+          dataLength: t.data?.length || 0,
+        })) : undefined,
       };
 
       plates.push(plateMetadata);
@@ -388,14 +390,8 @@ export class ThreeMFParser {
     return metadata;
   }
 
-  private extractThumbnails(zipEntries: AdmZip.IZipEntry[]): Array<{
-    width: number;
-    height: number;
-    format: string;
-    path?: string;
-    data?: string;
-  }> {
-    const thumbnails: Array<any> = [];
+  private extractThumbnails(zipEntries: AdmZip.IZipEntry[]): ParsedThumbnail[] {
+    const thumbnails: ParsedThumbnail[] = [];
 
     const thumbEntries = zipEntries.filter(e =>
       e.entryName.match(/Metadata\/.*\.(png|jpg|jpeg)/i) ||
@@ -403,23 +399,26 @@ export class ThreeMFParser {
     );
 
     for (const entry of thumbEntries) {
-      // Try to extract dimensions from filename
-      const sizeMatch = entry.entryName.match(/(\d+)x(\d+)/);
-      const width = sizeMatch ? Number.parseInt(sizeMatch[1]) : 0;
-      const height = sizeMatch ? Number.parseInt(sizeMatch[2]) : 0;
-
       const format = entry.entryName.match(/\.(png|jpg|jpeg)$/i)?.[1].toUpperCase() || "PNG";
-
-      // Extract image data as base64
       const imageData = entry.getData();
+
+      const sizeMatch = entry.entryName.match(/(\d+)x(\d+)/);
+      let width = sizeMatch ? Number.parseInt(sizeMatch[1]) : 0;
+      let height = sizeMatch ? Number.parseInt(sizeMatch[2]) : 0;
+
+      if (width === 0 || height === 0) {
+        const dimensions = getImageDimensions(imageData, format);
+        width = dimensions.width;
+        height = dimensions.height;
+      }
+
       const base64Data = imageData.toString("base64");
 
       thumbnails.push({
         width,
         height,
         format,
-        path: entry.entryName,
-        data: base64Data, // Include base64-encoded image data
+        data: base64Data,
       });
     }
 

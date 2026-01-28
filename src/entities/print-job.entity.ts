@@ -41,43 +41,46 @@ export interface BaseMetadata {
 
   // Print time estimates
   gcodePrintTimeSeconds: number | null;
+  gcodePrintTimeSecondsSilent?: number | null;
 
-  // Filament specification
-  nozzleDiameterMm: number | null;
-  filamentDiameterMm: number | null;
-  filamentDensityGramsCm3: number | null;
+  // Filament specification (single or array for MMU)
+  nozzleDiameterMm: number | number[] | null;
+  filamentDiameterMm: number | number[] | null;
+  filamentDensityGramsCm3: number | number[] | null;
 
-  // Filament usage
-  filamentUsedMm: number | null;
-  filamentUsedCm3: number | null;
-  filamentUsedGrams: number | null;
+  // Filament usage (single or array for MMU)
+  filamentUsedMm: number | number[] | null;
+  filamentUsedCm3: number | number[] | null;
+  filamentUsedGrams: number | number[] | null;
   totalFilamentUsedGrams: number | null;
 
-  // Print settings
+  // Print settings (single or array for MMU)
   layerHeight: number | null;
   firstLayerHeight: number | null;
-  bedTemperature: number | null;
-  nozzleTemperature: number | null;
+  bedTemperature: number | number[] | null;
+  nozzleTemperature: number | number[] | null;
   fillDensity: string | null;
 
-  // Printer/Slicer info
-  filamentType: string | null;
+  // Printer/Slicer info (single or array for MMU)
+  filamentType: string | string[] | null;
   printerModel: string | null;
   slicerVersion: string | null;
   maxLayerZ: number | null;
   totalLayers: number | null;
 }
 
+export interface NormalizedThumbnail {
+  width: number;
+  height: number;
+  format: string;
+  dataLength: number;
+}
+
 // G-code specific metadata
 export interface GCodeMetadata extends BaseMetadata {
   fileFormat: "gcode";
   generatedBy?: string;
-  thumbnails?: Array<{
-    width: number;
-    height: number;
-    format: string;
-    dataLength: number;
-  }>;
+  thumbnails?: NormalizedThumbnail[];
 }
 
 // 3MF specific metadata (multi-plate support)
@@ -85,8 +88,9 @@ export interface ThreeMFMetadata extends BaseMetadata {
   fileFormat: "3mf";
   isMultiPlate: boolean;
   totalPlates: number;
-  plateNumber?: number;  // Current plate if from multi-plate file
-  sourceFile?: string;   // Original filename for plate grouping
+  plateNumber?: number;
+  sourceFile?: string;
+  thumbnails?: NormalizedThumbnail[];
 
   plates?: Array<{
     plateNumber: number;
@@ -97,11 +101,7 @@ export interface ThreeMFMetadata extends BaseMetadata {
       name: string;
       bbox?: number[];
     }>;
-    thumbnails?: Array<{
-      path: string;
-      size: number;
-      type: string;
-    }>;
+    thumbnails?: NormalizedThumbnail[];
   }>;
 }
 
@@ -111,13 +111,9 @@ export interface BGCodeMetadata extends BaseMetadata {
   producer?: string;
   producedOn?: string;
   checksumType?: string;
+  isMmu?: boolean;
 
-  thumbnails?: Array<{
-    width: number;
-    height: number;
-    format: string;
-    size: number;
-  }>;
+  thumbnails?: NormalizedThumbnail[];
 
   blocks?: Array<{
     type: string;
