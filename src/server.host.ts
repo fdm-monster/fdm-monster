@@ -6,7 +6,7 @@ import { ExceptionFilter } from "./middleware/exception.filter";
 import { fetchServerPort } from "./server.env";
 import { NotFoundException } from "./exceptions/runtime.exceptions";
 import { AppConstants } from "./server.constants";
-import { getMediaPath, superRootPath } from "./utils/fs.utils";
+import { getMediaPath, resolveInstalledClientPath } from "./utils/fs.utils";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
 import { IConfigService } from "@/services/core/config.service";
@@ -71,13 +71,18 @@ export class ServerHost {
     }
 
     const bundleDistPath = join(getMediaPath(), AppConstants.defaultClientBundleStorage, "dist");
-    const backupClientPath = join(superRootPath(), "node_modules", AppConstants.clientPackageName, "dist");
+    const backupClientPath = resolveInstalledClientPath(AppConstants.clientPackageName);
 
     // Serve the main bundle
     app.use(express.static(bundleDistPath));
 
-    // Serve the backup client
-    app.use(express.static(backupClientPath));
+    // Serve the backup client if found
+    if (backupClientPath) {
+      this.logger.log(`Serving backup client from: ${backupClientPath}`);
+      app.use(express.static(backupClientPath));
+    } else {
+      this.logger.warn(`Backup client package '${AppConstants.clientPackageName}' not found in node_modules`);
+    }
 
     app.get("*", (req, _) => {
       const path = req.originalUrl;
