@@ -4,9 +4,13 @@ import { Request, Response } from "express";
 import { authorizeRoles, authenticate } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { PrintQueueService } from "@/services/print-queue.service";
+import { PrintJobService } from "@/services/orm/print-job.service";
+import { FileStorageService } from "@/services/file-storage.service";
+import { PrinterCache } from "@/state/printer.cache";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { ParamId } from "@/middleware/param-converter.middleware";
+import { NotFoundException } from "@/exceptions/runtime.exceptions";
 
 @route(AppConstants.apiRoute + "/print-queue")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
@@ -16,14 +20,13 @@ export class PrintQueueController {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly printQueueService: PrintQueueService,
+    private readonly printJobService: PrintJobService,
+    private readonly fileStorageService: FileStorageService,
+    private readonly printerCache: PrinterCache,
   ) {
     this.logger = loggerFactory(PrintQueueController.name);
   }
 
-  /**
-   * Get global queue across all printers with pagination
-   * GET /api/print-queue?page=1&pageSize=50
-   */
   @GET()
   async getGlobalQueue(req: Request, res: Response) {
     try {
@@ -35,19 +38,7 @@ export class PrintQueueController {
         return;
       }
 
-      const skip = (page - 1) * pageSize;
-
-      // Get all QUEUED jobs with pagination
-      const [jobs, totalCount] = await this.printQueueService.printJobRepository.findAndCount({
-        where: { status: "QUEUED" },
-        order: {
-          printerId: "ASC",
-          queuePosition: "ASC",
-        },
-        relations: ['printer'],
-        take: pageSize,
-        skip: skip,
-      });
+      const [jobs, totalCount] = await this.printQueueService.getGlobalQueuePaged(page, pageSize);
 
       const queueItems = jobs.map(job => ({
         jobId: job.id,
@@ -74,10 +65,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Get queue for specific printer
-   * GET /api/print-queue/:printerId
-   */
   @GET()
   @route("/:printerId")
   @before([ParamId("printerId")])
@@ -97,11 +84,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Add job to printer queue
-   * POST /api/print-queue/:printerId/add/:jobId
-   * Body: { position?: number }
-   */
   @POST()
   @route("/:printerId/add/:jobId")
   @before([ParamId("printerId"), ParamId("jobId")])
@@ -130,11 +112,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Reorder queue for a printer
-   * PUT /api/print-queue/:printerId/reorder
-   * Body: { jobIds: number[] }
-   */
   @PUT()
   @route("/:printerId/reorder")
   @before([ParamId("printerId")])
@@ -165,10 +142,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Clear all jobs from printer queue
-   * DELETE /api/print-queue/:printerId/clear
-   */
   @DELETE()
   @route("/:printerId/clear")
   @before([ParamId("printerId")])
@@ -191,10 +164,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Remove job from queue
-   * DELETE /api/print-queue/:printerId/:jobId
-   */
   @DELETE()
   @route("/:printerId/:jobId")
   @before([ParamId("printerId"), ParamId("jobId")])
@@ -221,10 +190,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Get next job in queue for printer
-   * GET /api/print-queue/:printerId/next
-   */
   @GET()
   @route("/:printerId/next")
   @before([ParamId("printerId")])
@@ -244,10 +209,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Process queue - start next job
-   * POST /api/print-queue/:printerId/process
-   */
   @POST()
   @route("/:printerId/process")
   @before([ParamId("printerId")])
@@ -280,10 +241,75 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Submit job directly to printer for immediate printing
-   * POST /api/print-queue/:printerId/submit/:jobId
-   */
+  @POST()
+  @route("/:printerId/from-file")
+  @before([ParamId("printerId")])
+  async createJobFromFile(req: Request, res: Response) {
+    const printerId = req.local.printerId;
+    const { fileStorageId, addToQueue = true, position } = req.body;
+
+    if (!fileStorageId) {
+      res.status(400).send({ error: "fileStorageId is required" });
+      return;
+    }
+
+    try {
+      const fileExists = await this.fileStorageService.fileExists(fileStorageId);
+      if (!fileExists) {
+        throw new NotFoundException("File not found in storage");
+      }
+
+      const metadata = await this.fileStorageService.loadMetadata(fileStorageId);
+      if (!metadata) {
+        res.status(400).send({ error: "File has no metadata. Please analyze the file first." });
+        return;
+      }
+
+      const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
+
+      const job = await this.printJobService.createPendingJob(
+        printerId,
+        metadata._originalFileName || metadata.fileName || "Unknown",
+        metadata,
+        printer.name
+      );
+
+      job.fileStorageId = fileStorageId;
+      job.fileHash = metadata._fileHash;
+      job.analysisState = "ANALYZED";
+      job.analyzedAt = new Date();
+
+      if (metadata.fileFormat) {
+        job.fileFormat = metadata.fileFormat;
+      }
+
+      await this.printJobService.updateJob(job);
+
+      if (addToQueue) {
+        await this.printQueueService.addToQueue(printerId, job.id, position);
+      }
+
+      this.logger.log(
+        `Created job ${job.id} from file storage ${fileStorageId} for printer ${printerId}${addToQueue ? " and added to queue" : ""}`
+      );
+
+      res.send({
+        id: job.id,
+        printerId: job.printerId,
+        printerName: job.printerName,
+        fileName: job.fileName,
+        fileStorageId: job.fileStorageId,
+        status: job.status,
+        analysisState: job.analysisState,
+        createdAt: job.createdAt,
+        addedToQueue: addToQueue,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create job from file ${fileStorageId}: ${error}`);
+      res.status(500).send({ error: "Failed to create job from file" });
+    }
+  }
+
   @POST()
   @route("/:printerId/submit/:jobId")
   @before([ParamId("printerId"), ParamId("jobId")])

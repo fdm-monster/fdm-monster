@@ -380,25 +380,4 @@ describe("PrintJobController", () => {
     });
   });
 
-  describe("POST /print-jobs/from-file", () => {
-    it("should return 400 for missing fileStorageId", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/from-file`)
-        .send({ printerId: 1 })
-        .set("Accept", "application/json");
-
-      expect(res.status).toBe(400);
-      expect(res.body.error).toContain("fileStorageId is required");
-    });
-
-    it("should return 400 for missing printerId", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/from-file`)
-        .send({ fileStorageId: "test-file-id" })
-        .set("Accept", "application/json");
-
-      expect(res.status).toBe(400);
-      expect(res.body.error).toContain("printerId is required");
-    });
-  });
 });

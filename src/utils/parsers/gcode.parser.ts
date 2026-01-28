@@ -2,15 +2,12 @@ import * as fs from "node:fs/promises";
 import * as readline from "node:readline";
 import { createReadStream } from "node:fs";
 import { GCodeMetadata } from "@/entities/print-job.entity";
+import { convertQoiToPng } from "../bgcode/bgcode-thumbnail.parser";
+import { ParsedThumbnail } from "./parser.types";
 
 interface GCodeParseResult {
   raw: {
-    _thumbnails?: Array<{
-      width: number;
-      height: number;
-      format: string;
-      data?: string;
-    }>;
+    _thumbnails?: ParsedThumbnail[];
     metadata: Record<string, string>;
   };
   normalized: GCodeMetadata;
@@ -185,13 +182,8 @@ export class GCodeParser {
     }
   }
 
-  private async extractThumbnails(filePath: string): Promise<Array<{
-    width: number;
-    height: number;
-    format: string;
-    data?: string;
-  }>> {
-    const thumbnails: Array<{ width: number; height: number; format: string; data?: string }> = [];
+  private async extractThumbnails(filePath: string): Promise<ParsedThumbnail[]> {
+    const thumbnails: ParsedThumbnail[] = [];
     let linesRead = 0;
     let inThumbnail = false;
     let thumbnailData: string[] = [];
@@ -233,16 +225,29 @@ export class GCodeParser {
 
       if (inThumbnail) {
         if (line.match(/;\s*thumbnail end/i)) {
+          let base64Data = thumbnailData.join("");
+          let format = currentFormat.toUpperCase();
+
+          if (format === "QOI") {
+            try {
+              const qoiBuffer = Buffer.from(base64Data, 'base64');
+              const pngBuffer = convertQoiToPng(qoiBuffer);
+              base64Data = pngBuffer.toString('base64');
+              format = "PNG";
+            } catch {
+              // Keep original QOI if conversion fails
+            }
+          }
+
           thumbnails.push({
             width: currentWidth,
             height: currentHeight,
-            format: currentFormat.toUpperCase(),
-            data: thumbnailData.join(""),
+            format,
+            data: base64Data,
           });
           inThumbnail = false;
           thumbnailData = [];
         } else if (line.startsWith(";")) {
-          // Extract base64 data
           const data = line.substring(1).trim();
           if (data) {
             thumbnailData.push(data);

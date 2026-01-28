@@ -5,6 +5,8 @@ import {
   PartialReprintFileDto,
   PrinterType,
   ReprintState,
+  UploadFileInput,
+  uploadFileInputSchema,
 } from "@/services/printer-api.interface";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
 import { LoginDto } from "@/services/interfaces/login.dto";
@@ -157,8 +159,9 @@ export class MoonrakerApi implements IPrinterApi {
     return await this.client.getServerFilesDownloadChunk(this.login, "gcodes", path, startBytes, endBytes);
   }
 
-  async uploadFile(fileOrBuffer: Buffer | Express.Multer.File, startPrint: boolean, uploadToken?: string) {
-    await this.client.postServerFileUpload(this.login, fileOrBuffer, startPrint, uploadToken);
+  async uploadFile(input: UploadFileInput) {
+    const validated = uploadFileInputSchema.parse(input);
+    await this.client.postServerFileUpload(this.login, validated.stream, validated.fileName, validated.contentLength, validated.startPrint, validated.uploadToken);
   }
 
   async deleteFile(path: string) {
