@@ -22,6 +22,7 @@ import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { OctoprintHttpClientBuilder } from "@/services/octoprint/utils/octoprint-http-client.builder";
 import { OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
 import { SettingsStore } from "@/state/settings.store";
+import { Readable } from "node:stream";
 
 type TAxes = "x" | "y" | "z";
 
@@ -198,7 +199,7 @@ export class OctoprintClient extends OctoprintRoutes {
 
   async uploadFileAsMultiPart(
     login: LoginDto,
-    stream: NodeJS.ReadableStream,
+    stream: Readable,
     fileName: string,
     contentLength: number,
     startPrint: boolean,
