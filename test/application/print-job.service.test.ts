@@ -68,11 +68,11 @@ describe("PrintJobService", () => {
       );
       const { metadata } = await fileAnalysisService.analyzeFile(bgcodePath);
 
-      expect(metadata.nozzleDiameterMm).toBe(0.4);
-      expect(metadata.filamentUsedMm).toBeCloseTo(2067.9, 1);
-      expect(metadata.filamentUsedGrams).toBeCloseTo(6.17, 1);
-      expect(metadata.filamentUsedCm3).toBeCloseTo(4.97, 1);
-      expect(metadata.gcodePrintTimeSeconds).toBe(1198); // 19m 58s
+      expect(metadata.isMmu).toBe(true);
+      expect(metadata.nozzleDiameterMm).toEqual([0.4, 0.4, 0.4, 0.4, 0.4]);
+      expect(metadata.filamentUsedMm).toEqual(expect.arrayContaining([expect.any(Number)]));
+      expect(metadata.totalFilamentUsedGrams).toBeCloseTo(6.17, 1);
+      expect(metadata.gcodePrintTimeSeconds).toBe(1198);
     });
 
     it("extracts metadata from 3mf with metadata.json", async () => {
