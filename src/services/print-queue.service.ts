@@ -25,6 +25,8 @@ export interface IPrintQueueService {
 
   getQueue(printerId: number): Promise<QueuedJob[]>;
 
+  getGlobalQueuePaged(page: number, pageSize: number): Promise<[PrintJob[], number]>;
+
   getNextInQueue(printerId: number): Promise<PrintJob | null>;
 
   reorderQueue(printerId: number, jobIds: number[]): Promise<void>;
@@ -74,19 +76,12 @@ export class PrintQueueService implements IPrintQueueService {
       throw new Error(`Print job ${ jobId } not found`);
     }
 
-    // Update job's printerId if needed
-    if (!job.printerId) {
-      job.printerId = printerId;
-    } else if (job.printerId !== printerId) {
-      throw new Error(`Job ${ jobId } belongs to printer ${ job.printerId }, cannot add to printer ${ printerId }`);
-    }
+    this.ensurePrinterAssignment(job, printerId);
 
     if (position === undefined || position === null) {
-      // Add to end of queue
       const maxPosition = await this.getMaxQueuePosition(printerId);
       job.queuePosition = (maxPosition ?? -1) + 1;
     } else {
-      // Insert at specific position, shift others down
       await this.shiftQueuePositions(printerId, position);
       job.queuePosition = position;
     }
@@ -150,9 +145,21 @@ export class PrintQueueService implements IPrintQueueService {
     }));
   }
 
-  /**
-   * Get next job in queue
-   */
+  async getGlobalQueuePaged(page: number, pageSize: number): Promise<[PrintJob[], number]> {
+    const skip = (page - 1) * pageSize;
+
+    return await this.printJobRepository.findAndCount({
+      where: { status: "QUEUED" },
+      order: {
+        printerId: "ASC",
+        queuePosition: "ASC",
+      },
+      relations: ['printer'],
+      take: pageSize,
+      skip: skip,
+    });
+  }
+
   async getNextInQueue(printerId: number): Promise<PrintJob | null> {
     return this.printJobRepository.findOne({
       where: {
@@ -216,9 +223,14 @@ export class PrintQueueService implements IPrintQueueService {
   }
 
 
-  /**
-   * Get max queue position for printer
-   */
+  private ensurePrinterAssignment(job: PrintJob, printerId: number): void {
+    if (!job.printerId) {
+      job.printerId = printerId;
+    } else if (job.printerId !== printerId) {
+      throw new Error(`Job ${job.id} belongs to printer ${job.printerId}, cannot submit to printer ${printerId}`);
+    }
+  }
+
   private async getMaxQueuePosition(printerId: number): Promise<number | null> {
     const result = await this.printJobRepository
       .createQueryBuilder("job")
@@ -249,20 +261,6 @@ export class PrintQueueService implements IPrintQueueService {
       .execute();
   }
 
-  /**
-   * Auto-start next job when previous completes (optional auto-queue processing)
-   */
-  async handleJobCompleted(printerId: number): Promise<void> {
-    const nextJob = await this.getNextInQueue(printerId);
-
-    if (nextJob) {
-      this.logger.log(`Auto-processing queue after completion: starting job ${ nextJob.id }`);
-      await this.processQueue(printerId);
-    } else {
-      this.logger.log(`Queue empty for printer ${ printerId } after job completion`);
-    }
-  }
-
   async submitToPrinter(printerId: number, jobId: number): Promise<void> {
     const job = await this.printJobRepository.findOne({ where: { id: jobId } });
 
@@ -270,16 +268,8 @@ export class PrintQueueService implements IPrintQueueService {
       throw new Error(`Print job ${ jobId } not found`);
     }
 
-    // Verify job belongs to the printer or assign it
-    if (job.printerId && job.printerId !== printerId) {
-      throw new Error(`Job ${ jobId } belongs to printer ${ job.printerId }, cannot submit to printer ${ printerId }`);
-    }
+    this.ensurePrinterAssignment(job, printerId);
 
-    if (!job.printerId) {
-      job.printerId = printerId;
-    }
-
-    // If job is queued, remove from queue first
     if (job.queuePosition !== null) {
       const oldPosition = job.queuePosition;
       job.queuePosition = null;
@@ -306,7 +296,7 @@ export class PrintQueueService implements IPrintQueueService {
         throw new Error(`Job ${ jobId } has no fileStorageId - cannot submit to printer`);
       }
       const printerApi = this.printerApiFactory.getById(printerId);
-      
+
       const fileSize = this.fileStorageService.getFileSize(fileStorageId);
       const fileStream = this.fileStorageService.readFileStream(fileStorageId);
 

@@ -4,6 +4,12 @@ import { EventEmitter2 } from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
+import {
+  updateStatisticsForCompletion,
+  updateStatisticsForFailure,
+  updateStatisticsForCancellation,
+  calculateJobDuration,
+} from "@/utils/job-stats.util";
 
 // Events emitted by this service
 export interface PrintJobAnalyzedEvent {
@@ -79,6 +85,19 @@ export interface IPrintJobService {
 
   // File download and analysis
   triggerFileAnalysis(jobId: number): Promise<void>;
+
+  // Manual status updates
+  markAsCompleted(jobId: number, reason?: string): Promise<PrintJob>;
+  markAsFailed(jobId: number, reason: string): Promise<PrintJob>;
+  markAsCancelled(jobId: number, reason?: string): Promise<PrintJob>;
+  markAsUnknown(jobId: number, reason?: string): Promise<PrintJob>;
+
+  // File reference counting
+  countJobsReferencingFile(fileStorageId: string): Promise<number>;
+
+  // Job management
+  updateJob(job: PrintJob): Promise<PrintJob>;
+  deleteJob(job: PrintJob): Promise<void>;
 }
 
 export class PrintJobService implements IPrintJobService {
@@ -310,26 +329,10 @@ export class PrintJobService implements IPrintJobService {
     }
 
     const endedAt = new Date();
-    const actualTimeSeconds = job.startedAt
-      ? (endedAt.getTime() - job.startedAt.getTime()) / 1000
-      : null;
+    const actualTimeSeconds = calculateJobDuration(job.startedAt, endedAt);
 
     job.status = "COMPLETED";
-    job.endedAt = endedAt;
-    job.progress = 100;
-
-    if (!job.statistics) {
-      job.statistics = {
-        startedAt: job.startedAt,
-        endedAt,
-        actualPrintTimeSeconds: actualTimeSeconds,
-        progress: 100,
-      };
-    } else {
-      job.statistics.endedAt = endedAt;
-      job.statistics.actualPrintTimeSeconds = actualTimeSeconds;
-      job.statistics.progress = 100;
-    }
+    updateStatisticsForCompletion(job, endedAt);
 
     await this.printJobRepository.save(job);
 
@@ -365,29 +368,9 @@ export class PrintJobService implements IPrintJobService {
     }
 
     const endedAt = new Date();
-    const actualTimeSeconds = job.startedAt
-      ? (endedAt.getTime() - job.startedAt.getTime()) / 1000
-      : null;
 
     job.status = "FAILED";
-    job.statusReason = reason;
-    job.endedAt = endedAt;
-
-    if (!job.statistics) {
-      job.statistics = {
-        startedAt: job.startedAt,
-        endedAt,
-        actualPrintTimeSeconds: actualTimeSeconds,
-        progress: job.progress,
-        failureReason: reason,
-        failureTime: endedAt,
-      };
-    } else {
-      job.statistics.endedAt = endedAt;
-      job.statistics.actualPrintTimeSeconds = actualTimeSeconds;
-      job.statistics.failureReason = reason;
-      job.statistics.failureTime = endedAt;
-    }
+    updateStatisticsForFailure(job, reason, endedAt);
 
     await this.printJobRepository.save(job);
 
@@ -418,25 +401,9 @@ export class PrintJobService implements IPrintJobService {
     }
 
     const endedAt = new Date();
-    const actualTimeSeconds = job.startedAt
-      ? (endedAt.getTime() - job.startedAt.getTime()) / 1000
-      : null;
 
     job.status = "CANCELLED";
-    job.statusReason = reason || "Print cancelled by user";
-    job.endedAt = endedAt;
-
-    if (!job.statistics) {
-      job.statistics = {
-        startedAt: job.startedAt,
-        endedAt,
-        actualPrintTimeSeconds: actualTimeSeconds,
-        progress: job.progress,
-      };
-    } else {
-      job.statistics.endedAt = endedAt;
-      job.statistics.actualPrintTimeSeconds = actualTimeSeconds;
-    }
+    updateStatisticsForCancellation(job, reason, endedAt);
 
     await this.printJobRepository.save(job);
 
@@ -747,5 +714,77 @@ export class PrintJobService implements IPrintJobService {
   async triggerFileAnalysis(jobId: number): Promise<void> {
     this.eventEmitter2.emit("printJob.needsFileDownload", { jobId });
     this.logger.log(`Triggered file download and analysis for job ${jobId}`);
+  }
+
+  async markAsCompleted(jobId: number, reason?: string): Promise<PrintJob> {
+    const job = await this.getJobByIdOrFail(jobId);
+
+    job.status = "COMPLETED";
+    updateStatisticsForCompletion(job);
+
+    if (reason) {
+      job.statusReason = reason;
+    } else {
+      job.statusReason = "Manually marked as completed by user";
+    }
+
+    await this.printJobRepository.save(job);
+
+    this.logger.log(`Job ${jobId} manually marked as COMPLETED`);
+
+    return job;
+  }
+
+  async markAsFailed(jobId: number, reason: string): Promise<PrintJob> {
+    const job = await this.getJobByIdOrFail(jobId);
+
+    job.status = "FAILED";
+    updateStatisticsForFailure(job, reason);
+
+    await this.printJobRepository.save(job);
+
+    this.logger.log(`Job ${jobId} manually marked as FAILED: ${reason}`);
+
+    return job;
+  }
+
+  async markAsCancelled(jobId: number, reason?: string): Promise<PrintJob> {
+    const job = await this.getJobByIdOrFail(jobId);
+
+    job.status = "CANCELLED";
+    updateStatisticsForCancellation(job, reason);
+
+    await this.printJobRepository.save(job);
+
+    this.logger.log(`Job ${jobId} manually marked as CANCELLED`);
+
+    return job;
+  }
+
+  async markAsUnknown(jobId: number, reason?: string): Promise<PrintJob> {
+    const job = await this.getJobByIdOrFail(jobId);
+
+    job.status = "UNKNOWN";
+    job.statusReason = reason || "Manually marked as unknown by user (state uncertain)";
+
+    await this.printJobRepository.save(job);
+
+    this.logger.log(`Job ${jobId} manually marked as UNKNOWN`);
+
+    return job;
+  }
+
+  async countJobsReferencingFile(fileStorageId: string): Promise<number> {
+    return await this.printJobRepository.count({
+      where: { fileStorageId },
+    });
+  }
+
+  async updateJob(job: PrintJob): Promise<PrintJob> {
+    return await this.printJobRepository.save(job);
+  }
+
+  async deleteJob(job: PrintJob): Promise<void> {
+    await this.printJobRepository.remove(job);
   }
 }
