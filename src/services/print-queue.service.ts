@@ -7,7 +7,6 @@ import { LoggerService } from "@/handlers/logger";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { FileStorageService } from "@/services/file-storage.service";
 import { captureException } from "@sentry/node";
-import { statSync } from "node:fs";
 
 export interface QueuedJob {
   id: number;
@@ -336,14 +335,14 @@ export class PrintQueueService implements IPrintQueueService {
       const printerApi = this.printerApiFactory.getById(printerId);
 
       const filePath = this.fileStorageService.getFilePath(fileStorageId);
-      const fileStats = statSync(filePath);
+      const fileSize = this.fileStorageService.getFileSize(fileStorageId);
       const fileStream = this.fileStorageService.readFileStream(fileStorageId);
 
       this.logger.log(`Uploading file ${ fileName } to printer ${ printerId } and starting print`);
       await printerApi.uploadFile({
         stream: fileStream,
         fileName,
-        contentLength: fileStats.size,
+        contentLength: fileSize,
         startPrint: true,
       });
       this.logger.log(`Successfully submitted job ${ jobId } to printer ${ printerId }`);
