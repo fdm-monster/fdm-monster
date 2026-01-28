@@ -747,5 +747,28 @@ describe("PrintQueueController", () => {
       expect(res.body.error).toContain("Failed to submit job to printer");
     });
   });
+
+  describe("POST /print-queue/:printerId/from-file", () => {
+    it("should return 400 for missing fileStorageId", async () => {
+      const printer = await createTestPrinter(testRequest);
+
+      const res = await testRequest
+        .post(`${baseRoute}/${printer.id}/from-file`)
+        .send({})
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("fileStorageId is required");
+    });
+
+    it("should return 400 for invalid printerId", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/invalid/from-file`)
+        .send({ fileStorageId: "test-file-id" })
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(400);
+    });
+  });
 });
 
