@@ -221,10 +221,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Get next job in queue for printer
-   * GET /api/print-queue/:printerId/next
-   */
   @GET()
   @route("/:printerId/next")
   @before([ParamId("printerId")])
@@ -244,10 +240,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Process queue - start next job
-   * POST /api/print-queue/:printerId/process
-   */
   @POST()
   @route("/:printerId/process")
   @before([ParamId("printerId")])
@@ -280,10 +272,6 @@ export class PrintQueueController {
     }
   }
 
-  /**
-   * Submit job directly to printer for immediate printing
-   * POST /api/print-queue/:printerId/submit/:jobId
-   */
   @POST()
   @route("/:printerId/submit/:jobId")
   @before([ParamId("printerId"), ParamId("jobId")])

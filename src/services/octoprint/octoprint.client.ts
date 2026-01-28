@@ -169,7 +169,7 @@ export class OctoprintClient extends OctoprintRoutes {
 
     return await this.createClient(login, (o) =>
       o.withHeaders({
-        Range: `bytes=${startBytes}-${endBytes}`,
+        Range: `bytes=${ startBytes }-${ endBytes }`,
       }),
     ).get<string>(pathUrl);
   }
@@ -199,7 +199,8 @@ export class OctoprintClient extends OctoprintRoutes {
 
   async uploadFileAsMultiPart(
     login: LoginDto,
-    multerFileOrBuffer: Buffer | Express.Multer.File,
+    stream: NodeJS.ReadableStream,
+    fileName: string,
     startPrint: boolean,
     progressToken?: string,
   ) {
@@ -207,21 +208,18 @@ export class OctoprintClient extends OctoprintRoutes {
 
     const formData = new FormData();
     if (startPrint) {
-      // select is implicit
       formData.append("print", "true");
     }
 
-    let fileBuffer: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
-    const filename = (multerFileOrBuffer as Express.Multer.File).originalname;
-    if (fileBuffer) {
-      this.logger.log("Attaching file from memory buffer to formdata for upload");
-      formData.append("file", fileBuffer, { filename });
-    } else {
-      const filePath = (multerFileOrBuffer as Express.Multer.File).path;
-      const fileStream = createReadStream(filePath);
-      this.logger.log(`Attaching file from disk to formdata for upload`);
-      formData.append("file", fileStream, { filename });
+    if (startPrint) {
+      formData.append("print", "true");
     }
+
+    this.logger.log("Attaching file stream to multipart upload");
+
+    formData.append("file", stream, {
+      filename: fileName,
+    });
 
     // Calculate the header that axios uses to determine progress
     const result: number = await new Promise<number>((resolve, reject) => {
@@ -242,19 +240,19 @@ export class OctoprintClient extends OctoprintRoutes {
           })
           .withOnUploadProgress((p) => {
             if (progressToken) {
-              this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
+              this.eventEmitter2.emit(`${ uploadProgressEvent(progressToken) }`, progressToken, p);
             }
           }),
       ).post(urlPath, formData);
 
       if (progressToken) {
-        this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+        this.eventEmitter2.emit(`${ uploadDoneEvent(progressToken) }`, progressToken);
       }
 
       return response.data;
     } catch (e: any) {
       if (progressToken) {
-        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+        this.eventEmitter2.emit(`${ uploadFailedEvent(progressToken) }`, progressToken, (e as AxiosError)?.message);
       }
       let data;
       try {
