@@ -53,7 +53,6 @@ export class PrintQueueService implements IPrintQueueService {
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(PrintQueueService.name);
 
-    // Register event handler for job submission
     this.eventEmitter2.on("printQueue.jobSubmitted", (event: {
       printerId: number;
       jobId: number;
@@ -103,9 +102,6 @@ export class PrintQueueService implements IPrintQueueService {
     });
   }
 
-  /**
-   * Remove job from queue
-   */
   async removeFromQueue(jobId: number): Promise<void> {
     const job = await this.printJobRepository.findOne({ where: { id: jobId } });
     if (!job) {
@@ -133,9 +129,6 @@ export class PrintQueueService implements IPrintQueueService {
     });
   }
 
-  /**
-   * Get current queue for printer
-   */
   async getQueue(printerId: number): Promise<QueuedJob[]> {
     const jobs = await this.printJobRepository.find({
       where: {
@@ -171,13 +164,10 @@ export class PrintQueueService implements IPrintQueueService {
     });
   }
 
-  /**
-   * Reorder queue by providing new job order
-   */
   async reorderQueue(printerId: number, jobIds: number[]): Promise<void> {
     for (let i = 0; i < jobIds.length; i++) {
       const job = await this.printJobRepository.findOne({ where: { id: jobIds[i] } });
-      if (job && job.printerId === printerId) {
+      if (job?.printerId === printerId) {
         job.queuePosition = i;
         await this.printJobRepository.save(job);
       }
@@ -187,9 +177,6 @@ export class PrintQueueService implements IPrintQueueService {
     this.eventEmitter2.emit("printQueue.reordered", { printerId });
   }
 
-  /**
-   * Clear entire queue for printer
-   */
   async clearQueue(printerId: number): Promise<void> {
     const jobs = await this.printJobRepository.find({
       where: {
@@ -208,10 +195,6 @@ export class PrintQueueService implements IPrintQueueService {
     this.eventEmitter2.emit("printQueue.cleared", { printerId });
   }
 
-  /**
-   * Process queue - get next job and emit event for printing
-   * Returns the job that should be printed next
-   */
   async processQueue(printerId: number): Promise<PrintJob | null> {
     const nextJob = await this.getNextInQueue(printerId);
 
@@ -222,7 +205,6 @@ export class PrintQueueService implements IPrintQueueService {
 
     this.logger.log(`Processing queue: next job is ${ nextJob.id } (${ nextJob.fileName })`);
 
-    // Emit event for printer to start the job
     this.eventEmitter2.emit("printQueue.processNext", {
       printerId,
       jobId: nextJob.id,
@@ -247,9 +229,6 @@ export class PrintQueueService implements IPrintQueueService {
     return result?.max ?? null;
   }
 
-  /**
-   * Shift queue positions down to make room
-   */
   private async shiftQueuePositions(printerId: number, fromPosition: number): Promise<void> {
     await this.printJobRepository
       .createQueryBuilder()
@@ -260,9 +239,6 @@ export class PrintQueueService implements IPrintQueueService {
       .execute();
   }
 
-  /**
-   * Compact queue positions after removal
-   */
   private async compactQueuePositions(printerId: number, removedPosition: number): Promise<void> {
     await this.printJobRepository
       .createQueryBuilder()
@@ -310,13 +286,10 @@ export class PrintQueueService implements IPrintQueueService {
       await this.compactQueuePositions(printerId, oldPosition);
     }
 
-    // Update status and save
     job.status = "PRINTING";
     await this.printJobRepository.save(job);
 
     this.logger.log(`Submitting job ${ jobId } (${ job.fileName }) to printer ${ printerId }`);
-
-    // Emit event for printer to start the job
     this.eventEmitter2.emit("printQueue.jobSubmitted", {
       printerId,
       jobId: job.id,
@@ -333,8 +306,7 @@ export class PrintQueueService implements IPrintQueueService {
         throw new Error(`Job ${ jobId } has no fileStorageId - cannot submit to printer`);
       }
       const printerApi = this.printerApiFactory.getById(printerId);
-
-      const filePath = this.fileStorageService.getFilePath(fileStorageId);
+      
       const fileSize = this.fileStorageService.getFileSize(fileStorageId);
       const fileStream = this.fileStorageService.readFileStream(fileStorageId);
 
