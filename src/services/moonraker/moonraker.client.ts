@@ -832,16 +832,6 @@ export class MoonrakerClient {
   /**
    * @deprecated API might not be available in the future
    * @param login
-   * @param commands
-   */
-  // async postFilesLocalUpload(login: LoginDto) {
-  //   // This is just an alias
-  //   return this.postServerFileUpload(login);
-  // }
-
-  /**
-   * @deprecated API might not be available in the future
-   * @param login
    */
   async getApiPrinter(login: LoginDto) {
     return this.createClient(login).get<ApiPrinterDto>(`api/printer`);

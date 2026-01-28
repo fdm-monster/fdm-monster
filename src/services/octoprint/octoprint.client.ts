@@ -1,4 +1,3 @@
-import { createReadStream, ReadStream } from "fs";
 import FormData from "form-data";
 import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
