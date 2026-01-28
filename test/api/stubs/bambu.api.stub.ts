@@ -222,13 +222,11 @@ export class BambuApiStub implements IPrinterApi {
   }
 
   async uploadFile(input: UploadFileInput): Promise<void> {
-    const fileBuffer = await this.streamToBuffer(input.stream);
-
-    this.logger.log(`[STUB] Uploading file: ${input.fileName} (${fileBuffer.length} bytes)`, this.logMeta());
+    this.logger.log(`[STUB] Uploading file: ${input.fileName} (${input.contentLength} bytes)`, this.logMeta());
 
     try {
       await this.ensureFtpConnected();
-      await this.client.ftp.uploadFile(fileBuffer, input.fileName, input.uploadToken);
+      await this.client.ftp.uploadFile(input.stream, input.fileName, input.uploadToken);
 
       if (input.startPrint) {
         this.logger.log(`[STUB] Starting print after upload: ${input.fileName}`, this.logMeta());

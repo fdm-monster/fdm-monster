@@ -5,9 +5,10 @@ import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
 import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto";
 import { z } from "zod";
+import { Readable } from "node:stream";
 
 export const uploadFileInputSchema = z.object({
-  stream: z.custom<NodeJS.ReadableStream>((val) => {
+  stream: z.custom<Readable>((val) => {
     return val && typeof val === "object" && "pipe" in val && typeof val.pipe === "function";
   }, "Must be a readable stream"),
   fileName: z.string().min(1),

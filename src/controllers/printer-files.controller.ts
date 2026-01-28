@@ -302,7 +302,6 @@ export class PrinterFilesController {
         currentPrinter.name
       );
 
-      // Update job with storage info
       job.fileStorageId = fileStorageId;
       job.fileHash = fileHash;
       await this.printJobService.printJobRepository.save(job);

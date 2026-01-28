@@ -1,9 +1,9 @@
 import EventEmitter2 from "eventemitter2";
-import { SettingsStore } from "@/state/settings.store";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { FileInfo } from "basic-ftp";
 import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
+import { Readable } from "node:stream";
 
 /**
  * Stub implementation of BambuFtpAdapter for testing
@@ -12,25 +12,18 @@ import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/const
 export class BambuFtpAdapterStub {
   protected readonly logger: LoggerService;
 
-  private host: string | null = null;
-  private accessCode: string | null = null;
   private isConnecting = false;
   private connected = false;
 
   constructor(
-    private readonly settingsStore: SettingsStore,
     loggerFactory: ILoggerFactory,
     private readonly eventEmitter2: EventEmitter2,
   ) {
-    this.settingsStore = settingsStore;
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory("BambuFtpAdapterStub");
   }
 
-  /**
-   * Connect to FTP server (stubbed)
-   */
-  async connect(host: string, accessCode: string): Promise<void> {
+  async connect(host: string, _accessCode: string): Promise<void> {
     if (this.connected) {
       this.logger.debug("FTP already connected (stub)");
       return;
@@ -40,11 +33,9 @@ export class BambuFtpAdapterStub {
       throw new Error("Connection already in progress");
     }
 
-    this.host = host;
-    this.accessCode = accessCode;
     this.isConnecting = true;
 
-    this.logger.log(`[STUB] Connecting to Bambu FTP at ${host}:990`);
+    this.logger.log(`[STUB] Connecting to Bambu FTP at ${ host }:990`);
 
     // Simulate connection delay
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -54,9 +45,6 @@ export class BambuFtpAdapterStub {
     this.logger.log("[STUB] FTP connected successfully");
   }
 
-  /**
-   * Disconnect FTP (stubbed)
-   */
   async disconnect(): Promise<void> {
     if (!this.connected) {
       return;
@@ -64,13 +52,8 @@ export class BambuFtpAdapterStub {
 
     this.logger.log("[STUB] Disconnecting FTP");
     this.connected = false;
-    this.host = null;
-    this.accessCode = null;
   }
 
-  /**
-   * List files in directory (stubbed)
-   */
   async listFiles(dirPath: string = "/"): Promise<FileInfo[]> {
     this.ensureConnected();
 
@@ -104,10 +87,7 @@ export class BambuFtpAdapterStub {
     ];
   }
 
-  /**
-   * Upload file to printer (stubbed)
-   */
-  async uploadFile(fileBuffer: Buffer, filename: string, progressToken?: string): Promise<void> {
+  async uploadFile(stream: Readable, filename: string, progressToken?: string): Promise<void> {
     this.ensureConnected();
 
     const remotePath = `/${filename}`;
@@ -115,7 +95,15 @@ export class BambuFtpAdapterStub {
     try {
       this.logger.log(`[STUB] Uploading ${filename} to ${remotePath}`);
 
-      // Simulate progress updates
+      const chunks: Buffer[] = [];
+      await new Promise<void>((resolve, reject) => {
+        stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+        stream.on("error", reject);
+        stream.on("end", resolve);
+      });
+
+      const fileBuffer = Buffer.concat(chunks);
+
       if (progressToken) {
         const totalSize = fileBuffer.length;
         let uploaded = 0;
@@ -132,7 +120,6 @@ export class BambuFtpAdapterStub {
           }
         }, 50);
 
-        // Wait for "upload" to complete
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
 

@@ -4,7 +4,7 @@ import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { Client, FileInfo } from "basic-ftp";
 import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
-import { writeFileSync, unlinkSync, createReadStream, mkdirSync, existsSync } from "node:fs";
+import { unlinkSync, createReadStream, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { Readable } from "node:stream";
 import { AppConstants } from "@/server.constants";
@@ -122,15 +122,10 @@ export class BambuFtpAdapter {
     return join(storagePath, filename);
   }
 
-  async uploadFile(fileBuffer: Buffer, remotePath: string, progressToken?: string): Promise<void> {
+  async uploadFile(stream: Readable, remotePath: string, progressToken?: string): Promise<void> {
     this.ensureConnected();
 
-    const tempPath = this.getFileStoragePath(`bambu-upload-${Date.now()}-${remotePath}`);
-
     try {
-      writeFileSync(tempPath, fileBuffer);
-      this.logger.debug(`Wrote temp file: ${tempPath}`);
-
       if (progressToken) {
         this.ftpClient!.trackProgress((info) => {
           this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, {
@@ -140,11 +135,9 @@ export class BambuFtpAdapter {
         });
       }
 
-      // Upload file
-      this.logger.log(`Uploading ${tempPath} to ${remotePath}`);
-      await this.ftpClient!.uploadFrom(tempPath, remotePath);
+      this.logger.log(`Uploading stream to ${remotePath}`);
+      await this.ftpClient!.uploadFrom(stream, remotePath);
 
-      // Stop tracking progress
       this.ftpClient!.trackProgress();
 
       if (progressToken) {
@@ -158,14 +151,6 @@ export class BambuFtpAdapter {
       }
       this.logger.error(`Upload failed for ${remotePath}:`, error);
       throw error;
-    } finally {
-      // Clean up temp file
-      try {
-        unlinkSync(tempPath);
-        this.logger.debug(`Cleaned up temp file: ${tempPath}`);
-      } catch (cleanupError) {
-        this.logger.warn(`Failed to cleanup temp file ${tempPath}:`, cleanupError);
-      }
     }
   }
 

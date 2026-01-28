@@ -254,13 +254,12 @@ export class BambuApi implements IPrinterApi {
 
   async uploadFile(input: UploadFileInput): Promise<void> {
     const validated = uploadFileInputSchema.parse(input);
-    const fileBuffer = await this.streamToBuffer(validated.stream);
 
-    this.logger.log(`Uploading file: ${validated.fileName} (${fileBuffer.length} bytes)`, this.logMeta());
+    this.logger.log(`Uploading file: ${validated.fileName} (${validated.contentLength} bytes)`, this.logMeta());
 
     try {
       await this.ensureFtpConnected();
-      await this.client.ftp.uploadFile(fileBuffer, validated.fileName, validated.uploadToken);
+      await this.client.ftp.uploadFile(validated.stream, validated.fileName, validated.uploadToken);
 
       if (validated.startPrint) {
         this.logger.log(`Starting print after upload: ${validated.fileName}`, this.logMeta());
@@ -271,15 +270,6 @@ export class BambuApi implements IPrinterApi {
       this.logger.error(`Upload failed: ${(error as Error).message}`, this.logMeta());
       throw error;
     }
-  }
-
-  private async streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
-    const chunks: Buffer[] = [];
-    return new Promise((resolve, reject) => {
-      stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
-      stream.on("error", (err) => reject(err));
-      stream.on("end", () => resolve(Buffer.concat(chunks)));
-    });
   }
 
   async deleteFile(path: string): Promise<void> {
