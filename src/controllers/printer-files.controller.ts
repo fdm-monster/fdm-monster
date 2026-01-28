@@ -304,7 +304,7 @@ export class PrinterFilesController {
 
       job.fileStorageId = fileStorageId;
       job.fileHash = fileHash;
-      await this.printJobService.printJobRepository.save(job);
+      await this.printJobService.updateJob(job);
 
       this.logger.log(
         `Created job ${ job.id }: format=${ job.fileFormat }, ` +
