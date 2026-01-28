@@ -8,6 +8,7 @@ import path, { basename, extname, join } from "node:path";
 import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { existsSync, createReadStream } from "node:fs";
+import { Readable } from "node:stream";
 
 export interface IFileStorageService {
   saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
@@ -51,7 +52,7 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  readFileStream(fileStorageId: string): NodeJS.ReadableStream {
+  readFileStream(fileStorageId: string): Readable {
     const filePath = this.getFilePath(fileStorageId);
     const stream = createReadStream(filePath);
 
