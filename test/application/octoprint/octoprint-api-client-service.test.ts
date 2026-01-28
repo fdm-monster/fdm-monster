@@ -140,6 +140,66 @@ describe(OctoprintClient.name, () => {
     expect(filesResult).toHaveLength(0);
   });
 
+  it("should request recursive files when recursive=true", async () => {
+    const nestedStructure = {
+      files: [
+        {
+          name: "root-file.gcode",
+          type: "machinecode",
+          path: "root-file.gcode",
+          size: 1000,
+          date: 1234567890,
+          origin: "local",
+          refs: {},
+          prints: {},
+          statistics: {}
+        },
+        {
+          name: "folder1",
+          type: "folder",
+          children: [
+            {
+              name: "nested-file.gcode",
+              type: "machinecode",
+              path: "folder1/nested-file.gcode",
+              size: 2000,
+              date: 1234567891,
+              origin: "local",
+              refs: {},
+              prints: {},
+              statistics: {}
+            },
+            {
+              name: "subfolder",
+              type: "folder",
+              children: [
+                {
+                  name: "deep-file.gcode",
+                  type: "machinecode",
+                  path: "folder1/subfolder/deep-file.gcode",
+                  size: 3000,
+                  date: 1234567892,
+                  origin: "local",
+                  refs: {},
+                  prints: {},
+                  statistics: {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    nock(printerURL).get("/api/files/local").query("recursive=true").reply(200, nestedStructure);
+    const filesResult = await octoprintClient.getLocalFiles(auth, true);
+
+    expect(filesResult).toHaveLength(3);
+    expect(filesResult[0].path).toBe("root-file.gcode");
+    expect(filesResult[1].path).toBe("folder1/nested-file.gcode");
+    expect(filesResult[2].path).toBe("folder1/subfolder/deep-file.gcode");
+  });
+
   it("should not throw error on getFile", async () => {
     const filename = "usr/path/illegal.gcode";
     nock(printerURL)
