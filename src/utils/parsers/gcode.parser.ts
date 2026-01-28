@@ -3,15 +3,11 @@ import * as readline from "node:readline";
 import { createReadStream } from "node:fs";
 import { GCodeMetadata } from "@/entities/print-job.entity";
 import { convertQoiToPng } from "../bgcode/bgcode-thumbnail.parser";
+import { ParsedThumbnail } from "./parser.types";
 
 interface GCodeParseResult {
   raw: {
-    _thumbnails?: Array<{
-      width: number;
-      height: number;
-      format: string;
-      data?: string;
-    }>;
+    _thumbnails?: ParsedThumbnail[];
     metadata: Record<string, string>;
   };
   normalized: GCodeMetadata;
@@ -186,13 +182,8 @@ export class GCodeParser {
     }
   }
 
-  private async extractThumbnails(filePath: string): Promise<Array<{
-    width: number;
-    height: number;
-    format: string;
-    data?: string;
-  }>> {
-    const thumbnails: Array<{ width: number; height: number; format: string; data?: string }> = [];
+  private async extractThumbnails(filePath: string): Promise<ParsedThumbnail[]> {
+    const thumbnails: ParsedThumbnail[] = [];
     let linesRead = 0;
     let inThumbnail = false;
     let thumbnailData: string[] = [];

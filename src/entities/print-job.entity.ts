@@ -69,16 +69,18 @@ export interface BaseMetadata {
   totalLayers: number | null;
 }
 
+export interface NormalizedThumbnail {
+  width: number;
+  height: number;
+  format: string;
+  dataLength: number;
+}
+
 // G-code specific metadata
 export interface GCodeMetadata extends BaseMetadata {
   fileFormat: "gcode";
   generatedBy?: string;
-  thumbnails?: Array<{
-    width: number;
-    height: number;
-    format: string;
-    dataLength: number;
-  }>;
+  thumbnails?: NormalizedThumbnail[];
 }
 
 // 3MF specific metadata (multi-plate support)
@@ -86,8 +88,9 @@ export interface ThreeMFMetadata extends BaseMetadata {
   fileFormat: "3mf";
   isMultiPlate: boolean;
   totalPlates: number;
-  plateNumber?: number;  // Current plate if from multi-plate file
-  sourceFile?: string;   // Original filename for plate grouping
+  plateNumber?: number;
+  sourceFile?: string;
+  thumbnails?: NormalizedThumbnail[];
 
   plates?: Array<{
     plateNumber: number;
@@ -98,11 +101,7 @@ export interface ThreeMFMetadata extends BaseMetadata {
       name: string;
       bbox?: number[];
     }>;
-    thumbnails?: Array<{
-      path: string;
-      size: number;
-      type: string;
-    }>;
+    thumbnails?: NormalizedThumbnail[];
   }>;
 }
 
@@ -114,12 +113,7 @@ export interface BGCodeMetadata extends BaseMetadata {
   checksumType?: string;
   isMmu?: boolean;
 
-  thumbnails?: Array<{
-    width: number;
-    height: number;
-    format: string;
-    dataLength: number;
-  }>;
+  thumbnails?: NormalizedThumbnail[];
 
   blocks?: Array<{
     type: string;

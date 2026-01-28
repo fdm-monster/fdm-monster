@@ -68,8 +68,6 @@ export class PrintQueueService implements IPrintQueueService {
         captureException(error);
       });
     });
-
-    this.logger.log("Print queue service initialized");
   }
 
   private isPrinterConnected(printerId: number): { connected: boolean; reason?: string } {
@@ -294,14 +292,13 @@ export class PrintQueueService implements IPrintQueueService {
 
     this.ensurePrinterAssignment(job, printerId);
 
+    const queuePosition = job.queuePosition;
     if (job.queuePosition !== null) {
       const oldPosition = job.queuePosition;
       job.queuePosition = null;
       await this.compactQueuePositions(printerId, oldPosition);
     }
 
-
-    // Update status but keep in queue until submission succeeds
     job.status = "PRINTING";
     job.startedAt = new Date();
     await this.printJobRepository.save(job);
@@ -316,9 +313,6 @@ export class PrintQueueService implements IPrintQueueService {
     });
   }
 
-  /**
-   * Handle job submission event - upload file to printer and start print
-   */
   private async handleJobSubmission(printerId: number, jobId: number, fileName: string, fileStorageId?: string, queuePosition?: number | null): Promise<void> {
     this.logger.log(`Handling job submission for job ${jobId} on printer ${printerId}`);
 
@@ -340,10 +334,9 @@ export class PrintQueueService implements IPrintQueueService {
       });
       this.logger.log(`Successfully submitted job ${ jobId } to printer ${ printerId }`);
 
-      // Only remove from queue after successful submission
       if (queuePosition !== null && queuePosition !== undefined) {
         const job = await this.printJobRepository.findOne({ where: { id: jobId } });
-        if (job && job.queuePosition === queuePosition) {
+        if (job?.queuePosition === queuePosition) {
           job.queuePosition = null;
           await this.printJobRepository.save(job);
           await this.compactQueuePositions(printerId, queuePosition);
@@ -354,7 +347,6 @@ export class PrintQueueService implements IPrintQueueService {
     } catch (error) {
       this.logger.error(`Failed to submit job ${ jobId } to printer ${ printerId }`, error);
 
-      // Update job status to reflect failure (keeps startedAt and queuePosition)
       try {
         const job = await this.printJobRepository.findOne({ where: { id: jobId } });
         if (job) {

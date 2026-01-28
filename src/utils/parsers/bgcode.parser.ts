@@ -16,15 +16,11 @@ import {
   BgCodeCompressionName,
 } from "../bgcode/bgcode.types";
 import { processThumbnail } from "../bgcode/bgcode-thumbnail.parser";
+import { ParsedThumbnail } from "./parser.types";
 
 interface BGCodeParseResult {
   raw: {
-    _thumbnails?: Array<{
-      width: number;
-      height: number;
-      format: string;
-      size: number;
-    }>;
+    _thumbnails?: ParsedThumbnail[];
     blocks?: Array<{
       type: string;
       compressedSize: number;
@@ -124,14 +120,8 @@ export class BGCodeParser {
   private async extractThumbnailsFromBlocks(
     fileHandle: any,
     blockHeaders: BgCodeBlockHeader[]
-  ): Promise<Array<{
-    width: number;
-    height: number;
-    format: string;
-    size: number;
-    data?: string;
-  }>> {
-    const thumbnails: Array<any> = [];
+  ): Promise<ParsedThumbnail[]> {
+    const thumbnails: ParsedThumbnail[] = [];
 
     const thumbnailBlocks = blockHeaders.filter(b => b.type === BgCodeBlockTypes.Thumbnail);
 
@@ -141,16 +131,13 @@ export class BGCodeParser {
       const blockData = await getBlockData(fileHandle, header);
       const imageData = decompressBlock(header.compression, blockData);
 
-      // Process thumbnail (converts QOI to PNG if needed)
       const processed = processThumbnail(imageData, parameters);
-      const base64Data = processed.data.toString('base64');
 
       thumbnails.push({
         width: parameters.width,
         height: parameters.height,
         format: processed.extension,
-        size: processed.data.length,
-        data: base64Data,
+        data: processed.data.toString('base64'),
       });
     }
 
