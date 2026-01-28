@@ -334,17 +334,22 @@ export class PrintQueueService implements IPrintQueueService {
       }
       const printerApi = this.printerApiFactory.getById(printerId);
 
-      const fileName = this.fileStorageService.getFilePath(fileStorageId);
+      const filePath = this.fileStorageService.getFilePath(fileStorageId);
+      const fileStats = statSync(filePath);
       const fileStream = this.fileStorageService.readFileStream(fileStorageId);
 
       this.logger.log(`Uploading file ${ fileName } to printer ${ printerId } and starting print`);
-      await printerApi.uploadFile(fileStream, fileName, true);
+      await printerApi.uploadFile({
+        stream: fileStream,
+        fileName,
+        contentLength: fileStats.size,
+        startPrint: true,
+      });
       this.logger.log(`Successfully submitted job ${ jobId } to printer ${ printerId }`);
 
     } catch (error) {
       this.logger.error(`Failed to submit job ${ jobId } to printer ${ printerId }`, error);
 
-      // Update job status to reflect failure
       try {
         const job = await this.printJobRepository.findOne({ where: { id: jobId } });
         if (job) {

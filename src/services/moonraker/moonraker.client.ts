@@ -29,7 +29,6 @@ import {
 } from "@/services/moonraker/dto/server-files/server-file-directory-action.dto";
 import { ServerFileZipActionDto } from "@/services/moonraker/dto/server-files/server-file-zip-action.dto";
 import FormData from "form-data";
-import { createReadStream, ReadStream } from "fs";
 import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
 import { AccessLoginResultDto } from "@/services/moonraker/dto/access/access-login-result.dto";
@@ -353,7 +352,9 @@ export class MoonrakerClient {
 
   async postServerFileUpload(
     login: LoginDto,
-    multerFileOrBuffer: Buffer | Express.Multer.File,
+    stream: NodeJS.ReadableStream,
+    fileName: string,
+    contentLength: number,
     startPrint: boolean,
     progressToken?: string,
     root?: string,
@@ -374,17 +375,7 @@ export class MoonrakerClient {
       formData.append("print", "true");
     }
 
-    let fileBuffer: ArrayBufferLike | ReadStream = (multerFileOrBuffer as Buffer).buffer;
-    const filename = (multerFileOrBuffer as Express.Multer.File).originalname;
-    if (fileBuffer) {
-      this.logger.log("Attaching file from memory buffer to formdata for upload");
-      formData.append("file", fileBuffer, { filename });
-    } else {
-      const filePath = (multerFileOrBuffer as Express.Multer.File).path;
-      const fileStream = createReadStream(filePath);
-      this.logger.log(`Attaching file from disk to formdata for upload`);
-      formData.append("file", fileStream, { filename });
-    }
+    formData.append("file", stream, { filename: fileName, knownLength: contentLength });
 
     // Calculate the header that axios uses to determine progress
     const result: number = await new Promise<number>((resolve, reject) => {

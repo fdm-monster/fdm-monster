@@ -5,6 +5,8 @@ import {
   PartialReprintFileDto,
   PrinterType,
   ReprintState,
+  UploadFileInput,
+  uploadFileInputSchema,
 } from "@/services/printer-api.interface";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
@@ -15,7 +17,7 @@ import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { AxiosPromise, AxiosResponse } from "axios";
 import { ServerConfigDto } from "./moonraker/dto/server/server-config.dto";
 import { SettingsDto } from "./octoprint/dto/settings/settings.dto";
-import { readFileSync, statSync } from "node:fs";
+import { statSync } from "node:fs";
 
 const defaultLog = { adapter: "bambu-lab" };
 
@@ -250,41 +252,34 @@ export class BambuApi implements IPrinterApi {
     throw new Error("Method not implemented");
   }
 
-  async uploadFile(
-    fileOrBuffer: Buffer | Express.Multer.File,
-    startPrint: boolean,
-    uploadToken?: string,
-  ): Promise<void> {
-    let fileBuffer: Buffer;
-    let filename: string;
+  async uploadFile(input: UploadFileInput): Promise<void> {
+    const validated = uploadFileInputSchema.parse(input);
+    const fileBuffer = await this.streamToBuffer(validated.stream);
 
-    // Get file buffer and name
-    if (Buffer.isBuffer(fileOrBuffer)) {
-      this.logger.log("Using file directly from memory buffer for upload");
-      fileBuffer = fileOrBuffer;
-      filename = `upload_${Date.now()}.3mf`; // Default name for buffer uploads
-    } else {
-      const filePath = fileOrBuffer.path;
-      filename = fileOrBuffer.originalname;
-      this.logger.log(`Reading file from disk for upload: ${filePath}`);
-      fileBuffer = readFileSync(filePath);
-    }
-
-    this.logger.log(`Uploading file: ${filename} (${fileBuffer.length} bytes)`, this.logMeta());
+    this.logger.log(`Uploading file: ${validated.fileName} (${fileBuffer.length} bytes)`, this.logMeta());
 
     try {
       await this.ensureFtpConnected();
-      await this.client.ftp.uploadFile(fileBuffer, filename, uploadToken);
+      await this.client.ftp.uploadFile(fileBuffer, validated.fileName, validated.uploadToken);
 
-      if (startPrint) {
-        this.logger.log(`Starting print after upload: ${filename}`, this.logMeta());
+      if (validated.startPrint) {
+        this.logger.log(`Starting print after upload: ${validated.fileName}`, this.logMeta());
         const mqttAdapter = this.getMqttAdapter();
-        await mqttAdapter.startPrint(filename);
+        await mqttAdapter.startPrint(validated.fileName);
       }
     } catch (error) {
       this.logger.error(`Upload failed: ${(error as Error).message}`, this.logMeta());
       throw error;
     }
+  }
+
+  private async streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
+    const chunks: Buffer[] = [];
+    return new Promise((resolve, reject) => {
+      stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+      stream.on("error", (err) => reject(err));
+      stream.on("end", () => resolve(Buffer.concat(chunks)));
+    });
   }
 
   async deleteFile(path: string): Promise<void> {

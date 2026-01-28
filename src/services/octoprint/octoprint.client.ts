@@ -201,6 +201,7 @@ export class OctoprintClient extends OctoprintRoutes {
     login: LoginDto,
     stream: NodeJS.ReadableStream,
     fileName: string,
+    contentLength: number,
     startPrint: boolean,
     progressToken?: string,
   ) {
@@ -211,14 +212,9 @@ export class OctoprintClient extends OctoprintRoutes {
       formData.append("print", "true");
     }
 
-    if (startPrint) {
-      formData.append("print", "true");
-    }
-
-    this.logger.log("Attaching file stream to multipart upload");
-
     formData.append("file", stream, {
       filename: fileName,
+      knownLength: contentLength,
     });
 
     // Calculate the header that axios uses to determine progress
