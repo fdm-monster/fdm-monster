@@ -37,3 +37,5 @@ test/requests/*.env.json
 mosquitto/
 bambu-link/
 setups/
+
+.claude/settings.local.json

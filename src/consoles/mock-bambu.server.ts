@@ -58,16 +58,10 @@ console.log(`[BAMBU MOCK]   Access Code: ${accessCode}`);
 console.log(`[BAMBU MOCK]   Username: bblp`);
 
 const ftpDir = path.join(os.tmpdir(), "bambu-mock-ftp", serial);
-const cacheDir = path.join(ftpDir, "cache");
 
 if (!fs.existsSync(ftpDir)) {
   console.log(`[BAMBU MOCK] Creating FTP directory: ${ftpDir}`);
   fs.mkdirSync(ftpDir, { recursive: true });
-}
-
-if (!fs.existsSync(cacheDir)) {
-  console.log(`[BAMBU MOCK] Creating cache directory: ${cacheDir}`);
-  fs.mkdirSync(cacheDir, { recursive: true });
 }
 
 /**

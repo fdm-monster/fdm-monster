@@ -23,7 +23,7 @@ import { errorSummary } from "@/utils/error.utils";
 import { getScopedPrinter } from "@/middleware/printer-resolver";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { FileStorageService } from "@/services/file-storage.service";
-import { copyFileSync, existsSync, unlinkSync } from "node:fs";
+import { copyFileSync, createReadStream, existsSync, unlinkSync } from "node:fs";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { extname } from "node:path";
 
@@ -194,7 +194,13 @@ export class PrinterFilesController {
     const uploadedFile = files[0];
     const token = this.multerService.startTrackingSession(uploadedFile, currentPrinterId);
 
-    await this.printerApi.uploadFile(uploadedFile, startPrint, token).catch((e) => {
+    await this.printerApi.uploadFile({
+      stream: createReadStream(uploadedFile.path),
+      fileName: uploadedFile.originalname,
+      contentLength: uploadedFile.size,
+      startPrint,
+      uploadToken: token,
+    }).catch((e) => {
       try {
         this.multerService.clearUploadedFile(uploadedFile);
       } catch (e) {
@@ -296,10 +302,9 @@ export class PrinterFilesController {
         currentPrinter.name
       );
 
-      // Update job with storage info
       job.fileStorageId = fileStorageId;
       job.fileHash = fileHash;
-      await this.printJobService.printJobRepository.save(job);
+      await this.printJobService.updateJob(job);
 
       this.logger.log(
         `Created job ${ job.id }: format=${ job.fileFormat }, ` +

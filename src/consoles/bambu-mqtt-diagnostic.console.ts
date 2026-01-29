@@ -21,9 +21,9 @@
  */
 
 import mqtt, { MqttClient } from "mqtt";
-import * as readline from "readline";
-import * as fs from "fs";
-import * as path from "path";
+import * as readline from "node:readline";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import "dotenv/config";
 
 // Configuration from env or args
@@ -66,7 +66,7 @@ let dumpMessageCount = 0;
 
 // Initialize dump file
 function initDumpFile(): void {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const timestamp = new Date().toISOString().replaceAll(/[:.]/g, "-");
   const dumpDir = path.join(process.cwd(), "mqtt-dumps");
 
   // Create dumps directory if it doesn't exist
@@ -507,7 +507,6 @@ async function handleCommand(input: string) {
 
     case "c":
       clearScreen();
-      printDiagnostics();
       break;
 
     case "j":

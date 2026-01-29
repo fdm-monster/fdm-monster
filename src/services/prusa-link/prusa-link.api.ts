@@ -7,6 +7,8 @@ import {
   PartialReprintFileDto,
   PrinterType,
   PrusaLinkType,
+  UploadFileInput,
+  uploadFileInputSchema,
 } from "@/services/printer-api.interface";
 import { AxiosError, AxiosPromise } from "axios";
 import { LoginDto } from "../interfaces/login.dto";
@@ -18,7 +20,6 @@ import { PL_FileResponseDto } from "@/services/prusa-link/dto/file-response.dto"
 import { PL_StatusDto } from "@/services/prusa-link/dto/status.dto";
 import { PL_PrinterStateDto } from "@/services/prusa-link/dto/printer-state.dto";
 import { PL_JobStateDto } from "@/services/prusa-link/dto/job-state.dto";
-import { readFileSync } from "fs";
 import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
@@ -196,52 +197,33 @@ export class PrusaLinkApi implements IPrinterApi {
     ).get<string>(pathUrl);
   }
 
-  async uploadFile(
-    multerFileOrBuffer: Buffer | Express.Multer.File,
-    startPrint: boolean,
-    progressToken?: string,
-  ): Promise<void> {
+  async uploadFile(input: UploadFileInput): Promise<void> {
+    const validated = uploadFileInputSchema.parse(input);
+
     try {
-      let fileBuffer: Buffer;
-      const filename = (multerFileOrBuffer as Express.Multer.File).originalname;
-
-      // Get file buffer - either from buffer or from file path
-      if (Buffer.isBuffer(multerFileOrBuffer)) {
-        this.logger.log("Using file directly from memory buffer for upload");
-        fileBuffer = multerFileOrBuffer as Buffer;
-      } else {
-        const filePath = (multerFileOrBuffer as Express.Multer.File).path;
-        this.logger.log(`Reading file from disk for upload: ${filePath}`);
-        fileBuffer = readFileSync(filePath);
-      }
-
-      // Calculate content length
-      const contentLength = fileBuffer.length;
-
       const response = await this.createClient((b) => {
         b.withHeaders({
-          "Content-Length": contentLength.toString(),
-          // Compliance with other printer services
+          "Content-Type": "application/octet-stream",
+          "Content-Length": validated.contentLength.toString(),
           Overwrite: "?1",
-          // Compliance with other printer services
-          "Print-After-Upload": startPrint ? "?1" : "?0",
+          "Print-After-Upload": validated.startPrint ? "?1" : "?0",
         })
           .withTimeout(this.settingsStore.getTimeoutSettings().apiUploadTimeout)
           .withOnUploadProgress((p) => {
-            if (progressToken) {
-              this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
+            if (validated.uploadToken) {
+              this.eventEmitter2.emit(`${uploadProgressEvent(validated.uploadToken)}`, validated.uploadToken, p);
             }
           });
-      }).put(`/api/v1/files/usb/${encodeURIComponent(filename)}`, fileBuffer);
+      }).put(`/api/v1/files/usb/${encodeURIComponent(validated.fileName)}`, validated.stream);
 
-      if (progressToken) {
-        this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
+      if (validated.uploadToken) {
+        this.eventEmitter2.emit(`${uploadDoneEvent(validated.uploadToken)}`, validated.uploadToken);
       }
 
       return response.data;
     } catch (e: any) {
-      if (progressToken) {
-        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
+      if (validated.uploadToken) {
+        this.eventEmitter2.emit(`${uploadFailedEvent(validated.uploadToken)}`, validated.uploadToken, (e as AxiosError)?.message);
       }
 
       let data;
