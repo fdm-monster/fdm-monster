@@ -582,7 +582,7 @@ __metadata:
     "@lcov-viewer/cli": "npm:1.3.0"
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"
-    "@sentry/node": "npm:10.37.0"
+    "@sentry/node": "npm:10.38.0"
     "@swc/cli": "npm:0.7.10"
     "@swc/core": "npm:1.15.11"
     "@swc/jest": "npm:0.2.39"
@@ -2408,21 +2408,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:10.37.0":
-  version: 10.37.0
-  resolution: "@sentry/core@npm:10.37.0"
-  checksum: 10c0/129f6d1590a9ced159815b6346ed3a3cf9343d0bb8cb24a4c9e360fae50395af7229168a5c4b2dc04102406961a3851287810b4d05394746171ae65432835b9c
+"@sentry/core@npm:10.38.0":
+  version: 10.38.0
+  resolution: "@sentry/core@npm:10.38.0"
+  checksum: 10c0/33719d9ee650c18fca759f4b3c6c839b9463e6fc487133aa3dee337bc1da30d6c0ccc118f009637cbed1358d373d431f179dc77c6e8772800acffd19f63a494e
   languageName: node
   linkType: hard
 
-"@sentry/node-core@npm:10.37.0":
-  version: 10.37.0
-  resolution: "@sentry/node-core@npm:10.37.0"
+"@sentry/node-core@npm:10.38.0":
+  version: 10.38.0
+  resolution: "@sentry/node-core@npm:10.38.0"
   dependencies:
     "@apm-js-collab/tracing-hooks": "npm:^0.3.1"
-    "@sentry/core": "npm:10.37.0"
-    "@sentry/opentelemetry": "npm:10.37.0"
-    import-in-the-middle: "npm:^2.0.1"
+    "@sentry/core": "npm:10.38.0"
+    "@sentry/opentelemetry": "npm:10.38.0"
+    import-in-the-middle: "npm:^2.0.6"
   peerDependencies:
     "@opentelemetry/api": ^1.9.0
     "@opentelemetry/context-async-hooks": ^1.30.1 || ^2.1.0
@@ -2431,13 +2431,13 @@ __metadata:
     "@opentelemetry/resources": ^1.30.1 || ^2.1.0
     "@opentelemetry/sdk-trace-base": ^1.30.1 || ^2.1.0
     "@opentelemetry/semantic-conventions": ^1.39.0
-  checksum: 10c0/56ac6ee4150fcc9ca31ff3ff239c174099227cb563b405618573b293a540a5eeb4b3a0969f57c4a05245c30ad93afaec1c3bda0df838ea9f7d51c6fdb54b570f
+  checksum: 10c0/39542845bbca1a810d4a7dc1321fd6c4507f7ab205eb404fa09bb43da2acca5c08eaa9d642fd8d5330c35682b34ce927a940b816c99166e1e60ed676f475ac93
   languageName: node
   linkType: hard
 
-"@sentry/node@npm:10.37.0":
-  version: 10.37.0
-  resolution: "@sentry/node@npm:10.37.0"
+"@sentry/node@npm:10.38.0":
+  version: 10.38.0
+  resolution: "@sentry/node@npm:10.38.0"
   dependencies:
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/context-async-hooks": "npm:^2.5.0"
@@ -2469,27 +2469,27 @@ __metadata:
     "@opentelemetry/sdk-trace-base": "npm:^2.5.0"
     "@opentelemetry/semantic-conventions": "npm:^1.39.0"
     "@prisma/instrumentation": "npm:7.2.0"
-    "@sentry/core": "npm:10.37.0"
-    "@sentry/node-core": "npm:10.37.0"
-    "@sentry/opentelemetry": "npm:10.37.0"
-    import-in-the-middle: "npm:^2.0.1"
+    "@sentry/core": "npm:10.38.0"
+    "@sentry/node-core": "npm:10.38.0"
+    "@sentry/opentelemetry": "npm:10.38.0"
+    import-in-the-middle: "npm:^2.0.6"
     minimatch: "npm:^9.0.0"
-  checksum: 10c0/c62f19bc477ea962d3c72d444abd42569d0161c5942302407c67fdfcdc555f6caf265182dbc4e58b4cdb62630d7013faf6e083c490329dfc880f2b7f5c03e852
+  checksum: 10c0/3c227a51bf4336209f4a065c5d6942d95c7749503b92730cc7fe9123552a2580e38b5f730fd02675f24cebb37f21e1cd7bd1e21e095e1c09ea7955cd84086744
   languageName: node
   linkType: hard
 
-"@sentry/opentelemetry@npm:10.37.0":
-  version: 10.37.0
-  resolution: "@sentry/opentelemetry@npm:10.37.0"
+"@sentry/opentelemetry@npm:10.38.0":
+  version: 10.38.0
+  resolution: "@sentry/opentelemetry@npm:10.38.0"
   dependencies:
-    "@sentry/core": "npm:10.37.0"
+    "@sentry/core": "npm:10.38.0"
   peerDependencies:
     "@opentelemetry/api": ^1.9.0
     "@opentelemetry/context-async-hooks": ^1.30.1 || ^2.1.0
     "@opentelemetry/core": ^1.30.1 || ^2.1.0
     "@opentelemetry/sdk-trace-base": ^1.30.1 || ^2.1.0
     "@opentelemetry/semantic-conventions": ^1.39.0
-  checksum: 10c0/649faeea05b9e8bbd411e83a34c1495ae56caae545c2839b9786d04c831ce866f2f6f2212053c10100afeb6091abe309a1324ad5f539684c72e5e6aa08106f17
+  checksum: 10c0/3ab40df12339a3790149479ab0495587a7218d4e32cff19dfda10a84e37c18add9f2d29c30ad3c41015874c3e3b9169bae52bfc59c2e8166c785a8b70776e89c
   languageName: node
   linkType: hard
 
@@ -5783,7 +5783,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"import-in-the-middle@npm:^2.0.0, import-in-the-middle@npm:^2.0.1":
+"import-in-the-middle@npm:^2.0.0, import-in-the-middle@npm:^2.0.6":
   version: 2.0.6
   resolution: "import-in-the-middle@npm:2.0.6"
   dependencies:
