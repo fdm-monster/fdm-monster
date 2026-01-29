@@ -53,11 +53,9 @@ export function flattenOctoPrintFiles(items: OctoprintFileDto[], parentPath: str
 
   for (const item of items) {
     if (item.type === 'folder' && item.children) {
-      // Recursively process folder contents
       const folderPath = parentPath ? `${parentPath}/${item.name}` : item.name;
       files.push(...flattenOctoPrintFiles(item.children, folderPath));
     } else if (item.type === 'machinecode' && item.date) {
-      // Add file with full path - use item.path if available, otherwise construct from parent
       const normalizedFile = normalizePrinterFile(item);
       files.push(normalizedFile);
     }

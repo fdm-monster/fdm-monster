@@ -34,6 +34,5 @@ export interface OctoprintFileDto extends OctoPrintCustomDto {
   // Default but optional parts
   gcodeAnalysis?: GcodeAnalysisDto;
 
-  // Recursive listing support - folders contain children
   children?: OctoprintFileDto[];
 }

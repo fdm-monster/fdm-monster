@@ -21,7 +21,6 @@ describe(OctoprintClient.name, () => {
   const auth = { apiKey, printerURL, printerType: OctoprintType };
 
   it("should throw error on getSettings with incorrect printerURL", async () => {
-    // TODO Not human-friendly
     await expect(
       async () =>
         await octoprintClient.getSettings({
