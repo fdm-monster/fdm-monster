@@ -137,17 +137,25 @@ export class OctoprintClient extends OctoprintRoutes {
   }
 
   async getLocalFiles(login: LoginDto, recursive = false, startDir = "") {
-    const response = await this.createClient(login).get<OctoprintFilesResponseDto>(this.apiGetFiles(recursive, startDir));
+    const url = this.apiGetFiles(recursive, startDir);
+    const response = await this.createClient(login).get<OctoprintFilesResponseDto | OctoprintFileDto>(url);
 
-    if (!response?.data?.files) {
+    if (!response?.data) {
+      return [];
+    }
+
+    const data = response.data as any;
+    const items = data.files || (data.children ? data.children : []);
+
+    if (!items.length) {
       return [];
     }
 
     if (recursive) {
-      return flattenOctoPrintFiles(response.data.files, startDir);
+      return flattenOctoPrintFiles(items, startDir);
     } else {
-      return response.data.files.map((item) => ({
-        path: startDir ? `${startDir}/${item.name}` : item.name,
+      return items.map((item: OctoprintFileDto) => ({
+        path: item.path || item.name,
         size: item.size || 0,
         date: item.date || null,
         dir: item.type === 'folder',
