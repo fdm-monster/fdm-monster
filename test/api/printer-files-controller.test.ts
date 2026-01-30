@@ -208,20 +208,18 @@ describe(PrinterFilesController.name, () => {
         .field("startPrint", "false")
         .attach("file", examplBambuFilePath);
 
-      // Should get a 400 error due to unsupported file extension
-      expect(response.status).toBe(400);
+      expectInvalidResponse(response);
     });
 
-    it("should accept .gcode files for Bambu printers", async () => {
+    it("should not accept .gcode files for Bambu printers", async () => {
       const bambuPrinter = await createTestBambuPrinter(request);
 
       const response = await request
         .post(uploadFileRoute(bambuPrinter.id))
         .field("startPrint", "false")
         .attach("file", gcodePath);
-
-      // Should succeed with stub implementations
-      expectOkResponse(response);
+      
+      expectInvalidResponse(response);
     });
 
     it("should show appropriate error for empty upload on Bambu printer", async () => {
