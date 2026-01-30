@@ -67,6 +67,11 @@ export interface FileDto {
   dir: boolean;
 }
 
+export interface FilesDto {
+  dirs: FileDto[];
+  files: FileDto[];
+}
+
 export enum ReprintState {
   PrinterNotAvailable = 0,
   NoLastPrint = 1,
@@ -120,7 +125,7 @@ export interface IPrinterApi {
 
   getFile(path: string): Promise<FileDto>;
 
-  getFiles(recursive?: boolean, startDir?: string): Promise<FileDto[]>;
+  getFiles(recursive?: boolean, startDir?: string): Promise<FilesDto>;
 
   downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream>;
 

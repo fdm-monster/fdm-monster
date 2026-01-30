@@ -130,7 +130,7 @@ export class MoonrakerApi implements IPrinterApi {
     return { size: file.size, path, date: Math.floor(file.modified * 1000), dir: false };
   }
 
-  async getFiles(recursive = false, startDir = ""): Promise<FileDto[]> {
+  async getFiles(recursive = false, startDir = "") {
     if (recursive && startDir) {
       throw new Error("Recursive mode does not support startDir parameter for Moonraker");
     }
@@ -151,23 +151,21 @@ export class MoonrakerApi implements IPrinterApi {
       });
 
       dirsSet.forEach((dirPath) => files.push(this.toFileDto(dirPath, 0, null, true)));
-      return files;
+
+      return {
+        dirs: files.filter(f => f.dir),
+        files: files.filter(f => !f.dir),
+      };
     }
 
     const moonrakerPath = startDir ? `gcodes/${startDir}` : "gcodes";
     const response = await this.client.getServerFilesDirectoryInfo(this.login, moonrakerPath, false);
-    const { dirs, files: apiFiles } = response.data.result;
-    const result: FileDto[] = [];
+    const { dirs: apiDirs, files: apiFiles } = response.data.result;
 
-    for (const dir of dirs) {
-      result.push(this.toFileDto(buildPath(dir.dirname), dir.size, dir.modified, true));
-    }
-
-    for (const file of apiFiles) {
-      result.push(this.toFileDto(buildPath(file.filename), file.size, file.modified, false));
-    }
-
-    return result;
+    return {
+      dirs: apiDirs.map((d) => this.toFileDto(buildPath(d.dirname), d.size, d.modified, true)),
+      files: apiFiles.map((f) => this.toFileDto(buildPath(f.filename), f.size, f.modified, false)),
+    };
   }
 
   private toFileDto(path: string, size: number, modified: number | null, dir: boolean): FileDto {

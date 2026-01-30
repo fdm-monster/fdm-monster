@@ -17,6 +17,6 @@ export const uploadFileSchema = z.object({
 });
 
 export const getFilesSchema = z.object({
-  recursive: z.coerce.boolean().default(false),
+  recursive: z.string().optional(),
   startDir: z.string().optional(),
 });

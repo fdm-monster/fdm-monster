@@ -94,7 +94,11 @@ export class OctoprintApi implements IPrinterApi {
   }
 
   async getFiles(recursive = false, startDir = "") {
-    return await this.client.getLocalFiles(this.login, recursive, startDir);
+    const items = await this.client.getLocalFiles(this.login, recursive, startDir);
+    return {
+      dirs: items.filter(f => f.dir),
+      files: items.filter(f => !f.dir),
+    };
   }
 
   async downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {

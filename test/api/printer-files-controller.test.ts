@@ -69,7 +69,7 @@ describe(PrinterFilesController.name, () => {
       .query("recursive=false")
       .reply(200, { files: [], free: 1, total: 1 });
     const response = await request.get(getFilesRoute(printer.id)).send();
-    expectOkResponse(response, []);
+    expectOkResponse(response, { dirs: [], files: [] });
   });
 
   it("should retrieve file with hash character on GET for existing printer", async () => {
@@ -115,28 +115,6 @@ describe(PrinterFilesController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should allow DELETE to clear printer files - with status result", async () => {
-    const printer = await createTestPrinter(request);
-    const jsonFile = require("./test-data/octoprint-file.data.json");
-
-    nock(printer.printerURL)
-      .delete("/api/files/local/" + jsonFile.path)
-      .reply(200);
-
-    nock(printer.printerURL)
-      .get("/api/files/local")
-      .query("recursive=false")
-      .reply(200, { files: [jsonFile], free: 1, total: 1 });
-
-    // octoprintClient.storeResponse({ files: [jsonFile] }, 200);
-    const response = await request.delete(clearFilesRoute(printer.id)).send();
-    expectOkResponse(response, {
-      succeededFiles: expect.any(Array),
-      failedFiles: expect.any(Array),
-    });
-    expect(response.body.succeededFiles).toHaveLength(1);
-    expect(response.body.failedFiles).toHaveLength(0);
-  });
 
 
   it("should allow POST to print a printer file", async () => {

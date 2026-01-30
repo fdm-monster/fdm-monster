@@ -69,7 +69,7 @@ export class PrusaLinkApi implements IPrinterApi {
     await this.getVersion();
   }
 
-  async getFiles(recursive = false, startDir = "/usb"): Promise<FileDto[]> {
+  async getFiles(recursive = false, startDir = "/usb") {
     if (recursive) {
       throw new Error("Recursive listing not supported for PrusaLink printers");
     }
@@ -78,15 +78,20 @@ export class PrusaLinkApi implements IPrinterApi {
     const root = response.data.files.find((dir) => dir.path === startDir);
 
     if (!root || !root.children) {
-      return [];
+      return { dirs: [], files: [] };
     }
 
-    return root.children.map((child) => ({
+    const items = root.children.map((child) => ({
       path: child.path,
       size: null,
       date: null,
       dir: !child.refs?.download,
     }));
+
+    return {
+      dirs: items.filter(i => i.dir),
+      files: items.filter(i => !i.dir),
+    };
   }
 
   async getFile(path: string): Promise<FileDto> {

@@ -57,7 +57,8 @@ export class PrinterFilesController {
   @before(permission(PERMS.PrinterFiles.Get))
   async getFiles(req: Request, res: Response) {
     const { printerApi } = getScopedPrinter(req);
-    const { recursive, startDir } = await validateInput(req.query, getFilesSchema);
+    const { recursive: recursiveStr, startDir } = await validateInput(req.query, getFilesSchema);
+    const recursive = recursiveStr === "true";
 
     const files = await printerApi.getFiles(recursive, startDir);
     res.send(files);
@@ -99,38 +100,11 @@ export class PrinterFilesController {
   @route("/:id")
   @before(permission(PERMS.PrinterFiles.Delete))
   async deleteFileOrFolder(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
     const { path } = await validateInput(req.query, getFileSchema);
     const encodedFilePath = encodeURIComponent(path);
 
     const result = await this.printerApi.deleteFile(encodedFilePath);
     res.send(result);
-  }
-
-  @DELETE()
-  @route("/:id/clear")
-  @before(permission(PERMS.PrinterFiles.Clear))
-  async clearPrinterFiles(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-
-    const failedFiles = [];
-    const succeededFiles = [];
-
-    const nonRecursiveFiles = await this.printerApi.getFiles(false);
-    for (let file of nonRecursiveFiles) {
-      try {
-        const encodedFilePath = encodeURIComponent(file.path);
-        await this.printerApi.deleteFile(encodedFilePath);
-        succeededFiles.push(file);
-      } catch (e) {
-        failedFiles.push(file);
-      }
-    }
-
-    res.send({
-      failedFiles,
-      succeededFiles,
-    });
   }
 
   @GET()
