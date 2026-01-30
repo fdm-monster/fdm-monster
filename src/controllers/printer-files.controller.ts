@@ -70,7 +70,7 @@ export class PrinterFilesController {
   async startPrintFile(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const { filePath } = await validateInput(req.body, startPrintFileSchema);
-    const encodedFilePath = encodeURIComponent(filePath);
+    const encodedFilePath = filePath.split('/').map(encodeURIComponent).join('/');
     await this.printerApi.startPrint(encodedFilePath);
 
     this.logger.log(`Started print for printer ${ currentPrinterId }`);
@@ -84,7 +84,7 @@ export class PrinterFilesController {
   async downloadFile(req: Request, res: Response) {
     this.logger.log(`Downloading file ${ req.params.path }`);
     const { path } = await validateInput(req.params, downloadFileSchema);
-    const encodedFilePath = encodeURIComponent(path);
+    const encodedFilePath = path.split('/').map(encodeURIComponent).join('/');
 
     const response = await this.printerApi.downloadFile(encodedFilePath);
     res.setHeader("Content-Type", response.headers["content-type"]);
@@ -101,7 +101,7 @@ export class PrinterFilesController {
   @before(permission(PERMS.PrinterFiles.Delete))
   async deleteFileOrFolder(req: Request, res: Response) {
     const { path } = await validateInput(req.query, getFileSchema);
-    const encodedFilePath = encodeURIComponent(path);
+    const encodedFilePath = path.split('/').map(encodeURIComponent).join('/');
 
     const result = await this.printerApi.deleteFile(encodedFilePath);
     res.send(result);
