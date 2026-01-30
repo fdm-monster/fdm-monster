@@ -223,28 +223,22 @@ export class BambuApi implements IPrinterApi {
 
     const { stream, tempPath } = await this.client.ftp.downloadFileAsStream(path);
 
-    // Get file size from the temp file
     const stats = statSync(tempPath);
-
-    // Extract filename from path for Content-Disposition header
     const filename = path.split("/").pop() || "download";
 
-    // Create an AxiosResponse-like structure
-    const response: AxiosResponse<NodeJS.ReadableStream> = {
+    return {
       data: stream,
       status: 200,
       statusText: "OK",
       headers: {
         "content-type": "application/octet-stream",
         "content-length": String(stats.size),
-        "content-disposition": `attachment; filename="${filename}"`,
+        "content-disposition": `attachment; filename="${ filename }"`,
       },
       config: {
         headers: {} as any,
       },
     };
-
-    return response;
   }
 
   getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string> {
