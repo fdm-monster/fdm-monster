@@ -65,6 +65,11 @@ export class PrinterFilesController {
   }
 
   @POST()
+
+  /**
+   * @obsolete /:id/select, removed in v2
+   */
+  @route("/:id/select")
   @route("/:id/print")
   @before(permission(PERMS.PrinterFiles.Actions))
   async startPrintFile(req: Request, res: Response) {
