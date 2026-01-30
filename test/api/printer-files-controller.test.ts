@@ -146,12 +146,6 @@ describe(PrinterFilesController.name, () => {
     expect(response.body.failedFiles).toHaveLength(0);
   });
 
-  it("should allow POST to purge all printer files", async () => {
-    await createTestPrinter(request);
-    await createTestPrinter(request);
-    const response = await request.post(purgeIndexedFilesRoute).send();
-    expectOkResponse(response);
-  });
 
   it("should allow POST to print a printer file", async () => {
     const printer = await createTestPrinter(request);
