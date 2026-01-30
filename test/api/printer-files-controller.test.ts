@@ -16,7 +16,6 @@ import { BambuMqttAdapterStub } from "./stubs/bambu-mqtt.adapter.stub";
 import { SettingsStore } from "@/state/settings.store";
 
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
-const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
 const thumbnailsRoute = `${defaultRoute}/thumbnails`;
 const getRoute = (id: number) => `${defaultRoute}/${id}`;
 const clearFilesRoute = (id: number) => `${getRoute(id)}/clear`;
@@ -25,7 +24,6 @@ const printFileRoute = (id: number) => `${getRoute(id)}/print`;
 const uploadFileRoute = (id: number) => `${getRoute(id)}/upload`;
 const getFilesRoute = (id: number) => `${getRoute(id)}`;
 const downloadFileRoute = (id: number, path: string) => `${getRoute(id)}/download/${path}`;
-const getCacheRoute = (id: number) => `${getRoute(id)}/cache`;
 const getPrintThumbnailRoute = (id: number) => `${getRoute(id)}/thumbnail`;
 
 let request: TestAgent<Test>;
@@ -92,12 +90,6 @@ describe(PrinterFilesController.name, () => {
       );
     const response = await request.get(downloadFileRoute(printer.id, encodeURIComponent(filename))).send();
     expectOkResponse(response, reply0);
-  });
-
-  it("should allow GET on printer files cache", async () => {
-    const printer = await createTestPrinter(request);
-    const response = await request.get(getCacheRoute(printer.id)).send();
-    expectOkResponse(response);
   });
 
   it("should allow GET on printer files thumbnails cache", async () => {
@@ -218,7 +210,7 @@ describe(PrinterFilesController.name, () => {
         .post(uploadFileRoute(bambuPrinter.id))
         .field("startPrint", "false")
         .attach("file", gcodePath);
-      
+
       expectInvalidResponse(response);
     });
 
