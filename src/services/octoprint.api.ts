@@ -137,7 +137,12 @@ export class OctoprintApi implements IPrinterApi {
 
     return {
       connectionState,
-      file: currentJobFile,
+      file: {
+        path: currentJobFile.path,
+        size: currentJobFile.size,
+        date: currentJobFile.date,
+        dir: false,
+      },
       reprintState: ReprintState.LastPrintReady,
     };
   }

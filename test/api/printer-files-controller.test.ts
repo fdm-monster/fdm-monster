@@ -179,11 +179,6 @@ describe(PrinterFilesController.name, () => {
         },
       },
     });
-    nock(printer.printerURL)
-      .get("/api/files/local")
-      .query("recursive=true")
-      .reply(200, { files: [], free: 1, total: 1 });
-
     const response = await request
       .post(uploadFileRoute(printer.id))
       .field("startPrint", "true")

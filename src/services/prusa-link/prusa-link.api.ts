@@ -96,6 +96,7 @@ export class PrusaLinkApi implements IPrinterApi {
       path: response.data.name,
       size: response.data.size,
       date: null,
+      dir: false,
     };
   }
 

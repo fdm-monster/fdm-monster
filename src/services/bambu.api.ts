@@ -199,6 +199,7 @@ export class BambuApi implements IPrinterApi {
       path: file.name,
       size: file.size,
       date: file.modifiedAt ? new Date(file.modifiedAt).getTime() : null,
+      dir: file.isDirectory,
     };
   }
 
@@ -315,6 +316,7 @@ export class BambuApi implements IPrinterApi {
         path: lastFile,
         size: -1,
         date: null,
+        dir: false,
       },
       reprintState: ReprintState.LastPrintReady,
       connectionState: null,

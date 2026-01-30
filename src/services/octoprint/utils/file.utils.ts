@@ -35,9 +35,12 @@ export function normalizePrinterFile(file: OctoprintFileDto): FileDto {
     delete fileCopy[unknownKey];
   }
 
-  fileCopy.customData = customData;
-
-  return fileCopy;
+  return {
+    path: fileCopy.path,
+    size: fileCopy.size,
+    date: fileCopy.date,
+    dir: fileCopy.type === 'folder',
+  };
 }
 
 export function flattenOctoPrintFiles(items: OctoprintFileDto[], parentPath: string = ''): FileDto[] {

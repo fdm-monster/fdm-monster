@@ -159,7 +159,13 @@ export class OctoprintClient extends OctoprintRoutes {
     const urlPath = this.apiFile(path);
     const response = await this.createClient(login).get<OctoprintFileDto>(urlPath);
 
-    return normalizePrinterFile(response?.data);
+    const file = response?.data;
+    return {
+      path: file.path,
+      size: file.size,
+      date: file.date,
+      dir: file.type === 'folder',
+    };
   }
 
   async downloadFile(login: LoginDto, path: string): AxiosPromise<NodeJS.ReadableStream> {

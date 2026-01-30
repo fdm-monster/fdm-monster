@@ -127,7 +127,7 @@ export class MoonrakerApi implements IPrinterApi {
   async getFile(path: string): Promise<FileDto> {
     const metadata = await this.client.getServerFileMetadata(this.login, path);
     const file = metadata.data.result;
-    return { size: file.size, path, date: file.modified };
+    return { size: file.size, path, date: Math.floor(file.modified * 1000), dir: false };
   }
 
   async getFiles(recursive = false, startDir = ""): Promise<FileDto[]> {
@@ -250,6 +250,7 @@ export class MoonrakerApi implements IPrinterApi {
         date: job.start_time,
         path: job.filename,
         size: job.metadata.size,
+        dir: false,
       },
     };
   }
