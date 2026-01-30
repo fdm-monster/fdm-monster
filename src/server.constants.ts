@@ -21,7 +21,7 @@ export const AppConstants = {
   defaultFileUploadsStorage: "file-uploads",
   defaultPrintFilesStorage: "files",
   defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
-  defaultAcceptedBambuExtensions: [".gcode", ".3mf"],
+  defaultAcceptedBambuExtensions: [".3mf"],
   defaultServerPort: 4000,
   apiRoute: "/api/v2",
   enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",

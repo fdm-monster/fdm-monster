@@ -196,19 +196,28 @@ export class BambuApiStub implements IPrinterApi {
       path: file.name,
       size: file.size,
       date: file.modifiedAt ? new Date(file.modifiedAt).getTime() : null,
+      dir: file.isDirectory,
     };
   }
 
-  async getFiles(recursive = true): Promise<FileDto[]> {
-    this.logger.debug("[STUB] Getting files list", this.logMeta());
-    await this.ensureFtpConnected();
-    const files = await this.client.ftp.listFiles("/");
+  async getFiles(recursive = false, startDir = "/"): Promise<FileDto[]> {
+    if (recursive) {
+      throw new Error("Recursive listing not supported for Bambu Lab printers");
+    }
 
-    return files.map((file) => ({
-      path: file.name,
-      size: file.size,
-      date: file.modifiedAt ? new Date(file.modifiedAt).getTime() : null,
-    }));
+    this.logger.debug(`[STUB] Getting files list from ${startDir}`, this.logMeta());
+    await this.ensureFtpConnected();
+    const items = await this.client.ftp.listFiles(startDir);
+
+    return items.map((item) => {
+      const fullPath = startDir === "/" ? `/${item.name}` : `${startDir}/${item.name}`;
+      return {
+        path: fullPath,
+        size: item.size,
+        date: item.modifiedAt ? new Date(item.modifiedAt).getTime() : null,
+        dir: item.isDirectory,
+      };
+    });
   }
 
   downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {

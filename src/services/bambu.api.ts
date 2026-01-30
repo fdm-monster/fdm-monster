@@ -202,18 +202,26 @@ export class BambuApi implements IPrinterApi {
     };
   }
 
-  async getFiles(recursive = true): Promise<FileDto[]> {
-    this.logger.debug("Listing files", this.logMeta());
-    await this.ensureFtpConnected();
-    const files = await this.client.ftp.listFiles("/");
+  async getFiles(recursive = false, startDir = "/"): Promise<FileDto[]> {
+    if (recursive) {
+      throw new Error("Recursive listing not supported for Bambu Lab printers");
+    }
 
-    return files
-      .filter((f) => f.isFile) // Only files, not directories
-      .map((f) => ({
-        path: f.name,
-        size: f.size,
-        date: f.modifiedAt ? new Date(f.modifiedAt).getTime() : null,
-      }));
+    this.logger.debug(`Listing files from ${startDir}`, this.logMeta());
+    await this.ensureFtpConnected();
+
+    const items = await this.client.ftp.listFiles(startDir);
+
+    return items.map((item) => {
+      const fullPath = startDir === "/" ? `/${item.name}` : `${startDir}/${item.name}`;
+
+      return {
+        path: fullPath,
+        size: item.size,
+        date: item.modifiedAt ? new Date(item.modifiedAt).getTime() : null,
+        dir: item.isDirectory,
+      };
+    });
   }
 
   async downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {

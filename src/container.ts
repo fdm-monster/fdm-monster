@@ -8,11 +8,9 @@ import { SettingsStore } from "./state/settings.store";
 import { ServerReleaseService } from "./services/core/server-release.service";
 import { TaskManagerService } from "./services/task-manager.service";
 import { GithubService } from "./services/core/github.service";
-import { FileCache } from "./state/file.cache";
 import { PrinterWebsocketTask } from "./tasks/printer-websocket.task";
 import { SocketIoTask } from "./tasks/socketio.task";
 import { SocketFactory } from "./services/socket.factory";
-import { PrinterFilesStore } from "./state/printer-files.store";
 import { configureEventEmitter } from "./handlers/event-emitter";
 import { AppConstants } from "./server.constants";
 import { SoftwareUpdateTask } from "./tasks/software-update.task";
@@ -24,7 +22,6 @@ import { BootTask } from "./tasks/boot.task";
 import { UserService } from "./services/orm/user.service";
 import { RoleService } from "./services/orm/role.service";
 import { PermissionService } from "./services/orm/permission.service";
-import { PrinterFilesLoadTask } from "./tasks/printer-files-load.task";
 import { ROLES } from "./constants/authorization.constants";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
 import { ConfigService, IConfigService } from "./services/core/config.service";
@@ -163,9 +160,7 @@ export function configureContainer() {
 
     [di.floorStore]: asClass(FloorStore).singleton(),
     [di.printerThumbnailCache]: asClass(PrinterThumbnailCache).singleton(),
-    [di.fileCache]: asClass(FileCache).singleton(),
     [di.fileUploadTrackerCache]: asClass(FileUploadTrackerCache).singleton(),
-    [di.printerFilesStore]: asClass(PrinterFilesStore).singleton(),
     [di.printerCache]: asClass(PrinterCache).singleton(),
     [di.printerEventsCache]: asClass(PrinterEventsCache).singleton(),
     [di.printerSocketStore]: asClass(PrinterSocketStore).singleton(),
@@ -182,7 +177,6 @@ export function configureContainer() {
     [di.clientDistDownloadTask]: asClass(ClientDistDownloadTask).singleton(),
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
-    [di.printerFilesLoadTask]: asClass(PrinterFilesLoadTask).singleton(),
     [di.printJobAnalysisTask]: asClass(PrintJobAnalysisTask).singleton(),
   });
 

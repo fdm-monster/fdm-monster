@@ -68,7 +68,7 @@ describe(PrinterFilesController.name, () => {
     const printer = await createTestPrinter(request);
     nock(printer.printerURL)
       .get("/api/files/local")
-      .query("recursive=true")
+      .query("recursive=false")
       .reply(200, { files: [], free: 1, total: 1 });
     const response = await request.get(getFilesRoute(printer.id)).send();
     expectOkResponse(response, []);

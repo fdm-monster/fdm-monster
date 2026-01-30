@@ -62,8 +62,9 @@ export interface StatusFlags {
 
 export interface FileDto {
   path: string;
-  size: number;
+  size: number | null;
   date: number | null;
+  dir: boolean;
 }
 
 export enum ReprintState {
@@ -119,7 +120,7 @@ export interface IPrinterApi {
 
   getFile(path: string): Promise<FileDto>;
 
-  getFiles(recursive?: boolean): Promise<FileDto[]>;
+  getFiles(recursive?: boolean, startDir?: string): Promise<FileDto[]>;
 
   downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream>;
 

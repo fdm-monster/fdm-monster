@@ -26,9 +26,6 @@ export interface IFileStorageService {
   listThumbnails(fileStorageId: string): Promise<string[]>;
 }
 
-/**
- * Service for managing print job file storage with optional queue support
- */
 export class FileStorageService implements IFileStorageService {
   printJobRepository: Repository<PrintJob>;
   private readonly logger;

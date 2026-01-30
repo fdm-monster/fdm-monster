@@ -130,9 +130,53 @@ export class MoonrakerApi implements IPrinterApi {
     return { size: file.size, path, date: file.modified };
   }
 
-  async getFiles(recursive = true): Promise<FileDto[]> {
-    const files = await this.client.getServerFilesList(this.login);
-    return files.data.result.map((f) => ({ size: f.size, path: f.path, date: f.modified }));
+  async getFiles(recursive = false, startDir = ""): Promise<FileDto[]> {
+    if (recursive && startDir) {
+      throw new Error("Recursive mode does not support startDir parameter for Moonraker");
+    }
+
+    const stripGcodes = (path: string) => path.startsWith('gcodes/') ? path.substring(7) : path;
+    const buildPath = (name: string) => startDir ? `${startDir}/${name}` : name;
+
+    if (recursive) {
+      const response = await this.client.getServerFilesList(this.login, "gcodes");
+      const dirsSet = new Set<string>();
+      const files: FileDto[] = response.data.result.map((f) => {
+        const strippedPath = stripGcodes(f.path);
+        const pathParts = strippedPath.split('/');
+        for (let i = 0; i < pathParts.length - 1; i++) {
+          dirsSet.add(pathParts.slice(0, i + 1).join('/'));
+        }
+        return this.toFileDto(strippedPath, f.size, f.modified, false);
+      });
+
+      dirsSet.forEach((dirPath) => files.push(this.toFileDto(dirPath, 0, null, true)));
+      return files;
+    }
+
+    const moonrakerPath = startDir ? `gcodes/${startDir}` : "gcodes";
+    const response = await this.client.getServerFilesDirectoryInfo(this.login, moonrakerPath, false);
+    const { dirs, files: apiFiles } = response.data.result;
+    const result: FileDto[] = [];
+
+    for (const dir of dirs) {
+      result.push(this.toFileDto(buildPath(dir.dirname), dir.size, dir.modified, true));
+    }
+
+    for (const file of apiFiles) {
+      result.push(this.toFileDto(buildPath(file.filename), file.size, file.modified, false));
+    }
+
+    return result;
+  }
+
+  private toFileDto(path: string, size: number, modified: number | null, dir: boolean): FileDto {
+    return {
+      path,
+      size,
+      date: modified !== null ? Math.floor(modified * 1000) : null,
+      dir,
+    };
   }
 
   async homeAxes(axes: { x?: boolean; y?: boolean; z?: boolean }): Promise<void> {

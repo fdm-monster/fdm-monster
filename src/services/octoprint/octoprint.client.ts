@@ -136,21 +136,22 @@ export class OctoprintClient extends OctoprintRoutes {
     return await this.createClient(login).get<UserListDto>(this.apiUsers);
   }
 
-  async getLocalFiles(login: LoginDto, recursive = false) {
-    const response = await this.createClient(login).get<OctoprintFilesResponseDto>(this.apiGetFiles(recursive));
+  async getLocalFiles(login: LoginDto, recursive = false, startDir = "") {
+    const response = await this.createClient(login).get<OctoprintFilesResponseDto>(this.apiGetFiles(recursive, startDir));
 
     if (!response?.data?.files) {
       return [];
     }
 
     if (recursive) {
-      // Use recursive flattening to handle nested folder structure
-      return flattenOctoPrintFiles(response.data.files);
+      return flattenOctoPrintFiles(response.data.files, startDir);
     } else {
-      // Non-recursive: only process top-level files
-      return response.data.files
-        .filter((f) => f.date && f.type === "machinecode")
-        .map((f) => normalizePrinterFile(f));
+      return response.data.files.map((item) => ({
+        path: startDir ? `${startDir}/${item.name}` : item.name,
+        size: item.size || 0,
+        date: item.date || null,
+        dir: item.type === 'folder',
+      }));
     }
   }
 
