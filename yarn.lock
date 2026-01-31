@@ -4832,9 +4832,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.263":
-  version: 1.5.282
-  resolution: "electron-to-chromium@npm:1.5.282"
-  checksum: 10c0/b970db002c3fd9b89faacd0f3752b868e16619fb720f1ac5975e4d93f8cf6e564762e05d647ea02246231342c105a37b886c5e4a6608e6987076d8e1a357ad8c
+  version: 1.5.283
+  resolution: "electron-to-chromium@npm:1.5.283"
+  checksum: 10c0/2ff8670d94ec49d2b12ae5d8ffb0208dde498d8a112ebb8016aac90171c7ee0860c7d8f78269afd3a3b7cba6dece3c49dd350cd240cc0f9a73a804699746798e
   languageName: node
   linkType: hard
 
@@ -6670,9 +6670,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.11.1":
-  version: 1.12.35
-  resolution: "libphonenumber-js@npm:1.12.35"
-  checksum: 10c0/6aab76b82c365589933f17a55ec33d914507d1e87ce0b656c32749bfa21ca2940f0fc76a44551584e1b61cf0d7e647627ebecf649c69832e221a99d4ef4f66e9
+  version: 1.12.36
+  resolution: "libphonenumber-js@npm:1.12.36"
+  checksum: 10c0/1bf9e3f24aba0b4d9748642db52a698641c0746eb4e0706d13f9ae076ed18c0c9ff814323ebb130b1ad2b17d0894b7cd33463bea009fc5efac3feaeb1d17b865
   languageName: node
   linkType: hard
 
