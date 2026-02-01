@@ -15,3 +15,8 @@ export const getFileSchema = z.object({
 export const uploadFileSchema = z.object({
   startPrint: z.enum(["true", "false"]),
 });
+
+export const getFilesSchema = z.object({
+  recursive: z.string().optional(),
+  startDir: z.string().optional(),
+});

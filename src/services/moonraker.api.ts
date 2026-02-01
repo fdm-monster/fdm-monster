@@ -127,12 +127,54 @@ export class MoonrakerApi implements IPrinterApi {
   async getFile(path: string): Promise<FileDto> {
     const metadata = await this.client.getServerFileMetadata(this.login, path);
     const file = metadata.data.result;
-    return { size: file.size, path, date: file.modified };
+    return { size: file.size, path, date: Math.floor(file.modified * 1000), dir: false };
   }
 
-  async getFiles(): Promise<FileDto[]> {
-    const files = await this.client.getServerFilesList(this.login);
-    return files.data.result.map((f) => ({ size: f.size, path: f.path, date: f.modified }));
+  async getFiles(recursive = false, startDir = "") {
+    if (recursive && startDir) {
+      throw new Error("Recursive mode does not support startDir parameter for Moonraker");
+    }
+
+    const stripGcodes = (path: string) => path.startsWith('gcodes/') ? path.substring(7) : path;
+    const buildPath = (name: string) => startDir ? `${startDir}/${name}` : name;
+
+    if (recursive) {
+      const response = await this.client.getServerFilesList(this.login, "gcodes");
+      const dirsSet = new Set<string>();
+      const files: FileDto[] = response.data.result.map((f) => {
+        const strippedPath = stripGcodes(f.path);
+        const pathParts = strippedPath.split('/');
+        for (let i = 0; i < pathParts.length - 1; i++) {
+          dirsSet.add(pathParts.slice(0, i + 1).join('/'));
+        }
+        return this.toFileDto(strippedPath, f.size, f.modified, false);
+      });
+
+      dirsSet.forEach((dirPath) => files.push(this.toFileDto(dirPath, 0, null, true)));
+
+      return {
+        dirs: files.filter(f => f.dir),
+        files: files.filter(f => !f.dir),
+      };
+    }
+
+    const moonrakerPath = startDir ? `gcodes/${startDir}` : "gcodes";
+    const response = await this.client.getServerFilesDirectoryInfo(this.login, moonrakerPath, false);
+    const { dirs: apiDirs, files: apiFiles } = response.data.result;
+
+    return {
+      dirs: apiDirs.map((d) => this.toFileDto(buildPath(d.dirname), d.size, d.modified, true)),
+      files: apiFiles.map((f) => this.toFileDto(buildPath(f.filename), f.size, f.modified, false)),
+    };
+  }
+
+  private toFileDto(path: string, size: number, modified: number | null, dir: boolean): FileDto {
+    return {
+      path,
+      size,
+      date: modified !== null ? Math.floor(modified * 1000) : null,
+      dir,
+    };
   }
 
   async homeAxes(axes: { x?: boolean; y?: boolean; z?: boolean }): Promise<void> {
@@ -206,6 +248,7 @@ export class MoonrakerApi implements IPrinterApi {
         date: job.start_time,
         path: job.filename,
         size: job.metadata.size,
+        dir: false,
       },
     };
   }

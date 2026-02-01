@@ -199,21 +199,35 @@ export class BambuApi implements IPrinterApi {
       path: file.name,
       size: file.size,
       date: file.modifiedAt ? new Date(file.modifiedAt).getTime() : null,
+      dir: file.isDirectory,
     };
   }
 
-  async getFiles(): Promise<FileDto[]> {
-    this.logger.debug("Listing files", this.logMeta());
-    await this.ensureFtpConnected();
-    const files = await this.client.ftp.listFiles("/");
+  async getFiles(recursive = false, startDir = "/") {
+    if (recursive) {
+      throw new Error("Recursive listing not supported for Bambu Lab printers");
+    }
 
-    return files
-      .filter((f) => f.isFile) // Only files, not directories
-      .map((f) => ({
-        path: f.name,
-        size: f.size,
-        date: f.modifiedAt ? new Date(f.modifiedAt).getTime() : null,
-      }));
+    this.logger.debug(`Listing files from ${startDir}`, this.logMeta());
+    await this.ensureFtpConnected();
+
+    const items = await this.client.ftp.listFiles(startDir);
+
+    const mapped = items.map((item) => {
+      const fullPath = startDir === "/" ? `/${item.name}` : `${startDir}/${item.name}`;
+
+      return {
+        path: fullPath,
+        size: item.size,
+        date: item.modifiedAt ? new Date(item.modifiedAt).getTime() : null,
+        dir: item.isDirectory,
+      };
+    });
+
+    return {
+      dirs: mapped.filter(i => i.dir),
+      files: mapped.filter(i => !i.dir),
+    };
   }
 
   async downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
@@ -223,28 +237,22 @@ export class BambuApi implements IPrinterApi {
 
     const { stream, tempPath } = await this.client.ftp.downloadFileAsStream(path);
 
-    // Get file size from the temp file
     const stats = statSync(tempPath);
-
-    // Extract filename from path for Content-Disposition header
     const filename = path.split("/").pop() || "download";
 
-    // Create an AxiosResponse-like structure
-    const response: AxiosResponse<NodeJS.ReadableStream> = {
+    return {
       data: stream,
       status: 200,
       statusText: "OK",
       headers: {
         "content-type": "application/octet-stream",
         "content-length": String(stats.size),
-        "content-disposition": `attachment; filename="${filename}"`,
+        "content-disposition": `attachment; filename="${ filename }"`,
       },
       config: {
         headers: {} as any,
       },
     };
-
-    return response;
   }
 
   getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string> {
@@ -313,6 +321,7 @@ export class BambuApi implements IPrinterApi {
         path: lastFile,
         size: -1,
         date: null,
+        dir: false,
       },
       reprintState: ReprintState.LastPrintReady,
       connectionState: null,

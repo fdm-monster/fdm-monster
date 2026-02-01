@@ -1,5 +1,17 @@
 # Develop
 
+# FDM Monster 2.0.9
+
+## Features
+
+- Implemented directory navigation with optional recursive mode for printer file listings across all 4 implementations
+- Added `dir` field to `FileDto` to distinguish files from directories (OctoPrint and Moonraker support recursive, PrusaLink and Bambu non-recursive only)
+
+## Refactor
+
+- Updated `getFiles()` signature to support `recursive` and `startDir` parameters with non-recursive as default for performance
+- Removed in-memory file cache system - files are now fetched fresh from printer APIs
+
 # FDM Monster 2.0.8
 
 ## Features

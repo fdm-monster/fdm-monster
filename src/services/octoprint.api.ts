@@ -93,13 +93,12 @@ export class OctoprintApi implements IPrinterApi {
     return this.client.getFile(this.login, path);
   }
 
-  async getFiles() {
-    const files = await this.client.getLocalFiles(this.login, false);
-    return files.map((f) => ({
-      path: f.path,
-      size: f.size,
-      date: f.date,
-    }));
+  async getFiles(recursive = false, startDir = "") {
+    const items = await this.client.getLocalFiles(this.login, recursive, startDir);
+    return {
+      dirs: items.filter(f => f.dir),
+      files: items.filter(f => !f.dir),
+    };
   }
 
   async downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
@@ -142,7 +141,12 @@ export class OctoprintApi implements IPrinterApi {
 
     return {
       connectionState,
-      file: currentJobFile,
+      file: {
+        path: currentJobFile.path,
+        size: currentJobFile.size,
+        date: currentJobFile.date,
+        dir: false,
+      },
       reprintState: ReprintState.LastPrintReady,
     };
   }

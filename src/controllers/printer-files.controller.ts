@@ -5,13 +5,13 @@ import { AppConstants } from "@/server.constants";
 import {
   downloadFileSchema,
   getFileSchema,
+  getFilesSchema,
   startPrintFileSchema,
   uploadFileSchema,
 } from "./validation/printer-files-controller.validation";
 import { NotFoundException, ValidationException } from "@/exceptions/runtime.exceptions";
 import { printerResolveMiddleware } from "@/middleware/printer";
 import { PERMS, ROLES } from "@/constants/authorization.constants";
-import { PrinterFilesStore } from "@/state/printer-files.store";
 import { MulterService } from "@/services/core/multer.service";
 import { LoggerService } from "@/handlers/logger";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -35,7 +35,6 @@ export class PrinterFilesController {
   constructor(
     loggerFactory: ILoggerFactory,
     private readonly printerApi: IPrinterApi,
-    private readonly printerFilesStore: PrinterFilesStore,
     private readonly printJobService: PrintJobService,
     private readonly fileAnalysisService: FileAnalysisService,
     private readonly fileStorageService: FileStorageService,
@@ -43,14 +42,6 @@ export class PrinterFilesController {
     private readonly printerThumbnailCache: PrinterThumbnailCache,
   ) {
     this.logger = loggerFactory(PrinterFilesController.name);
-  }
-
-  @POST()
-  @route("/purge")
-  @before(permission(PERMS.PrinterFiles.Clear))
-  async purgeIndexedFiles(req: Request, res: Response) {
-    await this.printerFilesStore.purgeFiles();
-    res.send();
   }
 
   @GET()
@@ -65,9 +56,11 @@ export class PrinterFilesController {
   @route("/:id")
   @before(permission(PERMS.PrinterFiles.Get))
   async getFiles(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-    this.logger.log("Refreshing file storage (eager load)");
-    const files = await this.printerFilesStore.loadFiles(currentPrinterId);
+    const { printerApi } = getScopedPrinter(req);
+    const { recursive: recursiveStr, startDir } = await validateInput(req.query, getFilesSchema);
+    const recursive = recursiveStr === "true";
+
+    const files = await printerApi.getFiles(recursive, startDir);
     res.send(files);
   }
 
@@ -81,20 +74,12 @@ export class PrinterFilesController {
   async startPrintFile(req: Request, res: Response) {
     const { currentPrinterId } = getScopedPrinter(req);
     const { filePath } = await validateInput(req.body, startPrintFileSchema);
-    const encodedFilePath = encodeURIComponent(filePath);
+    const encodedFilePath = filePath.split('/').map(encodeURIComponent).join('/');
     await this.printerApi.startPrint(encodedFilePath);
 
-    this.logger.log(`Started print for printer ${currentPrinterId}`);
+    this.logger.log(`Started print for printer ${ currentPrinterId }`);
 
     res.send();
-  }
-
-  @GET()
-  @route("/:id/cache")
-  @before(permission(PERMS.PrinterFiles.Get))
-  async getFilesCache(req: Request, res: Response) {
-    const { currentPrinter } = getScopedPrinter(req);
-    res.send(this.printerFilesStore.getFiles(currentPrinter.id));
   }
 
   @GET()
@@ -103,7 +88,7 @@ export class PrinterFilesController {
   async downloadFile(req: Request, res: Response) {
     this.logger.log(`Downloading file ${ req.params.path }`);
     const { path } = await validateInput(req.params, downloadFileSchema);
-    const encodedFilePath = encodeURIComponent(path);
+    const encodedFilePath = path.split('/').map(encodeURIComponent).join('/');
 
     const response = await this.printerApi.downloadFile(encodedFilePath);
     res.setHeader("Content-Type", response.headers["content-type"]);
@@ -119,41 +104,11 @@ export class PrinterFilesController {
   @route("/:id")
   @before(permission(PERMS.PrinterFiles.Delete))
   async deleteFileOrFolder(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
     const { path } = await validateInput(req.query, getFileSchema);
-    const encodedFilePath = encodeURIComponent(path);
+    const encodedFilePath = path.split('/').map(encodeURIComponent).join('/');
 
     const result = await this.printerApi.deleteFile(encodedFilePath);
-    await this.printerFilesStore.deleteFile(currentPrinterId, path);
     res.send(result);
-  }
-
-  @DELETE()
-  @route("/:id/clear")
-  @before(permission(PERMS.PrinterFiles.Clear))
-  async clearPrinterFiles(req: Request, res: Response) {
-    const { currentPrinterId } = getScopedPrinter(req);
-
-    const failedFiles = [];
-    const succeededFiles = [];
-
-    const nonRecursiveFiles = await this.printerApi.getFiles();
-    for (let file of nonRecursiveFiles) {
-      try {
-        const encodedFilePath = encodeURIComponent(file.path);
-        await this.printerApi.deleteFile(encodedFilePath);
-        succeededFiles.push(file);
-      } catch (e) {
-        failedFiles.push(file);
-      }
-    }
-
-    await this.printerFilesStore.purgePrinterFiles(currentPrinterId);
-
-    res.send({
-      failedFiles,
-      succeededFiles,
-    });
   }
 
   @GET()
@@ -208,7 +163,6 @@ export class PrinterFilesController {
       }
       throw e;
     });
-    await this.printerFilesStore.loadFiles(currentPrinterId);
 
     // Process file: analyze, store, create job
     const ext = extname(uploadedFile.originalname);

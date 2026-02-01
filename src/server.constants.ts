@@ -21,7 +21,7 @@ export const AppConstants = {
   defaultFileUploadsStorage: "file-uploads",
   defaultPrintFilesStorage: "files",
   defaultAcceptedGcodeExtensions: [".gcode", ".bgcode"],
-  defaultAcceptedBambuExtensions: [".gcode", ".3mf"],
+  defaultAcceptedBambuExtensions: [".3mf"],
   defaultServerPort: 4000,
   apiRoute: "/api/v2",
   enableClientDistAutoUpdateKey: "ENABLE_CLIENT_DIST_AUTO_UPDATE",
@@ -73,7 +73,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "2.3.1",
+  defaultClientMinimum: "2.3.3",
 
   // Websocket values
   defaultWebsocketHandshakeTimeout: 3000,

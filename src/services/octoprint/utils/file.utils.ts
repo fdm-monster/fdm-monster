@@ -35,7 +35,40 @@ export function normalizePrinterFile(file: OctoprintFileDto): FileDto {
     delete fileCopy[unknownKey];
   }
 
-  fileCopy.customData = customData;
+  return {
+    path: fileCopy.path,
+    size: fileCopy.size,
+    date: fileCopy.date,
+    dir: fileCopy.type === 'folder',
+  };
+}
 
-  return fileCopy;
+export function flattenOctoPrintFiles(items: OctoprintFileDto[], parentPath: string = ''): FileDto[] {
+  const files: FileDto[] = [];
+
+  for (const item of items) {
+    const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
+
+    if (item.type === 'folder') {
+      files.push({
+        path: fullPath,
+        size: 0,
+        date: item.date || null,
+        dir: true,
+      });
+
+      if (item.children) {
+        files.push(...flattenOctoPrintFiles(item.children, fullPath));
+      }
+    } else if (item.type === 'machinecode') {
+      files.push({
+        path: fullPath,
+        size: item.size,
+        date: item.date,
+        dir: false,
+      });
+    }
+  }
+
+  return files;
 }
