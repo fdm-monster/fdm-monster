@@ -65,7 +65,6 @@ export class PrinterFilesController {
   }
 
   @POST()
-
   /**
    * @obsolete /:id/select, removed in v2
    */
