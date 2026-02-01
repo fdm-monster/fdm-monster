@@ -7,7 +7,7 @@ import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { LoginDto } from "@/services/interfaces/login.dto";
 import { ILoggerFactory } from "@/handlers/logger-factory";
-import { normalizePrinterFile } from "@/services/octoprint/utils/file.utils";
+import { flattenOctoPrintFiles } from "@/services/octoprint/utils/file.utils";
 import { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
 import { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
 import { VersionDto } from "@/services/octoprint/dto/server/version.dto";
@@ -23,6 +23,7 @@ import { OctoprintHttpClientBuilder } from "@/services/octoprint/utils/octoprint
 import { OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
 import { SettingsStore } from "@/state/settings.store";
 import { Readable } from "node:stream";
+import { FileDto } from "@/services/printer-api.interface";
 
 type TAxes = "x" | "y" | "z";
 
@@ -136,24 +137,44 @@ export class OctoprintClient extends OctoprintRoutes {
     return await this.createClient(login).get<UserListDto>(this.apiUsers);
   }
 
-  async getLocalFiles(login: LoginDto, recursive = false) {
-    const response = await this.createClient(login).get<OctoprintFilesResponseDto>(this.apiGetFiles(recursive));
+  async getLocalFiles(login: LoginDto, recursive = false, startDir = ""): Promise<FileDto[]> {
+    const url = this.apiGetFiles(recursive, startDir);
+    const response = await this.createClient(login).get<OctoprintFilesResponseDto | OctoprintFileDto>(url);
 
-    return (
-      // Filter out folders
-      response?.data?.files
-        ?.filter((f) => f.date && f.type === "machinecode")
-        .map((f) => {
-          return normalizePrinterFile(f);
-        }) || []
-    );
+    if (!response?.data) {
+      return [];
+    }
+
+    const data = response.data as any;
+    const items = data.files || (data.children ? data.children : []);
+
+    if (!items.length) {
+      return [];
+    }
+
+    if (recursive) {
+      return flattenOctoPrintFiles(items, startDir);
+    } else {
+      return items.map((item: OctoprintFileDto) => ({
+        path: item.path || item.name,
+        size: item.size || 0,
+        date: item.date || null,
+        dir: item.type === 'folder',
+      }));
+    }
   }
 
   async getFile(login: LoginDto, path: string) {
     const urlPath = this.apiFile(path);
     const response = await this.createClient(login).get<OctoprintFileDto>(urlPath);
 
-    return normalizePrinterFile(response?.data);
+    const file = response?.data;
+    return {
+      path: file.path,
+      size: file.size,
+      date: file.date,
+      dir: file.type === 'folder',
+    };
   }
 
   async downloadFile(login: LoginDto, path: string): AxiosPromise<NodeJS.ReadableStream> {
@@ -194,7 +215,8 @@ export class OctoprintClient extends OctoprintRoutes {
 
   async postSelectPrintFile(login: LoginDto, path: string, print: boolean) {
     const command = this.selectCommand(print);
-    await this.createClient(login).post(this.apiFile(path), command);
+    const url = this.apiFile(path);
+    await this.createClient(login).post(url, command);
   }
 
   async uploadFileAsMultiPart(

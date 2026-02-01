@@ -1,6 +1,5 @@
 import { validNewPrinterState } from "../test-data/printer.data";
 import { PrinterCache } from "@/state/printer.cache";
-import { PrinterFilesStore } from "@/state/printer-files.store";
 import { DITokens } from "@/container.tokens";
 import { configureContainer } from "@/container";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
@@ -18,7 +17,6 @@ jest.mock("@/services/octoprint/octoprint.client");
 let printerService: IPrinterService;
 let printerCache: PrinterCache;
 let testPrinterSocketStore: TestPrinterSocketStore;
-let printerFilesStore: PrinterFilesStore;
 let printerSocketStore: PrinterSocketStore;
 let settingsStore: SettingsStore;
 
@@ -29,7 +27,6 @@ beforeAll(async () => {
   testPrinterSocketStore = container.resolve(DITokens.testPrinterSocketStore);
   printerCache = container.resolve(DITokens.printerCache);
   printerService = container.resolve(DITokens.printerService);
-  printerFilesStore = container.resolve(DITokens.printerFilesStore);
   printerSocketStore = container.resolve(DITokens.printerSocketStore);
   settingsStore = container.resolve(DITokens.settingsStore);
   await printerCache.loadCache();
@@ -107,9 +104,6 @@ describe(PrinterSocketStore.name, () => {
   it("should be able to add printer - receiving an object back", async () => {
     let printerEntity = await printerService.create(validNewPrinterState);
     expect(printerEntity).toBeTruthy();
-
-    // Need the store in order to have files to refer to
-    await printerFilesStore.loadFilesStore();
 
     const printerDto = await printerCache.getCachedPrinterOrThrowAsync(printerEntity.id);
     expect(printerDto).toMatchObject({

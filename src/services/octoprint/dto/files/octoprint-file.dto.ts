@@ -28,9 +28,11 @@ export interface OctoprintFileDto extends OctoPrintCustomDto {
   refs: Refs;
   size: number;
   statistics: OctoPrintStatisticsDto;
-  type: "machinecode" | "folder";
+  type: "machinecode" | "folder" | "model";
   typePath: ["machinecode", "gcode"];
 
   // Default but optional parts
   gcodeAnalysis?: GcodeAnalysisDto;
+
+  children?: OctoprintFileDto[];
 }

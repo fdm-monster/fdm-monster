@@ -16,7 +16,6 @@ import { BambuMqttAdapterStub } from "./stubs/bambu-mqtt.adapter.stub";
 import { SettingsStore } from "@/state/settings.store";
 
 const defaultRoute = AppConstants.apiRoute + "/printer-files";
-const purgeIndexedFilesRoute = `${defaultRoute}/purge`;
 const thumbnailsRoute = `${defaultRoute}/thumbnails`;
 const getRoute = (id: number) => `${defaultRoute}/${id}`;
 const clearFilesRoute = (id: number) => `${getRoute(id)}/clear`;
@@ -25,7 +24,6 @@ const printFileRoute = (id: number) => `${getRoute(id)}/print`;
 const uploadFileRoute = (id: number) => `${getRoute(id)}/upload`;
 const getFilesRoute = (id: number) => `${getRoute(id)}`;
 const downloadFileRoute = (id: number, path: string) => `${getRoute(id)}/download/${path}`;
-const getCacheRoute = (id: number) => `${getRoute(id)}/cache`;
 const getPrintThumbnailRoute = (id: number) => `${getRoute(id)}/thumbnail`;
 
 let request: TestAgent<Test>;
@@ -71,7 +69,7 @@ describe(PrinterFilesController.name, () => {
       .query("recursive=false")
       .reply(200, { files: [], free: 1, total: 1 });
     const response = await request.get(getFilesRoute(printer.id)).send();
-    expectOkResponse(response, []);
+    expectOkResponse(response, { dirs: [], files: [] });
   });
 
   it("should retrieve file with hash character on GET for existing printer", async () => {
@@ -92,12 +90,6 @@ describe(PrinterFilesController.name, () => {
       );
     const response = await request.get(downloadFileRoute(printer.id, encodeURIComponent(filename))).send();
     expectOkResponse(response, reply0);
-  });
-
-  it("should allow GET on printer files cache", async () => {
-    const printer = await createTestPrinter(request);
-    const response = await request.get(getCacheRoute(printer.id)).send();
-    expectOkResponse(response);
   });
 
   it("should allow GET on printer files thumbnails cache", async () => {
@@ -123,35 +115,7 @@ describe(PrinterFilesController.name, () => {
     expectOkResponse(response);
   });
 
-  it("should allow DELETE to clear printer files - with status result", async () => {
-    const printer = await createTestPrinter(request);
-    const jsonFile = require("./test-data/octoprint-file.data.json");
 
-    nock(printer.printerURL)
-      .delete("/api/files/local/" + jsonFile.path)
-      .reply(200);
-
-    nock(printer.printerURL)
-      .get("/api/files/local")
-      .query("recursive=false")
-      .reply(200, { files: [jsonFile], free: 1, total: 1 });
-
-    // octoprintClient.storeResponse({ files: [jsonFile] }, 200);
-    const response = await request.delete(clearFilesRoute(printer.id)).send();
-    expectOkResponse(response, {
-      succeededFiles: expect.any(Array),
-      failedFiles: expect.any(Array),
-    });
-    expect(response.body.succeededFiles).toHaveLength(1);
-    expect(response.body.failedFiles).toHaveLength(0);
-  });
-
-  it("should allow POST to purge all printer files", async () => {
-    await createTestPrinter(request);
-    await createTestPrinter(request);
-    const response = await request.post(purgeIndexedFilesRoute).send();
-    expectOkResponse(response);
-  });
 
   it("should allow POST to print a printer file", async () => {
     const printer = await createTestPrinter(request);
@@ -179,11 +143,6 @@ describe(PrinterFilesController.name, () => {
         },
       },
     });
-    nock(printer.printerURL)
-      .get("/api/files/local")
-      .query("recursive=false")
-      .reply(200, { files: [], free: 1, total: 1 });
-
     const response = await request
       .post(uploadFileRoute(printer.id))
       .field("startPrint", "true")
@@ -219,11 +178,10 @@ describe(PrinterFilesController.name, () => {
         .field("startPrint", "false")
         .attach("file", examplBambuFilePath);
 
-      // Should get a 400 error due to unsupported file extension
-      expect(response.status).toBe(400);
+      expectInvalidResponse(response);
     });
 
-    it("should accept .gcode files for Bambu printers", async () => {
+    it("should not accept .gcode files for Bambu printers", async () => {
       const bambuPrinter = await createTestBambuPrinter(request);
 
       const response = await request
@@ -231,8 +189,7 @@ describe(PrinterFilesController.name, () => {
         .field("startPrint", "false")
         .attach("file", gcodePath);
 
-      // Should succeed with stub implementations
-      expectOkResponse(response);
+      expectInvalidResponse(response);
     });
 
     it("should show appropriate error for empty upload on Bambu printer", async () => {

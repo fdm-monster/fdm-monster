@@ -26,9 +26,6 @@ export interface IFileStorageService {
   listThumbnails(fileStorageId: string): Promise<string[]>;
 }
 
-/**
- * Service for managing print job file storage with optional queue support
- */
 export class FileStorageService implements IFileStorageService {
   printJobRepository: Repository<PrintJob>;
   private readonly logger;
@@ -183,7 +180,6 @@ export class FileStorageService implements IFileStorageService {
       }
     }
 
-    // Return best guess if not found (caller should validate)
     return join(this.storageBasePath, "gcode", fileStorageId);
   }
 
@@ -260,22 +256,18 @@ export class FileStorageService implements IFileStorageService {
 
     const metadataPath = filePath + ".json";
 
-    // Load existing metadata to preserve originalFileName and thumbnails
     let existingOriginalFileName = originalFileName;
     let existingThumbnails = thumbnailMetadata;
     try {
       const existingContent = await readFile(metadataPath, "utf8");
       const existing = JSON.parse(existingContent);
-      // Preserve original filename from first save
       if (existing._originalFileName && !originalFileName) {
         existingOriginalFileName = existing._originalFileName;
       }
-      // Preserve thumbnails if not provided
       if (existing._thumbnails && !thumbnailMetadata) {
         existingThumbnails = existing._thumbnails;
       }
     } catch {
-      // File doesn't exist yet
     }
 
     const metadataWithMeta = {
@@ -357,15 +349,12 @@ export class FileStorageService implements IFileStorageService {
 
     const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, '_thumbnails');
 
-    // Delete old thumbnails directory if it exists
     try {
       await rm(thumbnailDir, { recursive: true, force: true });
       this.logger.debug(`Cleared old thumbnails for ${fileStorageId}`);
     } catch {
-      // Directory might not exist
     }
 
-    // Create fresh thumbnail directory
     await mkdir(thumbnailDir, { recursive: true });
 
     for (let i = 0; i < thumbnails.length; i++) {
@@ -410,13 +399,11 @@ export class FileStorageService implements IFileStorageService {
 
     const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, '_thumbnails');
 
-    // Try different extensions (PNG, JPG, QOI)
     for (const ext of ['png', 'jpg', 'jpeg', 'qoi']) {
       const thumbPath = join(thumbnailDir, `thumb_${index}.${ext}`);
       try {
         return await readFile(thumbPath);
       } catch {
-        // Try next extension
       }
     }
 
@@ -461,17 +448,14 @@ export class FileStorageService implements IFileStorageService {
         const dirFiles = await readdir(dirPath);
 
         for (const file of dirFiles) {
-          // Skip thumbnail directories and metadata files
           if (file.endsWith('_thumbnails') || file.endsWith('.json')) continue;
 
           const fileId = path.parse(file).name;
           const filePath = join(dirPath, file);
           const stats = await stat(filePath);
 
-          // Load metadata
           const metadata = await this.loadMetadata(fileId);
 
-          // Count thumbnails
           const thumbnails = await this.listThumbnails(fileId);
 
           files.push({
@@ -490,7 +474,6 @@ export class FileStorageService implements IFileStorageService {
       }
     }
 
-    // Sort by creation date, newest first
     return files.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
