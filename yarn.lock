@@ -628,7 +628,7 @@ __metadata:
     jsonwebtoken: "npm:9.0.3"
     lodash: "npm:4.17.23"
     luxon: "npm:3.7.2"
-    mqtt: "npm:5.14.1"
+    mqtt: "npm:5.15.0"
     multer: "npm:2.0.2"
     nock: "npm:13.5.6"
     octokit: "npm:3.2.2"
@@ -7133,9 +7133,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mqtt@npm:5.14.1":
-  version: 5.14.1
-  resolution: "mqtt@npm:5.14.1"
+"mqtt@npm:5.15.0":
+  version: 5.15.0
+  resolution: "mqtt@npm:5.15.0"
   dependencies:
     "@types/readable-stream": "npm:^4.0.21"
     "@types/ws": "npm:^8.18.1"
@@ -7157,7 +7157,7 @@ __metadata:
     mqtt: build/bin/mqtt.js
     mqtt_pub: build/bin/pub.js
     mqtt_sub: build/bin/sub.js
-  checksum: 10c0/30acd3858223cb5e7b4aa2a725f47e51bd40eaca530c0e3b5cf96f7377a1f0018a7fe4d2bc2c10327973d46d5a2b8118560936de1a3d8a209c7f37ee914cfdbd
+  checksum: 10c0/cfa887a7c360ce6d16285a8787b83047f5ecd7280a9b75bc42ed0c5ff935fcbd2b6f54edb85b0d17d84a946c9b5b4994b239bee0f7f72f5e100bece7f6e4eab9
   languageName: node
   linkType: hard
 
