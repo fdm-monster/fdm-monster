@@ -1,5 +1,9 @@
 # Develop
 
+## Fixes
+
+- The printer files load task was removed because it is no longer required. The printer files are now loaded on demand.
+
 # FDM Monster 2.0.9
 
 ## Features
