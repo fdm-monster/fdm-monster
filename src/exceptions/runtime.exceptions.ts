@@ -43,6 +43,16 @@ export class BadRequestException extends Error {
   }
 }
 
+export class ConflictException extends Error {
+  existingResourceId?: string;
+
+  constructor(message: string, existingResourceId?: string) {
+    super(message);
+    this.name = ConflictException.name;
+    this.existingResourceId = existingResourceId;
+  }
+}
+
 export class NotFoundException extends Error {
   path?: string;
 

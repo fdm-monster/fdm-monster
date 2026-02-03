@@ -8,6 +8,7 @@ import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { FileAnalysisService } from "@/services/file-analysis.service";
+import { BadRequestException } from "@/exceptions/runtime.exceptions";
 import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { extname } from "node:path";
 
@@ -214,79 +215,53 @@ export class FileStorageController {
   @POST()
   @route("/upload")
   async uploadFile(req: Request, res: Response) {
+    const acceptedExtensions = ['.gcode', '.3mf', '.bgcode'];
+    const files = await this.multerService.multerLoadFileAsync(req, res, acceptedExtensions, true);
+
+    if (!files?.length) {
+      throw new BadRequestException("No file uploaded");
+    }
+
+    if (files.length > 1) {
+      throw new BadRequestException("Only 1 file can be uploaded at a time");
+    }
+
+    const file = files[0];
+    await this.fileStorageService.validateUniqueFilename(file.originalname);
+
+    const ext = extname(file.originalname);
+    const tempPathWithExt = file.path + ext;
+
     try {
-      // Use multer to handle file upload
-      const acceptedExtensions = ['.gcode', '.3mf', '.bgcode'];
-      const files = await this.multerService.multerLoadFileAsync(req, res, acceptedExtensions, true);
+      copyFileSync(file.path, tempPathWithExt);
 
-      if (!files?.length) {
-        res.status(400).send({ error: "No file uploaded" });
-        return;
+      const fileHash = await this.fileStorageService.calculateFileHash(tempPathWithExt);
+      this.logger.log(`Analyzing ${file.originalname}`);
+      const analysisResult = await this.fileAnalysisService.analyzeFile(tempPathWithExt);
+      const { metadata, thumbnails } = analysisResult;
+
+      const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
+      this.logger.log(`Saved ${file.originalname} as ${fileStorageId}`);
+
+      const thumbnailMetadata = thumbnails.length > 0
+        ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails)
+        : [];
+
+      await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
+
+      res.send({
+        message: "File uploaded successfully",
+        fileStorageId,
+        fileName: file.originalname,
+        fileSize: file.size,
+        fileHash,
+        metadata,
+        thumbnailCount: thumbnails.length,
+      });
+    } finally {
+      if (existsSync(tempPathWithExt)) {
+        unlinkSync(tempPathWithExt);
       }
-
-      if (files.length > 1) {
-        res.status(400).send({ error: "Only 1 file can be uploaded at a time" });
-        return;
-      }
-
-      const file = files[0];
-
-      // Get file extension and create temp path with extension
-      const ext = extname(file.originalname);
-      const tempPathWithExt = file.path + ext;
-
-      try {
-        // Copy file with proper extension for analysis
-        copyFileSync(file.path, tempPathWithExt);
-
-        // Calculate file hash
-        const fileHash = await this.fileStorageService.calculateFileHash(tempPathWithExt);
-
-        // Analyze the file before saving
-        this.logger.log(`Analyzing file: ${file.originalname} (ext: ${ext})`);
-        const analysisResult = await this.fileAnalysisService.analyzeFile(tempPathWithExt);
-        const metadata = analysisResult.metadata;
-        const thumbnails = analysisResult.thumbnails;
-
-        this.logger.log(
-          `Analysis complete: format=${metadata.fileFormat}, layers=${metadata.totalLayers}, ` +
-          `time=${metadata.gcodePrintTimeSeconds}s, filament=${metadata.filamentUsedGrams}g, ` +
-          `thumbnails=${thumbnails.length}`
-        );
-
-        // Save file to storage
-        const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
-        this.logger.log(`Uploaded file ${file.originalname} as ${fileStorageId}`);
-
-        // Save thumbnails
-        let thumbnailMetadata: any[] = [];
-        if (thumbnails.length > 0) {
-          thumbnailMetadata = await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails);
-          this.logger.log(`Saved ${thumbnailMetadata.length} thumbnail(s) for ${fileStorageId}`);
-        }
-
-        // Save metadata JSON with thumbnail index
-        await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
-        this.logger.log(`Saved metadata JSON for ${fileStorageId}`);
-
-        res.send({
-          message: "File uploaded successfully",
-          fileStorageId,
-          fileName: file.originalname,
-          fileSize: file.size,
-          fileHash,
-          metadata,
-          thumbnailCount: thumbnails.length,
-        });
-      } finally {
-        // Clean up temp file with extension
-        if (existsSync(tempPathWithExt)) {
-          unlinkSync(tempPathWithExt);
-        }
-      }
-    } catch (error) {
-      this.logger.error(`Failed to upload file: ${error}`);
-      res.status(500).send({ error: "Failed to upload file" });
     }
   }
 }

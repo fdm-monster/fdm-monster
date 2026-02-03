@@ -2,6 +2,7 @@ import {
   AuthenticationError,
   AuthorizationError,
   BadRequestException,
+  ConflictException,
   ExternalServiceError,
   ForbiddenError,
   InternalServerException,
@@ -66,6 +67,13 @@ export class ExceptionFilter {
     }
     if (err instanceof BadRequestException) {
       res.status(400).send({ error: err.message });
+      return;
+    }
+    if (err instanceof ConflictException) {
+      res.status(409).send({
+        error: err.message,
+        existingResourceId: err.existingResourceId,
+      });
       return;
     }
     if (err instanceof ValidationException) {
