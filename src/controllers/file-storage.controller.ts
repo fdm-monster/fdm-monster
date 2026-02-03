@@ -8,7 +8,6 @@ import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { FileAnalysisService } from "@/services/file-analysis.service";
-import { ConflictException } from "@/exceptions/runtime.exceptions";
 import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { extname } from "node:path";
 
@@ -231,61 +230,27 @@ export class FileStorageController {
       }
 
       const file = files[0];
+      await this.fileStorageService.validateUniqueFilename(file.originalname);
 
-      // Check for existing file with same original filename
-      const existingFile = await this.fileStorageService.findDuplicateByOriginalFileName(file.originalname);
-
-      if (existingFile) {
-        // Clean up uploaded file
-        try {
-          this.multerService.clearUploadedFile(file);
-        } catch (e) {
-          this.logger.error(`Could not remove uploaded file from temporary storage: ${e}`);
-        }
-
-        throw new ConflictException(
-          `A file named "${file.originalname}" already exists in storage. Please rename the file, delete the existing file (ID: ${existingFile.fileStorageId}), or choose a different name.`,
-          existingFile.fileStorageId
-        );
-      }
-
-      // Get file extension and create temp path with extension
       const ext = extname(file.originalname);
       const tempPathWithExt = file.path + ext;
 
       try {
-        // Copy file with proper extension for analysis
         copyFileSync(file.path, tempPathWithExt);
 
-        // Calculate file hash
         const fileHash = await this.fileStorageService.calculateFileHash(tempPathWithExt);
-
-        // Analyze the file before saving
-        this.logger.log(`Analyzing file: ${file.originalname} (ext: ${ext})`);
+        this.logger.log(`Analyzing ${file.originalname}`);
         const analysisResult = await this.fileAnalysisService.analyzeFile(tempPathWithExt);
-        const metadata = analysisResult.metadata;
-        const thumbnails = analysisResult.thumbnails;
+        const { metadata, thumbnails } = analysisResult;
 
-        this.logger.log(
-          `Analysis complete: format=${metadata.fileFormat}, layers=${metadata.totalLayers}, ` +
-          `time=${metadata.gcodePrintTimeSeconds}s, filament=${metadata.filamentUsedGrams}g, ` +
-          `thumbnails=${thumbnails.length}`
-        );
-
-        // Save file to storage
         const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
-        this.logger.log(`Uploaded file ${file.originalname} as ${fileStorageId}`);
+        this.logger.log(`Saved ${file.originalname} as ${fileStorageId}`);
 
-        // Save thumbnails
-        let thumbnailMetadata: any[] = [];
-        if (thumbnails.length > 0) {
-          thumbnailMetadata = await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails);
-          this.logger.log(`Saved ${thumbnailMetadata.length} thumbnail(s) for ${fileStorageId}`);
-        }
+        const thumbnailMetadata = thumbnails.length > 0
+          ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails)
+          : [];
 
-        // Save metadata JSON with thumbnail index
         await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
-        this.logger.log(`Saved metadata JSON for ${fileStorageId}`);
 
         res.send({
           message: "File uploaded successfully",

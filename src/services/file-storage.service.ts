@@ -17,6 +17,7 @@ export interface IFileStorageService {
   getFilePath(fileStorageId: string): string;
   getFileSize(fileStorageId: string): number;
   calculateFileHash(filePath: string): Promise<string>;
+  validateUniqueFilename(fileName: string): Promise<void>;
   saveMetadata(fileStorageId: string, metadata: any, fileHash?: string, originalFileName?: string, thumbnailMetadata?: any[]): Promise<void>;
   loadMetadata(fileStorageId: string): Promise<any | null>;
   hasMetadata(fileStorageId: string): Promise<boolean>;
@@ -71,28 +72,31 @@ export class FileStorageService implements IFileStorageService {
     return stats.size;
   }
 
-  /**
-   * Save uploaded file to storage
-   * Storage ID is deterministic based on file hash + filename for deduplication
-   */
+  async validateUniqueFilename(fileName: string): Promise<void> {
+    const existing = await this.findDuplicateByOriginalFileName(fileName);
+    if (existing) {
+      const { ConflictException } = await import("@/exceptions/runtime.exceptions");
+      throw new ConflictException(
+        `A file named "${fileName}" already exists in storage. Please rename the file, delete the existing file (ID: ${existing.fileStorageId}), or choose a different name.`,
+        existing.fileStorageId
+      );
+    }
+  }
+
   async saveFile(file: Express.Multer.File, fileHash?: string): Promise<string> {
     const fileExt = extname(file.originalname).toLowerCase();
 
-    // Generate deterministic file ID from hash + filename
     let fileId: string;
     if (fileHash) {
-      // Deterministic: hash(fileHash + fileName) for deduplication
       const nameHash = createHash('sha256')
         .update(fileHash + file.originalname)
         .digest('hex')
         .substring(0, 32);
       fileId = `${nameHash.substring(0, 8)}-${nameHash.substring(8, 12)}-${nameHash.substring(12, 16)}-${nameHash.substring(16, 20)}-${nameHash.substring(20, 32)}`;
     } else {
-      // Fallback to random UUID if no hash provided
       fileId = crypto.randomUUID();
     }
 
-    // Determine subdirectory based on file type
     let subdir = "gcode";
     if (fileExt === ".3mf" || file.originalname.includes(".gcode.3mf")) {
       subdir = "3mf";
@@ -103,12 +107,9 @@ export class FileStorageService implements IFileStorageService {
     const targetDir = join(this.storageBasePath, subdir);
     const targetPath = join(targetDir, `${fileId}${fileExt}`);
 
-    // Copy file to storage
     if (file.path) {
-      // Multer already saved it, move it
       await rename(file.path, targetPath);
     } else if (file.buffer) {
-      // File is in memory, write it
       await writeFile(targetPath, file.buffer);
     } else {
       throw new Error("File has no path or buffer");
@@ -118,9 +119,6 @@ export class FileStorageService implements IFileStorageService {
     return fileId;
   }
 
-  /**
-   * Get file from storage
-   */
   async getFile(fileStorageId: string): Promise<Buffer> {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) {
@@ -130,9 +128,6 @@ export class FileStorageService implements IFileStorageService {
     return readFile(filePath);
   }
 
-  /**
-   * Delete file from storage (also deletes metadata JSON and thumbnails)
-   */
   async deleteFile(fileStorageId: string): Promise<void> {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) {
@@ -140,38 +135,26 @@ export class FileStorageService implements IFileStorageService {
       return;
     }
 
-    // Delete the file
     await unlink(filePath);
 
-    // Delete metadata JSON if it exists
     const metadataPath = filePath + ".json";
     try {
       await unlink(metadataPath);
       this.logger.debug(`Deleted metadata JSON for ${fileStorageId}`);
     } catch {
-      // Metadata file might not exist
     }
 
-    // Delete thumbnail directory if it exists
     const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, '_thumbnails');
     try {
       await rm(thumbnailDir, { recursive: true, force: true });
       this.logger.debug(`Deleted thumbnails for ${fileStorageId}`);
     } catch {
-      // Thumbnail dir might not exist
     }
 
     this.logger.log(`Deleted file ${fileStorageId}`);
   }
 
-  /**
-   * Get full file path
-   */
   getFilePath(fileStorageId: string) : string {
-    // This is synchronous, returns best-guess path
-    // Use findFilePath for async validation
-
-    // Try to find file with common extensions
     for (const subdir of this.STORAGE_SUBDIRS) {
       for (const ext of [".gcode", ".3mf", ".bgcode", ""]) {
         const fullPath = join(this.storageBasePath, subdir, fileStorageId + ext);
@@ -184,9 +167,6 @@ export class FileStorageService implements IFileStorageService {
     return join(this.storageBasePath, "gcode", fileStorageId);
   }
 
-  /**
-   * Calculate SHA256 hash of file
-   */
   async calculateFileHash(filePath: string): Promise<string> {
     const fileBuffer = await readFile(filePath);
     const hashSum = createHash("sha256");
@@ -194,10 +174,6 @@ export class FileStorageService implements IFileStorageService {
     return hashSum.digest("hex");
   }
 
-  /**
-   * Get deterministic storage ID from file hash + filename
-   * Same file with same name = same ID (perfect deduplication)
-   */
   getDeterministicId(fileHash: string, fileName: string): string {
     const nameHash = createHash('sha256')
       .update(fileHash + fileName)
@@ -206,9 +182,6 @@ export class FileStorageService implements IFileStorageService {
     return `${nameHash.substring(0, 8)}-${nameHash.substring(8, 12)}-${nameHash.substring(12, 16)}-${nameHash.substring(16, 20)}-${nameHash.substring(20, 32)}`;
   }
 
-  /**
-   * Find file path across subdirectories
-   */
   private async findFilePath(fileStorageId: string): Promise<string | null> {
     for (const subdir of this.STORAGE_SUBDIRS) {
       const dirPath = join(this.storageBasePath, subdir);
@@ -219,24 +192,17 @@ export class FileStorageService implements IFileStorageService {
           return join(dirPath, matchingFile);
         }
       } catch {
-        // Directory might not exist, continue
       }
     }
 
     return null;
   }
 
-  /**
-   * Check if file exists in storage
-   */
   async fileExists(fileStorageId: string): Promise<boolean> {
     const filePath = await this.findFilePath(fileStorageId);
     return filePath !== null;
   }
 
-  /**
-   * Find duplicate files by hash
-   */
   async findDuplicateByHash(fileHash: string): Promise<PrintJob | null> {
     return this.printJobRepository.findOne({
       where: { fileHash },
@@ -244,12 +210,6 @@ export class FileStorageService implements IFileStorageService {
     });
   }
 
-  /**
-   * Find existing file by original filename in central storage
-   * Searches through all storage subdirectories and checks metadata for matching _originalFileName
-   * @param originalFileName The original filename to search for
-   * @returns fileStorageId and metadata if found, null otherwise
-   */
   async findDuplicateByOriginalFileName(originalFileName: string): Promise<{
     fileStorageId: string;
     metadata: any;
@@ -260,7 +220,6 @@ export class FileStorageService implements IFileStorageService {
         const dirFiles = await readdir(dirPath);
 
         for (const file of dirFiles) {
-          // Skip thumbnail directories and JSON metadata files
           if (file.endsWith('_thumbnails') || file.endsWith('.json')) continue;
 
           const fileId = path.parse(file).name;
@@ -281,10 +240,6 @@ export class FileStorageService implements IFileStorageService {
     return null;
   }
 
-  /**
-   * Save analysis metadata as JSON alongside the file
-   * Also stores hash, timestamp, original filename, and thumbnail index
-   */
   async saveMetadata(fileStorageId: string, metadata: any, fileHash?: string, originalFileName?: string, thumbnailMetadata?: any[]): Promise<void> {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) {
@@ -322,9 +277,6 @@ export class FileStorageService implements IFileStorageService {
     this.logger.debug(`Saved metadata for ${fileStorageId}${thumbnailMeta}`);
   }
 
-  /**
-   * Load analysis metadata from JSON file
-   */
   async loadMetadata(fileStorageId: string): Promise<any | null> {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) {
@@ -336,14 +288,10 @@ export class FileStorageService implements IFileStorageService {
       const content = await readFile(metadataPath, "utf8");
       return JSON.parse(content);
     } catch (error) {
-      // Metadata file doesn't exist or is invalid
       return null;
     }
   }
 
-  /**
-   * Check if metadata JSON exists for a file
-   */
   async hasMetadata(fileStorageId: string): Promise<boolean> {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) {
@@ -359,11 +307,6 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  /**
-   * Save thumbnails for a file
-   * Returns array of thumbnail metadata with paths
-   * Clears old thumbnails before saving new ones
-   */
   async saveThumbnails(fileStorageId: string, thumbnails: Array<{data?: string; format?: string; width?: number; height?: number}>): Promise<Array<{
     index: number;
     path: string;
@@ -428,9 +371,6 @@ export class FileStorageService implements IFileStorageService {
     return savedThumbnails;
   }
 
-  /**
-   * Get a specific thumbnail for a file
-   */
   async getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null> {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) return null;
@@ -448,9 +388,6 @@ export class FileStorageService implements IFileStorageService {
     return null;
   }
 
-  /**
-   * List all thumbnails for a file
-   */
   async listThumbnails(fileStorageId: string): Promise<string[]> {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) return [];
@@ -465,9 +402,6 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  /**
-   * List all stored files with metadata
-   */
   async listAllFiles(): Promise<Array<{
     fileStorageId: string;
     fileName: string;
@@ -515,9 +449,6 @@ export class FileStorageService implements IFileStorageService {
     return files.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  /**
-   * Get file information with metadata
-   */
   async getFileInfo(fileStorageId: string): Promise<{
     fileStorageId: string;
     fileName: string;

@@ -6,7 +6,6 @@ import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
-import { ConflictException } from "@/exceptions/runtime.exceptions";
 import { slicerApiKeyAuth } from "@/middleware/slicer-api-key.middleware";
 
 /**
@@ -76,35 +75,12 @@ export class SlicerCompatController {
       const print = req.body.print === "true" || req.body.print === true;
       const select = req.body.select === "true" || req.body.select === true;
 
-      this.logger.log(`OctoPrint-compatible upload: ${file.originalname} (print=${print}, select=${select})`);
+      await this.fileStorageService.validateUniqueFilename(file.originalname);
 
-      // Check for existing file with same original filename
-      const existingFile = await this.fileStorageService.findDuplicateByOriginalFileName(file.originalname);
-
-      if (existingFile) {
-        // Clean up uploaded file
-        try {
-          this.multerService.clearUploadedFile(file);
-        } catch (e) {
-          this.logger.error(`Could not remove uploaded file from temporary storage`);
-        }
-
-        throw new ConflictException(
-          `A file named "${file.originalname}" already exists in storage. Please rename the file, delete the existing file (ID: ${existingFile.fileStorageId}), or choose a different name.`,
-          existingFile.fileStorageId
-        );
-      }
-
-      // Calculate file hash
       const fileHash = await this.fileStorageService.calculateFileHash(file.path);
-
-      // Save file to storage
       const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
-
-      // Get file path for analysis
       const filePath = this.fileStorageService.getFilePath(fileStorageId);
 
-      // Analyze file synchronously for immediate feedback
       let metadata: any = {};
       let thumbnails: any[] = [];
 
@@ -113,34 +89,15 @@ export class SlicerCompatController {
         metadata = analysisResult.metadata;
         thumbnails = analysisResult.thumbnails || [];
 
-        // Save thumbnails
-        if (thumbnails.length > 0) {
-          const thumbnailMetadata = await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails);
-          this.logger.log(`Saved ${thumbnailMetadata.length} thumbnail(s) for ${fileStorageId}`);
+        const thumbnailMetadata = thumbnails.length > 0
+          ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails)
+          : [];
 
-          // Save metadata with thumbnails
-          await this.fileStorageService.saveMetadata(
-            fileStorageId,
-            metadata,
-            fileHash,
-            file.originalname,
-            thumbnailMetadata
-          );
-        } else {
-          // Save metadata without thumbnails
-          await this.fileStorageService.saveMetadata(
-            fileStorageId,
-            metadata,
-            fileHash,
-            file.originalname
-          );
-        }
+        await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
       } catch (analysisError) {
         this.logger.error(`Failed to analyze uploaded file: ${analysisError}`);
-        // Continue even if analysis fails
       }
 
-      // Clean up temp file
       try {
         this.multerService.clearUploadedFile(file);
       } catch (e) {
