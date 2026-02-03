@@ -8,6 +8,7 @@ import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { FileAnalysisService } from "@/services/file-analysis.service";
+import { BadRequestException } from "@/exceptions/runtime.exceptions";
 import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { extname } from "node:path";
 
@@ -214,62 +215,53 @@ export class FileStorageController {
   @POST()
   @route("/upload")
   async uploadFile(req: Request, res: Response) {
+    const acceptedExtensions = ['.gcode', '.3mf', '.bgcode'];
+    const files = await this.multerService.multerLoadFileAsync(req, res, acceptedExtensions, true);
+
+    if (!files?.length) {
+      throw new BadRequestException("No file uploaded");
+    }
+
+    if (files.length > 1) {
+      throw new BadRequestException("Only 1 file can be uploaded at a time");
+    }
+
+    const file = files[0];
+    await this.fileStorageService.validateUniqueFilename(file.originalname);
+
+    const ext = extname(file.originalname);
+    const tempPathWithExt = file.path + ext;
+
     try {
-      // Use multer to handle file upload
-      const acceptedExtensions = ['.gcode', '.3mf', '.bgcode'];
-      const files = await this.multerService.multerLoadFileAsync(req, res, acceptedExtensions, true);
+      copyFileSync(file.path, tempPathWithExt);
 
-      if (!files?.length) {
-        res.status(400).send({ error: "No file uploaded" });
-        return;
+      const fileHash = await this.fileStorageService.calculateFileHash(tempPathWithExt);
+      this.logger.log(`Analyzing ${file.originalname}`);
+      const analysisResult = await this.fileAnalysisService.analyzeFile(tempPathWithExt);
+      const { metadata, thumbnails } = analysisResult;
+
+      const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
+      this.logger.log(`Saved ${file.originalname} as ${fileStorageId}`);
+
+      const thumbnailMetadata = thumbnails.length > 0
+        ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails)
+        : [];
+
+      await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
+
+      res.send({
+        message: "File uploaded successfully",
+        fileStorageId,
+        fileName: file.originalname,
+        fileSize: file.size,
+        fileHash,
+        metadata,
+        thumbnailCount: thumbnails.length,
+      });
+    } finally {
+      if (existsSync(tempPathWithExt)) {
+        unlinkSync(tempPathWithExt);
       }
-
-      if (files.length > 1) {
-        res.status(400).send({ error: "Only 1 file can be uploaded at a time" });
-        return;
-      }
-
-      const file = files[0];
-      await this.fileStorageService.validateUniqueFilename(file.originalname);
-
-      const ext = extname(file.originalname);
-      const tempPathWithExt = file.path + ext;
-
-      try {
-        copyFileSync(file.path, tempPathWithExt);
-
-        const fileHash = await this.fileStorageService.calculateFileHash(tempPathWithExt);
-        this.logger.log(`Analyzing ${file.originalname}`);
-        const analysisResult = await this.fileAnalysisService.analyzeFile(tempPathWithExt);
-        const { metadata, thumbnails } = analysisResult;
-
-        const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
-        this.logger.log(`Saved ${file.originalname} as ${fileStorageId}`);
-
-        const thumbnailMetadata = thumbnails.length > 0
-          ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails)
-          : [];
-
-        await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
-
-        res.send({
-          message: "File uploaded successfully",
-          fileStorageId,
-          fileName: file.originalname,
-          fileSize: file.size,
-          fileHash,
-          metadata,
-          thumbnailCount: thumbnails.length,
-        });
-      } finally {
-        // Clean up temp file with extension
-        if (existsSync(tempPathWithExt)) {
-          unlinkSync(tempPathWithExt);
-        }
-      }
-    } catch (error) {
-      this.logger.error(`Failed to upload file: ${error}`);
-      res.status(500).send({ error: "Failed to upload file" });
     }
   }
 }

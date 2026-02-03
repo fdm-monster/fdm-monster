@@ -3,6 +3,7 @@ import { DITokens } from "@/container.tokens";
 import { FileStorageService } from "@/services/file-storage.service";
 import { expectOkResponse, expectInvalidResponse, expectNotFoundResponse } from "../extensions";
 import { AppConstants } from "@/server.constants";
+import { ConflictException } from "@/exceptions/runtime.exceptions";
 import TestAgent from "supertest/lib/agent";
 import { Test } from "supertest";
 
@@ -20,13 +21,14 @@ describe("FileStorageController", () => {
       .attach("file", Buffer.from(content), filename);
   };
 
+  let mockFileIdCounter = 0;
+  let uploadedFilenames: Map<string, string>;
+
   beforeAll(async () => {
     const { request, container } = await setupTestApp(false);
     testRequest = request;
     fileStorageService = container.resolve<FileStorageService>(DITokens.fileStorageService);
-
-    let mockFileIdCounter = 0;
-    const uploadedFilenames: Map<string, string> = new Map();
+    uploadedFilenames = new Map();
 
     jest.spyOn(fileStorageService, 'saveFile').mockImplementation(async (file) => {
       const fileId = `mock-file-id-${++mockFileIdCounter}`;
@@ -39,10 +41,8 @@ describe("FileStorageController", () => {
     jest.spyOn(fileStorageService, 'saveMetadata').mockResolvedValue(undefined);
     jest.spyOn(fileStorageService, 'saveThumbnails').mockResolvedValue([]);
 
-    const originalValidateUniqueFilename = fileStorageService.validateUniqueFilename.bind(fileStorageService);
     jest.spyOn(fileStorageService, 'validateUniqueFilename').mockImplementation(async (filename: string) => {
       if (uploadedFilenames.has(filename)) {
-        const { ConflictException } = await import("@/exceptions/runtime.exceptions");
         throw new ConflictException(
           `A file named "${filename}" already exists in storage. Please rename the file, delete the existing file (ID: ${uploadedFilenames.get(filename)}), or choose a different name.`,
           uploadedFilenames.get(filename)
@@ -60,6 +60,11 @@ describe("FileStorageController", () => {
       }
       return null;
     });
+  });
+
+  beforeEach(() => {
+    uploadedFilenames.clear();
+    mockFileIdCounter = 0;
   });
 
   afterAll(() => {
