@@ -72,21 +72,13 @@ export class SlicerCompatController {
       }
 
       const file = files[0];
-      const print = req.body.print === "true" || req.body.print === true;
-      const select = req.body.select === "true" || req.body.select === true;
 
-      this.logger.log(`OctoPrint-compatible upload: ${file.originalname} (print=${print}, select=${select})`);
+      await this.fileStorageService.validateUniqueFilename(file.originalname);
 
-      // Calculate file hash
       const fileHash = await this.fileStorageService.calculateFileHash(file.path);
-
-      // Save file to storage
       const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
-
-      // Get file path for analysis
       const filePath = this.fileStorageService.getFilePath(fileStorageId);
 
-      // Analyze file synchronously for immediate feedback
       let metadata: any = {};
       let thumbnails: any[] = [];
 
@@ -95,34 +87,15 @@ export class SlicerCompatController {
         metadata = analysisResult.metadata;
         thumbnails = analysisResult.thumbnails || [];
 
-        // Save thumbnails
-        if (thumbnails.length > 0) {
-          const thumbnailMetadata = await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails);
-          this.logger.log(`Saved ${thumbnailMetadata.length} thumbnail(s) for ${fileStorageId}`);
+        const thumbnailMetadata = thumbnails.length > 0
+          ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails)
+          : [];
 
-          // Save metadata with thumbnails
-          await this.fileStorageService.saveMetadata(
-            fileStorageId,
-            metadata,
-            fileHash,
-            file.originalname,
-            thumbnailMetadata
-          );
-        } else {
-          // Save metadata without thumbnails
-          await this.fileStorageService.saveMetadata(
-            fileStorageId,
-            metadata,
-            fileHash,
-            file.originalname
-          );
-        }
+        await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
       } catch (analysisError) {
         this.logger.error(`Failed to analyze uploaded file: ${analysisError}`);
-        // Continue even if analysis fails
       }
 
-      // Clean up temp file
       try {
         this.multerService.clearUploadedFile(file);
       } catch (e) {

@@ -105,11 +105,25 @@ M140 S0
 
     // Mock file storage to prevent actual file writes
     let mockFileIdCounter = 0;
-    jest.spyOn(fileStorageService, 'saveFile').mockImplementation(async () => {
-      return `mock-file-id-${ ++mockFileIdCounter }`;
+    const uploadedFilenames: Map<string, string> = new Map(); // Track uploaded filenames
+
+    jest.spyOn(fileStorageService, 'saveFile').mockImplementation(async (file) => {
+      const fileId = `mock-file-id-${ ++mockFileIdCounter }`;
+      uploadedFilenames.set(file.originalname, fileId);
+      return fileId;
     });
     jest.spyOn(fileStorageService, 'calculateFileHash').mockResolvedValue('mock-hash-abc123');
     jest.spyOn(fileStorageService, 'getFilePath').mockImplementation((id: string) => `/mock/path/${ id }`);
+    jest.spyOn(fileStorageService, 'findDuplicateByOriginalFileName').mockImplementation(async (filename: string) => {
+      const existingFileId = uploadedFilenames.get(filename);
+      if (existingFileId) {
+        return {
+          fileStorageId: existingFileId,
+          metadata: { _originalFileName: filename },
+        };
+      }
+      return null;
+    });
   });
 
   afterAll(async () => {
@@ -313,6 +327,24 @@ G1 X20 Y20 E5 F1500
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty("done", true);
       expect(res.body.files.local.refs.resource).toContain("/api/files/local/");
+    });
+
+    it("should reject duplicate filename uploads", async () => {
+      const filename = "duplicate-test.gcode";
+      const content1 = "G28\nG1 X10 Y10\n";
+      const content2 = "G28\nG1 X20 Y20\n";
+
+      const res1 = await uploadFile(filename, content1);
+      expect(res1.status).toBe(201);
+      expect(res1.body.done).toBe(true);
+
+      const res2 = await uploadFile(filename, content2);
+      expect(res2.status).toBe(409);
+      expect(res2.body).toHaveProperty("error");
+      expect(res2.body.error).toContain("already exists");
+      expect(res2.body.error).toContain(filename);
+      expect(res2.body).toHaveProperty("existingResourceId");
+      expect(res2.body.existingResourceId).toBeDefined();
     });
   });
 
