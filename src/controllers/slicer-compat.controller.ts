@@ -6,6 +6,7 @@ import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
+import { ConflictException } from "@/exceptions/runtime.exceptions";
 import { slicerApiKeyAuth } from "@/middleware/slicer-api-key.middleware";
 
 /**
@@ -76,6 +77,23 @@ export class SlicerCompatController {
       const select = req.body.select === "true" || req.body.select === true;
 
       this.logger.log(`OctoPrint-compatible upload: ${file.originalname} (print=${print}, select=${select})`);
+
+      // Check for existing file with same original filename
+      const existingFile = await this.fileStorageService.findDuplicateByOriginalFileName(file.originalname);
+
+      if (existingFile) {
+        // Clean up uploaded file
+        try {
+          this.multerService.clearUploadedFile(file);
+        } catch (e) {
+          this.logger.error(`Could not remove uploaded file from temporary storage`);
+        }
+
+        throw new ConflictException(
+          `A file named "${file.originalname}" already exists in storage. Please rename the file, delete the existing file (ID: ${existingFile.fileStorageId}), or choose a different name.`,
+          existingFile.fileStorageId
+        );
+      }
 
       // Calculate file hash
       const fileHash = await this.fileStorageService.calculateFileHash(file.path);

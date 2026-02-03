@@ -21,6 +21,7 @@ export interface IFileStorageService {
   loadMetadata(fileStorageId: string): Promise<any | null>;
   hasMetadata(fileStorageId: string): Promise<boolean>;
   getDeterministicId(fileHash: string, fileName: string): string;
+  findDuplicateByOriginalFileName(originalFileName: string): Promise<{fileStorageId: string; metadata: any} | null>;
   saveThumbnails(fileStorageId: string, thumbnails: Array<{data?: string; format?: string; width?: number; height?: number}>): Promise<Array<{index: number; path: string; filename: string; width: number; height: number; format: string; size: number}>>;
   getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null>;
   listThumbnails(fileStorageId: string): Promise<string[]>;
@@ -241,6 +242,43 @@ export class FileStorageService implements IFileStorageService {
       where: { fileHash },
       order: { createdAt: "DESC" },
     });
+  }
+
+  /**
+   * Find existing file by original filename in central storage
+   * Searches through all storage subdirectories and checks metadata for matching _originalFileName
+   * @param originalFileName The original filename to search for
+   * @returns fileStorageId and metadata if found, null otherwise
+   */
+  async findDuplicateByOriginalFileName(originalFileName: string): Promise<{
+    fileStorageId: string;
+    metadata: any;
+  } | null> {
+    for (const subdir of this.STORAGE_SUBDIRS) {
+      const dirPath = join(this.storageBasePath, subdir);
+      try {
+        const dirFiles = await readdir(dirPath);
+
+        for (const file of dirFiles) {
+          // Skip thumbnail directories and JSON metadata files
+          if (file.endsWith('_thumbnails') || file.endsWith('.json')) continue;
+
+          const fileId = path.parse(file).name;
+          const metadata = await this.loadMetadata(fileId);
+
+          if (metadata?._originalFileName === originalFileName) {
+            return {
+              fileStorageId: fileId,
+              metadata,
+            };
+          }
+        }
+      } catch (error) {
+        this.logger.error(`Error searching for duplicate in ${subdir}`, error);
+      }
+    }
+
+    return null;
   }
 
   /**

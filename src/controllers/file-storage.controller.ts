@@ -8,6 +8,7 @@ import { MulterService } from "@/services/core/multer.service";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { FileAnalysisService } from "@/services/file-analysis.service";
+import { ConflictException } from "@/exceptions/runtime.exceptions";
 import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { extname } from "node:path";
 
@@ -230,6 +231,23 @@ export class FileStorageController {
       }
 
       const file = files[0];
+
+      // Check for existing file with same original filename
+      const existingFile = await this.fileStorageService.findDuplicateByOriginalFileName(file.originalname);
+
+      if (existingFile) {
+        // Clean up uploaded file
+        try {
+          this.multerService.clearUploadedFile(file);
+        } catch (e) {
+          this.logger.error(`Could not remove uploaded file from temporary storage: ${e}`);
+        }
+
+        throw new ConflictException(
+          `A file named "${file.originalname}" already exists in storage. Please rename the file, delete the existing file (ID: ${existingFile.fileStorageId}), or choose a different name.`,
+          existingFile.fileStorageId
+        );
+      }
 
       // Get file extension and create temp path with extension
       const ext = extname(file.originalname);
