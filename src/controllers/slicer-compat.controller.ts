@@ -72,8 +72,6 @@ export class SlicerCompatController {
       }
 
       const file = files[0];
-      const print = req.body.print === "true" || req.body.print === true;
-      const select = req.body.select === "true" || req.body.select === true;
 
       await this.fileStorageService.validateUniqueFilename(file.originalname);
 
