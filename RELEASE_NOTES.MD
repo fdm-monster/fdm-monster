@@ -1,8 +1,14 @@
 # Develop
 
+# FDM Monster 2.0.10
+
 ## Fixes
 
-- The printer files load task was removed because it is no longer required. The printer files are now loaded on demand.
+- Reject duplicate filename uploads in central file storage (fixes #4972)
+- Added ConflictException for 409 status code responses
+- Refactored printer-files upload handler into focused helper methods
+- Replaced manual error responses with proper exception classes throughout file upload endpoints
+- The printer files load task was removed because it is no longer required
 
 # FDM Monster 2.0.9
 
