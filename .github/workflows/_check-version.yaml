@@ -35,6 +35,6 @@ jobs:
       - name: Check if tag exists
         id: check_tag
         if: inputs.check_tag_exists
-        uses: mukunku/tag-exists-action@v1.7.0
+        uses: mukunku/tag-exists-action@5c39604fe8aef7e65acb6fbcf96ec580f7680313
         with:
           tag: ${{ steps.version.outputs.version }}
