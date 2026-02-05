@@ -1,0 +1,29 @@
+name: Docker Build
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  check-version:
+    uses: ./.github/workflows/_check-version.yaml
+
+  metadata:
+    needs: [check-version]
+    uses: ./.github/workflows/_metadata.yaml
+    with:
+      version: ${{ needs.check-version.outputs.version }}
+      tag_suffix: -develop
+
+  build:
+    needs: [metadata]
+    uses: ./.github/workflows/_build-docker.yaml
+    with:
+      tags: ${{ needs.metadata.outputs.tags }}
+      tags_mdns: ${{ needs.metadata.outputs.tags_mdns }}
+      labels: ${{ needs.metadata.outputs.labels }}
+      push: ${{ github.event_name != 'pull_request' }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

@@ -1,0 +1,40 @@
+name: Check Version (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      check_tag_exists:
+        type: boolean
+        required: false
+        description: 'Check if git tag already exists'
+        default: false
+    outputs:
+      version:
+        description: 'Version from package.json'
+        value: ${{ jobs.check.outputs.version }}
+      tag_exists:
+        description: 'Whether git tag already exists (empty string if not checked)'
+        value: ${{ jobs.check.outputs.tag_exists }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag_exists: ${{ steps.check_tag.outputs.exists }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(npm pkg get version | sed 's/"//g')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Check if tag exists
+        id: check_tag
+        if: inputs.check_tag_exists
+        uses: mukunku/tag-exists-action@v1.7.0
+        with:
+          tag: ${{ steps.version.outputs.version }}

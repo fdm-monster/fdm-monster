@@ -1,0 +1,67 @@
+name: Generate Docker Metadata (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+        description: 'Version string (e.g., 2.0.10 or 2.0.10-rc1)'
+      tag_suffix:
+        type: string
+        required: false
+        description: 'Tag suffix (e.g., -develop)'
+        default: ''
+      release_tags:
+        type: boolean
+        required: false
+        description: 'Enable release tags: latest, major, major.minor (auto-disabled for rc versions)'
+        default: false
+    outputs:
+      tags:
+        description: 'Docker tags for regular variant'
+        value: ${{ jobs.generate.outputs.tags }}
+      tags_mdns:
+        description: 'Docker tags for mDNS variant'
+        value: ${{ jobs.generate.outputs.tags_mdns }}
+      labels:
+        description: 'Docker labels'
+        value: ${{ jobs.generate.outputs.labels }}
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      tags_mdns: ${{ steps.meta_mdns.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
+    steps:
+      - name: Docker metadata (regular)
+        id: meta
+        uses: docker/metadata-action@a60f0f62b5c12316066c8db464bfb2faafd7907b
+        with:
+          images: fdmmonster/fdm-monster
+          tags: |
+            type=semver,pattern={{version}}${{ inputs.tag_suffix }},value=${{ inputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }},enable=${{ inputs.release_tags && !contains(inputs.version, 'rc') }}
+            type=semver,pattern={{major}},value=${{ inputs.version }},enable=${{ inputs.release_tags && !contains(inputs.version, 'rc') }}
+            type=raw,value=latest,enable=${{ inputs.release_tags && !contains(inputs.version, 'rc') }}
+
+      - name: Docker metadata (mDNS)
+        id: meta_mdns
+        uses: docker/metadata-action@a60f0f62b5c12316066c8db464bfb2faafd7907b
+        with:
+          images: fdmmonster/fdm-monster
+          flavor: |
+            suffix=-mdns
+          tags: |
+            type=semver,pattern={{version}}${{ inputs.tag_suffix }},value=${{ inputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }},enable=${{ inputs.release_tags && !contains(inputs.version, 'rc') }}
+            type=semver,pattern={{major}},value=${{ inputs.version }},enable=${{ inputs.release_tags && !contains(inputs.version, 'rc') }}
+            type=raw,value=latest,enable=${{ inputs.release_tags && !contains(inputs.version, 'rc') }}
+
+      - name: Show tags
+        run: |
+          echo "Version: ${{ inputs.version }}"
+          echo "Regular tags: ${{ steps.meta.outputs.tags }}"
+          echo "mDNS tags: ${{ steps.meta_mdns.outputs.tags }}"
