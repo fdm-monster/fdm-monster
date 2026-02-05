@@ -8,7 +8,7 @@ body:
       value: |
         Please check to see if your problem already exists with a quick search of the issues. Start with one relevant term and then add others if you get too many results.
 
-        **NOTE: Keep in mind we have a [Code Of Conduct](https://github.com/fdm-monster/fdm-monster/blob/develop/CODE_OF_CONDUCT.md) that we expect folks to observe when they are looking for support.**
+        **NOTE: Keep in mind we have a [Code Of Conduct](https://github.com/fdm-monster/fdm-monster/blob/main/CODE_OF_CONDUCT.md) that we expect folks to observe when they are looking for support.**
 
         Name your issue appropriately: give it a sentence that reads well enough for anyone seeing this in the release notes to know what it is.
 
@@ -19,7 +19,7 @@ body:
       label: Checklist
       description: Before continuing, make sure you have done the following.
       options:
-        - label: I agree to follow our [Code of Conduct](https://github.com/fdm-monster/fdm-monster/blob/develop/CODE_OF_CONDUCT.md).
+        - label: I agree to follow our [Code of Conduct](https://github.com/fdm-monster/fdm-monster/blob/main/CODE_OF_CONDUCT.md).
           required: true
         - label: I have verified no [other issues](https://github.com/fdm-monster/fdm-monster/issues) exist related to my request.
           required: true

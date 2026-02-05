@@ -2,7 +2,7 @@ name: Docker
 on:
   pull_request:
   workflow_dispatch:
-  # Runs from default branch, which is develop
+  # Runs from default branch, which is main
   schedule:
     - cron: '0 0 * * *'
 jobs:
@@ -64,7 +64,7 @@ jobs:
           tags: |
             %X.Y.Z%-mdns
           extra_tags: |
-            develop-mdns::${{ github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop' }}
+            develop-mdns::${{ github.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main' }}
 
       # Show docker tags to be (conditionally) pushed
       - name: "Show docker tags"

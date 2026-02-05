@@ -13,7 +13,7 @@
     <a href="https://github.com/fdm-monster/fdm-monster/issues">
         <img src="https://img.shields.io/github/issues/fdm-monster/fdm-monster"/></a>
     <a href="https://app.codecov.io/gh/fdm-monster/fdm-monster">
-        <img src="https://codecov.io/gh/fdm-monster/fdm-monster/branch/develop/graph/badge.svg?flag=server-nodejs&precision=0"/></a>
+        <img src="https://codecov.io/gh/fdm-monster/fdm-monster/branch/main/graph/badge.svg?flag=server-nodejs&precision=0"/></a>
     <br/>
     <a href="https://unraid.net/community/apps?q=fdm+monster">
         <img src="https://img.shields.io/badge/Unraid%20Community%20Application-fc832e"/>

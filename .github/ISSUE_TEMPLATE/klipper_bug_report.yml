@@ -11,7 +11,7 @@ body:
       label: Checkboxes
       description: Before continuing, make sure you have done the following. 
       options:
-        - label: I agree to follow our [Code of Conduct](https://github.com/fdm-monster/fdm-monster/blob/develop/CODE_OF_CONDUCT.md).
+        - label: I agree to follow our [Code of Conduct](https://github.com/fdm-monster/fdm-monster/blob/main/CODE_OF_CONDUCT.md).
           required: true
         - label: I have verified no [other issues](https://github.com/fdm-monster/fdm-monster/issues) exist related to my request.
           required: true
