@@ -18,7 +18,7 @@ jobs:
       version: ${{ needs.check-version.outputs.version }}
       release_tags: true
 
-  build:
+  docker-release:
     needs: [check-version, metadata]
     if: needs.check-version.outputs.tag_exists == 'false'
     uses: ./.github/workflows/_build-docker.yaml

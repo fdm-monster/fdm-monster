@@ -1,6 +1,5 @@
 name: Docker Build
 on:
-  pull_request:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
@@ -16,7 +15,7 @@ jobs:
       version: ${{ needs.check-version.outputs.version }}
       tag_suffix: -develop
 
-  build:
+  docker-build:
     needs: [metadata]
     uses: ./.github/workflows/_build-docker.yaml
     with:
