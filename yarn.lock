@@ -583,7 +583,7 @@ __metadata:
     "@lcov-viewer/istanbul-report": "npm:1.4.0"
     "@octokit/plugin-throttling": "npm:8.2.0"
     "@sentry/node": "npm:10.38.0"
-    "@swc/cli": "npm:0.7.10"
+    "@swc/cli": "npm:0.8.0"
     "@swc/core": "npm:1.15.11"
     "@swc/jest": "npm:0.2.39"
     "@types/adm-zip": "npm:0.5.7"
@@ -2556,9 +2556,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/cli@npm:0.7.10":
-  version: 0.7.10
-  resolution: "@swc/cli@npm:0.7.10"
+"@swc/cli@npm:0.8.0":
+  version: 0.8.0
+  resolution: "@swc/cli@npm:0.8.0"
   dependencies:
     "@swc/counter": "npm:^0.1.3"
     "@xhmikosr/bin-wrapper": "npm:^13.0.5"
@@ -2571,7 +2571,7 @@ __metadata:
     tinyglobby: "npm:^0.2.13"
   peerDependencies:
     "@swc/core": ^1.2.66
-    chokidar: ^4.0.1
+    chokidar: ^5.0.0
   peerDependenciesMeta:
     chokidar:
       optional: true
@@ -2579,7 +2579,7 @@ __metadata:
     spack: bin/spack.js
     swc: bin/swc.js
     swcx: bin/swcx.js
-  checksum: 10c0/9e4d348538d35c44b5503b34c061b221a9ae17af12f78fdb4c0e0b8f5fe2992854dcdf2fa7f21ee709ecb959b5c92ca048a0a8b7d0c4d599e9502d021ea9bf32
+  checksum: 10c0/641fab4fcb063ec0ca6cc77072626d46757fa909fc7093634b4d7343752adeca5ff2e304a37daf72eb3f1a9490cbbd57d37116fe946469cee075f432c51a2b4d
   languageName: node
   linkType: hard
 
