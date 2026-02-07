@@ -1,4 +1,4 @@
-import { before, DELETE, GET, POST, route } from "awilix-express";
+import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { Request, Response } from "express";
 import { authorizeRoles, authenticate } from "@/middleware/authenticate";
@@ -11,6 +11,8 @@ import { FileAnalysisService } from "@/services/file-analysis.service";
 import { BadRequestException } from "@/exceptions/runtime.exceptions";
 import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { extname } from "node:path";
+import { validateInput } from "@/handlers/validators";
+import { updateFileMetadataSchema, batchUpdateFileMetadataSchema } from "./validation/file-storage-controller.validation";
 
 @route(AppConstants.apiRoute + "/file-storage")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN, ROLES.OPERATOR])])
@@ -59,10 +61,79 @@ export class FileStorageController {
     }
   }
 
-  /**
-   * Get file metadata
-   * GET /api/file-storage/:fileStorageId
-   */
+  @GET()
+  @route("/directory-tree")
+  async getDirectoryTree(req: Request, res: Response) {
+    try {
+      const tree = await this.fileStorageService.getDirectoryTree();
+      res.send({ tree });
+    } catch (error) {
+      this.logger.error(`Failed to build directory tree: ${error}`);
+      res.status(500).send({ error: "Failed to build directory tree" });
+    }
+  }
+
+  @GET()
+  @route("/virtual-directories")
+  async listVirtualDirectories(req: Request, res: Response) {
+    try {
+      const directories = await this.fileStorageService.listVirtualDirectories();
+      res.send({ directories, count: directories.length });
+    } catch (error) {
+      this.logger.error(`Failed to list virtual directories: ${error}`);
+      res.status(500).send({ error: "Failed to list virtual directories" });
+    }
+  }
+
+  @POST()
+  @route("/virtual-directories")
+  async createVirtualDirectory(req: Request, res: Response) {
+    const { path: virtualPath } = req.body;
+
+    if (!virtualPath || typeof virtualPath !== "string") {
+      res.status(400).send({ error: "Invalid path" });
+      return;
+    }
+
+    try {
+      const createdMarkers = await this.fileStorageService.createVirtualDirectory(virtualPath);
+      const leafMarker = createdMarkers[createdMarkers.length - 1];
+
+      this.logger.log(`Created virtual directory: ${virtualPath} (${createdMarkers.length} markers)`);
+
+      res.send({
+        message: "Virtual directory created",
+        markerId: leafMarker.markerId,
+        path: virtualPath,
+        createdMarkers
+      });
+    } catch (error) {
+      this.logger.error(`Failed to create virtual directory: ${error}`);
+      res.status(500).send({ error: "Failed to create virtual directory" });
+    }
+  }
+
+  @DELETE()
+  @route("/virtual-directories/:markerId")
+  async deleteVirtualDirectory(req: Request, res: Response) {
+    const { markerId } = req.params as { markerId: string };
+
+    try {
+      const deleted = await this.fileStorageService.deleteVirtualDirectory(markerId);
+
+      if (!deleted) {
+        res.status(404).send({ error: "Virtual directory not found" });
+        return;
+      }
+
+      this.logger.log(`Deleted virtual directory: ${markerId}`);
+      res.send({ message: "Virtual directory deleted", markerId });
+    } catch (error) {
+      this.logger.error(`Failed to delete virtual directory ${markerId}: ${error}`);
+      res.status(500).send({ error: "Failed to delete virtual directory" });
+    }
+  }
+
   @GET()
   @route("/:fileStorageId")
   async getFileMetadata(req: Request, res: Response) {
@@ -100,10 +171,55 @@ export class FileStorageController {
     }
   }
 
-  /**
-   * Delete a stored file and its thumbnails
-   * DELETE /api/file-storage/:fileStorageId
-   */
+  @PATCH()
+  @route("/:fileStorageId")
+  async updateFileMetadata(req: Request, res: Response) {
+    const { fileStorageId } = req.params as { fileStorageId: string };
+
+    try {
+      const validatedData = await validateInput(req.body, updateFileMetadataSchema);
+
+      await this.fileStorageService.updateFileMetadata(fileStorageId, {
+        fileName: validatedData.fileName,
+        path: validatedData.path,
+        metadata: validatedData.metadata,
+      });
+
+      const updatedFile = await this.fileStorageService.getFileInfo(fileStorageId);
+
+      if (!updatedFile) {
+        res.status(404).send({ error: "File not found after update" });
+        return;
+      }
+
+      const thumbnails = (updatedFile.metadata?._thumbnails || []).map((thumb: any) => ({
+        index: thumb.index,
+        width: thumb.width,
+        height: thumb.height,
+        format: thumb.format,
+        size: thumb.size,
+      }));
+
+      res.send({
+        fileStorageId: updatedFile.fileStorageId,
+        fileName: updatedFile.fileName,
+        fileFormat: updatedFile.fileFormat,
+        fileSize: updatedFile.fileSize,
+        fileHash: updatedFile.fileHash,
+        createdAt: updatedFile.createdAt,
+        thumbnails,
+        metadata: updatedFile.metadata,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to update file metadata for ${fileStorageId}: ${error}`);
+      if (error instanceof Error && error.message.includes("not found")) {
+        res.status(404).send({ error: error.message });
+      } else {
+        res.status(500).send({ error: "Failed to update file metadata" });
+      }
+    }
+  }
+
   @DELETE()
   @route("/:fileStorageId")
   async deleteFile(req: Request, res: Response) {
@@ -208,10 +324,29 @@ export class FileStorageController {
     }
   }
 
-  /**
-   * Upload a file to storage and analyze it
-   * POST /api/file-storage/upload
-   */
+  @PATCH()
+  @route("/batch")
+  async batchUpdateFileMetadata(req: Request, res: Response) {
+    try {
+      const validatedData = await validateInput(req.body, batchUpdateFileMetadataSchema);
+
+      const result = await this.fileStorageService.batchUpdateFileMetadata(validatedData.updates);
+
+      this.logger.log(`Batch update completed: ${result.success.length} succeeded, ${result.failed.length} failed`);
+
+      res.send({
+        message: "Batch update completed",
+        successCount: result.success.length,
+        failedCount: result.failed.length,
+        success: result.success,
+        failed: result.failed,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to batch update file metadata: ${error}`);
+      res.status(500).send({ error: "Failed to batch update file metadata" });
+    }
+  }
+
   @POST()
   @route("/upload")
   async uploadFile(req: Request, res: Response) {

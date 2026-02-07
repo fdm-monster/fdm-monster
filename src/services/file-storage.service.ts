@@ -5,10 +5,16 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { AppConstants } from "@/server.constants";
 import { getMediaPath } from "@/utils/fs.utils";
 import path, { basename, extname, join } from "node:path";
-import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access } from "node:fs/promises";
+import { access, mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { existsSync, createReadStream, statSync } from "node:fs";
+import { createReadStream, existsSync, statSync } from "node:fs";
 import { Readable } from "node:stream";
+import {
+  buildDirectoryTree,
+  createVirtualDirectory,
+  deleteVirtualDirectory,
+  listVirtualDirectories
+} from "./virtual-directory.utils";
 
 export interface IFileStorageService {
   saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
@@ -26,6 +32,12 @@ export interface IFileStorageService {
   saveThumbnails(fileStorageId: string, thumbnails: Array<{data?: string; format?: string; width?: number; height?: number}>): Promise<Array<{index: number; path: string; filename: string; width: number; height: number; format: string; size: number}>>;
   getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null>;
   listThumbnails(fileStorageId: string): Promise<string[]>;
+  updateFileMetadata(fileStorageId: string, updates: {fileName?: string; path?: string; metadata?: any}): Promise<void>;
+  batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; path?: string; metadata?: any}>): Promise<{success: Array<{fileStorageId: string}>; failed: Array<{fileStorageId: string; error: string}>}>;
+  createVirtualDirectory(virtualPath: string): Promise<Array<{ path: string; markerId: string }>>;
+  listVirtualDirectories(): Promise<Array<{markerId: string; path: string; createdAt: string}>>;
+  deleteVirtualDirectory(markerId: string): Promise<boolean>;
+  getDirectoryTree(): Promise<any>;
 }
 
 export class FileStorageService implements IFileStorageService {
@@ -427,7 +439,10 @@ export class FileStorageService implements IFileStorageService {
           const stats = await stat(filePath);
 
           const metadata = await this.loadMetadata(fileId);
-
+          if (metadata?.type === 'directory') {
+            continue;
+          }
+          
           const thumbnails = await this.listThumbnails(fileId);
 
           files.push({
@@ -482,6 +497,100 @@ export class FileStorageService implements IFileStorageService {
       this.logger.error(`Error getting file info for ${fileStorageId}`, error);
       return null;
     }
+  }
+
+  async updateFileMetadata(fileStorageId: string, updates: {fileName?: string; path?: string; metadata?: any}): Promise<void> {
+    const filePath = await this.findFilePath(fileStorageId);
+    if (!filePath) {
+      throw new Error(`File ${fileStorageId} not found`);
+    }
+
+    const existingMetadata = await this.loadMetadata(fileStorageId);
+    if (!existingMetadata) {
+      throw new Error(`Metadata for ${fileStorageId} not found`);
+    }
+
+    const updatedMetadata = {
+      ...existingMetadata,
+      ...updates.metadata,
+    };
+
+    if (updates.fileName !== undefined) {
+      updatedMetadata._originalFileName = updates.fileName;
+      updatedMetadata.fileName = updates.fileName;
+    }
+
+    if (updates.path !== undefined) {
+      updatedMetadata._path = updates.path;
+    }
+
+    const metadataPath = filePath + ".json";
+    await writeFile(metadataPath, JSON.stringify(updatedMetadata, null, 2), "utf8");
+    this.logger.log(`Updated metadata for ${fileStorageId}`);
+  }
+
+  async batchUpdateFileMetadata(updates: Array<{fileStorageId: string; fileName?: string; path?: string; metadata?: any}>): Promise<{
+    success: Array<{fileStorageId: string}>;
+    failed: Array<{fileStorageId: string; error: string}>;
+  }> {
+    const results = {
+      success: [] as Array<{fileStorageId: string}>,
+      failed: [] as Array<{fileStorageId: string; error: string}>,
+    };
+
+    for (const update of updates) {
+      try {
+        await this.updateFileMetadata(update.fileStorageId, {
+          fileName: update.fileName,
+          path: update.path,
+          metadata: update.metadata,
+        });
+        results.success.push({ fileStorageId: update.fileStorageId });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        results.failed.push({
+          fileStorageId: update.fileStorageId,
+          error: errorMessage,
+        });
+        this.logger.warn(`Failed to update ${update.fileStorageId}: ${errorMessage}`);
+      }
+    }
+
+    this.logger.log(`Batch update complete: ${results.success.length} succeeded, ${results.failed.length} failed`);
+    return results;
+  }
+
+
+  async createVirtualDirectory(virtualPath: string): Promise<Array<{ path: string; markerId: string }>> {
+    const createdMarkers = await createVirtualDirectory(this.storageBasePath, virtualPath);
+    this.logger.log(`Created virtual directory: ${virtualPath} (${createdMarkers.length} markers created)`);
+    return createdMarkers;
+  }
+
+  async listVirtualDirectories(): Promise<Array<{markerId: string; path: string; createdAt: string}>> {
+    const markers = await listVirtualDirectories(this.storageBasePath);
+    return markers.map(m => ({
+      markerId: m._fileStorageId,
+      path: m.path,
+      createdAt: m.createdAt,
+    }));
+  }
+
+  async deleteVirtualDirectory(markerId: string): Promise<boolean> {
+    const deleted = await deleteVirtualDirectory(this.storageBasePath, markerId);
+    if (deleted) {
+      this.logger.log(`Deleted virtual directory marker: ${markerId}`);
+    } else {
+      this.logger.warn(`Virtual directory marker not found: ${markerId}`);
+    }
+    return deleted;
+  }
+
+  async getDirectoryTree(): Promise<any> {
+    const files = await this.listAllFiles();
+    const virtualDirs = await listVirtualDirectories(this.storageBasePath);
+
+    return buildDirectoryTree(files, virtualDirs);
   }
 }
 
