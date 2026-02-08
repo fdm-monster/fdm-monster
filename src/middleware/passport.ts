@@ -12,7 +12,7 @@ import { AwilixContainer } from "awilix";
 import { PassportStatic } from "passport";
 import { SettingsStore } from "@/state/settings.store";
 import { ConfigService } from "@/services/core/config.service";
-import { IUserService } from "@/services/interfaces/user-service.interface";
+import type { IUserService } from "@/services/interfaces/user-service.interface";
 import { Socket } from "socket.io";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";

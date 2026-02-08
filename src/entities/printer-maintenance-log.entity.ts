@@ -1,11 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  ManyToOne,
-  PrimaryGeneratedColumn
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Printer } from "@/entities/printer.entity";
 import { User } from "@/entities/user.entity";
 
@@ -17,7 +10,7 @@ export class PrinterMaintenanceLog {
 
   @CreateDateColumn()
   createdAt: Date;
-  @Column({ nullable: false, })
+  @Column({ nullable: false })
   createdBy: string;
   @ManyToOne(() => User, { onDelete: "SET NULL", nullable: true })
   createdByUser: User | null;

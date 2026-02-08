@@ -2,7 +2,7 @@ import { errorSummary } from "@/utils/error.utils";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { captureException } from "@sentry/node";
 import { API_STATE } from "@/shared/dtos/api-state.type";
 import { OctoprintType } from "@/services/printer-api.interface";

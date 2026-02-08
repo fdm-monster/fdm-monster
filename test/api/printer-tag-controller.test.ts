@@ -1,8 +1,5 @@
 import { setupTestApp } from "../test-server";
-import {
-  expectNotFoundResponse,
-  expectOkResponse,
-} from "../extensions";
+import { expectNotFoundResponse, expectOkResponse } from "../extensions";
 import { createTestPrinter } from "./test-data/create-printer";
 import { createTestTag, tagRoute } from "./test-data/create-tag";
 import { Tag } from "@/entities";
@@ -99,7 +96,6 @@ describe(PrinterTagController.name, () => {
         printers: expect.any(Array),
       });
     });
-
 
     it("should strip id from body if provided", async () => {
       const response = await request.post(tagRoute).send({
@@ -397,4 +393,3 @@ describe(PrinterTagController.name, () => {
     });
   });
 });
-

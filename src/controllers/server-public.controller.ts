@@ -6,7 +6,7 @@ import { PERMS } from "@/constants/authorization.constants";
 import { SettingsStore } from "@/state/settings.store";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import { MonsterPiService } from "@/services/core/monsterpi.service";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 
 @route(AppConstants.apiRoute)
 export class ServerPublicController {

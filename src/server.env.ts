@@ -13,9 +13,9 @@ export function setupEnvConfig() {
   if (!environment || !AppConstants.knownEnvNames.includes(environment)) {
     const newEnvName = AppConstants.defaultProductionEnv;
     process.env[AppConstants.NODE_ENV_KEY] = newEnvName;
-    logger.warn(`NODE_ENV=${ environment } was not set, or not known. Defaulting to NODE_ENV=${ newEnvName }`);
+    logger.warn(`NODE_ENV=${environment} was not set, or not known. Defaulting to NODE_ENV=${newEnvName}`);
   } else {
-    logger.log(`✓ NODE_ENV variable correctly set (${ environment })`);
+    logger.log(`✓ NODE_ENV variable correctly set (${environment})`);
   }
 
   ensurePackageVersionSet();
@@ -35,9 +35,8 @@ function ensurePackageVersionSet() {
   const packageJsonVersion = packageJson.version;
   process.env[AppConstants.VERSION_KEY] ??= packageJsonVersion;
 
-  logger.log(`✓ Running server version ${ process.env[AppConstants.VERSION_KEY] }`);
+  logger.log(`✓ Running server version ${process.env[AppConstants.VERSION_KEY]}`);
 }
-
 
 export function fetchServerPort() {
   let port = process.env[AppConstants.SERVER_PORT_KEY];
@@ -62,7 +61,7 @@ export function setupSentry() {
   });
 
   process.on("unhandledRejection", (e) => {
-    const message = `Unhandled rejection error - ${ errorSummary(e) }`;
+    const message = `Unhandled rejection error - ${errorSummary(e)}`;
     logger.error(message);
 
     // The server must not crash
@@ -75,8 +74,8 @@ export function ensurePortSet() {
   fetchServerPort();
 
   if (!process.env[AppConstants.SERVER_PORT_KEY]) {
-    logger.log(`~ ${ AppConstants.SERVER_PORT_KEY } environment variable is not set`);
-    logger.log(`Please make sure to read ${ AppConstants.docsUrl } for more information.`);
+    logger.log(`~ ${AppConstants.SERVER_PORT_KEY} environment variable is not set`);
+    logger.log(`Please make sure to read ${AppConstants.docsUrl} for more information.`);
     process.env[AppConstants.SERVER_PORT_KEY] = AppConstants.defaultServerPort.toString();
   }
 }

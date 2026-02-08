@@ -1,11 +1,11 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { authorizeRoles, authenticate } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { FileStorageService } from "@/services/file-storage.service";
 import { MulterService } from "@/services/core/multer.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { BadRequestException } from "@/exceptions/runtime.exceptions";
@@ -197,8 +197,8 @@ export class FileStorageController {
         return;
       }
 
-      const mimeType = isJPG ? 'image/jpeg' : 'image/png';
-      const base64 = thumbnail.toString('base64');
+      const mimeType = isJPG ? "image/jpeg" : "image/png";
+      const base64 = thumbnail.toString("base64");
       res.send({
         thumbnailBase64: `data:${mimeType};base64,${base64}`,
       });
@@ -215,7 +215,7 @@ export class FileStorageController {
   @POST()
   @route("/upload")
   async uploadFile(req: Request, res: Response) {
-    const acceptedExtensions = ['.gcode', '.3mf', '.bgcode'];
+    const acceptedExtensions = [".gcode", ".3mf", ".bgcode"];
     const files = await this.multerService.multerLoadFileAsync(req, res, acceptedExtensions, true);
 
     if (!files?.length) {

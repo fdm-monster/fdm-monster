@@ -19,13 +19,13 @@ describe("3MF Thumbnail Extraction", () => {
     // Add a minimal 3dmodel.model file
     zip.addFile(
       "3D/3dmodel.model",
-      Buffer.from('<model xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"></model>', "utf8")
+      Buffer.from('<model xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"></model>', "utf8"),
     );
 
     // Add a small PNG thumbnail (1x1 red pixel)
     const redPixelPng = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==",
-      "base64"
+      "base64",
     );
     zip.addFile("Metadata/thumbnail_256x256.png", redPixelPng);
 
@@ -80,7 +80,7 @@ G28 ; home
     // Add thumbnail
     const thumbnailPng = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==",
-      "base64"
+      "base64",
     );
     zip.addFile("Metadata/plate_1_thumbnail_128x128.png", thumbnailPng);
 
@@ -115,4 +115,3 @@ G28 ; home
     }
   });
 });
-

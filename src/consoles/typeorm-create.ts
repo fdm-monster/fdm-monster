@@ -105,4 +105,3 @@ main().then(() => {
   // exit process if no errors
   process.exit(0);
 });
-

@@ -151,7 +151,7 @@ describe(OctoprintClient.name, () => {
           origin: "local",
           refs: {},
           prints: {},
-          statistics: {}
+          statistics: {},
         },
         {
           name: "folder1",
@@ -166,7 +166,7 @@ describe(OctoprintClient.name, () => {
               origin: "local",
               refs: {},
               prints: {},
-              statistics: {}
+              statistics: {},
             },
             {
               name: "subfolder",
@@ -181,24 +181,39 @@ describe(OctoprintClient.name, () => {
                   origin: "local",
                   refs: {},
                   prints: {},
-                  statistics: {}
-                }
-              ]
-            }
-          ]
-        }
-      ]
+                  statistics: {},
+                },
+              ],
+            },
+          ],
+        },
+      ],
     };
 
     nock(printerURL).get("/api/files/local").query("recursive=true").reply(200, nestedStructure);
     const filesResult = await octoprintClient.getLocalFiles(auth, true);
 
     expect(filesResult).toHaveLength(5);
-    expect(filesResult.find(f => f.path === "root-file.gcode")).toMatchObject({ path: "root-file.gcode", size: 1000, dir: false });
-    expect(filesResult.find(f => f.path === "folder1")).toMatchObject({ path: "folder1", dir: true });
-    expect(filesResult.find(f => f.path === "folder1/nested-file.gcode")).toMatchObject({ path: "folder1/nested-file.gcode", size: 2000, dir: false });
-    expect(filesResult.find(f => f.path === "folder1/subfolder")).toMatchObject({ path: "folder1/subfolder", dir: true });
-    expect(filesResult.find(f => f.path === "folder1/subfolder/deep-file.gcode")).toMatchObject({ path: "folder1/subfolder/deep-file.gcode", size: 3000, dir: false });
+    expect(filesResult.find((f) => f.path === "root-file.gcode")).toMatchObject({
+      path: "root-file.gcode",
+      size: 1000,
+      dir: false,
+    });
+    expect(filesResult.find((f) => f.path === "folder1")).toMatchObject({ path: "folder1", dir: true });
+    expect(filesResult.find((f) => f.path === "folder1/nested-file.gcode")).toMatchObject({
+      path: "folder1/nested-file.gcode",
+      size: 2000,
+      dir: false,
+    });
+    expect(filesResult.find((f) => f.path === "folder1/subfolder")).toMatchObject({
+      path: "folder1/subfolder",
+      dir: true,
+    });
+    expect(filesResult.find((f) => f.path === "folder1/subfolder/deep-file.gcode")).toMatchObject({
+      path: "folder1/subfolder/deep-file.gcode",
+      size: 3000,
+      dir: false,
+    });
   });
 
   it("should not throw error on getFile", async () => {

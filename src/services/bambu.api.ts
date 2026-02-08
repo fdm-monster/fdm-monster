@@ -9,14 +9,14 @@ import {
   uploadFileInputSchema,
 } from "@/services/printer-api.interface";
 import { LoggerService } from "@/handlers/logger";
-import { LoginDto } from "@/services/interfaces/login.dto";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { LoginDto } from "@/services/interfaces/login.dto";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { BambuClient } from "@/services/bambu/bambu.client";
 import { BambuMqttAdapter } from "@/services/bambu/bambu-mqtt.adapter";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { AxiosPromise, AxiosResponse } from "axios";
-import { ServerConfigDto } from "./moonraker/dto/server/server-config.dto";
-import { SettingsDto } from "./octoprint/dto/settings/settings.dto";
+import type { ServerConfigDto } from "./moonraker/dto/server/server-config.dto";
+import type { SettingsDto } from "./octoprint/dto/settings/settings.dto";
 import { statSync } from "node:fs";
 
 const defaultLog = { adapter: "bambu-lab" };
@@ -225,8 +225,8 @@ export class BambuApi implements IPrinterApi {
     });
 
     return {
-      dirs: mapped.filter(i => i.dir),
-      files: mapped.filter(i => !i.dir),
+      dirs: mapped.filter((i) => i.dir),
+      files: mapped.filter((i) => !i.dir),
     };
   }
 
@@ -247,7 +247,7 @@ export class BambuApi implements IPrinterApi {
       headers: {
         "content-type": "application/octet-stream",
         "content-length": String(stats.size),
-        "content-disposition": `attachment; filename="${ filename }"`,
+        "content-disposition": `attachment; filename="${filename}"`,
       },
       config: {
         headers: {} as any,

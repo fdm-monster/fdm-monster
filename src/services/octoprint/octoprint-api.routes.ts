@@ -56,7 +56,8 @@ export class OctoprintRoutes {
 
   downloadFileLocal = (path: string) => `${this.octoPrintBase}downloads/files/local/${path}`;
 
-  apiGetFiles = (recursive = false, path = "") => `${this.apiFiles}/local${path ? `/${path}` : ''}?recursive=${recursive}`;
+  apiGetFiles = (recursive = false, path = "") =>
+    `${this.apiFiles}/local${path ? `/${path}` : ""}?recursive=${recursive}`;
 
   selectCommand(print = false) {
     return { command: "select", print };

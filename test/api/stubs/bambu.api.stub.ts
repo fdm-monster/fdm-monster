@@ -220,8 +220,8 @@ export class BambuApiStub implements IPrinterApi {
     });
 
     return {
-      dirs: mapped.filter(i => i.dir),
-      files: mapped.filter(i => !i.dir),
+      dirs: mapped.filter((i) => i.dir),
+      files: mapped.filter((i) => !i.dir),
     };
   }
 

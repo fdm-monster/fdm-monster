@@ -7,7 +7,7 @@ import { checkVersionSatisfiesMinimum, getMaximumOfVersionsSafe } from "@/utils/
 import { AppConstants } from "@/server.constants";
 import { GithubService } from "@/services/core/github.service";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { compare } from "semver";
 import { errorSummary } from "@/utils/error.utils";
 import { ExternalServiceError, InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";

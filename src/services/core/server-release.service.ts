@@ -2,7 +2,7 @@ import semver from "semver";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
 import { GithubService } from "@/services/core/github.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { Octokit } from "octokit";
 
 export class ServerReleaseService {

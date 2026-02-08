@@ -1,7 +1,7 @@
 import { AppConstants } from "@/server.constants";
 import { CloseEvent, Data, ErrorEvent, Event as WsEvent, WebSocket } from "ws";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 
 export abstract class WebsocketAdapter {
   socket?: WebSocket;

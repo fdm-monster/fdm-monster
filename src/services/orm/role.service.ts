@@ -1,12 +1,13 @@
 import { BaseService } from "@/services/orm/base.service";
-import { IRoleService } from "@/services/interfaces/role-service.interface";
+import type { IRoleService } from "@/services/interfaces/role-service.interface";
 import { Role } from "@/entities";
 import { SettingsStore } from "@/state/settings.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { RoleDto } from "@/services/interfaces/role.dto";
 import { union } from "lodash-es";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { PermissionName, ROLE_PERMS, RoleName, ROLES } from "@/constants/authorization.constants";
+import { ROLE_PERMS, ROLES } from "@/constants/authorization.constants";
+import type { PermissionName, RoleName } from "@/constants/authorization.constants";
 
 export class RoleService extends BaseService(Role, RoleDto) implements IRoleService {
   constructor(

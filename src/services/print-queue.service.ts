@@ -2,7 +2,7 @@ import { Repository, Not, IsNull } from "typeorm";
 import { PrintJob } from "@/entities/print-job.entity";
 import { Printer } from "@/entities/printer.entity";
 import EventEmitter2 from "eventemitter2";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
@@ -62,12 +62,27 @@ export class PrintQueueService implements IPrintQueueService {
     this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(PrintQueueService.name);
 
-    this.eventEmitter2.on("printQueue.jobSubmitted", (event: { printerId: number; jobId: number; fileName: string; fileStorageId?: string; queuePosition?: number | null }) => {
-      this.handleJobSubmission(event.printerId, event.jobId, event.fileName, event.fileStorageId, event.queuePosition).catch((error) => {
-        this.logger.error(`Failed to handle job submission for job ${event.jobId}`, error);
-        captureException(error);
-      });
-    });
+    this.eventEmitter2.on(
+      "printQueue.jobSubmitted",
+      (event: {
+        printerId: number;
+        jobId: number;
+        fileName: string;
+        fileStorageId?: string;
+        queuePosition?: number | null;
+      }) => {
+        this.handleJobSubmission(
+          event.printerId,
+          event.jobId,
+          event.fileName,
+          event.fileStorageId,
+          event.queuePosition,
+        ).catch((error) => {
+          this.logger.error(`Failed to handle job submission for job ${event.jobId}`, error);
+          captureException(error);
+        });
+      },
+    );
   }
 
   private isPrinterConnected(printerId: number): { connected: boolean; reason?: string } {
@@ -94,7 +109,7 @@ export class PrintQueueService implements IPrintQueueService {
   async addToQueue(printerId: number, jobId: number, position?: number): Promise<void> {
     const job = await this.printJobRepository.findOne({ where: { id: jobId } });
     if (!job) {
-      throw new Error(`Print job ${ jobId } not found`);
+      throw new Error(`Print job ${jobId} not found`);
     }
 
     this.ensurePrinterAssignment(job, printerId);
@@ -110,7 +125,7 @@ export class PrintQueueService implements IPrintQueueService {
     job.status = "QUEUED";
     await this.printJobRepository.save(job);
 
-    this.logger.log(`Added job ${ jobId } to printer ${ printerId } queue at position ${ job.queuePosition }`);
+    this.logger.log(`Added job ${jobId} to printer ${printerId} queue at position ${job.queuePosition}`);
     this.eventEmitter2.emit("printQueue.jobAdded", {
       printerId,
       jobId,
@@ -121,7 +136,7 @@ export class PrintQueueService implements IPrintQueueService {
   async removeFromQueue(jobId: number): Promise<void> {
     const job = await this.printJobRepository.findOne({ where: { id: jobId } });
     if (!job) {
-      throw new Error(`Print job ${ jobId } not found`);
+      throw new Error(`Print job ${jobId} not found`);
     }
 
     const printerId = job.printerId;
@@ -137,7 +152,7 @@ export class PrintQueueService implements IPrintQueueService {
       await this.compactQueuePositions(printerId, oldPosition);
     }
 
-    this.logger.log(`Removed job ${ jobId } from queue`);
+    this.logger.log(`Removed job ${jobId} from queue`);
     this.eventEmitter2.emit("printQueue.jobRemoved", {
       printerId,
       jobId,
@@ -154,7 +169,7 @@ export class PrintQueueService implements IPrintQueueService {
       order: { queuePosition: "ASC" },
     });
 
-    return jobs.map(j => ({
+    return jobs.map((j) => ({
       id: j.id,
       fileName: j.fileName,
       queuePosition: j.queuePosition!,
@@ -174,12 +189,11 @@ export class PrintQueueService implements IPrintQueueService {
         printerId: "ASC",
         queuePosition: "ASC",
       },
-      relations: ['printer'],
+      relations: ["printer"],
       take: pageSize,
       skip: skip,
     });
   }
-
 
   async getNextInQueue(printerId: number): Promise<PrintJob | null> {
     return this.printJobRepository.findOne({
@@ -201,7 +215,7 @@ export class PrintQueueService implements IPrintQueueService {
       }
     }
 
-    this.logger.log(`Reordered queue for printer ${ printerId }`);
+    this.logger.log(`Reordered queue for printer ${printerId}`);
     this.eventEmitter2.emit("printQueue.reordered", { printerId });
   }
 
@@ -219,7 +233,7 @@ export class PrintQueueService implements IPrintQueueService {
       await this.printJobRepository.save(job);
     }
 
-    this.logger.log(`Cleared queue for printer ${ printerId } (${ jobs.length } jobs)`);
+    this.logger.log(`Cleared queue for printer ${printerId} (${jobs.length} jobs)`);
     this.eventEmitter2.emit("printQueue.cleared", { printerId });
   }
 
@@ -227,11 +241,11 @@ export class PrintQueueService implements IPrintQueueService {
     const nextJob = await this.getNextInQueue(printerId);
 
     if (!nextJob) {
-      this.logger.log(`No jobs in queue for printer ${ printerId }`);
+      this.logger.log(`No jobs in queue for printer ${printerId}`);
       return null;
     }
 
-    this.logger.log(`Processing queue: next job is ${ nextJob.id } (${ nextJob.fileName })`);
+    this.logger.log(`Processing queue: next job is ${nextJob.id} (${nextJob.fileName})`);
 
     this.eventEmitter2.emit("printQueue.processNext", {
       printerId,
@@ -243,7 +257,6 @@ export class PrintQueueService implements IPrintQueueService {
     return nextJob;
   }
 
-
   private ensurePrinterAssignment(job: PrintJob, printerId: number): void {
     if (!job.printerId) {
       job.printerId = printerId;
@@ -251,7 +264,6 @@ export class PrintQueueService implements IPrintQueueService {
       throw new Error(`Job ${job.id} belongs to printer ${job.printerId}, cannot submit to printer ${printerId}`);
     }
   }
-
 
   private async getMaxQueuePosition(printerId: number): Promise<number | null> {
     const result = await this.printJobRepository
@@ -287,7 +299,7 @@ export class PrintQueueService implements IPrintQueueService {
     const job = await this.printJobRepository.findOne({ where: { id: jobId } });
 
     if (!job) {
-      throw new Error(`Print job ${ jobId } not found`);
+      throw new Error(`Print job ${jobId} not found`);
     }
 
     this.ensurePrinterAssignment(job, printerId);
@@ -303,7 +315,7 @@ export class PrintQueueService implements IPrintQueueService {
     job.startedAt = new Date();
     await this.printJobRepository.save(job);
 
-    this.logger.log(`Submitting job ${ jobId } (${ job.fileName }) to printer ${ printerId }`);
+    this.logger.log(`Submitting job ${jobId} (${job.fileName}) to printer ${printerId}`);
     this.eventEmitter2.emit("printQueue.jobSubmitted", {
       printerId,
       jobId: job.id,
@@ -313,26 +325,32 @@ export class PrintQueueService implements IPrintQueueService {
     });
   }
 
-  private async handleJobSubmission(printerId: number, jobId: number, fileName: string, fileStorageId?: string, queuePosition?: number | null): Promise<void> {
+  private async handleJobSubmission(
+    printerId: number,
+    jobId: number,
+    fileName: string,
+    fileStorageId?: string,
+    queuePosition?: number | null,
+  ): Promise<void> {
     this.logger.log(`Handling job submission for job ${jobId} on printer ${printerId}`);
 
     try {
       if (!fileStorageId) {
-        throw new Error(`Job ${ jobId } has no fileStorageId - cannot submit to printer`);
+        throw new Error(`Job ${jobId} has no fileStorageId - cannot submit to printer`);
       }
       const printerApi = this.printerApiFactory.getById(printerId);
 
       const fileSize = this.fileStorageService.getFileSize(fileStorageId);
       const fileStream = this.fileStorageService.readFileStream(fileStorageId);
 
-      this.logger.log(`Uploading file ${ fileName } to printer ${ printerId } and starting print`);
+      this.logger.log(`Uploading file ${fileName} to printer ${printerId} and starting print`);
       await printerApi.uploadFile({
         stream: fileStream,
         fileName,
         contentLength: fileSize,
         startPrint: true,
       });
-      this.logger.log(`Successfully submitted job ${ jobId } to printer ${ printerId }`);
+      this.logger.log(`Successfully submitted job ${jobId} to printer ${printerId}`);
 
       if (queuePosition !== null && queuePosition !== undefined) {
         const job = await this.printJobRepository.findOne({ where: { id: jobId } });
@@ -343,9 +361,8 @@ export class PrintQueueService implements IPrintQueueService {
           this.logger.log(`Removed job ${jobId} from queue after successful submission`);
         }
       }
-
     } catch (error) {
-      this.logger.error(`Failed to submit job ${ jobId } to printer ${ printerId }`, error);
+      this.logger.error(`Failed to submit job ${jobId} to printer ${printerId}`, error);
 
       try {
         const job = await this.printJobRepository.findOne({ where: { id: jobId } });
@@ -357,11 +374,10 @@ export class PrintQueueService implements IPrintQueueService {
           this.logger.log(`Updated job ${jobId} status to FAILED (still in queue for retry)`);
         }
       } catch (updateError) {
-        this.logger.error(`Failed to update job ${ jobId } status after submission error`, updateError);
+        this.logger.error(`Failed to update job ${jobId} status after submission error`, updateError);
       }
 
       throw error;
     }
   }
 }
-

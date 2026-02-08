@@ -24,7 +24,7 @@ import { RoleService } from "./services/orm/role.service";
 import { PermissionService } from "./services/orm/permission.service";
 import { ROLES } from "./constants/authorization.constants";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
-import { ConfigService, IConfigService } from "./services/core/config.service";
+import { ConfigService, type IConfigService } from "./services/core/config.service";
 import { SocketIoGateway } from "./state/socket-io.gateway";
 import { ClientBundleService } from "./services/core/client-bundle.service";
 import { FloorStore } from "./state/floor.store";

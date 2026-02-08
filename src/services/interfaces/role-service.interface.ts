@@ -1,6 +1,6 @@
-import { RoleDto } from "@/services/interfaces/role.dto";
+import type { RoleDto } from "@/services/interfaces/role.dto";
 import { Role } from "@/entities";
-import { PermissionName, RoleName } from "@/constants/authorization.constants";
+import type { PermissionName, RoleName } from "@/constants/authorization.constants";
 
 export interface IRoleService<Entity = Role> {
   toDto(role: Entity): RoleDto;

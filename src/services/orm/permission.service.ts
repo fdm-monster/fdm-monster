@@ -1,5 +1,6 @@
-import { IPermissionService } from "@/services/interfaces/permission.service.interface";
-import { flattenPermissionDefinition, PermissionName } from "@/constants/authorization.constants";
+import type { IPermissionService } from "@/services/interfaces/permission.service.interface";
+import { flattenPermissionDefinition } from "@/constants/authorization.constants";
+import type { PermissionName } from "@/constants/authorization.constants";
 
 export class PermissionService implements IPermissionService {
   private _permissions: PermissionName[] = [];

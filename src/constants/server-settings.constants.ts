@@ -43,7 +43,7 @@ export const getDefaultFrontendSettings = (): FrontendSettingsDto => ({
   gridRows: 2,
   largeTiles: false,
   tilePreferCancelOverQuickStop: false,
-  gridNameSortDirection: 'horizontal',
+  gridNameSortDirection: "horizontal",
 });
 
 export const timeoutSettingKey = "timeout";
@@ -51,7 +51,6 @@ export const getDefaultTimeout = (): TimeoutSettingsDto => ({
   apiTimeout: 10000,
   apiUploadTimeout: 30000,
 });
-
 
 export const getDefaultSettings = () => ({
   [serverSettingsKey]: getDefaultServerSettings(),

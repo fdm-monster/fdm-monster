@@ -1,10 +1,10 @@
 import { WebsocketAdapter } from "@/shared/websocket.adapter";
-import { JsonRpcResponseDto } from "@/services/moonraker/dto/rpc/json-rpc-response.dto";
+import type { JsonRpcResponseDto } from "@/services/moonraker/dto/rpc/json-rpc-response.dto";
 import { Data } from "ws";
-import { JsonRpcRequestDto } from "@/services/moonraker/dto/rpc/json-rpc-request.dto";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { JsonRpcRequestDto } from "@/services/moonraker/dto/rpc/json-rpc-request.dto";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
-import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-event.dto";
+import type { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-event.dto";
 
 export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
   protected declare logger: LoggerService;
@@ -25,7 +25,10 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     this.requestMap = new Map();
   }
 
-  sendRequest<R, I = any>(request: JsonRpcRequestDto<I>, options?: { timeout: number }): Promise<JsonRpcResponseDto<R>> {
+  sendRequest<R, I = any>(
+    request: JsonRpcRequestDto<I>,
+    options?: { timeout: number },
+  ): Promise<JsonRpcResponseDto<R>> {
     if (!this.socket) {
       throw new Error("Websocket was not created, cannot send request");
     }
@@ -35,10 +38,13 @@ export abstract class WebsocketRpcExtendedAdapter extends WebsocketAdapter {
     // Create a registered promise for the response
     const requestId = request.id;
     const promise = new Promise<JsonRpcResponseDto<R>>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        this.clearRequest(requestId);
-        reject(new Error(`Websocket RPC Request by ID ${requestId} timed out`));
-      }, Math.min(3000, options?.timeout ?? 10000));
+      const timeout = setTimeout(
+        () => {
+          this.clearRequest(requestId);
+          reject(new Error(`Websocket RPC Request by ID ${requestId} timed out`));
+        },
+        Math.min(3000, options?.timeout ?? 10000),
+      );
 
       this.requestMap.set(requestId, { resolve, reject, timeout });
     });
