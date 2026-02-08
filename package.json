@@ -66,7 +66,7 @@
     "@octokit/plugin-throttling": "8.2.0",
     "@sentry/node": "10.38.0",
     "adm-zip": "0.5.16",
-    "awilix": "12.0.5",
+    "awilix": "12.1.0",
     "awilix-express": "9.0.2",
     "axios": "1.13.5",
     "basic-ftp": "5.1.0",
