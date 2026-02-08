@@ -2,7 +2,7 @@ import { AppConstants } from "@/server.constants";
 import nock from "nock";
 import { NockRecordingEntry } from "./nock-recording-entry.interface";
 
-module.exports = async () => {
+export async function setup() {
   nock.recorder.rec({
     logging: (content) => {
       const entry = JSON.parse(content.replace(/<<<<<<-- cut here -->>>>>>/g, "")) as NockRecordingEntry;
@@ -20,4 +20,4 @@ module.exports = async () => {
   process.env[AppConstants.ENABLE_PROMETHEUS_METRICS] = "false";
   process.env[AppConstants.ENABLE_LOKI_LOGGING] = "false";
   process.env["NODE_NO_WARNINGS"] = "1";
-};
+}

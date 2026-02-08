@@ -1,5 +1,3 @@
-import dotenv from "dotenv";
-import { join } from "node:path";
 import { captureException, flush } from "@sentry/node";
 import { setupEnvConfig } from "./server.env";
 import { setupServer } from "./server.core";
@@ -7,7 +5,6 @@ import { DITokens } from "./container.tokens";
 import { ServerHost } from "@/server.host";
 import { LoggerService as Logger } from "@/handlers/logger";
 import { createStaticLogger } from "@/handlers/logging/static.logger";
-import { superRootPath } from "@/utils/fs.utils";
 
 createStaticLogger({ enableFileLogs: true });
 const logger = new Logger("FDM-Environment");

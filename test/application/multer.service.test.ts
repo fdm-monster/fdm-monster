@@ -1,9 +1,17 @@
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
 import { MulterService } from "@/services/core/multer.service";
+import { existsSync, readdirSync } from "fs";
+import { Dirent, PathLike } from "node:fs";
 
-const fs = require("fs");
-jest.mock("fs");
+type ReaddirSyncWithDirent = (path: PathLike, options: { withFileTypes: true }) => Dirent[];
+
+vi.mock("fs", () => ({
+  existsSync: vi.fn(),
+  readdirSync: vi.fn(),
+  unlinkSync: vi.fn(),
+  rmSync: vi.fn(),
+}));
 
 let container;
 let multerService: MulterService;
@@ -15,12 +23,12 @@ beforeAll(async () => {
 
 describe("MulterService", () => {
   it("should clear folder", () => {
-    fs.existsSync.mockReturnValue(true);
-    fs.readdirSync.mockReturnValue([
+    vi.mocked(existsSync).mockReturnValue(true);
+    vi.mocked<ReaddirSyncWithDirent>(readdirSync).mockReturnValue([
       {
         name: "somefile.gcode",
         isDirectory: () => false,
-      },
+      } as Dirent,
     ]);
     multerService.clearUploadsFolder();
   });

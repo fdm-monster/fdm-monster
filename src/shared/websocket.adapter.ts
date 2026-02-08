@@ -8,7 +8,7 @@ export abstract class WebsocketAdapter {
   protected logger: LoggerService;
   eventEmittingAllowed: boolean = true;
 
-  constructor(loggerFactory: ILoggerFactory) {
+  protected constructor(loggerFactory: ILoggerFactory) {
     this.logger = loggerFactory(WebsocketAdapter.name);
   }
 
