@@ -1,6 +1,6 @@
 import AdmZip from "adm-zip";
 import { join } from "node:path";
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
 import { ensureDirExists, getMediaPath } from "@/utils/fs.utils";
 import { checkVersionSatisfiesMinimum, getMaximumOfVersionsSafe } from "@/utils/semver.utils";
@@ -270,8 +270,11 @@ export class ClientBundleService {
       return null;
     }
 
-    require.cache[path] = undefined;
-    const json = require(path);
-    return json?.version ?? null;
+    try {
+      const json = JSON.parse(readFileSync(path, "utf-8"));
+      return json?.version ?? null;
+    } catch {
+      return null;
+    }
   }
 }

@@ -134,7 +134,6 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
       const completion = payload?.progress?.completion;
 
       if (flags?.printing && filePath) {
-        // Ensure a job exists and set STARTED
         const printerName = await this.getPrinterName(printerId);
         const job = await this.printJobService.markStarted(printerId, filePath, printerName);
 
@@ -155,7 +154,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
           await this.printJobService.updateJobMetadata(printerId, filePath, {
             gcodePrintTimeSeconds: estimatedTime ? Math.round(estimatedTime) : null,
-            nozzleDiameterMm: null, // Not in websocket data
+            nozzleDiameterMm: null,
             filamentDiameterMm: null,
             filamentDensityGramsCm3: null,
             filamentUsedMm: filament?.length ? Math.round(filament.length) : null,

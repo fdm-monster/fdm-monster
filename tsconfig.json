@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "commonjs",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
     "allowJs": true,
     "removeComments": true,
     "resolveJsonModule": true,
