@@ -1,6 +1,7 @@
 import nock from "nock";
 import { createStaticLogger } from "@/handlers/logging/static.logger";
-const jestConsole = console;
+
+const vitestConsole = console;
 
 beforeAll(async () => {
   nock.disableNetConnect();
@@ -29,16 +30,24 @@ beforeAll(async () => {
   //   });
   // });
 
+  // Log when nock intercepts a request successfully
+  // nock.emitter.on("replied", (req) => {
+  //   console.log("✅ Nock - Intercepted request:", {
+  //     method: req.method,
+  //     host: req.host,
+  //     path: req.path,
+  //   });
+  // });
+
   createStaticLogger({ enableFileLogs: false });
 });
 
-// https://github.com/jestjs/jest/issues/10322
 beforeEach(() => {
-  global.console = require("console");
+  globalThis.console = console;
 });
 
 afterEach(() => {
-  global.console = jestConsole;
+  globalThis.console = vitestConsole;
 });
 
 afterAll(async () => {

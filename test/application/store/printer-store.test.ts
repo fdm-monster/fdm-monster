@@ -2,6 +2,7 @@ import { validNewPrinterState } from "../test-data/printer.data";
 import { PrinterCache } from "@/state/printer.cache";
 import { DITokens } from "@/container.tokens";
 import { configureContainer } from "@/container";
+import { asValue } from "awilix";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
@@ -12,7 +13,6 @@ import { createPrinterSchema } from "@/services/validators/printer-service.valid
 import { OctoprintType, BambuType } from "@/services/printer-api.interface";
 import { SettingsStore } from "@/state/settings.store";
 
-jest.mock("@/services/octoprint/octoprint.client");
 
 let printerService: IPrinterService;
 let printerCache: PrinterCache;
@@ -22,6 +22,30 @@ let settingsStore: SettingsStore;
 
 beforeAll(async () => {
   const container = configureContainer();
+
+  // Mock HttpClientFactory to prevent real HTTP requests
+  const mockAxiosInstance = {
+    get: vi.fn().mockResolvedValue({ data: {} }),
+    post: vi.fn().mockResolvedValue({ data: {} }),
+    put: vi.fn().mockResolvedValue({ data: {} }),
+    patch: vi.fn().mockResolvedValue({ data: {} }),
+    delete: vi.fn().mockResolvedValue({ data: {} }),
+    request: vi.fn().mockResolvedValue({ data: {} }),
+    defaults: { headers: { common: {} } },
+    interceptors: {
+      request: { use: vi.fn(), eject: vi.fn() },
+      response: { use: vi.fn(), eject: vi.fn() },
+    },
+  };
+
+  container.register({
+    [DITokens.httpClientFactory]: asValue({
+      createClient: vi.fn().mockReturnValue(mockAxiosInstance),
+      createDefaultClient: vi.fn().mockReturnValue(mockAxiosInstance),
+      createClientWithBaseUrl: vi.fn().mockReturnValue(mockAxiosInstance),
+    }),
+  });
+
   await container.resolve<TypeormService>(DITokens.typeormService).createConnection();
   await container.resolve(DITokens.settingsStore).loadSettings();
   testPrinterSocketStore = container.resolve(DITokens.testPrinterSocketStore);

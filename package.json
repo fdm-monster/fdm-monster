@@ -139,7 +139,8 @@
     "tsconfig-paths": "4.2.0",
     "tsx": "4.19.2",
     "typescript": "5.9.3",
-    "vitest": "^4.0.18"
+    "unplugin-swc": "1.5.9",
+    "vitest": "4.0.18"
   },
   "ignore-engines": false,
   "engine-strict": true,

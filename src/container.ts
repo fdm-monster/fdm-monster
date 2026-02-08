@@ -73,7 +73,6 @@ import { PrintJobAnalysisTask } from "@/tasks/print-job-analysis.task";
 import { PrintFileDownloaderService } from "@/services/print-file-downloader.service";
 
 export function configureContainer() {
-  // Create the container and set the injectionMode to PROXY (which is also the default).
   const container = createContainer({
     injectionMode: InjectionMode.CLASSIC,
   });
