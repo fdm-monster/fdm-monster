@@ -1,6 +1,7 @@
 import { SwaggerGenerator } from "./generator";
 import { Application, static as expressStatic } from "express";
 import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { AppConstants } from "@/server.constants";
 import { ensureDirExists, getMediaPath } from "@/utils/fs.utils";
 import { LoggerService } from "@/handlers/logger";
@@ -9,8 +10,9 @@ import { writeFile } from "node:fs/promises";
 // Find swagger-ui-dist path
 function getSwaggerUiDistPath(): string {
   try {
-    // Try to resolve from node_modules
-    return dirname(require.resolve("swagger-ui-dist/package.json"));
+    // Try to resolve from node_modules using import.meta.resolve
+    const resolved = import.meta.resolve("swagger-ui-dist/package.json");
+    return dirname(fileURLToPath(resolved));
   } catch {
     // Fallback for different module resolution scenarios
     return join(process.cwd(), "node_modules", "swagger-ui-dist");

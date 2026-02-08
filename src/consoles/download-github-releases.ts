@@ -1,6 +1,9 @@
 import axios from "axios";
 import fs from "fs";
 import path from "path";
+import { getDirname } from "@/utils/fs.utils";
+
+const __dirname = getDirname(import.meta.url);
 
 interface Release {
   tag_name: string;

@@ -11,6 +11,9 @@ import {
   filesSuccessResponse,
   printerHistorySuccessResponse,
 } from "@/consoles/utils/api-messages";
+import { getDirname } from "@/utils/fs.utils";
+
+const __dirname = getDirname(import.meta.url);
 
 // Shared print state (similar to Bambu mock)
 let isPrinting = false;

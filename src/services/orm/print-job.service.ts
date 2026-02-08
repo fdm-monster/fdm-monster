@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
 import { PrintJob, PrintJobMetadata } from "@/entities/print-job.entity";
-import { EventEmitter2 } from "eventemitter2";
+import EventEmitter2 from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
@@ -265,8 +265,6 @@ export class PrintJobService implements IPrintJobService {
   async handlePrintProgress(
     printerId: number,
     progress: number,
-    currentLayer?: number,
-    totalLayers?: number,
   ): Promise<PrintJob | null> {
     const job = await this.printJobRepository.findOne({
       where: { printerId, status: "PRINTING" },
@@ -274,28 +272,20 @@ export class PrintJobService implements IPrintJobService {
     });
 
     if (!job) {
-      this.logger.warn(`No active print job found for printer ${printerId} during progress update`);
       return null;
     }
 
     job.progress = Math.min(100, Math.max(0, progress));
 
-    if (!job.statistics) {
+    if (job.statistics) {
+      job.statistics.progress = job.progress;
+    } else {
       job.statistics = {
         startedAt: job.startedAt,
         endedAt: null,
         actualPrintTimeSeconds: null,
         progress: job.progress,
       };
-    } else {
-      job.statistics.progress = job.progress;
-    }
-
-    if (currentLayer !== undefined) {
-      job.statistics.currentLayer = currentLayer;
-    }
-    if (totalLayers !== undefined) {
-      job.statistics.totalLayers = totalLayers;
     }
 
     await this.printJobRepository.save(job);
@@ -304,8 +294,6 @@ export class PrintJobService implements IPrintJobService {
       jobId: job.id,
       printerId,
       progress: job.progress,
-      currentLayer,
-      totalLayers,
     } as PrintJobProgressEvent);
 
     return job;
@@ -495,28 +483,16 @@ export class PrintJobService implements IPrintJobService {
     });
   }
 
-  // ========== Helper methods for printer middleware integration ==========
-
-  /**
-   * Mark a print as started by fileName (creates job if needed)
-   * Used by printer middleware when they detect a print starting
-   */
   async markStarted(printerId: number, fileName: string, printerName?: string): Promise<PrintJob> {
     return await this.handlePrintStarted(printerId, fileName, undefined, printerName);
   }
 
-  /**
-   * Update print progress by fileName
-   * Used by printer middleware to update progress during printing
-   */
   async markProgress(
     printerId: number,
     fileName: string,
-    progress: number,
-    currentLayer?: number,
-    totalLayers?: number,
+    progress: number
   ): Promise<PrintJob | null> {
-    return await this.handlePrintProgress(printerId, progress, currentLayer, totalLayers);
+    return await this.handlePrintProgress(printerId, progress);
   }
 
   /**
@@ -575,7 +551,7 @@ export class PrintJobService implements IPrintJobService {
     } else {
       // No metadata exists - only create if we have meaningful data
       // Don't create metadata structure with mostly nulls
-      const hasData = Object.values(partialMetadata).some(v => v != null && v !== null);
+      const hasData = Object.values(partialMetadata).some(v => v !== null);
       if (!hasData) {
         this.logger.debug(`Skipping metadata creation for job ${job.id} - no meaningful data provided`);
         return;

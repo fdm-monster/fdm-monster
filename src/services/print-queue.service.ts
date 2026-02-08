@@ -1,7 +1,7 @@
 import { Repository, Not, IsNull } from "typeorm";
 import { PrintJob } from "@/entities/print-job.entity";
 import { Printer } from "@/entities/printer.entity";
-import { EventEmitter2 } from "eventemitter2";
+import EventEmitter2 from "eventemitter2";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { LoggerService } from "@/handlers/logger";

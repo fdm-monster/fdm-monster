@@ -1,4 +1,4 @@
-import { EventEmitter2 } from "eventemitter2";
+import EventEmitter2 from "eventemitter2";
 
 export function configureEventEmitter() {
   return new EventEmitter2({

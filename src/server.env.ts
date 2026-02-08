@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import { readFileSync } from "node:fs";
 import { AppConstants } from "./server.constants";
 import { LoggerService as Logger } from "./handlers/logger";
 import { getEnvOrDefault, isProductionEnvironment, isTestEnvironment } from "./utils/env.utils";
@@ -30,7 +31,8 @@ export function setupEnvConfig() {
 
 function ensurePackageVersionSet() {
   const logger = new Logger("FDM-Environment");
-  const packageJsonVersion = require(packageJsonPath()).version;
+  const packageJson = JSON.parse(readFileSync(packageJsonPath(), "utf-8"));
+  const packageJsonVersion = packageJson.version;
   process.env[AppConstants.VERSION_KEY] ??= packageJsonVersion;
 
   logger.log(`✓ Running server version ${ process.env[AppConstants.VERSION_KEY] }`);

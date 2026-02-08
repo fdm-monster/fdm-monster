@@ -36,7 +36,7 @@ import { PP } from "@/utils/pretty-print.utils";
 import { MoonrakerErrorDto } from "@/services/moonraker/dto/rest/error.dto";
 import { MoonrakerEventDto } from "@/services/moonraker/constants/moonraker-event.dto";
 import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
-import _ from "lodash";
+import _ from "lodash-es";
 import { ConnectionIdentifyResponseDto } from "@/services/moonraker/dto/websocket/connection-identify-response.dto";
 import { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
 import { FdmCurrentMessageDto, MoonrakerType } from "@/services/printer-api.interface";

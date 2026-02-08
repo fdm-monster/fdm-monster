@@ -3,6 +3,9 @@ import { API_METADATA_KEY } from "@/utils/swagger/decorators";
 import { findControllers, FindControllersResult } from "awilix-express";
 import { IRouteConfig, MethodName } from "awilix-router-core/lib/state-util";
 import { LoggerService } from "@/handlers/logger";
+import { getDirname } from "@/utils/fs.utils";
+
+const __dirname = getDirname(import.meta.url);
 
 export class SwaggerGenerator {
   private readonly logger: LoggerService;
@@ -57,6 +60,7 @@ export class SwaggerGenerator {
         cwd: __dirname,
         ignore: ["**/*.map", "**/*.d.ts"],
         absolute: true,
+        esModules: true,
       });
       for (const registration of discoveredControllers) {
         await this.processController(registration);

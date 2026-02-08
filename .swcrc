@@ -20,14 +20,17 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"]
+    },
+    "experimental": {
+      "plugins": []
     }
   },
   "module": {
-    "type": "commonjs",
-    // These are defaults.
+    "type": "es6",
     "strict": true,
     "strictMode": true,
     "lazy": false,
-    "noInterop": false
+    "noInterop": false,
+    "resolveFully": true
   }
 }
