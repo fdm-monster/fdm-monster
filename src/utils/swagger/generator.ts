@@ -6,8 +6,6 @@ import type { IRouteConfig } from "awilix-router-core/lib/state-util";
 import { LoggerService } from "@/handlers/logger";
 import { getDirname } from "@/utils/fs.utils";
 
-const __dirname = getDirname(import.meta.url);
-
 export class SwaggerGenerator {
   private readonly logger: LoggerService;
 
@@ -59,7 +57,7 @@ export class SwaggerGenerator {
     try {
       const routePath = "../../controllers";
       const discoveredControllers = await findControllers(`${routePath}/*.controller.js`, {
-        cwd: __dirname,
+        cwd: getDirname(import.meta.url),
         ignore: ["**/*.map", "**/*.d.ts"],
         absolute: true,
         esModules: true,
