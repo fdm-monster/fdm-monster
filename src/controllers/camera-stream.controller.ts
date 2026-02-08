@@ -1,4 +1,4 @@
-import { route, GET, POST, PUT, DELETE, before } from "awilix-router-core";
+import { route, GET, POST, PUT, DELETE, before } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import type { Request, Response } from "express";

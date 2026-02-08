@@ -1,12 +1,16 @@
-module.exports = {
+export default {
   transform: {
     "^.+\\.(t|j)sx?$": [
       "@swc/jest",
       {
-        sourceMaps: "inline",
+        swcrc: false,
+        configFile: "./.swcrc-test",
       },
     ],
   },
+  transformIgnorePatterns: [
+    "node_modules/(?!lodash-es)"
+  ],
   testEnvironment: "node",
   testTimeout: 5000,
   rootDir: ".",
@@ -20,6 +24,7 @@ module.exports = {
     "docker",
     "node_modules",
     "media",
+    "setups",
   ],
   globalSetup: "./test/setup-global.ts",
   setupFilesAfterEnv: ["jest-27-expect-message", "./test/setup-after-env.ts"],
