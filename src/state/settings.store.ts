@@ -10,8 +10,8 @@ import { getClient } from "@sentry/node";
 import { isTestEnvironment } from "@/utils/env.utils";
 import { AppConstants } from "@/server.constants";
 import { LoggerService } from "@/handlers/logger";
-import { ISettingsService } from "@/services/interfaces/settings.service.interface";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ISettingsService } from "@/services/interfaces/settings.service.interface";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { z } from "zod";
 import {
   credentialCoreSettingUpdateSchema,
@@ -47,7 +47,7 @@ export class SettingsStore {
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
-        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
       },
       [wizardSettingKey]: settings[wizardSettingKey],
       [frontendSettingKey]: settings[frontendSettingKey],
@@ -64,7 +64,7 @@ export class SettingsStore {
         jwtExpiresIn: settings[credentialSettingsKey].jwtExpiresIn,
         refreshTokenAttempts: settings[credentialSettingsKey].refreshTokenAttempts,
         refreshTokenExpiry: settings[credentialSettingsKey].refreshTokenExpiry,
-        slicerApiKey: settings[credentialSettingsKey].slicerApiKey
+        slicerApiKey: settings[credentialSettingsKey].slicerApiKey,
       },
       [serverSettingsKey]: {
         loginRequired: settings[serverSettingsKey].loginRequired,
@@ -72,7 +72,7 @@ export class SettingsStore {
         sentryDiagnosticsEnabled: settings[serverSettingsKey].sentryDiagnosticsEnabled,
         experimentalMoonrakerSupport: settings[serverSettingsKey].experimentalMoonrakerSupport,
         experimentalPrusaLinkSupport: settings[serverSettingsKey].experimentalPrusaLinkSupport,
-        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport
+        experimentalBambuSupport: settings[serverSettingsKey].experimentalBambuSupport,
       },
     });
   }
@@ -198,8 +198,13 @@ export class SettingsStore {
     this.settings = await this.settingsService.updateCoreCredentialSettings(credentialSettings);
   }
 
-  async setRefreshTokenSettings({ refreshTokenAttempts, refreshTokenExpiry, }:
-                                { refreshTokenAttempts: number; refreshTokenExpiry: number; }) {
+  async setRefreshTokenSettings({
+    refreshTokenAttempts,
+    refreshTokenExpiry,
+  }: {
+    refreshTokenAttempts: number;
+    refreshTokenExpiry: number;
+  }) {
     this.throwIfSettingsUnset();
     this.settings![credentialSettingsKey].refreshTokenAttempts = refreshTokenAttempts;
     this.settings![credentialSettingsKey].refreshTokenExpiry = refreshTokenExpiry;

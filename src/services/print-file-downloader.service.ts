@@ -1,6 +1,6 @@
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { EventEmitter2 } from "eventemitter2";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
+import EventEmitter2 from "eventemitter2";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { FileStorageService } from "@/services/file-storage.service";
 import { FileAnalysisService } from "@/services/file-analysis.service";
@@ -32,7 +32,7 @@ export class PrintFileDownloaderService {
     // Register event handler
     this.eventEmitter2.on("printJob.needsFileDownload", (event: { jobId: number }) => {
       this.handleFileDownloadRequest(event.jobId).catch((error) => {
-        this.logger.error(`Failed to handle file download for job ${ event.jobId }`, error);
+        this.logger.error(`Failed to handle file download for job ${event.jobId}`, error);
         captureException(error);
       });
     });
@@ -41,32 +41,32 @@ export class PrintFileDownloaderService {
   }
 
   private async handleFileDownloadRequest(jobId: number): Promise<void> {
-    this.logger.log(`Handling file download request for job ${ jobId }`);
+    this.logger.log(`Handling file download request for job ${jobId}`);
 
     try {
       const job = await this.printJobService.getJobByIdOrFail(jobId);
 
       // Check if already has storage ID (race condition protection)
       if (job.fileStorageId) {
-        this.logger.log(`Job ${ jobId } already has fileStorageId ${ job.fileStorageId } - skipping download`);
+        this.logger.log(`Job ${jobId} already has fileStorageId ${job.fileStorageId} - skipping download`);
         return;
       }
 
       if (!job.printerId) {
-        this.logger.error(`Job ${ jobId } has no printerId - cannot download file`);
+        this.logger.error(`Job ${jobId} has no printerId - cannot download file`);
         return;
       }
 
       const printer = await this.printerCache.getValue(job.printerId);
       if (!printer) {
-        this.logger.error(`Printer ${ job.printerId } not found for job ${ jobId }`);
+        this.logger.error(`Printer ${job.printerId} not found for job ${jobId}`);
         return;
       }
 
       // Get printer API
       const printerApi = this.printerApiFactory.getById(job.printerId);
 
-      this.logger.log(`Downloading file ${ job.fileName } from printer ${ printer.name } (${ printer.printerType })`);
+      this.logger.log(`Downloading file ${job.fileName} from printer ${printer.name} (${printer.printerType})`);
 
       // Download file from printer
       let fileBuffer: Buffer;
@@ -78,32 +78,32 @@ export class PrintFileDownloaderService {
         const stream = response.data;
 
         await new Promise<void>((resolve, reject) => {
-          stream.on('data', (chunk: Buffer) => chunks.push(chunk));
-          stream.on('end', () => resolve());
-          stream.on('error', (err) => reject(err));
+          stream.on("data", (chunk: Buffer) => chunks.push(chunk));
+          stream.on("end", () => resolve());
+          stream.on("error", (err) => reject(err));
         });
 
         fileBuffer = Buffer.concat(chunks);
       } catch (downloadError) {
-        this.logger.error(`Failed to download file from printer: ${ downloadError }`);
+        this.logger.error(`Failed to download file from printer: ${downloadError}`);
 
         // Mark job as failed analysis
         job.analysisState = "FAILED";
-        job.statusReason = `File download failed: ${ downloadError instanceof Error ? downloadError.message : "Unknown error" }`;
+        job.statusReason = `File download failed: ${downloadError instanceof Error ? downloadError.message : "Unknown error"}`;
         await this.printJobService.printJobRepository.save(job);
         return;
       }
 
-      this.logger.log(`Downloaded ${ fileBuffer.length } bytes for job ${ jobId }`);
+      this.logger.log(`Downloaded ${fileBuffer.length} bytes for job ${jobId}`);
 
       // Create temporary file
-      const tempPath = join(tmpdir(), `fdm-monster-download-${ jobId }-${ Date.now() }-${ job.fileName }`);
+      const tempPath = join(tmpdir(), `fdm-monster-download-${jobId}-${Date.now()}-${job.fileName}`);
       writeFileSync(tempPath, fileBuffer);
 
       try {
         // Calculate hash
         const fileHash = await this.fileStorageService.calculateFileHash(tempPath);
-        this.logger.log(`File hash for job ${ jobId }: ${ fileHash.substring(0, 12) }...`);
+        this.logger.log(`File hash for job ${jobId}: ${fileHash.substring(0, 12)}...`);
 
         // Check for duplicate
         const existingJob = await this.fileStorageService.findDuplicateByHash(fileHash);
@@ -116,14 +116,18 @@ export class PrintFileDownloaderService {
           const cachedMetadata = await this.fileStorageService.loadMetadata(existingJob.fileStorageId);
 
           if (cachedMetadata) {
-            this.logger.log(`Duplicate file detected (job ${ existingJob.id }, hash match) - reusing storage ${ existingJob.fileStorageId }`);
+            this.logger.log(
+              `Duplicate file detected (job ${existingJob.id}, hash match) - reusing storage ${existingJob.fileStorageId}`,
+            );
             metadata = {
               ...cachedMetadata,
               fileName: job.fileName,
             };
             fileStorageId = existingJob.fileStorageId;
           } else if (existingJob.analysisState === "ANALYZED" && existingJob.metadata) {
-            this.logger.log(`Duplicate file with DB metadata (job ${ existingJob.id }) - reusing storage ${ existingJob.fileStorageId }`);
+            this.logger.log(
+              `Duplicate file with DB metadata (job ${existingJob.id}) - reusing storage ${existingJob.fileStorageId}`,
+            );
             metadata = {
               ...existingJob.metadata,
               fileName: job.fileName,
@@ -134,7 +138,9 @@ export class PrintFileDownloaderService {
             await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, job.fileName);
           } else {
             // Duplicate hash but not analyzed - reuse storage, analyze file
-            this.logger.log(`Duplicate file not analyzed - reusing storage ${ existingJob.fileStorageId }, analyzing now`);
+            this.logger.log(
+              `Duplicate file not analyzed - reusing storage ${existingJob.fileStorageId}, analyzing now`,
+            );
             const existingFilePath = this.fileStorageService.getFilePath(existingJob.fileStorageId);
             const analysisResult = await this.fileAnalysisService.analyzeFile(existingFilePath);
             metadata = analysisResult.metadata;
@@ -143,12 +149,14 @@ export class PrintFileDownloaderService {
           }
         } else {
           // New file - analyze and store
-          this.logger.log(`Analyzing downloaded file: ${ job.fileName }`);
+          this.logger.log(`Analyzing downloaded file: ${job.fileName}`);
           const analysisResult = await this.fileAnalysisService.analyzeFile(tempPath);
           metadata = analysisResult.metadata;
           const thumbnails = analysisResult.thumbnails;
 
-          this.logger.log(`Analysis complete: format=${ metadata.fileFormat }, layers=${ metadata.totalLayers }, time=${ metadata.gcodePrintTimeSeconds }s, filament=${ metadata.filamentUsedGrams }g`);
+          this.logger.log(
+            `Analysis complete: format=${metadata.fileFormat}, layers=${metadata.totalLayers}, time=${metadata.gcodePrintTimeSeconds}s, filament=${metadata.filamentUsedGrams}g`,
+          );
 
           // Save file to storage (with proper file object simulation)
           const fileObject = {
@@ -159,16 +167,22 @@ export class PrintFileDownloaderService {
           } as Express.Multer.File;
 
           fileStorageId = await this.fileStorageService.saveFile(fileObject, fileHash);
-          this.logger.log(`Saved file to storage: ${ fileStorageId }`);
+          this.logger.log(`Saved file to storage: ${fileStorageId}`);
 
           let thumbnailMetadata: any[] = [];
           if (thumbnails.length > 0) {
             thumbnailMetadata = await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails);
-            this.logger.log(`Saved ${ thumbnailMetadata.length } thumbnail(s) for ${ fileStorageId }`);
+            this.logger.log(`Saved ${thumbnailMetadata.length} thumbnail(s) for ${fileStorageId}`);
           }
 
-          await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, job.fileName, thumbnailMetadata);
-          this.logger.log(`Saved metadata JSON for ${ fileStorageId }`);
+          await this.fileStorageService.saveMetadata(
+            fileStorageId,
+            metadata,
+            fileHash,
+            job.fileName,
+            thumbnailMetadata,
+          );
+          this.logger.log(`Saved metadata JSON for ${fileStorageId}`);
         }
 
         job.fileStorageId = fileStorageId;
@@ -180,30 +194,30 @@ export class PrintFileDownloaderService {
         job.analyzedAt = new Date();
         await this.printJobService.printJobRepository.save(job);
 
-        this.logger.log(`Successfully processed downloaded file for job ${ jobId }: storageId=${ fileStorageId }, analysisState=${ job.analysisState }`);
+        this.logger.log(
+          `Successfully processed downloaded file for job ${jobId}: storageId=${fileStorageId}, analysisState=${job.analysisState}`,
+        );
       } finally {
         try {
           unlinkSync(tempPath);
         } catch (cleanupError) {
-          this.logger.warn(`Failed to clean up temp file ${ tempPath }: ${ cleanupError }`);
+          this.logger.warn(`Failed to clean up temp file ${tempPath}: ${cleanupError}`);
         }
       }
-
     } catch (error) {
-      this.logger.error(`Failed to download and analyze file for job ${ jobId }`, error);
+      this.logger.error(`Failed to download and analyze file for job ${jobId}`, error);
       captureException(error);
 
       try {
         const job = await this.printJobService.printJobRepository.findOne({ where: { id: jobId } });
         if (job) {
           job.analysisState = "FAILED";
-          job.statusReason = `File download/analysis failed: ${ error instanceof Error ? error.message : "Unknown error" }`;
+          job.statusReason = `File download/analysis failed: ${error instanceof Error ? error.message : "Unknown error"}`;
           await this.printJobService.printJobRepository.save(job);
         }
       } catch (updateError) {
-        this.logger.error(`Failed to mark job ${ jobId } as failed`, updateError);
+        this.logger.error(`Failed to mark job ${jobId} as failed`, updateError);
       }
     }
   }
 }
-

@@ -1,10 +1,10 @@
-import { JobDto } from "@/services/octoprint/dto/job/job.dto";
-import { TempsDto } from "@/services/octoprint/dto/printer/temps.dto";
-import { ProgressDto } from "@/services/octoprint/dto/printer/progress.dto";
-import { ResendsDto } from "@/services/octoprint/dto/printer/resends.dto";
-import { StateDto } from "@/services/octoprint/dto/printer/state.dto";
-import { MarkingsDto } from "@/services/octoprint/dto/printer/markings.dto";
-import { BusyFileDto } from "@/services/octoprint/dto/printer/busy-file.dto";
+import type { JobDto } from "@/services/octoprint/dto/job/job.dto";
+import type { TempsDto } from "@/services/octoprint/dto/printer/temps.dto";
+import type { ProgressDto } from "@/services/octoprint/dto/printer/progress.dto";
+import type { ResendsDto } from "@/services/octoprint/dto/printer/resends.dto";
+import type { StateDto } from "@/services/octoprint/dto/printer/state.dto";
+import type { MarkingsDto } from "@/services/octoprint/dto/printer/markings.dto";
+import type { BusyFileDto } from "@/services/octoprint/dto/printer/busy-file.dto";
 
 export interface CurrentMessageDto {
   // Printer information

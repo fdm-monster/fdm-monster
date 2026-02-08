@@ -42,7 +42,7 @@ beforeAll(async () => {
   ({ request, container } = await setupTestApp(true, stubMocks));
   const settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   await settingsStore.setExperimentalBambuSupport(true);
-  
+
   printerService = container.resolve<IPrinterService>(DITokens.printerService);
 });
 
@@ -114,8 +114,6 @@ describe(PrinterFilesController.name, () => {
     const response = await request.delete(deleteFileRoute(printer.id, filename)).send();
     expectOkResponse(response);
   });
-
-
 
   it("should allow POST to print a printer file", async () => {
     const printer = await createTestPrinter(request);

@@ -5,9 +5,9 @@ import { wizardSettingsSchema } from "./validation/setting.validation";
 import { BadRequestException, ForbiddenError } from "@/exceptions/runtime.exceptions";
 import { ROLES } from "@/constants/authorization.constants";
 import { SettingsStore } from "@/state/settings.store";
-import { Request, Response } from "express";
-import { IUserService } from "@/services/interfaces/user-service.interface";
-import { IRoleService } from "@/services/interfaces/role-service.interface";
+import type { Request, Response } from "express";
+import type { IUserService } from "@/services/interfaces/user-service.interface";
+import type { IRoleService } from "@/services/interfaces/role-service.interface";
 import { YamlService } from "@/services/core/yaml.service";
 import { MulterService } from "@/services/core/multer.service";
 

@@ -12,10 +12,10 @@ import { SocketFactory } from "@/services/socket.factory";
 import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintWebsocketAdapter } from "@/services/octoprint/octoprint-websocket.adapter";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { OctoprintType } from "@/services/printer-api.interface";
-import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
-import { PrinterDto } from "@/services/interfaces/printer.dto";
+import type { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import type { PrinterDto } from "@/services/interfaces/printer.dto";
 import { SocketState } from "@/shared/dtos/socket-state.type";
 import { ApiState } from "@/shared/dtos/api-state.type";
 
@@ -164,7 +164,9 @@ export class PrinterSocketStore {
         foundAdapter.close();
         this.logger.log(`Closing printer socket for update`);
       } else {
-        this.logger.log(`Printer type changed from ${ foundAdapter.printerType } to ${ printer.printerType }. Creating new socket adapter`);
+        this.logger.log(
+          `Printer type changed from ${foundAdapter.printerType} to ${printer.printerType}. Creating new socket adapter`,
+        );
         foundAdapter.close();
         foundAdapter = this.socketFactory.createInstance(printer.printerType);
         this.printerSocketAdaptersById.set(id, foundAdapter);

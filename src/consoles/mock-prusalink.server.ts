@@ -4,7 +4,9 @@ import console from "node:console";
 import multer from "multer";
 import express from "express";
 import http from "node:http";
+import { getDirname } from "@/utils/fs.utils";
 
+const __dirname = getDirname(import.meta.url);
 const port = process.argv[2] ? Number.parseInt(process.argv[2]) : 2234;
 const uploadsDir = path.join(__dirname, "uploads", `server-${port.toString()}`);
 

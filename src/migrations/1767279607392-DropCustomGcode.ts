@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class DropCustomGcode1767279607392 implements MigrationInterface {
-  name = 'DropCustomGcode1767279607392'
+  name = "DropCustomGcode1767279607392";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`

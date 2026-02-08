@@ -1,10 +1,10 @@
 import { inject } from "awilix-express";
 import { ForbiddenError } from "@/exceptions/runtime.exceptions";
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { SettingsStore } from "@/state/settings.store";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { IConfigService } from "@/services/core/config.service";
-import { IRoleService } from "@/services/interfaces/role-service.interface";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
+import type { IConfigService } from "@/services/core/config.service";
+import type { IRoleService } from "@/services/interfaces/role-service.interface";
 
 export const validateWizardCompleted = inject(
   (configService: IConfigService, settingsStore: SettingsStore, loggerFactory: ILoggerFactory) =>

@@ -2,6 +2,7 @@ import { validNewPrinterState } from "../test-data/printer.data";
 import { PrinterCache } from "@/state/printer.cache";
 import { DITokens } from "@/container.tokens";
 import { configureContainer } from "@/container";
+import { asValue } from "awilix";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { TestPrinterSocketStore } from "@/state/test-printer-socket.store";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
@@ -12,7 +13,6 @@ import { createPrinterSchema } from "@/services/validators/printer-service.valid
 import { OctoprintType, BambuType } from "@/services/printer-api.interface";
 import { SettingsStore } from "@/state/settings.store";
 
-jest.mock("@/services/octoprint/octoprint.client");
 
 let printerService: IPrinterService;
 let printerCache: PrinterCache;
@@ -22,6 +22,30 @@ let settingsStore: SettingsStore;
 
 beforeAll(async () => {
   const container = configureContainer();
+
+  // Mock HttpClientFactory to prevent real HTTP requests
+  const mockAxiosInstance = {
+    get: vi.fn().mockResolvedValue({ data: {} }),
+    post: vi.fn().mockResolvedValue({ data: {} }),
+    put: vi.fn().mockResolvedValue({ data: {} }),
+    patch: vi.fn().mockResolvedValue({ data: {} }),
+    delete: vi.fn().mockResolvedValue({ data: {} }),
+    request: vi.fn().mockResolvedValue({ data: {} }),
+    defaults: { headers: { common: {} } },
+    interceptors: {
+      request: { use: vi.fn(), eject: vi.fn() },
+      response: { use: vi.fn(), eject: vi.fn() },
+    },
+  };
+
+  container.register({
+    [DITokens.httpClientFactory]: asValue({
+      createClient: vi.fn().mockReturnValue(mockAxiosInstance),
+      createDefaultClient: vi.fn().mockReturnValue(mockAxiosInstance),
+      createClientWithBaseUrl: vi.fn().mockReturnValue(mockAxiosInstance),
+    }),
+  });
+
   await container.resolve<TypeormService>(DITokens.typeormService).createConnection();
   await container.resolve(DITokens.settingsStore).loadSettings();
   testPrinterSocketStore = container.resolve(DITokens.testPrinterSocketStore);
@@ -169,7 +193,7 @@ describe(PrinterSocketStore.name, () => {
     expect(initialAdapter.printerType).toBe(OctoprintType);
 
     // Spy on the close method to verify it's called
-    const closeSpy = jest.spyOn(initialAdapter, "close");
+    const closeSpy = vi.spyOn(initialAdapter, "close");
 
     // Act - Update printer to different type
     await printerService.update(printerEntity.id, {
@@ -206,7 +230,7 @@ describe(PrinterSocketStore.name, () => {
     initialAdapter.refreshPrinterCurrentInterval = mockIntervalId;
 
     // Spy on clearInterval to verify it's called
-    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+    const clearIntervalSpy = vi.spyOn(global, "clearInterval");
 
     // Act - Update printer to different type
     await printerService.update(printerEntity.id, {
@@ -235,29 +259,29 @@ describe(PrinterSocketStore.name, () => {
     // Arrange - Create an adapter with pending requests
     const mockAdapter = {
       requestMap: new Map(),
-      clearAllRequests: function() {
+      clearAllRequests: function () {
         for (const [, request] of this.requestMap.entries()) {
           clearTimeout(request.timeout);
           request.reject(new Error("WebSocket adapter closed"));
         }
         this.requestMap.clear();
       },
-      close: function() {
+      close: function () {
         this.clearAllRequests();
-      }
+      },
     };
 
     // Add some mock pending requests
     const mockTimeout1 = setTimeout(() => {}, 5000);
     const mockTimeout2 = setTimeout(() => {}, 5000);
-    const mockReject1 = jest.fn();
-    const mockReject2 = jest.fn();
+    const mockReject1 = vi.fn();
+    const mockReject2 = vi.fn();
 
-    mockAdapter.requestMap.set(1, { resolve: jest.fn(), reject: mockReject1, timeout: mockTimeout1 });
-    mockAdapter.requestMap.set(2, { resolve: jest.fn(), reject: mockReject2, timeout: mockTimeout2 });
+    mockAdapter.requestMap.set(1, { resolve: vi.fn(), reject: mockReject1, timeout: mockTimeout1 });
+    mockAdapter.requestMap.set(2, { resolve: vi.fn(), reject: mockReject2, timeout: mockTimeout2 });
 
     // Spy on clearTimeout
-    const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+    const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
     // Act - Close the adapter (this should trigger cleanup)
     mockAdapter.close();

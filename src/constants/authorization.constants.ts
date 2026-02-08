@@ -1,4 +1,4 @@
-import { union } from "lodash";
+import { union } from "lodash-es";
 
 export const AUTH_ERROR_REASON = {
   // Before login

@@ -24,7 +24,7 @@ import { RoleService } from "./services/orm/role.service";
 import { PermissionService } from "./services/orm/permission.service";
 import { ROLES } from "./constants/authorization.constants";
 import { PrinterWebsocketRestoreTask } from "./tasks/printer-websocket-restore.task";
-import { ConfigService, IConfigService } from "./services/core/config.service";
+import { ConfigService, type IConfigService } from "./services/core/config.service";
 import { SocketIoGateway } from "./state/socket-io.gateway";
 import { ClientBundleService } from "./services/core/client-bundle.service";
 import { FloorStore } from "./state/floor.store";
@@ -41,7 +41,7 @@ import { LogDumpService } from "./services/core/logs-manager.service";
 import { CameraStreamService } from "./services/orm/camera-stream.service";
 import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
-import { throttling } from "@octokit/plugin-throttling";
+import { throttling, ThrottlingOptions } from "@octokit/plugin-throttling";
 import { RefreshTokenService } from "@/services/orm/refresh-token.service";
 import { SettingsService } from "@/services/orm/settings.service";
 import { FloorService } from "@/services/orm/floor.service";
@@ -73,7 +73,6 @@ import { PrintJobAnalysisTask } from "@/tasks/print-job-analysis.task";
 import { PrintFileDownloaderService } from "@/services/print-file-downloader.service";
 
 export function configureContainer() {
-  // Create the container and set the injectionMode to PROXY (which is also the default).
   const container = createContainer({
     injectionMode: InjectionMode.CLASSIC,
   });
@@ -133,7 +132,7 @@ export function configureContainer() {
             // does not retry, only logs a warning
             logger.warn(`SecondaryRateLimit detected for request ${options.method} ${options.url}`);
           },
-        },
+        } satisfies ThrottlingOptions,
       });
     }),
     [di.clientBundleService]: asClass(ClientBundleService),

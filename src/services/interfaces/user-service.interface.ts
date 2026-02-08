@@ -1,7 +1,7 @@
-import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
+import type { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { DeleteResult } from "typeorm";
 import { User } from "@/entities";
-import { RoleName } from "@/constants/authorization.constants";
+import type { RoleName } from "@/constants/authorization.constants";
 
 export interface IUserService<Entity = User> {
   toDto(user: Entity): UserDto;

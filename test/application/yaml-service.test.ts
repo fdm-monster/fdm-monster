@@ -346,9 +346,9 @@ describe(YamlService.name, () => {
     const hasSlicerKey = yamlDump.includes("slicerApiKey:");
     if (hasSlicerKey) {
       // Ensure it's in the credential section, not at top level
-      const lines = yamlDump.split('\n');
-      const credentialLine = lines.findIndex(l => l.trim().startsWith('credential'));
-      const slicerKeyLine = lines.findIndex(l => l.includes('slicerApiKey:'));
+      const lines = yamlDump.split("\n");
+      const credentialLine = lines.findIndex((l) => l.trim().startsWith("credential"));
+      const slicerKeyLine = lines.findIndex((l) => l.includes("slicerApiKey:"));
 
       // slicerApiKey should appear after credential section starts
       expect(slicerKeyLine).toBeGreaterThan(credentialLine);
@@ -368,10 +368,10 @@ describe(YamlService.name, () => {
     expect(yamlContent).toContain("slicerApiKey: ec7cdc28-c649-4cd3-8ec4-dcfa34a03d1b");
 
     // Verify slicerApiKey is nested under credentials, not at top level of settings
-    const lines = yamlContent.split('\n');
-    const settingsLine = lines.findIndex(l => l.trim() === 'settings:');
-    const credentialsLine = lines.findIndex(l => l.trim() === 'credentials:');
-    const slicerKeyLine = lines.findIndex(l => l.trim().startsWith('slicerApiKey:'));
+    const lines = yamlContent.split("\n");
+    const settingsLine = lines.findIndex((l) => l.trim() === "settings:");
+    const credentialsLine = lines.findIndex((l) => l.trim() === "credentials:");
+    const slicerKeyLine = lines.findIndex((l) => l.trim().startsWith("slicerApiKey:"));
 
     // Credentials should be after settings
     expect(credentialsLine).toBeGreaterThan(settingsLine);

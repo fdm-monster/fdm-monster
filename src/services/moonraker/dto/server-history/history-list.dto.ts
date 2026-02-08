@@ -1,4 +1,4 @@
-import { JobDto } from "@/services/moonraker/dto/server-history/job.dto";
+import type { JobDto } from "@/services/moonraker/dto/server-history/job.dto";
 
 export interface HistoryListDto {
   count: number;

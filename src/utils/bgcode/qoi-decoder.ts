@@ -7,11 +7,11 @@ interface QOIDecoded {
 }
 
 const QOI_OP_INDEX = 0x00; // 00xxxxxx
-const QOI_OP_DIFF = 0x40;  // 01xxxxxx
-const QOI_OP_LUMA = 0x80;  // 10xxxxxx
-const QOI_OP_RUN = 0xc0;   // 11xxxxxx
-const QOI_OP_RGB = 0xfe;   // 11111110
-const QOI_OP_RGBA = 0xff;  // 11111111
+const QOI_OP_DIFF = 0x40; // 01xxxxxx
+const QOI_OP_LUMA = 0x80; // 10xxxxxx
+const QOI_OP_RUN = 0xc0; // 11xxxxxx
+const QOI_OP_RGB = 0xfe; // 11111110
+const QOI_OP_RGBA = 0xff; // 11111111
 
 const QOI_MAGIC = 0x716f6966; // "qoif"
 
@@ -24,7 +24,7 @@ export function decodeQOI(buffer: Buffer): QOIDecoded {
 
   // Read header (14 bytes)
   if (buffer.length < 14) {
-    throw new Error('Invalid QOI file: too short');
+    throw new Error("Invalid QOI file: too short");
   }
 
   const magic = buffer.readUInt32BE(pos);
@@ -57,7 +57,10 @@ export function decodeQOI(buffer: Buffer): QOIDecoded {
     colorArray[i] = [0, 0, 0, 0];
   }
 
-  let r = 0, g = 0, b = 0, a = 255;
+  let r = 0,
+    g = 0,
+    b = 0,
+    a = 255;
   let outPos = 0;
 
   // Decode chunks
@@ -77,7 +80,7 @@ export function decodeQOI(buffer: Buffer): QOIDecoded {
     }
 
     if (pos >= buffer.length) {
-      throw new Error('Unexpected end of QOI data');
+      throw new Error("Unexpected end of QOI data");
     }
 
     const byte1 = buffer[pos++];
@@ -149,6 +152,6 @@ export function decodeQOI(buffer: Buffer): QOIDecoded {
     height,
     channels,
     colorspace,
-    data: output
+    data: output,
   };
 }

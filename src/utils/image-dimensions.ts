@@ -22,12 +22,12 @@ function getJpgDimensions(data: Buffer): { width: number; height: number } {
   let offset = 2;
 
   while (offset < data.length) {
-    if (data[offset] !== 0xFF) break;
+    if (data[offset] !== 0xff) break;
 
     const marker = data[offset + 1];
     offset += 2;
 
-    if (marker === 0xC0 || marker === 0xC2) {
+    if (marker === 0xc0 || marker === 0xc2) {
       if (offset + 5 < data.length) {
         const height = data.readUInt16BE(offset + 1);
         const width = data.readUInt16BE(offset + 3);

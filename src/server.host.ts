@@ -9,8 +9,8 @@ import { AppConstants } from "./server.constants";
 import { getMediaPath, superRootPath } from "./utils/fs.utils";
 import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { BootTask } from "./tasks/boot.task";
-import { IConfigService } from "@/services/core/config.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { IConfigService } from "@/services/core/config.service";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { loadControllersFunc } from "@/shared/load-controllers";
 import { setupSwagger } from "@/utils/swagger/swagger";
@@ -60,7 +60,7 @@ export class ServerHost {
           next();
         }
       })
-      .use(loadControllersFunc());
+      .use(await loadControllersFunc());
 
     // Setup Swagger documentation (if enabled)
     if (swaggerDisabled) {
@@ -83,7 +83,12 @@ export class ServerHost {
       const path = req.originalUrl;
 
       let resource = "MVC";
-      if (path.startsWith("/socket.io") || path.startsWith("/api") || path.startsWith("/metrics") || path.startsWith("/api-docs")) {
+      if (
+        path.startsWith("/socket.io") ||
+        path.startsWith("/api") ||
+        path.startsWith("/metrics") ||
+        path.startsWith("/api-docs")
+      ) {
         resource = "API";
       } else if (path.endsWith(".min.js")) {
         resource = "client-bundle";
