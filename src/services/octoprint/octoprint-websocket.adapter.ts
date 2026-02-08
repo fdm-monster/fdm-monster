@@ -43,7 +43,6 @@ export const OctoPrintMessage = {
   slicingProgress: "slicingProgress",
 } as const;
 
-export const octoPrintWebsocketEvent = (printerId: string) => `octoprint.${printerId}`;
 export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebsocketAdapter {

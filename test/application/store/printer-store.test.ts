@@ -169,7 +169,7 @@ describe(PrinterSocketStore.name, () => {
     expect(initialAdapter.printerType).toBe(OctoprintType);
 
     // Spy on the close method to verify it's called
-    const closeSpy = jest.spyOn(initialAdapter, "close");
+    const closeSpy = vi.spyOn(initialAdapter, "close");
 
     // Act - Update printer to different type
     await printerService.update(printerEntity.id, {
@@ -206,7 +206,7 @@ describe(PrinterSocketStore.name, () => {
     initialAdapter.refreshPrinterCurrentInterval = mockIntervalId;
 
     // Spy on clearInterval to verify it's called
-    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
+    const clearIntervalSpy = vi.spyOn(global, "clearInterval");
 
     // Act - Update printer to different type
     await printerService.update(printerEntity.id, {
@@ -250,14 +250,14 @@ describe(PrinterSocketStore.name, () => {
     // Add some mock pending requests
     const mockTimeout1 = setTimeout(() => {}, 5000);
     const mockTimeout2 = setTimeout(() => {}, 5000);
-    const mockReject1 = jest.fn();
-    const mockReject2 = jest.fn();
+    const mockReject1 = vi.fn();
+    const mockReject2 = vi.fn();
 
-    mockAdapter.requestMap.set(1, { resolve: jest.fn(), reject: mockReject1, timeout: mockTimeout1 });
-    mockAdapter.requestMap.set(2, { resolve: jest.fn(), reject: mockReject2, timeout: mockTimeout2 });
+    mockAdapter.requestMap.set(1, { resolve: vi.fn(), reject: mockReject1, timeout: mockTimeout1 });
+    mockAdapter.requestMap.set(2, { resolve: vi.fn(), reject: mockReject2, timeout: mockTimeout2 });
 
     // Spy on clearTimeout
-    const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+    const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
     // Act - Close the adapter (this should trigger cleanup)
     mockAdapter.close();

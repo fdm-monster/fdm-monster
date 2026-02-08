@@ -3,7 +3,7 @@ import { setupTestApp } from "../test-server";
 import { expectBadRequestError, expectOkResponse, expectUnauthenticatedResponse } from "../extensions";
 import { ensureTestUserCreated, getUserData } from "./test-data/create-user";
 import { DITokens } from "@/container.tokens";
-import { AwilixContainer } from "awilix";
+import { type AwilixContainer } from "awilix";
 import { Test } from "supertest";
 import { SettingsStore } from "@/state/settings.store";
 import { loginTestUser } from "./auth/login-test-user";

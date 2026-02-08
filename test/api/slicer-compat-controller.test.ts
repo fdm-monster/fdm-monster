@@ -98,14 +98,14 @@ M140 S0
     let mockFileIdCounter = 0;
     const uploadedFilenames: Map<string, string> = new Map(); // Track uploaded filenames
 
-    jest.spyOn(fileStorageService, "saveFile").mockImplementation(async (file) => {
+    vi.spyOn(fileStorageService, "saveFile").mockImplementation(async (file) => {
       const fileId = `mock-file-id-${++mockFileIdCounter}`;
       uploadedFilenames.set(file.originalname, fileId);
       return fileId;
     });
-    jest.spyOn(fileStorageService, "calculateFileHash").mockResolvedValue("mock-hash-abc123");
-    jest.spyOn(fileStorageService, "getFilePath").mockImplementation((id: string) => `/mock/path/${id}`);
-    jest.spyOn(fileStorageService, "findDuplicateByOriginalFileName").mockImplementation(async (filename: string) => {
+    vi.spyOn(fileStorageService, "calculateFileHash").mockResolvedValue("mock-hash-abc123");
+    vi.spyOn(fileStorageService, "getFilePath").mockImplementation((id: string) => `/mock/path/${id}`);
+    vi.spyOn(fileStorageService, "findDuplicateByOriginalFileName").mockImplementation(async (filename: string) => {
       const existingFileId = uploadedFilenames.get(filename);
       if (existingFileId) {
         return {
@@ -121,7 +121,7 @@ M140 S0
     // Clean up the API key
     await settingsStore.deleteSlicerApiKey();
     // Restore mocks
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("GET /api/version - OctoPrint version endpoint", () => {

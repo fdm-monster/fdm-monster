@@ -45,11 +45,11 @@ export class ExceptionFilter {
       });
       return;
     }
-    if (err instanceof AuthenticationError) {
+    if (err instanceof AuthenticationError || err.constructor?.name === 'AuthenticationError') {
       res.status(401).send({ error: err.message, reasonCode: err.reasonCode });
       return;
     }
-    if (err instanceof AuthorizationError) {
+    if (err instanceof AuthorizationError || err.constructor?.name === 'AuthorizationError') {
       const permissions = err.permissions;
       const roles = err.roles;
       const error = err.message || "You lack permission to this resource";
@@ -57,26 +57,26 @@ export class ExceptionFilter {
       res.status(403).send({ error, reason, permissions, roles });
       return;
     }
-    if (err instanceof ForbiddenError) {
+    if (err instanceof ForbiddenError || err.constructor?.name === 'ForbiddenError') {
       res.status(403).send({ error: err.message });
       return;
     }
-    if (err instanceof NotFoundException || err instanceof EntityNotFoundError) {
+    if (err instanceof NotFoundException || err instanceof EntityNotFoundError || err.constructor?.name === 'NotFoundException' || err.constructor?.name === 'EntityNotFoundError') {
       res.status(404).send({ error: err.message });
       return;
     }
-    if (err instanceof BadRequestException) {
+    if (err instanceof BadRequestException || err.constructor?.name === 'BadRequestException') {
       res.status(400).send({ error: err.message });
       return;
     }
-    if (err instanceof ConflictException) {
+    if (err instanceof ConflictException || err.constructor?.name === 'ConflictException') {
       res.status(409).send({
         error: err.message,
         existingResourceId: err.existingResourceId,
       });
       return;
     }
-    if (err instanceof ValidationException) {
+    if (err instanceof ValidationException || err.constructor?.name === 'ValidationException') {
       res.status(400).send({
         error: "API could not accept this input",
         type: err.name,
@@ -84,7 +84,7 @@ export class ExceptionFilter {
       });
       return;
     }
-    if (err instanceof FailedDependencyException) {
+    if (err instanceof FailedDependencyException || err.constructor?.name === 'FailedDependencyException') {
       res.status(424).send({
         error: err.message,
         serviceCode: err.serviceCode,
@@ -92,7 +92,7 @@ export class ExceptionFilter {
       });
       return;
     }
-    if (err instanceof InternalServerException) {
+    if (err instanceof InternalServerException || err.constructor?.name === 'InternalServerException') {
       res.status(500).send({
         error: err.message,
         type: err.name,
@@ -100,7 +100,7 @@ export class ExceptionFilter {
       });
       return;
     }
-    if (err instanceof ExternalServiceError) {
+    if (err instanceof ExternalServiceError || err.constructor?.name === 'ExternalServiceError') {
       res.status(500).send(err.error);
       return;
     }

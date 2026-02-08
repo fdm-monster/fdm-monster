@@ -4,7 +4,7 @@ import { setupServer } from "@/server.core";
 import { setupEnvConfig } from "@/server.env";
 import { ROLES } from "@/constants/authorization.constants";
 import supertest, { Test } from "supertest";
-import { Express } from "express";
+import type { Express } from "express";
 import { AppConstants } from "@/server.constants";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { TaskManagerService } from "@/services/task-manager.service";

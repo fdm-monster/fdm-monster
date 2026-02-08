@@ -1,16 +1,14 @@
 import { loadControllers } from "awilix-express";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { getDirname } from "@/utils/fs.utils";
 
-// In test mode (CJS), use global __dirname; in ESM mode, compute it
-const dirPath = typeof __dirname !== 'undefined'
-  ? __dirname
-  : getDirname(import.meta.url);
+const isVitest = typeof process !== 'undefined' && process.env.VITEST === 'true';
 
 export const loadControllersFunc = () =>
-  loadControllers("./controllers/*.controller.*", {
-    cwd: join(dirPath, ".."),
+  loadControllers("./controllers/*.controller.js", {
+    cwd: isVitest
+      ? join(process.cwd(), 'dist')
+      : join(dirname(fileURLToPath(import.meta.url)), ".."),
     ignore: ["**/*.map", "**/*.d.ts"],
-    esModules: process.env.NODE_ENV !== 'test',
+    esModules: true,
   });

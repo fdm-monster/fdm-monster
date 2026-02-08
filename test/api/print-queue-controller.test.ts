@@ -18,20 +18,20 @@ describe("PrintQueueController", () => {
   beforeAll(async () => {
     // Mock printer API factory to prevent actual file uploads
     const mockPrinterApi = {
-      uploadFile: jest.fn().mockResolvedValue(undefined),
+      uploadFile: vi.fn().mockResolvedValue(undefined),
     };
     const mockPrinterApiFactory = {
-      getById: jest.fn().mockReturnValue(mockPrinterApi),
+      getById: vi.fn().mockReturnValue(mockPrinterApi),
     };
 
     // Mock file storage service to prevent writing to real media folder
     const mockFileStorageService = {
-      saveFile: jest.fn().mockResolvedValue("mock-file-storage-id"),
-      ensureStorageDirectories: jest.fn().mockResolvedValue(undefined),
-      getFilePath: jest.fn().mockReturnValue("/mock/path/file.gcode"),
-      getFileSize: jest.fn().mockReturnValue(1024),
-      readFile: jest.fn().mockReturnValue(Buffer.from("; mock gcode\nG28\n")),
-      readFileStream: jest.fn().mockReturnValue(Readable.from([Buffer.from("; test gcode\nG28\n")])),
+      saveFile: vi.fn().mockResolvedValue("mock-file-storage-id"),
+      ensureStorageDirectories: vi.fn().mockResolvedValue(undefined),
+      getFilePath: vi.fn().mockReturnValue("/mock/path/file.gcode"),
+      getFileSize: vi.fn().mockReturnValue(1024),
+      readFile: vi.fn().mockReturnValue(Buffer.from("; mock gcode\nG28\n")),
+      readFileStream: vi.fn().mockReturnValue(Readable.from([Buffer.from("; test gcode\nG28\n")])),
     };
 
     const { request, container } = await setupTestApp(

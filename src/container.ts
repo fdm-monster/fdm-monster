@@ -41,7 +41,7 @@ import { LogDumpService } from "./services/core/logs-manager.service";
 import { CameraStreamService } from "./services/orm/camera-stream.service";
 import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
-import { throttling } from "@octokit/plugin-throttling";
+import { throttling, ThrottlingOptions } from "@octokit/plugin-throttling";
 import { RefreshTokenService } from "@/services/orm/refresh-token.service";
 import { SettingsService } from "@/services/orm/settings.service";
 import { FloorService } from "@/services/orm/floor.service";
@@ -133,7 +133,7 @@ export function configureContainer() {
             // does not retry, only logs a warning
             logger.warn(`SecondaryRateLimit detected for request ${options.method} ${options.url}`);
           },
-        },
+        } satisfies ThrottlingOptions,
       });
     }),
     [di.clientBundleService]: asClass(ClientBundleService),

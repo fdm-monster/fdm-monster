@@ -17,12 +17,10 @@
       "mangle": false
     },
     "target": "es2022",
+    "keepClassNames": true,
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"]
-    },
-    "experimental": {
-      "plugins": []
     }
   },
   "module": {

@@ -9,6 +9,7 @@ import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access }
 import { createHash } from "node:crypto";
 import { existsSync, createReadStream, statSync } from "node:fs";
 import { Readable } from "node:stream";
+import { ConflictException } from "@/exceptions/runtime.exceptions";
 
 export interface IFileStorageService {
   saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
@@ -91,7 +92,6 @@ export class FileStorageService implements IFileStorageService {
   async validateUniqueFilename(fileName: string): Promise<void> {
     const existing = await this.findDuplicateByOriginalFileName(fileName);
     if (existing) {
-      const { ConflictException } = await import("@/exceptions/runtime.exceptions");
       throw new ConflictException(
         `A file named "${fileName}" already exists in storage. Please rename the file, delete the existing file (ID: ${existing.fileStorageId}), or choose a different name.`,
         existing.fileStorageId,
