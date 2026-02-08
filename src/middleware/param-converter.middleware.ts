@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { validateInput } from "@/handlers/validators";
 import { idRulesV2 } from "@/controllers/validation/generic.validation";
 

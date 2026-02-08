@@ -6,31 +6,31 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   type Relation,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from "typeorm";
 import { Printer } from "@/entities/printer.entity";
 
 // Job lifecycle states (printing/queue related only)
 export type PrintJobStatus =
-  | "PENDING"           // File uploaded, awaiting action
-  | "QUEUED"           // In printer queue
-  | "STARTING"         // Print job initializing
-  | "PRINTING"         // Active print in progress
-  | "PAUSED"           // Print paused by user/system
-  | "COMPLETED"        // Print finished successfully
-  | "FAILED"           // Print failed (hardware/material issue)
-  | "CANCELLED"        // Print cancelled by user
-  | "UNKNOWN";         // State unknown (disconnect/desync)
+  | "PENDING" // File uploaded, awaiting action
+  | "QUEUED" // In printer queue
+  | "STARTING" // Print job initializing
+  | "PRINTING" // Active print in progress
+  | "PAUSED" // Print paused by user/system
+  | "COMPLETED" // Print finished successfully
+  | "FAILED" // Print failed (hardware/material issue)
+  | "CANCELLED" // Print cancelled by user
+  | "UNKNOWN"; // State unknown (disconnect/desync)
 
 // File format types
 export type FileFormatType = "gcode" | "3mf" | "bgcode";
 
 // Analysis state
 export type AnalysisState =
-  | "NOT_ANALYZED"     // File not yet analyzed
-  | "ANALYZING"        // Analysis in progress
-  | "ANALYZED"         // Analysis complete
-  | "FAILED";          // Analysis failed
+  | "NOT_ANALYZED" // File not yet analyzed
+  | "ANALYZING" // Analysis in progress
+  | "ANALYZED" // Analysis complete
+  | "FAILED"; // Analysis failed
 
 // Base metadata interface
 export interface BaseMetadata {
@@ -130,9 +130,9 @@ export type PrintJobMetadata = GCodeMetadata | ThreeMFMetadata | BGCodeMetadata;
 export interface ThumbnailData {
   width: number;
   height: number;
-  format: string;  // PNG, JPG, QOI
-  data?: string;   // Base64 encoded image data
-  url?: string;    // URL if stored separately
+  format: string; // PNG, JPG, QOI
+  data?: string; // Base64 encoded image data
+  url?: string; // URL if stored separately
 }
 
 // Print statistics (runtime tracking)
@@ -140,7 +140,7 @@ export interface PrintStatistics {
   startedAt: Date | null;
   endedAt: Date | null;
   actualPrintTimeSeconds: number | null;
-  progress: number | null;  // 0-100
+  progress: number | null; // 0-100
 
   // Failure tracking
   failureReason?: string;
@@ -182,7 +182,7 @@ export class PrintJob {
   fileSize: number | null;
 
   @Column({ type: "varchar", nullable: true })
-  fileHash: string | null;  // SHA256 for deduplication
+  fileHash: string | null; // SHA256 for deduplication
 
   // Timestamps
   @CreateDateColumn()
@@ -208,7 +208,7 @@ export class PrintJob {
   analysisState: AnalysisState;
 
   @Column({ type: "varchar", nullable: true })
-  statusReason: string | null;  // User-friendly reason for state
+  statusReason: string | null; // User-friendly reason for state
 
   // Progress tracking
   @Column({ type: "float", nullable: true })
@@ -227,5 +227,5 @@ export class PrintJob {
   queuePosition: number | null;
 
   @Column({ type: "varchar", nullable: true })
-  queueGroup: string | null;  // Group related plates/jobs overall or per printer
+  queueGroup: string | null; // Group related plates/jobs overall or per printer
 }

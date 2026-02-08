@@ -162,9 +162,9 @@ describe("PrinterMaintenanceLogService", () => {
     });
 
     it("should throw error when completing non-existent log", async () => {
-      await expect(maintenanceLogService.complete(99999, { completionNotes: "Test" }, testUser.id, testUser.username)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        maintenanceLogService.complete(99999, { completionNotes: "Test" }, testUser.id, testUser.username),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it("should throw error when completing already completed log", async () => {
@@ -179,9 +179,9 @@ describe("PrinterMaintenanceLogService", () => {
 
       await maintenanceLogService.complete(log.id, { completionNotes: "Done" }, testUser.id, testUser.username);
 
-      await expect(maintenanceLogService.complete(log.id, { completionNotes: "Again" }, testUser.id, testUser.username)).rejects.toThrow(
-        /already completed/,
-      );
+      await expect(
+        maintenanceLogService.complete(log.id, { completionNotes: "Again" }, testUser.id, testUser.username),
+      ).rejects.toThrow(/already completed/);
     });
   });
 

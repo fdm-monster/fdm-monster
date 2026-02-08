@@ -1,6 +1,6 @@
 import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import {
   FileDto,
   IPrinterApi,
@@ -11,19 +11,19 @@ import {
   uploadFileInputSchema,
 } from "@/services/printer-api.interface";
 import { AxiosError, AxiosPromise } from "axios";
-import { LoginDto } from "../interfaces/login.dto";
-import { ServerConfigDto } from "../moonraker/dto/server/server-config.dto";
-import { SettingsDto } from "../octoprint/dto/settings/settings.dto";
+import type { LoginDto } from "../interfaces/login.dto";
+import type { ServerConfigDto } from "../moonraker/dto/server/server-config.dto";
+import type { SettingsDto } from "../octoprint/dto/settings/settings.dto";
 import { PrusaLinkHttpClientBuilder } from "@/services/prusa-link/utils/prusa-link-http-client.builder";
-import { VersionDto } from "@/services/prusa-link/dto/version.dto";
-import { PL_FileResponseDto } from "@/services/prusa-link/dto/file-response.dto";
-import { PL_StatusDto } from "@/services/prusa-link/dto/status.dto";
-import { PL_PrinterStateDto } from "@/services/prusa-link/dto/printer-state.dto";
-import { PL_JobStateDto } from "@/services/prusa-link/dto/job-state.dto";
+import type { VersionDto } from "@/services/prusa-link/dto/version.dto";
+import type { PL_FileResponseDto } from "@/services/prusa-link/dto/file-response.dto";
+import type { PL_StatusDto } from "@/services/prusa-link/dto/status.dto";
+import type { PL_PrinterStateDto } from "@/services/prusa-link/dto/printer-state.dto";
+import type { PL_JobStateDto } from "@/services/prusa-link/dto/job-state.dto";
 import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { ExternalServiceError } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
-import { PL_FileDto } from "@/services/prusa-link/dto/file.dto";
+import type { PL_FileDto } from "@/services/prusa-link/dto/file.dto";
 import { SettingsStore } from "@/state/settings.store";
 
 const defaultLog = { adapter: "prusa-link" };
@@ -89,8 +89,8 @@ export class PrusaLinkApi implements IPrinterApi {
     }));
 
     return {
-      dirs: items.filter(i => i.dir),
-      files: items.filter(i => !i.dir),
+      dirs: items.filter((i) => i.dir),
+      files: items.filter((i) => !i.dir),
     };
   }
 
@@ -235,7 +235,11 @@ export class PrusaLinkApi implements IPrinterApi {
       return response.data;
     } catch (e: any) {
       if (validated.uploadToken) {
-        this.eventEmitter2.emit(`${uploadFailedEvent(validated.uploadToken)}`, validated.uploadToken, (e as AxiosError)?.message);
+        this.eventEmitter2.emit(
+          `${uploadFailedEvent(validated.uploadToken)}`,
+          validated.uploadToken,
+          (e as AxiosError)?.message,
+        );
       }
 
       let data;

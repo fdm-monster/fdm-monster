@@ -206,7 +206,7 @@ describe(PrinterSocketStore.name, () => {
     initialAdapter.refreshPrinterCurrentInterval = mockIntervalId;
 
     // Spy on clearInterval to verify it's called
-    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
 
     // Act - Update printer to different type
     await printerService.update(printerEntity.id, {
@@ -235,16 +235,16 @@ describe(PrinterSocketStore.name, () => {
     // Arrange - Create an adapter with pending requests
     const mockAdapter = {
       requestMap: new Map(),
-      clearAllRequests: function() {
+      clearAllRequests: function () {
         for (const [, request] of this.requestMap.entries()) {
           clearTimeout(request.timeout);
           request.reject(new Error("WebSocket adapter closed"));
         }
         this.requestMap.clear();
       },
-      close: function() {
+      close: function () {
         this.clearAllRequests();
-      }
+      },
     };
 
     // Add some mock pending requests
@@ -257,7 +257,7 @@ describe(PrinterSocketStore.name, () => {
     mockAdapter.requestMap.set(2, { resolve: jest.fn(), reject: mockReject2, timeout: mockTimeout2 });
 
     // Spy on clearTimeout
-    const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+    const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
 
     // Act - Close the adapter (this should trigger cleanup)
     mockAdapter.close();

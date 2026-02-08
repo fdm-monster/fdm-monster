@@ -43,8 +43,11 @@ export function migrateSettingsRuntime(knownSettings: Partial<Settings>): Settin
       gridCols: entity[frontendSettingKey].gridCols ?? defaultFrontendSettings.gridCols,
       gridRows: entity[frontendSettingKey].gridRows ?? defaultFrontendSettings.gridRows,
       largeTiles: entity[frontendSettingKey].largeTiles ?? defaultFrontendSettings.largeTiles,
-      tilePreferCancelOverQuickStop: entity[frontendSettingKey].tilePreferCancelOverQuickStop ?? defaultFrontendSettings.tilePreferCancelOverQuickStop,
-      gridNameSortDirection: entity[frontendSettingKey].gridNameSortDirection ?? defaultFrontendSettings.gridNameSortDirection,
+      tilePreferCancelOverQuickStop:
+        entity[frontendSettingKey].tilePreferCancelOverQuickStop ??
+        defaultFrontendSettings.tilePreferCancelOverQuickStop,
+      gridNameSortDirection:
+        entity[frontendSettingKey].gridNameSortDirection ?? defaultFrontendSettings.gridNameSortDirection,
     };
   }
 
@@ -62,7 +65,7 @@ export function migrateSettingsRuntime(knownSettings: Partial<Settings>): Settin
       experimentalBambuSupport:
         entity[serverSettingsKey].experimentalBambuSupport ?? defaultServerSettings.experimentalBambuSupport,
       sentryDiagnosticsEnabled:
-        entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled
+        entity[serverSettingsKey].sentryDiagnosticsEnabled ?? defaultServerSettings.sentryDiagnosticsEnabled,
     };
   }
 

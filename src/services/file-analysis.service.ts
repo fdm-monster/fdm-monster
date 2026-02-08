@@ -1,5 +1,5 @@
 import { PrintJobMetadata, FileFormatType, ThumbnailData } from "@/entities/print-job.entity";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { GCodeParser } from "@/utils/parsers/gcode.parser";
 import { ThreeMFParser } from "@/utils/parsers/3mf.parser";
@@ -96,18 +96,22 @@ export class FileAnalysisService {
    * Analyze multiple plates from a 3MF file
    * Returns array of metadata objects, one per plate
    */
-  async analyzeMultiPlate3MF(filePath: string): Promise<Array<{
-    metadata: PrintJobMetadata;
-    thumbnails: ThumbnailData[];
-  }>> {
+  async analyzeMultiPlate3MF(filePath: string): Promise<
+    Array<{
+      metadata: PrintJobMetadata;
+      thumbnails: ThumbnailData[];
+    }>
+  > {
     const result = await this.analyze3MF(filePath);
 
     if (!result.normalized.isMultiPlate || !result.plates) {
       // Single plate file
-      return [{
-        metadata: result.normalized as PrintJobMetadata,
-        thumbnails: this.extractThumbnails(result),
-      }];
+      return [
+        {
+          metadata: result.normalized as PrintJobMetadata,
+          thumbnails: this.extractThumbnails(result),
+        },
+      ];
     }
 
     // Multi-plate file - return metadata for each plate
@@ -119,11 +123,12 @@ export class FileAnalysisService {
         filamentUsedGrams: plate.filamentUsedGrams,
         totalLayers: plate.totalLayers,
       } as PrintJobMetadata,
-      thumbnails: plate.thumbnails?.map((t: any) => ({
-        width: t.width || 0,
-        height: t.height || 0,
-        format: t.type || t.format || "PNG",
-      })) || [],
+      thumbnails:
+        plate.thumbnails?.map((t: any) => ({
+          width: t.width || 0,
+          height: t.height || 0,
+          format: t.type || t.format || "PNG",
+        })) || [],
     }));
   }
 
@@ -165,7 +170,11 @@ export class FileAnalysisService {
     if (lowerPath.endsWith(this.EXTENSIONS.BGCODE)) {
       return this.FILE_FORMATS.BGCODE;
     }
-    if (lowerPath.endsWith(this.EXTENSIONS.GCODE) || lowerPath.endsWith(this.EXTENSIONS.GCODE_SHORT) || lowerPath.endsWith(this.EXTENSIONS.GCODE_ALT)) {
+    if (
+      lowerPath.endsWith(this.EXTENSIONS.GCODE) ||
+      lowerPath.endsWith(this.EXTENSIONS.GCODE_SHORT) ||
+      lowerPath.endsWith(this.EXTENSIONS.GCODE_ALT)
+    ) {
       return this.FILE_FORMATS.GCODE;
     }
 
@@ -191,4 +200,3 @@ export class FileAnalysisService {
     }
   }
 }
-

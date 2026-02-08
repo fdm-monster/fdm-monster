@@ -7,8 +7,8 @@ import {
 } from "@/constants/event.constants";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import EventEmitter2 from "eventemitter2";
-import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { PrinterDto } from "@/services/interfaces/printer.dto";
+import type { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import type { PrinterDto } from "@/services/interfaces/printer.dto";
 import { Printer } from "@/entities";
 
 export class PrinterCache extends KeyDiffCache<PrinterDto> {

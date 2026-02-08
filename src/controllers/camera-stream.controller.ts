@@ -1,8 +1,8 @@
 import { route, GET, POST, PUT, DELETE, before } from "awilix-router-core";
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
-import { Request, Response } from "express";
-import { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
+import type { Request, Response } from "express";
+import type { ICameraStreamService } from "@/services/interfaces/camera-stream.service.interface";
 import { ROLES } from "@/constants/authorization.constants";
 import { ParamId } from "@/middleware/param-converter.middleware";
 

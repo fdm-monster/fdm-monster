@@ -30,4 +30,3 @@ export interface CreateMaintenanceLogDto {
 export interface CompleteMaintenanceLogDto {
   completionNotes?: string;
 }
-

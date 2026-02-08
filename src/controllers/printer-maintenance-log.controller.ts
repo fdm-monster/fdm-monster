@@ -1,10 +1,10 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { authenticate, permission } from "@/middleware/authenticate";
 import { PERMS } from "@/constants/authorization.constants";
 import { PrinterMaintenanceLogService } from "@/services/orm/printer-maintenance-log.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { validateInput } from "@/handlers/validators";
 import {
@@ -93,4 +93,3 @@ export class PrinterMaintenanceLogController {
     res.send({ success: true });
   }
 }
-

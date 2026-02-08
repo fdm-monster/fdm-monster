@@ -5,25 +5,25 @@ import { OctoprintRoutes } from "./octoprint-api.routes";
 import { AxiosError, AxiosPromise } from "axios";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
-import { LoginDto } from "@/services/interfaces/login.dto";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { LoginDto } from "@/services/interfaces/login.dto";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { flattenOctoPrintFiles } from "@/services/octoprint/utils/file.utils";
-import { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
-import { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
-import { VersionDto } from "@/services/octoprint/dto/server/version.dto";
-import { ServerDto } from "@/services/octoprint/dto/server/server.dto";
-import { UserListDto } from "@/services/octoprint/dto/access/user-list.dto";
-import { OctoprintFilesResponseDto } from "@/services/octoprint/dto/files/octoprint-files-response.dto";
-import { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
-import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
-import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
-import { CurrentPrinterStateDto } from "@/services/octoprint/dto/printer/current-printer-state.dto";
+import type { ConnectionDto } from "@/services/octoprint/dto/connection/connection.dto";
+import type { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
+import type { VersionDto } from "@/services/octoprint/dto/server/version.dto";
+import type { ServerDto } from "@/services/octoprint/dto/server/server.dto";
+import type { UserListDto } from "@/services/octoprint/dto/access/user-list.dto";
+import type { OctoprintFilesResponseDto } from "@/services/octoprint/dto/files/octoprint-files-response.dto";
+import type { CurrentUserDto } from "@/services/octoprint/dto/auth/current-user.dto";
+import type { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
+import type { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
+import type { CurrentPrinterStateDto } from "@/services/octoprint/dto/printer/current-printer-state.dto";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { OctoprintHttpClientBuilder } from "@/services/octoprint/utils/octoprint-http-client.builder";
-import { OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
+import type { OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
 import { SettingsStore } from "@/state/settings.store";
 import { Readable } from "node:stream";
-import { FileDto } from "@/services/printer-api.interface";
+import type { FileDto } from "@/services/printer-api.interface";
 
 type TAxes = "x" | "y" | "z";
 
@@ -159,7 +159,7 @@ export class OctoprintClient extends OctoprintRoutes {
         path: item.path || item.name,
         size: item.size || 0,
         date: item.date || null,
-        dir: item.type === 'folder',
+        dir: item.type === "folder",
       }));
     }
   }
@@ -173,7 +173,7 @@ export class OctoprintClient extends OctoprintRoutes {
       path: file.path,
       size: file.size,
       date: file.date,
-      dir: file.type === 'folder',
+      dir: file.type === "folder",
     };
   }
 
@@ -190,7 +190,7 @@ export class OctoprintClient extends OctoprintRoutes {
 
     return await this.createClient(login, (o) =>
       o.withHeaders({
-        Range: `bytes=${ startBytes }-${ endBytes }`,
+        Range: `bytes=${startBytes}-${endBytes}`,
       }),
     ).get<string>(pathUrl);
   }
@@ -258,19 +258,19 @@ export class OctoprintClient extends OctoprintRoutes {
           })
           .withOnUploadProgress((p) => {
             if (progressToken) {
-              this.eventEmitter2.emit(`${ uploadProgressEvent(progressToken) }`, progressToken, p);
+              this.eventEmitter2.emit(`${uploadProgressEvent(progressToken)}`, progressToken, p);
             }
           }),
       ).post(urlPath, formData);
 
       if (progressToken) {
-        this.eventEmitter2.emit(`${ uploadDoneEvent(progressToken) }`, progressToken);
+        this.eventEmitter2.emit(`${uploadDoneEvent(progressToken)}`, progressToken);
       }
 
       return response.data;
     } catch (e: any) {
       if (progressToken) {
-        this.eventEmitter2.emit(`${ uploadFailedEvent(progressToken) }`, progressToken, (e as AxiosError)?.message);
+        this.eventEmitter2.emit(`${uploadFailedEvent(progressToken)}`, progressToken, (e as AxiosError)?.message);
       }
       let data;
       try {

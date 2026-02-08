@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddPrinterMaintenanceLog1767909428129 implements MigrationInterface {
-  name = 'AddPrinterMaintenanceLog1767909428129'
+  name = "AddPrinterMaintenanceLog1767909428129";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`

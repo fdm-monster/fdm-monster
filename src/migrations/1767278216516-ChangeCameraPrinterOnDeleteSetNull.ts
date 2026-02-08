@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class ChangeCameraPrinterOnDeleteSetNull1767278216516 implements MigrationInterface {
-    name = 'ChangeCameraPrinterOnDeleteSetNull1767278216516'
+  name = "ChangeCameraPrinterOnDeleteSetNull1767278216516";
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "temporary_camera_stream" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "streamURL" varchar NOT NULL,
@@ -17,7 +17,7 @@ export class ChangeCameraPrinterOnDeleteSetNull1767278216516 implements Migratio
                 CONSTRAINT "UQ_565f1b0713258ce710e9fb48273" UNIQUE ("printerId")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_camera_stream"(
                     "id",
                     "streamURL",
@@ -38,14 +38,14 @@ export class ChangeCameraPrinterOnDeleteSetNull1767278216516 implements Migratio
                 "flipVertical"
             FROM "camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_camera_stream"
                 RENAME TO "camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_camera_stream" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "streamURL" varchar NOT NULL,
@@ -60,7 +60,7 @@ export class ChangeCameraPrinterOnDeleteSetNull1767278216516 implements Migratio
                 SET NULL ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_camera_stream"(
                     "id",
                     "streamURL",
@@ -81,21 +81,21 @@ export class ChangeCameraPrinterOnDeleteSetNull1767278216516 implements Migratio
                 "flipVertical"
             FROM "camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_camera_stream"
                 RENAME TO "camera_stream"
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             ALTER TABLE "camera_stream"
                 RENAME TO "temporary_camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "camera_stream" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "streamURL" varchar NOT NULL,
@@ -108,7 +108,7 @@ export class ChangeCameraPrinterOnDeleteSetNull1767278216516 implements Migratio
                 CONSTRAINT "UQ_565f1b0713258ce710e9fb48273" UNIQUE ("printerId")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "camera_stream"(
                     "id",
                     "streamURL",
@@ -129,14 +129,14 @@ export class ChangeCameraPrinterOnDeleteSetNull1767278216516 implements Migratio
                 "flipVertical"
             FROM "temporary_camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "camera_stream"
                 RENAME TO "temporary_camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "camera_stream" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "streamURL" varchar NOT NULL,
@@ -150,7 +150,7 @@ export class ChangeCameraPrinterOnDeleteSetNull1767278216516 implements Migratio
                 CONSTRAINT "FK_565f1b0713258ce710e9fb48273" FOREIGN KEY ("printerId") REFERENCES "printer" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "camera_stream"(
                     "id",
                     "streamURL",
@@ -171,9 +171,8 @@ export class ChangeCameraPrinterOnDeleteSetNull1767278216516 implements Migratio
                 "flipVertical"
             FROM "temporary_camera_stream"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_camera_stream"
         `);
-    }
-
+  }
 }

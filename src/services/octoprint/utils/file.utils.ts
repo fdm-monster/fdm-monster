@@ -1,5 +1,5 @@
-import { OctoPrintCustomDto, OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
-import { FileDto } from "@/services/printer-api.interface";
+import type { OctoPrintCustomDto, OctoprintFileDto } from "@/services/octoprint/dto/files/octoprint-file.dto";
+import type { FileDto } from "@/services/printer-api.interface";
 
 export function normalizePrinterFile(file: OctoprintFileDto): FileDto {
   if (!file) {
@@ -39,17 +39,17 @@ export function normalizePrinterFile(file: OctoprintFileDto): FileDto {
     path: fileCopy.path,
     size: fileCopy.size,
     date: fileCopy.date,
-    dir: fileCopy.type === 'folder',
+    dir: fileCopy.type === "folder",
   };
 }
 
-export function flattenOctoPrintFiles(items: OctoprintFileDto[], parentPath: string = ''): FileDto[] {
+export function flattenOctoPrintFiles(items: OctoprintFileDto[], parentPath: string = ""): FileDto[] {
   const files: FileDto[] = [];
 
   for (const item of items) {
     const fullPath = parentPath ? `${parentPath}/${item.name}` : item.name;
 
-    if (item.type === 'folder') {
+    if (item.type === "folder") {
       files.push({
         path: fullPath,
         size: 0,
@@ -60,7 +60,7 @@ export function flattenOctoPrintFiles(items: OctoprintFileDto[], parentPath: str
       if (item.children) {
         files.push(...flattenOctoPrintFiles(item.children, fullPath));
       }
-    } else if (item.type === 'machinecode') {
+    } else if (item.type === "machinecode") {
       files.push({
         path: fullPath,
         size: item.size,

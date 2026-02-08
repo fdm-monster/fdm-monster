@@ -1,6 +1,6 @@
 import { PrinterTag } from "@/entities/printer-tag.entity";
-import { TagWithPrintersDto } from "@/services/interfaces/tag.dto";
-import { CreateTagDto, PrinterTagDto } from "@/services/interfaces/printer-tag.dto";
+import type { TagWithPrintersDto } from "@/services/interfaces/tag.dto";
+import type { CreateTagDto, PrinterTagDto } from "@/services/interfaces/printer-tag.dto";
 
 export interface IPrinterTagService<Entity = PrinterTag> {
   toDto(document: Entity): PrinterTagDto;

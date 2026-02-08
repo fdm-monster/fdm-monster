@@ -1,8 +1,8 @@
-import { IPrinterTagService } from "@/services/interfaces/printer-tag.service.interface";
+import type { IPrinterTagService } from "@/services/interfaces/printer-tag.service.interface";
 import { AppConstants } from "@/server.constants";
 import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { route, before, GET, POST, DELETE, PATCH } from "awilix-express";
 import { ParamId } from "@/middleware/param-converter.middleware";
 

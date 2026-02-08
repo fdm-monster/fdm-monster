@@ -3,7 +3,7 @@ import { AwilixResolutionError } from "awilix";
 import { JobValidationException } from "@/exceptions/job.exceptions";
 import { LoggerService } from "@/handlers/logger";
 import { CradleService } from "@/services/core/cradle.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { TaskRegistration, TaskSchedulerOptions, TaskService } from "./interfaces/task.interfaces";
 import { DITokens } from "@/container.tokens";
 import { errorSummary } from "@/utils/error.utils";

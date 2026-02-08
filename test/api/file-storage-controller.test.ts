@@ -30,27 +30,27 @@ describe("FileStorageController", () => {
     fileStorageService = container.resolve<FileStorageService>(DITokens.fileStorageService);
     uploadedFilenames = new Map();
 
-    jest.spyOn(fileStorageService, 'saveFile').mockImplementation(async (file) => {
+    jest.spyOn(fileStorageService, "saveFile").mockImplementation(async (file) => {
       const fileId = `mock-file-id-${++mockFileIdCounter}`;
       uploadedFilenames.set(file.originalname, fileId);
       return fileId;
     });
 
-    jest.spyOn(fileStorageService, 'calculateFileHash').mockResolvedValue('mock-hash-abc123');
-    jest.spyOn(fileStorageService, 'getFilePath').mockImplementation((id: string) => `/mock/path/${id}`);
-    jest.spyOn(fileStorageService, 'saveMetadata').mockResolvedValue(undefined);
-    jest.spyOn(fileStorageService, 'saveThumbnails').mockResolvedValue([]);
+    jest.spyOn(fileStorageService, "calculateFileHash").mockResolvedValue("mock-hash-abc123");
+    jest.spyOn(fileStorageService, "getFilePath").mockImplementation((id: string) => `/mock/path/${id}`);
+    jest.spyOn(fileStorageService, "saveMetadata").mockResolvedValue(undefined);
+    jest.spyOn(fileStorageService, "saveThumbnails").mockResolvedValue([]);
 
-    jest.spyOn(fileStorageService, 'validateUniqueFilename').mockImplementation(async (filename: string) => {
+    jest.spyOn(fileStorageService, "validateUniqueFilename").mockImplementation(async (filename: string) => {
       if (uploadedFilenames.has(filename)) {
         throw new ConflictException(
           `A file named "${filename}" already exists in storage. Please rename the file, delete the existing file (ID: ${uploadedFilenames.get(filename)}), or choose a different name.`,
-          uploadedFilenames.get(filename)
+          uploadedFilenames.get(filename),
         );
       }
     });
 
-    jest.spyOn(fileStorageService, 'findDuplicateByOriginalFileName').mockImplementation(async (filename: string) => {
+    jest.spyOn(fileStorageService, "findDuplicateByOriginalFileName").mockImplementation(async (filename: string) => {
       const existingFileId = uploadedFilenames.get(filename);
       if (existingFileId) {
         return {
@@ -73,7 +73,7 @@ describe("FileStorageController", () => {
 
   describe("GET /api/file-storage - List files", () => {
     beforeEach(() => {
-      jest.spyOn(fileStorageService, 'listAllFiles').mockResolvedValue([]);
+      jest.spyOn(fileStorageService, "listAllFiles").mockResolvedValue([]);
     });
 
     it("should return empty array when no files exist", async () => {
@@ -84,61 +84,61 @@ describe("FileStorageController", () => {
     });
 
     it("should return list of files with metadata", async () => {
-      jest.spyOn(fileStorageService, 'listAllFiles').mockResolvedValue([
+      jest.spyOn(fileStorageService, "listAllFiles").mockResolvedValue([
         {
-          fileStorageId: 'file-123',
-          fileName: 'test.gcode',
-          fileFormat: 'gcode',
+          fileStorageId: "file-123",
+          fileName: "test.gcode",
+          fileFormat: "gcode",
           fileSize: 1024,
-          fileHash: 'abc123',
+          fileHash: "abc123",
           createdAt: new Date(),
           thumbnailCount: 2,
-          metadata: { _originalFileName: 'test.gcode' },
+          metadata: { _originalFileName: "test.gcode" },
         },
       ]);
 
       const res = await testRequest.get(baseRoute);
       expectOkResponse(res);
       expect(res.body.files.length).toBe(1);
-      expect(res.body.files[0].fileName).toBe('test.gcode');
-      expect(res.body.files[0].fileStorageId).toBe('file-123');
+      expect(res.body.files[0].fileName).toBe("test.gcode");
+      expect(res.body.files[0].fileStorageId).toBe("file-123");
     });
   });
 
   describe("GET /api/file-storage/:id - Get file info", () => {
     it("should return 404 for non-existent file", async () => {
-      jest.spyOn(fileStorageService, 'getFileInfo').mockResolvedValue(null);
+      jest.spyOn(fileStorageService, "getFileInfo").mockResolvedValue(null);
 
       const res = await testRequest.get(`${baseRoute}/non-existent-id`);
       expectNotFoundResponse(res);
     });
 
     it("should return file info for existing file", async () => {
-      jest.spyOn(fileStorageService, 'getFileInfo').mockResolvedValue({
-        fileStorageId: 'file-123',
-        fileName: 'test.gcode',
-        fileFormat: 'gcode',
+      jest.spyOn(fileStorageService, "getFileInfo").mockResolvedValue({
+        fileStorageId: "file-123",
+        fileName: "test.gcode",
+        fileFormat: "gcode",
         fileSize: 1024,
-        fileHash: 'abc123',
+        fileHash: "abc123",
         createdAt: new Date(),
         thumbnailCount: 1,
-        metadata: { _originalFileName: 'test.gcode' },
+        metadata: { _originalFileName: "test.gcode" },
       });
 
       const res = await testRequest.get(`${baseRoute}/file-123`);
       expectOkResponse(res);
-      expect(res.body.fileStorageId).toBe('file-123');
-      expect(res.body.fileName).toBe('test.gcode');
+      expect(res.body.fileStorageId).toBe("file-123");
+      expect(res.body.fileName).toBe("test.gcode");
     });
   });
 
   describe("DELETE /api/file-storage/:id - Delete file", () => {
     it("should delete file successfully", async () => {
-      jest.spyOn(fileStorageService, 'deleteFile').mockResolvedValue(undefined);
+      jest.spyOn(fileStorageService, "deleteFile").mockResolvedValue(undefined);
 
       const res = await testRequest.delete(`${baseRoute}/file-123`);
       expectOkResponse(res);
-      expect(fileStorageService.deleteFile).toHaveBeenCalledWith('file-123');
+      expect(fileStorageService.deleteFile).toHaveBeenCalledWith("file-123");
     });
   });
 
@@ -154,9 +154,7 @@ describe("FileStorageController", () => {
     });
 
     it("should return 400 when no file is uploaded", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/upload`)
-        .set("Accept", "application/json");
+      const res = await testRequest.post(`${baseRoute}/upload`).set("Accept", "application/json");
 
       expectInvalidResponse(res);
     });
@@ -200,11 +198,7 @@ describe("FileStorageController", () => {
     });
 
     it("should handle files with special characters in name", async () => {
-      const specialNames = [
-        "test with spaces.gcode",
-        "test-with-dashes.gcode",
-        "test_with_underscores.gcode",
-      ];
+      const specialNames = ["test with spaces.gcode", "test-with-dashes.gcode", "test_with_underscores.gcode"];
 
       for (const name of specialNames) {
         const res = await uploadFile(name, SIMPLE_GCODE);
@@ -230,18 +224,17 @@ describe("FileStorageController", () => {
     });
   });
 
-
   describe("GET /api/file-storage/:id/thumbnail/:index - Get thumbnail", () => {
     it("should return 404 for non-existent thumbnail", async () => {
-      jest.spyOn(fileStorageService, 'getThumbnail').mockResolvedValue(null);
+      jest.spyOn(fileStorageService, "getThumbnail").mockResolvedValue(null);
 
       const res = await testRequest.get(`${baseRoute}/file-123/thumbnail/0`);
       expectNotFoundResponse(res);
     });
 
     it("should return thumbnail when it exists", async () => {
-      const mockImage = Buffer.from('fake image data');
-      jest.spyOn(fileStorageService, 'getThumbnail').mockResolvedValue(mockImage);
+      const mockImage = Buffer.from("fake image data");
+      jest.spyOn(fileStorageService, "getThumbnail").mockResolvedValue(mockImage);
 
       const res = await testRequest.get(`${baseRoute}/file-123/thumbnail/0`);
       expectOkResponse(res);
@@ -270,7 +263,7 @@ describe("FileStorageController", () => {
   describe("Concurrent operations", () => {
     it("should handle multiple concurrent uploads", async () => {
       const uploads = Array.from({ length: 3 }, (_, i) =>
-        uploadFile(`concurrent-${i}.gcode`, `G28\nG1 X${i * 10} Y${i * 10}\n`)
+        uploadFile(`concurrent-${i}.gcode`, `G28\nG1 X${i * 10} Y${i * 10}\n`),
       );
 
       const results = await Promise.all(uploads);

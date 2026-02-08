@@ -1,4 +1,4 @@
-import { RoleName } from "@/constants/authorization.constants";
+import type { RoleName } from "@/constants/authorization.constants";
 
 export class UserDto {
   id: number;

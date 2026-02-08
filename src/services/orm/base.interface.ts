@@ -1,5 +1,5 @@
 import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from "typeorm";
-import { IPagination } from "@/services/interfaces/page.interface";
+import type { IPagination } from "@/services/interfaces/page.interface";
 
 export interface IBaseService<
   T extends object,

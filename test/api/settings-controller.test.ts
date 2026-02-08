@@ -41,7 +41,7 @@ describe(SettingsController.name, () => {
       sentryDiagnosticsEnabled: false,
       loginRequired: false,
       registration: false,
-      experimentalMoonrakerSupport: true
+      experimentalMoonrakerSupport: true,
     });
     expect(body[wizardSettingKey]).toMatchObject({
       wizardCompleted: true,
@@ -159,9 +159,7 @@ describe(SettingsController.name, () => {
       expect(response.body.slicerApiKey).toBeTruthy();
       expect(typeof response.body.slicerApiKey).toBe("string");
       // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-      expect(response.body.slicerApiKey).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-      );
+      expect(response.body.slicerApiKey).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
     });
 
     it("should return existing slicer API key after generation", async () => {

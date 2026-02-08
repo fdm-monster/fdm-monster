@@ -36,7 +36,7 @@ export class Printer {
   })
   enabled: boolean;
 
-  @Column({ type: "varchar", nullable: true, })
+  @Column({ type: "varchar", nullable: true })
   disabledReason: string | null;
 
   @Column({

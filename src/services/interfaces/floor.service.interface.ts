@@ -1,4 +1,4 @@
-import { CreateFloorDto, CreatePositionDto, FloorDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
+import type { CreateFloorDto, CreatePositionDto, FloorDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 import { Floor } from "@/entities";
 import { FindOneOptions } from "typeorm";
 

@@ -44,7 +44,7 @@ export class Settings {
     gridRows: number;
     largeTiles: boolean;
     tilePreferCancelOverQuickStop: boolean;
-    gridNameSortDirection?: 'horizontal' | 'vertical';
+    gridNameSortDirection?: "horizontal" | "vertical";
   };
 
   @Column({ type: "simple-json", nullable: false })

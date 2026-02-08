@@ -1,6 +1,6 @@
 import { asValue } from "awilix";
 import { DITokens } from "@/container.tokens";
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { PrinterCache } from "@/state/printer.cache";
 import { OctoprintApi } from "@/services/octoprint.api";
 import { MoonrakerType, OctoprintType, PrusaLinkType, BambuType } from "@/services/printer-api.interface";

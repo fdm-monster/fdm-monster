@@ -33,9 +33,7 @@ export class GCodeParser {
       fileFormat: "gcode",
       fileSize: stats.size,
       gcodePrintTimeSeconds: this.parseTime(
-        metadata.estimated_printing_time_normal_mode ||
-        metadata.estimated_printing_time ||
-        metadata.print_time
+        metadata.estimated_printing_time_normal_mode || metadata.estimated_printing_time || metadata.print_time,
       ),
       nozzleDiameterMm: this.parseFloat(metadata.nozzle_diameter),
       filamentDiameterMm: this.parseFloat(metadata.filament_diameter),
@@ -55,12 +53,15 @@ export class GCodeParser {
       maxLayerZ: this.parseFloat(metadata.max_layer_z),
       totalLayers: this.parseInt(metadata.total_layers) || this.parseInt(metadata.layer_count),
       generatedBy: metadata.generated_by,
-      thumbnails: thumbnails.length > 0 ? thumbnails.map(t => ({
-        width: t.width,
-        height: t.height,
-        format: t.format,
-        dataLength: t.data?.length || 0,
-      })) : undefined,
+      thumbnails:
+        thumbnails.length > 0
+          ? thumbnails.map((t) => ({
+              width: t.width,
+              height: t.height,
+              format: t.format,
+              dataLength: t.data?.length || 0,
+            }))
+          : undefined,
     };
 
     return {
@@ -113,12 +114,12 @@ export class GCodeParser {
     const estimatedBytes = this.maxFooterLinesToRead * 50;
     const startPosition = Math.max(0, fileSize - estimatedBytes);
 
-    const fileHandle = await fs.open(filePath, 'r');
+    const fileHandle = await fs.open(filePath, "r");
     try {
       const buffer = Buffer.alloc(estimatedBytes);
       const { bytesRead } = await fileHandle.read(buffer, 0, estimatedBytes, startPosition);
-      const text = buffer.toString('utf8', 0, bytesRead);
-      const lines = text.split('\n');
+      const text = buffer.toString("utf8", 0, bytesRead);
+      const lines = text.split("\n");
 
       // Process footer lines (summary metadata often here)
       for (const line of lines) {
@@ -147,11 +148,11 @@ export class GCodeParser {
       let value = prusaMatch[2].trim();
 
       // Normalize bracketed units: "filament used [mm]" -> "filament_used_mm"
-      key = key.replace(/\[([^\]]+)\]/g, (_, unit) => '_' + unit.replace(/\^/g, ''));
+      key = key.replace(/\[([^\]]+)\]/g, (_, unit) => "_" + unit.replace(/\^/g, ""));
       // Normalize parentheses: "estimated printing time (normal mode)" -> "estimated_printing_time_normal_mode"
-      key = key.replace(/\(([^)]+)\)/g, (_, content) => '_' + content.replace(/\s+/g, '_'));
+      key = key.replace(/\(([^)]+)\)/g, (_, content) => "_" + content.replace(/\s+/g, "_"));
       // Normalize multiple underscores
-      key = key.replace(/_+/g, '_');
+      key = key.replace(/_+/g, "_");
 
       // Don't overwrite if already set (header takes precedence)
       if (!metadata[key]) {
@@ -230,9 +231,9 @@ export class GCodeParser {
 
           if (format === "QOI") {
             try {
-              const qoiBuffer = Buffer.from(base64Data, 'base64');
+              const qoiBuffer = Buffer.from(base64Data, "base64");
               const pngBuffer = convertQoiToPng(qoiBuffer);
-              base64Data = pngBuffer.toString('base64');
+              base64Data = pngBuffer.toString("base64");
               format = "PNG";
             } catch {
               // Keep original QOI if conversion fails
@@ -293,4 +294,3 @@ export class GCodeParser {
     return null;
   }
 }
-

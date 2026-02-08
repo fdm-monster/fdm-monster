@@ -1,7 +1,7 @@
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { Octokit } from "octokit";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class GithubService {
   private readonly logger: LoggerService;

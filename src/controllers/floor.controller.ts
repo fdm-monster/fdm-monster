@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { FloorStore } from "@/state/floor.store";
 import { PERMS } from "@/constants/authorization.constants";
 import { AppConstants } from "@/server.constants";

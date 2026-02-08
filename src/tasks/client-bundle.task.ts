@@ -1,7 +1,7 @@
 import { AppConstants } from "@/server.constants";
 import { ClientBundleService } from "@/services/core/client-bundle.service";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class ClientDistDownloadTask {
   private readonly logger: LoggerService;
