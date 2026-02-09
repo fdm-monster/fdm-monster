@@ -126,6 +126,7 @@
     "@types/supertest": "6.0.3",
     "@types/uuid": "10.0.0",
     "@types/ws": "8.18.1",
+    "@vitest/coverage-v8": "4.0.18",
     "@vitest/ui": "4.0.18",
     "chokidar": "5.0.0",
     "ftp-srv": "4.6.3",
