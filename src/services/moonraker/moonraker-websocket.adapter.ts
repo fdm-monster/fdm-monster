@@ -36,7 +36,6 @@ import { PP } from "@/utils/pretty-print.utils";
 import type { MoonrakerErrorDto } from "@/services/moonraker/dto/rest/error.dto";
 import type { MoonrakerEventDto } from "@/services/moonraker/constants/moonraker-event.dto";
 import type { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
-import _ from "lodash-es";
 import type { ConnectionIdentifyResponseDto } from "@/services/moonraker/dto/websocket/connection-identify-response.dto";
 import type { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
 import { MoonrakerType } from "@/services/printer-api.interface";
@@ -47,6 +46,7 @@ import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.ada
 import type { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { AxiosError } from "axios";
+import { merge } from "lodash-es";
 
 export type SubscriptionType = IdleTimeoutObject &
   PauseResumeObject &
@@ -310,7 +310,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
 
       const subState = Object.keys(data)[0] as keyof SubscriptionType;
       if (Object.keys((this.printerObjects as PrinterObjectsQueryDto<SubscriptionType>).status).includes(subState)) {
-        this.printerObjects.status = _.merge(this.printerObjects.status, data);
+        this.printerObjects.status = merge(this.printerObjects.status, data);
         this.printerObjects.eventtime = eventtime;
         await this.emitCurrentEvent(this.printerObjects);
       } else {
