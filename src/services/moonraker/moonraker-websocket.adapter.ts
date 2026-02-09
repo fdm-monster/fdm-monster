@@ -38,8 +38,7 @@ import type { MoonrakerEventDto } from "@/services/moonraker/constants/moonraker
 import type { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import type { ConnectionIdentifyResponseDto } from "@/services/moonraker/dto/websocket/connection-identify-response.dto";
 import type { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
-import { MoonrakerType } from "@/services/printer-api.interface";
-import type { FdmCurrentMessageDto } from "@/services/printer-api.interface";
+import { MoonrakerType, type FdmCurrentMessageDto } from "@/services/printer-api.interface";
 import { Event as WsEvent } from "ws";
 import { NotifyServiceStateChangedParams } from "@/services/moonraker/dto/websocket/notify-service-state-changed.params";
 import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.adapter";

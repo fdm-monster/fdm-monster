@@ -1,10 +1,8 @@
 import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
 import { printerEvents, PrintersDeletedEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
-import { WsMessage, messages } from "@/services/octoprint/dto/octoprint-event.dto";
-import type { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
-import { MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
-import type { MoonrakerEventDto } from "@/services/moonraker/constants/moonraker-event.dto";
+import { WsMessage, messages, type OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import { MR_WsMessage, type MoonrakerEventDto } from "@/services/moonraker/constants/moonraker-event.dto";
 import type { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapter";
 import { octoPrintEvent } from "@/services/octoprint/octoprint-websocket.adapter";
