@@ -11,8 +11,7 @@ import { octoPrintEvent } from "@/services/octoprint/octoprint-websocket.adapter
 import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
 import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.constants";
 import type { PrusaLinkEventDto } from "@/services/prusa-link/constants/prusalink-event.dto";
-import { bambuEvent } from "@/services/bambu/bambu-mqtt.adapter";
-import type { BambuEventDto } from "@/services/bambu/bambu-mqtt.adapter";
+import { bambuEvent, type BambuEventDto } from "@/services/bambu/bambu-mqtt.adapter";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { PrintJobService } from "@/services/orm/print-job.service";

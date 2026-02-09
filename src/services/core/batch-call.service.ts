@@ -6,8 +6,7 @@ import { errorSummary } from "@/utils/error.utils";
 import { LoggerService } from "@/handlers/logger";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
-import { ReprintState } from "@/services/printer-api.interface";
-import type { IPrinterApi, ReprintFileDto } from "@/services/printer-api.interface";
+import { ReprintState, type IPrinterApi, type ReprintFileDto } from "@/services/printer-api.interface";
 import type { LoginDto } from "@/services/interfaces/login.dto";
 
 interface BatchSingletonModel {

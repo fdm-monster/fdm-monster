@@ -1,6 +1,5 @@
 import type { GcodeAnalysisDto } from "@/services/octoprint/dto/files/gcode-analysis.dto";
-import { Prints, Refs } from "@/services/interfaces/printer-file.dto";
-import type { OctoPrintStatisticsDto } from "@/services/interfaces/printer-file.dto";
+import { Prints, Refs, type OctoPrintStatisticsDto } from "@/services/interfaces/printer-file.dto";
 
 export interface DisplayLayerProgressDto {
   // numberstring

@@ -9,8 +9,7 @@ import { newPasswordSchema, registerUserSchema } from "@/services/validators/use
 import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { UserRoleService } from "@/services/orm/user-role.service";
-import { ROLES } from "@/constants/authorization.constants";
-import type { RoleName } from "@/constants/authorization.constants";
+import { ROLES, type RoleName } from "@/constants/authorization.constants";
 import { RoleService } from "@/services/orm/role.service";
 
 export class UserService extends BaseService(User, UserDto) implements IUserService {

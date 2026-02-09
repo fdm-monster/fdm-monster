@@ -6,8 +6,7 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { RoleDto } from "@/services/interfaces/role.dto";
 import { union } from "lodash-es";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { ROLE_PERMS, ROLES } from "@/constants/authorization.constants";
-import type { PermissionName, RoleName } from "@/constants/authorization.constants";
+import { ROLE_PERMS, ROLES, type PermissionName, type RoleName } from "@/constants/authorization.constants";
 
 export class RoleService extends BaseService(Role, RoleDto) implements IRoleService {
   constructor(

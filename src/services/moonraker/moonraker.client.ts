@@ -36,8 +36,7 @@ import type { AccessUserResultDto } from "@/services/moonraker/dto/access/access
 import type { AccessUserDto } from "@/services/moonraker/dto/access/access-user.dto";
 import type { AccessLoginRefreshDto } from "@/services/moonraker/dto/access/access-login-refresh.dto";
 import type { AccessInfoDto } from "@/services/moonraker/dto/access/access-info.dto";
-import { Namespaces } from "@/services/moonraker/dto/database/database-namespace-list.dto";
-import type { DatabaseNamespaceListDto } from "@/services/moonraker/dto/database/database-namespace-list.dto";
+import { Namespaces, type DatabaseNamespaceListDto } from "@/services/moonraker/dto/database/database-namespace-list.dto";
 import type { DatabaseNamespaceItemDto } from "@/services/moonraker/dto/database/database-namespace-item.dto";
 import type { JobQueueStatusDto } from "@/services/moonraker/dto/job-queue/job-queue-status.dto";
 import type { EnqueueJobDto } from "@/services/moonraker/dto/job-queue/enqueue-job.dto";

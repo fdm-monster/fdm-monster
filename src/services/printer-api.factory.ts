@@ -1,5 +1,4 @@
-import { MoonrakerType, OctoprintType, PrusaLinkType, BambuType } from "@/services/printer-api.interface";
-import type { IPrinterApi } from "@/services/printer-api.interface";
+import { MoonrakerType, OctoprintType, PrusaLinkType, BambuType, type IPrinterApi } from "@/services/printer-api.interface";
 import { DITokens } from "@/container.tokens";
 import type { LoginDto } from "@/services/interfaces/login.dto";
 import { PrinterCache } from "@/state/printer.cache";

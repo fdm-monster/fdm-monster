@@ -1,5 +1,4 @@
-import { SocketIoGateway } from "@/state/socket-io.gateway";
-import { IO_MESSAGES } from "@/state/socket-io.gateway";
+import { SocketIoGateway, IO_MESSAGES } from "@/state/socket-io.gateway";
 import { socketIoConnectedEvent } from "@/constants/event.constants";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
