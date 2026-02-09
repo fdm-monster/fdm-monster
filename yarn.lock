@@ -605,7 +605,7 @@ __metadata:
     "@types/ws": "npm:8.18.1"
     adm-zip: "npm:0.5.16"
     awilix: "npm:12.1.0"
-    awilix-express: "npm:9.0.2"
+    awilix-express: "npm:11.0.1"
     axios: "npm:1.13.5"
     basic-ftp: "npm:5.1.0"
     bcryptjs: "npm:3.0.3"
@@ -3664,22 +3664,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"awilix-express@npm:9.0.2":
-  version: 9.0.2
-  resolution: "awilix-express@npm:9.0.2"
+"awilix-express@npm:11.0.1":
+  version: 11.0.1
+  resolution: "awilix-express@npm:11.0.1"
   dependencies:
-    awilix-router-core: "npm:^2.1.0"
-    tslib: "npm:^2.8.1"
-  checksum: 10c0/52f32158b7e95aaca76fb8a98b9090734f36d5eb4672d0a7c07d933fc5130397549fdf3fed24213eda6c525b43bc02a1caf84f6f863b473124b6e35188571cef
+    awilix-router-core: "npm:^4.0.0"
+  checksum: 10c0/660cdfebed51d2223cc6f4acea22e9e5cc8785fd8bfe1edc652fc0aeee7753343daf2af09e8dfe0850b3bc41f216c5f677467e635ef6722088c8155c6a31edfc
   languageName: node
   linkType: hard
 
-"awilix-router-core@npm:^2.1.0":
-  version: 2.1.2
-  resolution: "awilix-router-core@npm:2.1.2"
+"awilix-router-core@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "awilix-router-core@npm:4.0.0"
   dependencies:
     fast-glob: "npm:^3.3.3"
-  checksum: 10c0/c8e53ef17214f3839ee377e305723a9cfdea1bfebb906cd2a800e2e9c502e8ddbb8a46ce7e19957dc82934bb43ee0e415e515c1224ae35a7a85670780e24ae09
+  checksum: 10c0/f9b7c11d02252d957617a360f4ef2b20d830e930de61aece0f967ecb9503c3d840020a5b83e6dd831723e5cfcd9e1338767d1e5e07b3978e5c224a44dd9c1893
   languageName: node
   linkType: hard
 
