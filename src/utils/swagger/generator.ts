@@ -1,8 +1,7 @@
 import { OpenAPIObject, PathItemObject, SchemaObject } from "openapi3-ts/oas31";
 import { API_METADATA_KEY } from "@/utils/swagger/decorators";
 import { findControllers, FindControllersResult } from "awilix-express";
-import { MethodName } from "awilix-router-core/lib/state-util";
-import type { IRouteConfig } from "awilix-router-core/lib/state-util";
+import { MethodName, type IRouteConfig } from "awilix-router-core/lib/state-util";
 import { LoggerService } from "@/handlers/logger";
 import { getDirname } from "@/utils/fs.utils";
 

@@ -1,6 +1,5 @@
 import { IsAlphanumeric } from "class-validator";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import type { Relation } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, type Relation } from "typeorm";
 import { PrinterTag } from "@/entities/printer-tag.entity";
 import { OctoprintType } from "@/services/printer-api.interface";
 

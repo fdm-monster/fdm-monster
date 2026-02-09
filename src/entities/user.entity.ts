@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from "typeorm";
-import type { Relation } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, type Relation } from "typeorm";
 import { RefreshToken } from "@/entities/refresh-token.entity";
 import { UserRole } from "@/entities/user-role.entity";
 

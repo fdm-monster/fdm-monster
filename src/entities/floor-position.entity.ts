@@ -1,5 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import type { Relation } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique, type Relation } from "typeorm";
 import { Floor } from "./floor.entity";
 import { Printer } from "./printer.entity";
 

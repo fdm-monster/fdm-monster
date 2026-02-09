@@ -1,5 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import type { Relation } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, type Relation } from "typeorm";
 import { Role } from "@/entities/role.entity";
 import { User } from "@/entities/user.entity";
 
