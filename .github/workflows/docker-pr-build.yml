@@ -14,7 +14,7 @@ jobs:
         uses: docker/setup-buildx-action@7c525be6cc8a882d5163ce04293cac18617c709f
 
       - name: Build regular image (AMD64 only)
-        uses: docker/build-push-action@806c75105a1251cac8905df5dd4723b33174552c
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
         with:
           push: false
           context: "{{defaultContext}}"
