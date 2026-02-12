@@ -604,7 +604,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     "@types/ws": "npm:8.18.1"
     adm-zip: "npm:0.5.16"
-    awilix: "npm:12.1.0"
+    awilix: "npm:12.1.1"
     awilix-express: "npm:11.0.1"
     axios: "npm:1.13.5"
     basic-ftp: "npm:5.1.0"
@@ -3682,12 +3682,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"awilix@npm:12.1.0":
-  version: 12.1.0
-  resolution: "awilix@npm:12.1.0"
+"awilix@npm:12.1.1":
+  version: 12.1.1
+  resolution: "awilix@npm:12.1.1"
   dependencies:
     fast-glob: "npm:^3.3.3"
-  checksum: 10c0/b96e9694087cfc87d75a12a6572850453a7fd16dda1456f109934960fc6fd87ac4677fccd30251394af5545ab7f33921ac802b2cc8ed410e7c68daeeb79bf1c1
+  checksum: 10c0/44b0c51b955547d7375d86af5811f837ead0920695d2a5ba5516f791f3e7345f2ba328240302ca4fda38b1766efae93efd62452d0b1cd58c8299abb4dab2f1ef
   languageName: node
   linkType: hard
 
