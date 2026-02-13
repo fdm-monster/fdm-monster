@@ -650,7 +650,7 @@ __metadata:
     typescript: "npm:5.9.3"
     uuid: "npm:11.1.0"
     winston: "npm:3.19.0"
-    winston-loki: "npm:6.1.3"
+    winston-loki: "npm:6.1.4"
     ws: "npm:8.19.0"
     zod: "npm:3.25.76"
   bin:
@@ -9370,9 +9370,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston-loki@npm:6.1.3":
-  version: 6.1.3
-  resolution: "winston-loki@npm:6.1.3"
+"winston-loki@npm:6.1.4":
+  version: 6.1.4
+  resolution: "winston-loki@npm:6.1.4"
   dependencies:
     async-exit-hook: "npm:2.0.1"
     btoa: "npm:^1.2.1"
@@ -9383,7 +9383,7 @@ __metadata:
   dependenciesMeta:
     snappy:
       optional: true
-  checksum: 10c0/0c961ba3765e44a30605f365e54c34ae3cc1241df0cbd00df03bf409b8a59046c5dd663710a352a02e2e719595f10e71bd6a484720d707247aae8808af111452
+  checksum: 10c0/9f34a79a52f0b3533c81b2fed5c2ad6b20853100fae5191aa7c082cfd1389f7bc7b8c8622d952e3b5f31bb9ccf30eb6b64d5b1d8990b66e8fc44198450acf30c
   languageName: node
   linkType: hard
 
