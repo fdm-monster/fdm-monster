@@ -8882,11 +8882,11 @@ __metadata:
   linkType: hard
 
 "text-decoder@npm:^1.1.0":
-  version: 1.2.4
-  resolution: "text-decoder@npm:1.2.4"
+  version: 1.2.6
+  resolution: "text-decoder@npm:1.2.6"
   dependencies:
     b4a: "npm:^1.6.4"
-  checksum: 10c0/9c75119e6daafbc091672859738be33b612bb48e1e14aeeabdb0bf4e9f81edf4d5656669a2adf1779fdb9b76605838741213e78683d1944cd425c133f16988de
+  checksum: 10c0/990fe5fa5e2f33c305d5ea7e4b058fd5534298c66d4bd9aaceafa9a1c244b0857ceeba0da04669981f2bcaf08e14bf51bf80955a851102176ec4822f61069963
   languageName: node
   linkType: hard
 
