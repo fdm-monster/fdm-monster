@@ -5,7 +5,7 @@ import { superRootPath } from "@/utils/fs.utils";
 
 if (process.env.NODE_ENV !== "test") {
   dotenv.config({
-    path: process.env.ENV_FILE || join(superRootPath(), ".env")
+    path: process.env.ENV_FILE || join(superRootPath(), ".env"),
   });
 }
 

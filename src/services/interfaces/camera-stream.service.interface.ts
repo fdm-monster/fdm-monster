@@ -1,4 +1,4 @@
-import { CameraStreamDto, CreateCameraStreamDto } from "@/services/interfaces/camera-stream.dto";
+import type { CameraStreamDto, CreateCameraStreamDto } from "@/services/interfaces/camera-stream.dto";
 import { CameraStream } from "@/entities";
 
 export interface ICameraStreamService<Entity = CameraStream> {

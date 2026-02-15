@@ -1,4 +1,4 @@
-import { PermissionName } from "@/constants/authorization.constants";
+import type { PermissionName } from "@/constants/authorization.constants";
 
 export interface IPermissionService {
   authorizePermission(requiredPermission: PermissionName, assignedPermissions: PermissionName[]): boolean;

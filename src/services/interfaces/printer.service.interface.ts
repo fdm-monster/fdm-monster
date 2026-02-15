@@ -1,4 +1,4 @@
-import { PrinterDto } from "@/services/interfaces/printer.dto";
+import type { PrinterDto } from "@/services/interfaces/printer.dto";
 import { z } from "zod";
 import { createPrinterSchema } from "@/services/validators/printer-service.validation";
 import { Printer } from "@/entities";

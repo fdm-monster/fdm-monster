@@ -1,8 +1,9 @@
 import { OpenAPIObject, PathItemObject, SchemaObject } from "openapi3-ts/oas31";
 import { API_METADATA_KEY } from "@/utils/swagger/decorators";
 import { findControllers, FindControllersResult } from "awilix-express";
-import { IRouteConfig, MethodName } from "awilix-router-core/lib/state-util";
+import { MethodName, type IRouteConfig } from "awilix-router-core/lib/state-util";
 import { LoggerService } from "@/handlers/logger";
+import { getDirname } from "@/utils/fs.utils";
 
 export class SwaggerGenerator {
   private readonly logger: LoggerService;
@@ -15,7 +16,8 @@ export class SwaggerGenerator {
     info: {
       title: "FDM Monster API",
       version: process.env.npm_package_version || "2.0.0",
-      description: "FDM Monster is a bulk OctoPrint, Klipper, PrusaLink and BambuLab manager to set up, configure and monitor 3D printers. Our aim is to provide neat overview over your farm.",
+      description:
+        "FDM Monster is a bulk OctoPrint, Klipper, PrusaLink and BambuLab manager to set up, configure and monitor 3D printers. Our aim is to provide neat overview over your farm.",
       license: {
         name: "AGPL-3.0-or-later",
         url: "https://www.gnu.org/licenses/agpl-3.0.en.html",
@@ -53,10 +55,11 @@ export class SwaggerGenerator {
   public async generate(): Promise<OpenAPIObject> {
     try {
       const routePath = "../../controllers";
-      const discoveredControllers = findControllers(`${routePath}/*.controller.js`, {
-        cwd: __dirname,
+      const discoveredControllers = await findControllers(`${routePath}/*.controller.js`, {
+        cwd: getDirname(import.meta.url),
         ignore: ["**/*.map", "**/*.d.ts"],
         absolute: true,
+        esModules: true,
       });
       for (const registration of discoveredControllers) {
         await this.processController(registration);
@@ -81,7 +84,7 @@ export class SwaggerGenerator {
     controller: Awaited<FindControllersResult>[number],
     root: IRouteConfig,
     methodName: MethodName,
-    methodConfig: IRouteConfig
+    methodConfig: IRouteConfig,
   ) {
     if (!methodName) return;
 
@@ -97,7 +100,15 @@ export class SwaggerGenerator {
         const key = `${name}:operation`;
         const description = metadata?.hasOwnProperty(key) ? metadata[key] : null;
 
-        const httpMethod = verb.toLowerCase() as "get" | "post" | "put" | "delete" | "patch" | "options" | "head" | "trace";
+        const httpMethod = verb.toLowerCase() as
+          | "get"
+          | "post"
+          | "put"
+          | "delete"
+          | "patch"
+          | "options"
+          | "head"
+          | "trace";
 
         const operationObject = {
           tags: [controller.target.name],

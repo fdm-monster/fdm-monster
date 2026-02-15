@@ -18,14 +18,14 @@ import { PrinterCache } from "@/state/printer.cache";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
 import { FloorStore } from "@/state/floor.store";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { Request, Response } from "express";
-import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
+import type { Request, Response } from "express";
+import type { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 import { AxiosError } from "axios";
 import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";
 import { InternalServerException } from "@/exceptions/runtime.exceptions";
-import { IPrinterApi } from "@/services/printer-api.interface";
+import type { IPrinterApi } from "@/services/printer-api.interface";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
@@ -288,7 +288,7 @@ export class PrinterController {
           default: {
             if (e.response?.status) {
               throw new FailedDependencyException(
-                `Reaching Printer service failed with status (code ${ e.code })`,
+                `Reaching Printer service failed with status (code ${e.code})`,
                 e.response?.status,
               );
             } else {
@@ -296,7 +296,7 @@ export class PrinterController {
               // ENOTFOUND: DNS problem
               // ECONNREFUSED: Port has no socket bound
               // ERR_BAD_REQUEST
-              throw new FailedDependencyException(`Reaching Printer service failed without status (code ${ e.code })`);
+              throw new FailedDependencyException(`Reaching Printer service failed without status (code ${e.code})`);
             }
           }
         }

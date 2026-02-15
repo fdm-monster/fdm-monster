@@ -1,13 +1,13 @@
 import { before, DELETE, GET, POST, PUT, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { authorizeRoles, authenticate } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { PrintQueueService } from "@/services/print-queue.service";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { FileStorageService } from "@/services/file-storage.service";
 import { PrinterCache } from "@/state/printer.cache";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { ParamId } from "@/middleware/param-converter.middleware";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";

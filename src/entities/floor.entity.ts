@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, type Relation } from "typeorm";
 import { FloorPosition } from "./floor-position.entity";
 
 @Entity()

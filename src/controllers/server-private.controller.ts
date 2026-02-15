@@ -10,12 +10,12 @@ import { PrinterCache } from "@/state/printer.cache";
 import { YamlService } from "@/services/core/yaml.service";
 import { MulterService } from "@/services/core/multer.service";
 import { LogDumpService } from "@/services/core/logs-manager.service";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { GithubService } from "@/services/core/github.service";
-import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import type { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { updateClientBundleSchema } from "@/controllers/validation/server-private.validation";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 
 @route(AppConstants.apiRoute + "/server")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
@@ -105,7 +105,7 @@ export class ServerPrivateController {
   @POST()
   @route("/yaml-import")
   async importYaml(req: Request, res: Response) {
-    const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml",".yml"], false);
+    const files = await this.multerService.multerLoadFileAsync(req, res, [".yaml", ".yml"], false);
     const firstFile = files[0];
     const spec = await this.yamlService.importYaml(firstFile.buffer.toString());
 

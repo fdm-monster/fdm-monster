@@ -4,7 +4,7 @@ import {
   jsonContentType,
 } from "@/services/octoprint/constants/octoprint-service.constants";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 
 export function validateLogin(login: LoginDto) {
   if (!login.apiKey || !login.printerURL) {

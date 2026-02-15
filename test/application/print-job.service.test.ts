@@ -64,7 +64,7 @@ describe("PrintJobService", () => {
         "..",
         "api",
         "test-data",
-        "Shape-Box_0.4n_0.2mm_PLA_MK4ISMMU3_20m.bgcode"
+        "Shape-Box_0.4n_0.2mm_PLA_MK4ISMMU3_20m.bgcode",
       );
       const { metadata } = await fileAnalysisService.analyzeFile(bgcodePath);
 
@@ -91,8 +91,8 @@ describe("PrintJobService", () => {
             filamentDensity: 1.25,
             filamentUsedGrams: 10,
           }),
-          "utf8"
-        )
+          "utf8",
+        ),
       );
       const tmp = path.join(__dirname, "..", "api", "test-data", "test-metadata.3mf");
       zip.writeZip(tmp);

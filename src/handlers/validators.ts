@@ -1,4 +1,4 @@
-import { Request } from "express";
+import type { Request } from "express";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 import { ZodSchema } from "zod";
 

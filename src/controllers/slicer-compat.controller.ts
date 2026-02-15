@@ -1,9 +1,9 @@
 import { GET, POST, route, before } from "awilix-express";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { FileStorageService } from "@/services/file-storage.service";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { MulterService } from "@/services/core/multer.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
 import { slicerApiKeyAuth } from "@/middleware/slicer-api-key.middleware";
@@ -87,11 +87,16 @@ export class SlicerCompatController {
         metadata = analysisResult.metadata;
         thumbnails = analysisResult.thumbnails || [];
 
-        const thumbnailMetadata = thumbnails.length > 0
-          ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails)
-          : [];
+        const thumbnailMetadata =
+          thumbnails.length > 0 ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails) : [];
 
-        await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
+        await this.fileStorageService.saveMetadata(
+          fileStorageId,
+          metadata,
+          fileHash,
+          file.originalname,
+          thumbnailMetadata,
+        );
       } catch (analysisError) {
         this.logger.error(`Failed to analyze uploaded file: ${analysisError}`);
       }
@@ -153,7 +158,7 @@ export class SlicerCompatController {
       const files = await this.fileStorageService.listAllFiles();
 
       // Convert to known format
-      const knownFiles = files.map(file => ({
+      const knownFiles = files.map((file) => ({
         name: file.metadata?._originalFileName || file.fileName,
         path: file.fileStorageId,
         type: "machinecode",
@@ -163,15 +168,17 @@ export class SlicerCompatController {
           resource: `/api/files/local/${file.fileStorageId}`,
           download: `/api/files/local/${file.fileStorageId}`,
         },
-        gcodeAnalysis: file.metadata ? {
-          estimatedPrintTime: file.metadata.gcodePrintTimeSeconds,
-          filament: {
-            tool0: {
-              length: file.metadata.filamentUsedMm,
-              volume: file.metadata.filamentUsedCm3,
-            },
-          },
-        } : undefined,
+        gcodeAnalysis: file.metadata
+          ? {
+              estimatedPrintTime: file.metadata.gcodePrintTimeSeconds,
+              filament: {
+                tool0: {
+                  length: file.metadata.filamentUsedMm,
+                  volume: file.metadata.filamentUsedCm3,
+                },
+              },
+            }
+          : undefined,
         date: Math.floor(file.createdAt.getTime() / 1000),
         size: file.fileSize,
       }));
@@ -200,4 +207,3 @@ export class SlicerCompatController {
     });
   }
 }
-

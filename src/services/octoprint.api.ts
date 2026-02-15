@@ -1,5 +1,12 @@
-import { IPrinterApi, OctoprintType, PrinterType, ReprintState, UploadFileInput, uploadFileInputSchema } from "@/services/printer-api.interface";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import {
+  OctoprintType,
+  PrinterType,
+  ReprintState,
+  UploadFileInput,
+  uploadFileInputSchema,
+} from "@/services/printer-api.interface";
+import type { IPrinterApi } from "@/services/printer-api.interface";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { NotImplementedException } from "@/exceptions/runtime.exceptions";
 import { AxiosPromise } from "axios";
@@ -96,8 +103,8 @@ export class OctoprintApi implements IPrinterApi {
   async getFiles(recursive = false, startDir = "") {
     const items = await this.client.getLocalFiles(this.login, recursive, startDir);
     return {
-      dirs: items.filter(f => f.dir),
-      files: items.filter(f => !f.dir),
+      dirs: items.filter((f) => f.dir),
+      files: items.filter((f) => !f.dir),
     };
   }
 
@@ -111,7 +118,14 @@ export class OctoprintApi implements IPrinterApi {
 
   async uploadFile(input: UploadFileInput) {
     const validated = uploadFileInputSchema.parse(input);
-    await this.client.uploadFileAsMultiPart(this.login, validated.stream, validated.fileName, validated.contentLength, validated.startPrint, validated.uploadToken);
+    await this.client.uploadFileAsMultiPart(
+      this.login,
+      validated.stream,
+      validated.fileName,
+      validated.contentLength,
+      validated.startPrint,
+      validated.uploadToken,
+    );
   }
 
   async deleteFile(path: string) {

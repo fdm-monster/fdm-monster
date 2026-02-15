@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
-  printerApiKeyValidator, printerDisabledReasonValidator,
+  printerApiKeyValidator,
+  printerDisabledReasonValidator,
   printerEnabledValidator,
   printerNameValidator,
   printerPasswordValidator,

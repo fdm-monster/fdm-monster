@@ -1,6 +1,6 @@
 import { BaseService } from "@/services/orm/base.service";
 import { Floor, FloorPosition } from "@/entities";
-import { IFloorService } from "@/services/interfaces/floor.service.interface";
+import type { IFloorService } from "@/services/interfaces/floor.service.interface";
 import { FloorPositionService } from "./floor-position.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";

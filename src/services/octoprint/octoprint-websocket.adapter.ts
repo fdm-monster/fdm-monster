@@ -7,21 +7,21 @@ import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { ConfigService } from "@/services/core/config.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { AxiosError } from "axios";
-import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
+import type { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { WebsocketAdapter } from "@/shared/websocket.adapter";
-import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import type { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
-import { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
+import type { OP_LoginDto } from "@/services/octoprint/dto/auth/login.dto";
 import { Event as WsEvent } from "ws";
-import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
-import { OctoprintErrorDto } from "@/services/octoprint/dto/rest/error.dto";
+import type { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
+import type { OctoprintErrorDto } from "@/services/octoprint/dto/rest/error.dto";
 import { OctoprintType } from "@/services/printer-api.interface";
-import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
-import { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
+import type { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import type { CurrentJobDto } from "@/services/octoprint/dto/job/current-job.dto";
 
 export const WsMessage = {
   // Custom events
@@ -43,7 +43,6 @@ export const OctoPrintMessage = {
   slicingProgress: "slicingProgress",
 } as const;
 
-export const octoPrintWebsocketEvent = (printerId: string) => `octoprint.${printerId}`;
 export const octoPrintEvent = (event: string) => `octoprint.${event}`;
 
 export class OctoprintWebsocketAdapter extends WebsocketAdapter implements IWebsocketAdapter {

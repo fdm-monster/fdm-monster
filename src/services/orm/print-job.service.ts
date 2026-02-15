@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
 import { PrintJob, PrintJobMetadata } from "@/entities/print-job.entity";
-import { EventEmitter2 } from "eventemitter2";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import EventEmitter2 from "eventemitter2";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import {
@@ -59,7 +59,12 @@ export interface PrintJobCancelledEvent {
 export interface IPrintJobService {
   handleFileAnalyzed(jobId: number, metadata: PrintJobMetadata, thumbnails?: any[]): Promise<PrintJob>;
   handlePrintStarted(printerId: number, fileName: string, jobId?: number, printerName?: string): Promise<PrintJob>;
-  handlePrintProgress(printerId: number, progress: number, currentLayer?: number, totalLayers?: number): Promise<PrintJob | null>;
+  handlePrintProgress(
+    printerId: number,
+    progress: number,
+    currentLayer?: number,
+    totalLayers?: number,
+  ): Promise<PrintJob | null>;
   handlePrintCompleted(printerId: number, fileName?: string): Promise<PrintJob | null>;
   handlePrintFailed(printerId: number, reason: string, fileName?: string): Promise<PrintJob | null>;
   handlePrintCancelled(printerId: number, reason?: string): Promise<PrintJob | null>;
@@ -71,17 +76,35 @@ export interface IPrintJobService {
 
   // Helper methods for printer middleware
   markStarted(printerId: number, fileName: string, printerName?: string): Promise<PrintJob>;
-  markProgress(printerId: number, fileName: string, progress: number, currentLayer?: number, totalLayers?: number): Promise<PrintJob | null>;
+  markProgress(
+    printerId: number,
+    fileName: string,
+    progress: number,
+    currentLayer?: number,
+    totalLayers?: number,
+  ): Promise<PrintJob | null>;
   markFinished(printerId: number, fileName: string): Promise<PrintJob | null>;
   markFailed(printerId: number, fileName: string, reason: string): Promise<PrintJob | null>;
   updateJobMetadata(printerId: number, fileName: string, partialMetadata: Partial<PrintJobMetadata>): Promise<void>;
 
   // Search methods for API
   searchPrintJobs(searchPrinter?: string, searchFile?: string, startDate?: Date, endDate?: Date): Promise<PrintJob[]>;
-  searchPrintJobsPaged(searchPrinter?: string, searchFile?: string, startDate?: Date, endDate?: Date, page?: number, pageSize?: number): Promise<[PrintJob[], number]>;
+  searchPrintJobsPaged(
+    searchPrinter?: string,
+    searchFile?: string,
+    startDate?: Date,
+    endDate?: Date,
+    page?: number,
+    pageSize?: number,
+  ): Promise<[PrintJob[], number]>;
 
   // Job creation
-  createPendingJob(printerId: number, fileName: string, metadata: PrintJobMetadata, printerName?: string): Promise<PrintJob>;
+  createPendingJob(
+    printerId: number,
+    fileName: string,
+    metadata: PrintJobMetadata,
+    printerName?: string,
+  ): Promise<PrintJob>;
 
   // File download and analysis
   triggerFileAnalysis(jobId: number): Promise<void>;
@@ -114,7 +137,7 @@ export class PrintJobService implements IPrintJobService {
   async getJobByIdOrFail(id: number, relations?: string[]): Promise<PrintJob> {
     const job = await this.printJobRepository.findOne({
       where: { id },
-      relations
+      relations,
     });
     if (!job) {
       throw new NotFoundException(`Job ${id} not found`);
@@ -122,11 +145,7 @@ export class PrintJobService implements IPrintJobService {
     return job;
   }
 
-  async handleFileAnalyzed(
-    jobId: number,
-    metadata: PrintJobMetadata,
-    thumbnails?: any[],
-  ): Promise<PrintJob> {
+  async handleFileAnalyzed(jobId: number, metadata: PrintJobMetadata, thumbnails?: any[]): Promise<PrintJob> {
     const job = await this.printJobRepository.findOne({ where: { id: jobId } });
     if (!job) {
       throw new Error(`Print job ${jobId} not found`);
@@ -176,7 +195,7 @@ export class PrintJobService implements IPrintJobService {
 
       this.logger.warn(
         `Printer ${printerId} started new print "${fileName}" while job ${existingJob.id} was PRINTING "${existingJob.fileName}". ` +
-        `Marked job ${existingJob.id} as UNKNOWN.`
+          `Marked job ${existingJob.id} as UNKNOWN.`,
       );
     }
 
@@ -262,40 +281,27 @@ export class PrintJobService implements IPrintJobService {
     return job;
   }
 
-  async handlePrintProgress(
-    printerId: number,
-    progress: number,
-    currentLayer?: number,
-    totalLayers?: number,
-  ): Promise<PrintJob | null> {
+  async handlePrintProgress(printerId: number, progress: number): Promise<PrintJob | null> {
     const job = await this.printJobRepository.findOne({
       where: { printerId, status: "PRINTING" },
       order: { startedAt: "DESC" },
     });
 
     if (!job) {
-      this.logger.warn(`No active print job found for printer ${printerId} during progress update`);
       return null;
     }
 
     job.progress = Math.min(100, Math.max(0, progress));
 
-    if (!job.statistics) {
+    if (job.statistics) {
+      job.statistics.progress = job.progress;
+    } else {
       job.statistics = {
         startedAt: job.startedAt,
         endedAt: null,
         actualPrintTimeSeconds: null,
         progress: job.progress,
       };
-    } else {
-      job.statistics.progress = job.progress;
-    }
-
-    if (currentLayer !== undefined) {
-      job.statistics.currentLayer = currentLayer;
-    }
-    if (totalLayers !== undefined) {
-      job.statistics.totalLayers = totalLayers;
     }
 
     await this.printJobRepository.save(job);
@@ -304,8 +310,6 @@ export class PrintJobService implements IPrintJobService {
       jobId: job.id,
       printerId,
       progress: job.progress,
-      currentLayer,
-      totalLayers,
     } as PrintJobProgressEvent);
 
     return job;
@@ -323,9 +327,7 @@ export class PrintJobService implements IPrintJobService {
     }
 
     if (fileName && job.fileName !== fileName) {
-      this.logger.warn(
-        `Filename mismatch on completion: expected "${job.fileName}", got "${fileName}"`
-      );
+      this.logger.warn(`Filename mismatch on completion: expected "${job.fileName}", got "${fileName}"`);
     }
 
     const endedAt = new Date();
@@ -346,17 +348,13 @@ export class PrintJobService implements IPrintJobService {
 
     this.logger.log(
       `Print job ${job.id} completed on printer ${printerId}: ${job.fileName} ` +
-      `(${actualTimeSeconds?.toFixed(0)}s actual, ${job.metadata?.gcodePrintTimeSeconds}s estimated)`
+        `(${actualTimeSeconds?.toFixed(0)}s actual, ${job.metadata?.gcodePrintTimeSeconds}s estimated)`,
     );
 
     return job;
   }
 
-  async handlePrintFailed(
-    printerId: number,
-    reason: string,
-    fileName?: string,
-  ): Promise<PrintJob | null> {
+  async handlePrintFailed(printerId: number, reason: string, fileName?: string): Promise<PrintJob | null> {
     const job = await this.printJobRepository.findOne({
       where: { printerId, status: "PRINTING" },
       order: { startedAt: "DESC" },
@@ -382,9 +380,7 @@ export class PrintJobService implements IPrintJobService {
       failedAt: endedAt,
     } as PrintJobFailedEvent);
 
-    this.logger.log(
-      `Print job ${job.id} failed on printer ${printerId}: ${job.fileName} - ${reason}`
-    );
+    this.logger.log(`Print job ${job.id} failed on printer ${printerId}: ${job.fileName} - ${reason}`);
 
     return job;
   }
@@ -468,7 +464,7 @@ export class PrintJobService implements IPrintJobService {
 
       this.logger.warn(
         `Marked job ${job.id} (printer ${job.printerId}) as UNKNOWN after startup - ` +
-        `was PRINTING before server stopped`
+          `was PRINTING before server stopped`,
       );
     }
 
@@ -484,10 +480,7 @@ export class PrintJobService implements IPrintJobService {
     });
   }
 
-  async getPrintJobHistory(
-    printerId: number,
-    limit: number = 50,
-  ): Promise<PrintJob[]> {
+  async getPrintJobHistory(printerId: number, limit: number = 50): Promise<PrintJob[]> {
     return this.printJobRepository.find({
       where: { printerId },
       order: { createdAt: "DESC" },
@@ -495,28 +488,12 @@ export class PrintJobService implements IPrintJobService {
     });
   }
 
-  // ========== Helper methods for printer middleware integration ==========
-
-  /**
-   * Mark a print as started by fileName (creates job if needed)
-   * Used by printer middleware when they detect a print starting
-   */
   async markStarted(printerId: number, fileName: string, printerName?: string): Promise<PrintJob> {
     return await this.handlePrintStarted(printerId, fileName, undefined, printerName);
   }
 
-  /**
-   * Update print progress by fileName
-   * Used by printer middleware to update progress during printing
-   */
-  async markProgress(
-    printerId: number,
-    fileName: string,
-    progress: number,
-    currentLayer?: number,
-    totalLayers?: number,
-  ): Promise<PrintJob | null> {
-    return await this.handlePrintProgress(printerId, progress, currentLayer, totalLayers);
+  async markProgress(printerId: number, fileName: string, progress: number): Promise<PrintJob | null> {
+    return await this.handlePrintProgress(printerId, progress);
   }
 
   /**
@@ -575,7 +552,7 @@ export class PrintJobService implements IPrintJobService {
     } else {
       // No metadata exists - only create if we have meaningful data
       // Don't create metadata structure with mostly nulls
-      const hasData = Object.values(partialMetadata).some(v => v != null && v !== null);
+      const hasData = Object.values(partialMetadata).some((v) => v !== null);
       if (!hasData) {
         this.logger.debug(`Skipping metadata creation for job ${job.id} - no meaningful data provided`);
         return;
@@ -622,9 +599,7 @@ export class PrintJobService implements IPrintJobService {
       query.andWhere("job.startedAt <= :endDate", { endDate });
     }
 
-    return await query
-      .orderBy("job.startedAt", "DESC")
-      .getMany();
+    return await query.orderBy("job.startedAt", "DESC").getMany();
   }
 
   /**
@@ -677,7 +652,8 @@ export class PrintJobService implements IPrintJobService {
   ): Promise<PrintJob> {
     // Determine if metadata contains meaningful analysis data
     // (more than just basic file info)
-    const hasAnalysisData = metadata.gcodePrintTimeSeconds !== null ||
+    const hasAnalysisData =
+      metadata.gcodePrintTimeSeconds !== null ||
       metadata.filamentUsedGrams !== null ||
       metadata.totalFilamentUsedGrams !== null ||
       metadata.layerHeight !== null ||
@@ -702,7 +678,7 @@ export class PrintJobService implements IPrintJobService {
     await this.printJobRepository.save(job);
 
     this.logger.log(
-      `Created ${analysisState.toLowerCase()} print job ${job.id} for printer ${printerId}: ${fileName} (format: ${metadata.fileFormat})`
+      `Created ${analysisState.toLowerCase()} print job ${job.id} for printer ${printerId}: ${fileName} (format: ${metadata.fileFormat})`,
     );
     return job;
   }

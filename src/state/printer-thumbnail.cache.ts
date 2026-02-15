@@ -1,5 +1,5 @@
 import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { FileStorageService } from "@/services/file-storage.service";
@@ -196,4 +196,3 @@ export class PrinterThumbnailCache extends KeyDiffCache<CachedPrinterThumbnail> 
     }
   }
 }
-

@@ -1,7 +1,7 @@
-import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
+import type { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { SocketState } from "@/shared/dtos/socket-state.type";
 import { ApiState } from "@/shared/dtos/api-state.type";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 
 export interface IWebsocketAdapter {
   printerType: number;

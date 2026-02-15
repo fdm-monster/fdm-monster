@@ -9,10 +9,10 @@ import {
   uploadFileInputSchema,
 } from "@/services/printer-api.interface";
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 import { NotImplementedException } from "@/exceptions/runtime.exceptions";
 import { AxiosPromise } from "axios";
-import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
+import type { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { PrintStatsObject, WebhooksObject } from "@/services/moonraker/dto/objects/printer-object.types";
 
 /**
@@ -135,17 +135,17 @@ export class MoonrakerApi implements IPrinterApi {
       throw new Error("Recursive mode does not support startDir parameter for Moonraker");
     }
 
-    const stripGcodes = (path: string) => path.startsWith('gcodes/') ? path.substring(7) : path;
-    const buildPath = (name: string) => startDir ? `${startDir}/${name}` : name;
+    const stripGcodes = (path: string) => (path.startsWith("gcodes/") ? path.substring(7) : path);
+    const buildPath = (name: string) => (startDir ? `${startDir}/${name}` : name);
 
     if (recursive) {
       const response = await this.client.getServerFilesList(this.login, "gcodes");
       const dirsSet = new Set<string>();
       const files: FileDto[] = response.data.result.map((f) => {
         const strippedPath = stripGcodes(f.path);
-        const pathParts = strippedPath.split('/');
+        const pathParts = strippedPath.split("/");
         for (let i = 0; i < pathParts.length - 1; i++) {
-          dirsSet.add(pathParts.slice(0, i + 1).join('/'));
+          dirsSet.add(pathParts.slice(0, i + 1).join("/"));
         }
         return this.toFileDto(strippedPath, f.size, f.modified, false);
       });
@@ -153,8 +153,8 @@ export class MoonrakerApi implements IPrinterApi {
       dirsSet.forEach((dirPath) => files.push(this.toFileDto(dirPath, 0, null, true)));
 
       return {
-        dirs: files.filter(f => f.dir),
-        files: files.filter(f => !f.dir),
+        dirs: files.filter((f) => f.dir),
+        files: files.filter((f) => !f.dir),
       };
     }
 
@@ -203,7 +203,14 @@ export class MoonrakerApi implements IPrinterApi {
 
   async uploadFile(input: UploadFileInput) {
     const validated = uploadFileInputSchema.parse(input);
-    await this.client.postServerFileUpload(this.login, validated.stream, validated.fileName, validated.contentLength, validated.startPrint, validated.uploadToken);
+    await this.client.postServerFileUpload(
+      this.login,
+      validated.stream,
+      validated.fileName,
+      validated.contentLength,
+      validated.startPrint,
+      validated.uploadToken,
+    );
   }
 
   async deleteFile(path: string) {

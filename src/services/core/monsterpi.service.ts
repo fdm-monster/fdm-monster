@@ -1,7 +1,7 @@
 import { captureException } from "@sentry/node";
 import { existsSync, readFileSync } from "fs";
 import { AppConstants } from "@/server.constants";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class MonsterPiService {
   private monsterPiVersion: string | null = null;

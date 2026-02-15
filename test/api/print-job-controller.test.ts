@@ -22,9 +22,7 @@ describe("PrintJobController", () => {
   });
 
   it("GET /print-jobs/search-paged returns paged result", async () => {
-    const res = await testRequest
-      .get(`${baseRoute}/search-paged?page=1&pageSize=5`)
-      .set("Accept", "application/json");
+    const res = await testRequest.get(`${baseRoute}/search-paged?page=1&pageSize=5`).set("Accept", "application/json");
     expect(res.status).toBe(200);
     expect(typeof res.body).toBe("object");
     expect(Array.isArray(res.body.items)).toBe(true);
@@ -37,9 +35,7 @@ describe("PrintJobController", () => {
       const printer = await createTestPrinter(testRequest);
       const job = await printJobService.markStarted(printer.id, "test-get.gcode");
 
-      const res = await testRequest
-        .get(`${baseRoute}/${job!.id}`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}/${job!.id}`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body.id).toBe(job!.id);
@@ -48,9 +44,7 @@ describe("PrintJobController", () => {
     });
 
     it("should return 404 for non-existent job", async () => {
-      const res = await testRequest
-        .get(`${baseRoute}/999999`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}/999999`).set("Accept", "application/json");
 
       expect(res.status).toBe(404);
       expect(res.body.error).toContain("not found");
@@ -67,9 +61,7 @@ describe("PrintJobController", () => {
         job!.status = "UNKNOWN";
         await printJobService.printJobRepository.save(job!);
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-completed`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-completed`).set("Accept", "application/json");
 
         expect(res.status).toBe(200);
         expect(res.body.message).toBe("Job marked as completed");
@@ -89,12 +81,10 @@ describe("PrintJobController", () => {
         job.status = "QUEUED";
         await printJobService.printJobRepository.save(job);
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-completed`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-completed`).set("Accept", "application/json");
 
         expect(res.status).toBe(400);
-        expect(res.body.error).toContain("Can only mark jobs which are not \"PENDING\" | \"QUEUED\" as completed");
+        expect(res.body.error).toContain('Can only mark jobs which are not "PENDING" | "QUEUED" as completed');
       });
     });
 
@@ -103,9 +93,7 @@ describe("PrintJobController", () => {
         const printer = await createTestPrinter(testRequest);
         const job = await printJobService.markStarted(printer.id, "test-failed.gcode");
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-failed`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-failed`).set("Accept", "application/json");
 
         expect(res.status).toBe(200);
         expect(res.body.message).toBe("Job marked as failed");
@@ -128,9 +116,7 @@ describe("PrintJobController", () => {
         job!.status = "UNKNOWN";
         await printJobService.printJobRepository.save(job!);
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-failed`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-failed`).set("Accept", "application/json");
 
         expect(res.status).toBe(200);
         expect(res.body.previousStatus).toBe("UNKNOWN");
@@ -142,9 +128,7 @@ describe("PrintJobController", () => {
         const job = await printJobService.markStarted(printer.id, "test-completed.gcode");
         await printJobService.markFinished(printer.id, "test-completed.gcode");
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-failed`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-failed`).set("Accept", "application/json");
 
         expect(res.status).toBe(200);
         expect(res.body.message).toBe("Job marked as failed");
@@ -153,9 +137,7 @@ describe("PrintJobController", () => {
       });
 
       it("should return 404 for non-existent job", async () => {
-        const res = await testRequest
-          .post(`${baseRoute}/999999/set-failed`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/999999/set-failed`).set("Accept", "application/json");
 
         expect(res.status).toBe(404);
         expect(res.body.error).toContain("not found");
@@ -167,9 +149,7 @@ describe("PrintJobController", () => {
         const printer = await createTestPrinter(testRequest);
         const job = await printJobService.markStarted(printer.id, "test-cancelled.gcode");
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-cancelled`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-cancelled`).set("Accept", "application/json");
 
         expect(res.status).toBe(200);
         expect(res.body.message).toBe("Job marked as cancelled");
@@ -188,9 +168,7 @@ describe("PrintJobController", () => {
         const job = await printJobService.markStarted(printer.id, "test-paused-cancelled.gcode");
         await printJobService.handlePrintPaused(printer.id);
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-cancelled`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-cancelled`).set("Accept", "application/json");
 
         expect(res.status).toBe(200);
         expect(res.body.previousStatus).toBe("PAUSED");
@@ -202,11 +180,9 @@ describe("PrintJobController", () => {
         const job = await printJobService.markStarted(printer.id, "test-time-cancelled.gcode");
 
         // Wait a bit to have actual print time
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-cancelled`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-cancelled`).set("Accept", "application/json");
 
         expect(res.status).toBe(200);
 
@@ -219,9 +195,7 @@ describe("PrintJobController", () => {
         const job = await printJobService.markStarted(printer.id, "test-completed-cancel.gcode");
         await printJobService.markFinished(printer.id, "test-completed-cancel.gcode");
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-cancelled`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-cancelled`).set("Accept", "application/json");
 
         expect(res.status).toBe(400);
         expect(res.body.error).toContain("Can only mark UNKNOWN, PRINTING, or PAUSED jobs");
@@ -233,9 +207,7 @@ describe("PrintJobController", () => {
         const printer = await createTestPrinter(testRequest);
         const job = await printJobService.markStarted(printer.id, "test-unknown.gcode");
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-unknown`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-unknown`).set("Accept", "application/json");
 
         expect(res.status).toBe(200);
         expect(res.body.message).toBe("Job marked as unknown");
@@ -255,9 +227,7 @@ describe("PrintJobController", () => {
         const job = await printJobService.markStarted(printer.id, "test-paused-unknown.gcode");
         await printJobService.handlePrintPaused(printer.id);
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-unknown`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-unknown`).set("Accept", "application/json");
 
         expect(res.status).toBe(200);
         expect(res.body.previousStatus).toBe("PAUSED");
@@ -269,9 +239,7 @@ describe("PrintJobController", () => {
         const job = await printJobService.markStarted(printer.id, "test-completed-unknown.gcode");
         await printJobService.markFinished(printer.id, "test-completed-unknown.gcode");
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job!.id}/set-unknown`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job!.id}/set-unknown`).set("Accept", "application/json");
 
         expect(res.status).toBe(400);
         expect(res.body.error).toContain("Can only mark PRINTING or PAUSED jobs");
@@ -282,45 +250,37 @@ describe("PrintJobController", () => {
         const printer = await createTestPrinter(testRequest);
 
         // Create a PENDING job
-        const job = await printJobService.createPendingJob(
-          printer.id,
-          "test-pending.gcode",
-          {
-            fileName: "test-pending.gcode",
-            fileFormat: "gcode",
-            gcodePrintTimeSeconds: null,
-            nozzleDiameterMm: null,
-            filamentDiameterMm: null,
-            filamentDensityGramsCm3: null,
-            filamentUsedMm: null,
-            filamentUsedCm3: null,
-            filamentUsedGrams: null,
-            totalFilamentUsedGrams: null,
-            layerHeight: null,
-            firstLayerHeight: null,
-            bedTemperature: null,
-            nozzleTemperature: null,
-            fillDensity: null,
-            filamentType: null,
-            printerModel: null,
-            slicerVersion: null,
-            maxLayerZ: null,
-            totalLayers: null,
-          }
-        );
+        const job = await printJobService.createPendingJob(printer.id, "test-pending.gcode", {
+          fileName: "test-pending.gcode",
+          fileFormat: "gcode",
+          gcodePrintTimeSeconds: null,
+          nozzleDiameterMm: null,
+          filamentDiameterMm: null,
+          filamentDensityGramsCm3: null,
+          filamentUsedMm: null,
+          filamentUsedCm3: null,
+          filamentUsedGrams: null,
+          totalFilamentUsedGrams: null,
+          layerHeight: null,
+          firstLayerHeight: null,
+          bedTemperature: null,
+          nozzleTemperature: null,
+          fillDensity: null,
+          filamentType: null,
+          printerModel: null,
+          slicerVersion: null,
+          maxLayerZ: null,
+          totalLayers: null,
+        });
 
-        const res = await testRequest
-          .post(`${baseRoute}/${job.id}/set-unknown`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/${job.id}/set-unknown`).set("Accept", "application/json");
 
         expect(res.status).toBe(400);
         expect(res.body.error).toContain("Can only mark PRINTING or PAUSED jobs");
       });
 
       it("should return 404 for non-existent job", async () => {
-        const res = await testRequest
-          .post(`${baseRoute}/999999/set-unknown`)
-          .set("Accept", "application/json");
+        const res = await testRequest.post(`${baseRoute}/999999/set-unknown`).set("Accept", "application/json");
 
         expect(res.status).toBe(404);
         expect(res.body.error).toContain("not found");
@@ -354,9 +314,7 @@ describe("PrintJobController", () => {
         totalLayers: null,
       });
 
-      const res = await testRequest
-        .delete(`${baseRoute}/${job.id}`)
-        .set("Accept", "application/json");
+      const res = await testRequest.delete(`${baseRoute}/${job.id}`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body.message).toContain("Job deleted");
@@ -371,13 +329,10 @@ describe("PrintJobController", () => {
       const printer = await createTestPrinter(testRequest);
       const job = await printJobService.markStarted(printer.id, "test-active-delete.gcode");
 
-      const res = await testRequest
-        .delete(`${baseRoute}/${job!.id}`)
-        .set("Accept", "application/json");
+      const res = await testRequest.delete(`${baseRoute}/${job!.id}`).set("Accept", "application/json");
 
       expect(res.status).toBe(400);
       expect(res.body.error).toContain("Cannot delete active print job");
     });
   });
-
 });

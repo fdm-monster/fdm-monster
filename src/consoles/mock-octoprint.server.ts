@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import fs from "node:fs";
 import path from "node:path";
-import { Server as WebSocketServer, WebSocket } from "ws";
+import { WebSocketServer, WebSocket } from "ws";
 import http from "node:http";
 import { z } from "zod";
 import * as console from "node:console";
@@ -11,6 +11,9 @@ import {
   filesSuccessResponse,
   printerHistorySuccessResponse,
 } from "@/consoles/utils/api-messages";
+import { getDirname } from "@/utils/fs.utils";
+
+const __dirname = getDirname(import.meta.url);
 
 // Shared print state (similar to Bambu mock)
 let isPrinting = false;

@@ -9,7 +9,7 @@ import {
 } from "@/constants/server-settings.constants";
 import { BaseService } from "@/services/orm/base.service";
 import { SettingsDto } from "../interfaces/settings.dto";
-import { ISettingsService } from "@/services/interfaces/settings.service.interface";
+import type { ISettingsService } from "@/services/interfaces/settings.service.interface";
 import { z } from "zod";
 import {
   credentialCoreSettingUpdateSchema,

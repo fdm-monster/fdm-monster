@@ -16,7 +16,7 @@ export interface StatisticsUpdateOptions {
 export function initializeOrUpdateStatistics(
   job: PrintJob,
   endedAt: Date = new Date(),
-  options: StatisticsUpdateOptions = {}
+  options: StatisticsUpdateOptions = {},
 ): PrintStatistics {
   const actualPrintTimeSeconds = calculateJobDuration(job.startedAt, endedAt);
 
@@ -52,11 +52,7 @@ export function updateStatisticsForCompletion(job: PrintJob, endedAt: Date = new
   job.progress = 100;
 }
 
-export function updateStatisticsForFailure(
-  job: PrintJob,
-  reason: string,
-  endedAt: Date = new Date()
-): void {
+export function updateStatisticsForFailure(job: PrintJob, reason: string, endedAt: Date = new Date()): void {
   job.statistics = initializeOrUpdateStatistics(job, endedAt, {
     failureReason: reason,
     failureTime: endedAt,
@@ -68,7 +64,7 @@ export function updateStatisticsForFailure(
 export function updateStatisticsForCancellation(
   job: PrintJob,
   reason: string = "Print cancelled by user",
-  endedAt: Date = new Date()
+  endedAt: Date = new Date(),
 ): void {
   job.statistics = initializeOrUpdateStatistics(job, endedAt);
   job.endedAt = endedAt;

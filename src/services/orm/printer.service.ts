@@ -3,7 +3,7 @@ import { CreatePrinterDto, PrinterDto } from "@/services/interfaces/printer.dto"
 import { Printer } from "@/entities/printer.entity";
 import { BaseService } from "@/services/orm/base.service";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import type { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { validateInput } from "@/handlers/validators";
 import {
   BatchPrinterCreatedEvent,
@@ -13,13 +13,13 @@ import {
   PrinterUpdatedEvent,
 } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { defaultHttpProtocol } from "@/utils/url.utils";
 import {
   createPrinterSchema,
   updatePrinterDisabledReasonSchema,
-  updatePrinterEnabledSchema
+  updatePrinterEnabledSchema,
 } from "@/services/validators/printer-service.validation";
 import { PrinterType } from "@/services/printer-api.interface";
 import { z } from "zod";

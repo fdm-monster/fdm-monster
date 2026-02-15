@@ -1,19 +1,19 @@
 import { MoonrakerClient } from "@/services/moonraker/moonraker.client";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import EventEmitter2 from "eventemitter2";
 import { ConfigService } from "@/services/core/config.service";
-import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
+import type { ISocketLogin } from "@/shared/dtos/socket-login.dto";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
 import { httpToWsUrl } from "@/utils/url.utils";
-import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import type { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
 import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
-import { LoginDto } from "@/services/interfaces/login.dto";
-import { ConnectionIdentifyDto } from "@/services/moonraker/dto/websocket/connection-identify.dto";
-import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-event.dto";
+import type { LoginDto } from "@/services/interfaces/login.dto";
+import type { ConnectionIdentifyDto } from "@/services/moonraker/dto/websocket/connection-identify.dto";
+import type { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-event.dto";
 import { KnownPrinterObject } from "@/services/moonraker/dto/objects/printer-objects-list.dto";
 import { NotifyStatusUpdate } from "@/services/moonraker/dto/websocket/message.types";
 import {
@@ -33,19 +33,19 @@ import {
   WebhooksObject,
 } from "@/services/moonraker/dto/objects/printer-object.types";
 import { PP } from "@/utils/pretty-print.utils";
-import { MoonrakerErrorDto } from "@/services/moonraker/dto/rest/error.dto";
-import { MoonrakerEventDto } from "@/services/moonraker/constants/moonraker-event.dto";
-import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
-import _ from "lodash";
-import { ConnectionIdentifyResponseDto } from "@/services/moonraker/dto/websocket/connection-identify-response.dto";
-import { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
-import { FdmCurrentMessageDto, MoonrakerType } from "@/services/printer-api.interface";
+import type { MoonrakerErrorDto } from "@/services/moonraker/dto/rest/error.dto";
+import type { MoonrakerEventDto } from "@/services/moonraker/constants/moonraker-event.dto";
+import type { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
+import type { ConnectionIdentifyResponseDto } from "@/services/moonraker/dto/websocket/connection-identify-response.dto";
+import type { FlagsDto } from "@/services/octoprint/dto/printer/flags.dto";
+import { MoonrakerType, type FdmCurrentMessageDto } from "@/services/printer-api.interface";
 import { Event as WsEvent } from "ws";
 import { NotifyServiceStateChangedParams } from "@/services/moonraker/dto/websocket/notify-service-state-changed.params";
 import { WebsocketRpcExtendedAdapter } from "@/shared/websocket-rpc-extended.adapter";
-import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import type { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { normalizeUrl } from "@/utils/normalize-url";
 import { AxiosError } from "axios";
+import { merge } from "lodash-es";
 
 export type SubscriptionType = IdleTimeoutObject &
   PauseResumeObject &
@@ -309,7 +309,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
 
       const subState = Object.keys(data)[0] as keyof SubscriptionType;
       if (Object.keys((this.printerObjects as PrinterObjectsQueryDto<SubscriptionType>).status).includes(subState)) {
-        this.printerObjects.status = _.merge(this.printerObjects.status, data);
+        this.printerObjects.status = merge(this.printerObjects.status, data);
         this.printerObjects.eventtime = eventtime;
         await this.emitCurrentEvent(this.printerObjects);
       } else {

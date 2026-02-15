@@ -1,18 +1,18 @@
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import EventEmitter2 from "eventemitter2";
 import { SettingsStore } from "@/state/settings.store";
 import { LoggerService } from "@/handlers/logger";
 import { PrintData } from "@/services/bambu/mqtt-message.types";
 import mqtt from "mqtt";
-import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
-import { ISocketLogin } from "@/shared/dtos/socket-login.dto";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import type { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import type { ISocketLogin } from "@/shared/dtos/socket-login.dto";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 import { SOCKET_STATE, SocketState } from "@/shared/dtos/socket-state.type";
 import { API_STATE, ApiState } from "@/shared/dtos/api-state.type";
 import { BambuType } from "@/services/printer-api.interface";
 import { WsMessage } from "@/services/octoprint/octoprint-websocket.adapter";
 
-export const bambuEvent = (event: string) => `bambu.${ event }`;
+export const bambuEvent = (event: string) => `bambu.${event}`;
 
 export interface BambuEventDto {
   event: string;
@@ -132,10 +132,10 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
     this.isConnecting = true;
     this.updateSocketState(SOCKET_STATE.opening);
 
-    const mqttUrl = `mqtts://${ host }:8883`;
+    const mqttUrl = `mqtts://${host}:8883`;
     const timeout = this.settingsStore.getTimeoutSettings().apiTimeout;
 
-    this.logger.log(`Connecting to Bambu MQTT at ${ mqttUrl }`);
+    this.logger.log(`Connecting to Bambu MQTT at ${mqttUrl}`);
 
     const connectionTimeout = setTimeout(() => {
       this.isConnecting = false;
@@ -159,15 +159,15 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
         this.updateSocketState(SOCKET_STATE.authenticated);
         this.updateApiState(API_STATE.responding);
         this.logger.log("MQTT connected successfully");
-        this.logger.debug(`Connected to MQTT broker at mqtts://${ host }:8883`);
+        this.logger.debug(`Connected to MQTT broker at mqtts://${host}:8883`);
 
-        const reportTopic = `device/${ serial }/report`;
+        const reportTopic = `device/${serial}/report`;
         this.mqttClient!.subscribe(reportTopic, { qos: 0 }, (err) => {
           if (err) {
-            this.logger.error(`Failed to subscribe to ${ reportTopic }:`, err);
+            this.logger.error(`Failed to subscribe to ${reportTopic}:`, err);
             this.updateSocketState(SOCKET_STATE.error);
           } else {
-            this.logger.debug(`Subscribed to ${ reportTopic }`);
+            this.logger.debug(`Subscribed to ${reportTopic}`);
 
             this.sendPushallCommand().catch((err) => {
               this.logger.error("Failed to send pushall command:", err);
@@ -179,8 +179,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
       this.mqttClient.on("error", (error) => {
         this.isConnecting = false;
         this.updateSocketState(SOCKET_STATE.error);
-        this.emitEvent(WsMessage.WS_ERROR, error.message).catch(() => {
-        });
+        this.emitEvent(WsMessage.WS_ERROR, error.message).catch(() => {});
         this.logger.error("MQTT error:", error);
       });
 
@@ -191,8 +190,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
 
       this.mqttClient.on("disconnect", () => {
         this.updateSocketState(SOCKET_STATE.closed);
-        this.emitEvent(WsMessage.WS_CLOSED, "disconnected").catch(() => {
-        });
+        this.emitEvent(WsMessage.WS_CLOSED, "disconnected").catch(() => {});
         this.logger.warn("MQTT disconnected");
       });
 
@@ -206,8 +204,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
       this.mqttClient.on("close", () => {
         this.updateSocketState(SOCKET_STATE.closed);
         this.updateApiState(API_STATE.noResponse);
-        this.emitEvent(WsMessage.WS_CLOSED, "connection closed").catch(() => {
-        });
+        this.emitEvent(WsMessage.WS_CLOSED, "connection closed").catch(() => {});
         this.logger.warn("MQTT connection closed - automatic reconnection will be attempted");
 
         // Emit a "current" event with offline state so frontend updates
@@ -275,7 +272,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
       },
     };
 
-    this.logger.debug(`Sending command: ${ JSON.stringify(payload) } with sequence ID: ${ this.sequenceIdCounter }`);
+    this.logger.debug(`Sending command: ${JSON.stringify(payload)} with sequence ID: ${this.sequenceIdCounter}`);
     this.sequenceIdCounter++;
 
     await this.sendCommand(payload);
@@ -291,7 +288,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
       throw new Error("Serial number not set");
     }
 
-    const reportTopic = `device/${ this.serial }/report`;
+    const reportTopic = `device/${this.serial}/report`;
     const message = JSON.stringify(payload);
 
     return new Promise<void>((resolve, reject) => {
@@ -300,14 +297,19 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
           this.logger.error("Failed to send command:", err);
           reject(err);
         } else {
-          this.logger.debug(`Command sent: ${ message }`);
+          this.logger.debug(`Command sent: ${message}`);
           resolve();
         }
       });
     });
   }
 
-  async startPrint(filename: string, subtask_name?: string, amsMapping?: number[], plateNumber: number = 1): Promise<void> {
+  async startPrint(
+    filename: string,
+    subtask_name?: string,
+    amsMapping?: number[],
+    plateNumber: number = 1,
+  ): Promise<void> {
     await this.sendCommand({
       print: {
         command: "project_file",
@@ -319,7 +321,7 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
         subtask_name: subtask_name ?? filename,
 
         file: "", // Filename to print, not needed when "url" is specified with filepath
-        url: `file:///${ filename }`, // URL to print. Root path, protocol can vary. E.g., if sd card, "ftp:///myfile.3mf", "ftp:///cache/myotherfile.3mf"
+        url: `file:///${filename}`, // URL to print. Root path, protocol can vary. E.g., if sd card, "ftp:///myfile.3mf", "ftp:///cache/myotherfile.3mf"
         md5: "",
 
         timelapse: true,

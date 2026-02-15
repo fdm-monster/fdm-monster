@@ -9,13 +9,13 @@ import { FloorStore } from "@/state/floor.store";
 import { ConfigService } from "@/services/core/config.service";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { TaskService } from "@/services/interfaces/task.interfaces";
 import { RoleService } from "@/services/orm/role.service";
 import { UserService } from "@/services/orm/user.service";
 import { PermissionService } from "@/services/orm/permission.service";
-import { RoleName } from "@/constants/authorization.constants";
+import type { RoleName } from "@/constants/authorization.constants";
 import { PrintFileDownloaderService } from "@/services/print-file-downloader.service";
 import { FileStorageService } from "@/services/file-storage.service";
 

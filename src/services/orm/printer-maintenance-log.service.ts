@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
 import { PrinterMaintenanceLog } from "@/entities/printer-maintenance-log.entity";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import {
   CreateMaintenanceLogDto,
@@ -9,7 +9,7 @@ import {
   CompleteMaintenanceLogDto,
 } from "@/services/interfaces/printer-maintenance-log.dto";
 import { BadRequestException, NotFoundException } from "@/exceptions/runtime.exceptions";
-import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import type { IPrinterService } from "@/services/interfaces/printer.service.interface";
 
 export class PrinterMaintenanceLogService {
   private readonly logger: LoggerService;
@@ -70,15 +70,17 @@ export class PrinterMaintenanceLogService {
     await this.repository.save(log);
 
     // Update printer disabled reason for backwards compatibility
-    await this.printerService.updateDisabledReason(
-      dto.printerId,
-      this.buildDisabledReasonFromMetadata(dto.metadata),
-    );
+    await this.printerService.updateDisabledReason(dto.printerId, this.buildDisabledReasonFromMetadata(dto.metadata));
 
     return log;
   }
 
-  async complete(logId: number, dto: CompleteMaintenanceLogDto, userId: number | null, username: string): Promise<PrinterMaintenanceLog> {
+  async complete(
+    logId: number,
+    dto: CompleteMaintenanceLogDto,
+    userId: number | null,
+    username: string,
+  ): Promise<PrinterMaintenanceLog> {
     const log = await this.repository.findOne({ where: { id: logId } });
 
     if (!log) {
@@ -167,7 +169,11 @@ export class PrinterMaintenanceLogService {
     await this.repository.delete(logId);
   }
 
-  private buildDisabledReasonFromMetadata(metadata: { cause?: string; notes?: string; partsInvolved?: string[] }): string {
+  private buildDisabledReasonFromMetadata(metadata: {
+    cause?: string;
+    notes?: string;
+    partsInvolved?: string[];
+  }): string {
     const parts: string[] = [];
 
     if (metadata.cause) {
@@ -185,4 +191,3 @@ export class PrinterMaintenanceLogService {
     return parts.join(" - ") || "Under maintenance";
   }
 }
-

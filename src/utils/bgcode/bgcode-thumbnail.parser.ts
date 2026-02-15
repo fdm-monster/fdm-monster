@@ -1,8 +1,4 @@
-import {
-  BgCodeThumbnailFormats,
-  BgCodeThumbnailParameters,
-  BgCodeThumbnailFormatExtension
-} from "./bgcode.types";
+import { BgCodeThumbnailFormats, BgCodeThumbnailParameters, BgCodeThumbnailFormatExtension } from "./bgcode.types";
 import { decodeQOI } from "./qoi-decoder";
 import { encodePNG } from "./png-encoder";
 
@@ -22,13 +18,13 @@ export function processThumbnail(data: Buffer, parameters: BgCodeThumbnailParame
     case BgCodeThumbnailFormats.PNG:
       return {
         extension: BgCodeThumbnailFormatExtension[BgCodeThumbnailFormats.PNG],
-        data: data
+        data: data,
       };
 
     case BgCodeThumbnailFormats.JPG:
       return {
         extension: BgCodeThumbnailFormatExtension[BgCodeThumbnailFormats.JPG],
-        data: data
+        data: data,
       };
 
     case BgCodeThumbnailFormats.QOI:
@@ -36,7 +32,7 @@ export function processThumbnail(data: Buffer, parameters: BgCodeThumbnailParame
       return {
         extension: BgCodeThumbnailFormatExtension[BgCodeThumbnailFormats.PNG],
         data: pngData,
-        converted: true
+        converted: true,
       };
 
     default:

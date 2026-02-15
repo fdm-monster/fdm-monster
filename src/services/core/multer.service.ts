@@ -4,10 +4,10 @@ import { existsSync, readdirSync, rmSync } from "node:fs";
 import { getMediaPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
 import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { errorSummary } from "@/utils/error.utils";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { ValidationException } from "@/exceptions/runtime.exceptions";
 
 export class MulterService {

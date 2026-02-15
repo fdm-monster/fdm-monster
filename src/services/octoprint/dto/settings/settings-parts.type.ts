@@ -1,4 +1,4 @@
-import { VirtualPrinterSettingsDto } from "@/services/octoprint/dto/settings/virtual-printer-settings.dto";
+import type { VirtualPrinterSettingsDto } from "@/services/octoprint/dto/settings/virtual-printer-settings.dto";
 
 export interface Api {
   allowCrossOrigin: boolean;

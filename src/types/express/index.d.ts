@@ -1,6 +1,6 @@
 import { AwilixContainer } from "awilix";
-import { RoleName } from "@/constants/authorization.constants";
-import { UserDto } from "@/services/interfaces/user.dto";
+import type { RoleName } from "@/constants/authorization.constants";
+import type { UserDto } from "@/services/interfaces/user.dto";
 
 declare module "express" {
   interface Request {

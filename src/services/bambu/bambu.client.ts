@@ -1,8 +1,8 @@
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { SettingsStore } from "@/state/settings.store";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 import { BambuFtpAdapter } from "@/services/bambu/bambu-ftp.adapter";
 
 /**

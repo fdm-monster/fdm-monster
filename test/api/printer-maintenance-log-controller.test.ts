@@ -1,10 +1,5 @@
 import { setupTestApp } from "../test-server";
-import {
-  expectInvalidResponse,
-  expectNotFoundResponse,
-  expectOkResponse,
-  expectBadRequestError,
-} from "../extensions";
+import { expectInvalidResponse, expectNotFoundResponse, expectOkResponse, expectBadRequestError } from "../extensions";
 import { AppConstants } from "@/server.constants";
 import { createTestPrinter } from "./test-data/create-printer";
 import { Test } from "supertest";
@@ -173,7 +168,7 @@ describe(PrinterMaintenanceLogController.name, () => {
 
       // Complete the log
       const completeResp = await request.post(completeRoute(logId)).send({
-        completionNotes: "Successfully resolved"
+        completionNotes: "Successfully resolved",
       });
       expectOkResponse(completeResp);
       expect(completeResp.body.id).toBe(logId);

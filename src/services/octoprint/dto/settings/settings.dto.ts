@@ -1,4 +1,4 @@
-import { SerialSettingsDto } from "@/services/octoprint/dto/settings/serial-settings.dto";
+import type { SerialSettingsDto } from "@/services/octoprint/dto/settings/serial-settings.dto";
 import {
   Api,
   Appearance,

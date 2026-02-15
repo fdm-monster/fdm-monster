@@ -4,7 +4,7 @@ import { AppConstants } from "@/server.constants";
 import { PERMS } from "@/constants/authorization.constants";
 import { OctoprintClient } from "@/services/octoprint/octoprint.client";
 import { PrinterCache } from "@/state/printer.cache";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { ParamId } from "@/middleware/param-converter.middleware";
 
 @route(AppConstants.apiRoute + "/printer-settings")

@@ -1,21 +1,21 @@
 import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
 import { printerEvents, PrintersDeletedEvent } from "@/constants/event.constants";
 import EventEmitter2 from "eventemitter2";
-import { OctoPrintEventDto, WsMessage, messages } from "@/services/octoprint/dto/octoprint-event.dto";
-import { MoonrakerEventDto, MR_WsMessage } from "@/services/moonraker/constants/moonraker-event.dto";
-import { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
+import { WsMessage, messages, type OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import { MR_WsMessage, type MoonrakerEventDto } from "@/services/moonraker/constants/moonraker-event.dto";
+import type { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { SubscriptionType } from "@/services/moonraker/moonraker-websocket.adapter";
 import { octoPrintEvent } from "@/services/octoprint/octoprint-websocket.adapter";
 import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
 import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.constants";
-import { PrusaLinkEventDto } from "@/services/prusa-link/constants/prusalink-event.dto";
-import { bambuEvent, BambuEventDto } from "@/services/bambu/bambu-mqtt.adapter";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { PrusaLinkEventDto } from "@/services/prusa-link/constants/prusalink-event.dto";
+import { bambuEvent, type BambuEventDto } from "@/services/bambu/bambu-mqtt.adapter";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { PrinterCache } from "@/state/printer.cache";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
-import { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
+import type { CurrentMessageDto } from "@/services/octoprint/dto/websocket/current-message.dto";
 
 export type WsMessageWithoutEventAndPlugin = Exclude<WsMessage, "event" | "plugin">;
 export type PrinterEventsCacheDto = Record<WsMessageWithoutEventAndPlugin, any>;
@@ -77,7 +77,12 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     await this.setKeyValue(printerId, ref);
   }
 
-  async setEventPartial(printerId: number, label: WsMessageWithoutEventAndPlugin, payload: any, keysToUpdate: string[]) {
+  async setEventPartial(
+    printerId: number,
+    label: WsMessageWithoutEventAndPlugin,
+    payload: any,
+    keysToUpdate: string[],
+  ) {
     const ref = await this.getOrCreateEvents(printerId);
     if (!ref[label]) {
       ref[label] = {
@@ -111,7 +116,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
       const printer = await this.printerCache.getValue(printerId);
       return printer?.name;
     } catch (error) {
-      this.logger.debug(`Could not get printer name for ${ printerId }: ${ error }`);
+      this.logger.debug(`Could not get printer name for ${printerId}: ${error}`);
       return undefined;
     }
   }
@@ -121,10 +126,10 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
     if (e.event === messages.current && e.payload) {
       const payload = e.payload as CurrentMessageDto;
 
-      const keysToUpdate = ['state', 'job', 'progress', 'currentZ', 'offsets', 'resends'];
+      const keysToUpdate = ["state", "job", "progress", "currentZ", "offsets", "resends"];
 
       if (Array.isArray(payload.temps) && payload.temps.length > 0) {
-        keysToUpdate.push('temps');
+        keysToUpdate.push("temps");
       }
 
       await this.setEventPartial(printerId, messages.current, payload, keysToUpdate);
@@ -134,7 +139,6 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
       const completion = payload?.progress?.completion;
 
       if (flags?.printing && filePath) {
-        // Ensure a job exists and set STARTED
         const printerName = await this.getPrinterName(printerId);
         const job = await this.printJobService.markStarted(printerId, filePath, printerName);
 
@@ -144,7 +148,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
         // Trigger file download and analysis if we don't have the file locally
         if (job && !job.fileStorageId && job.analysisState === "NOT_ANALYZED") {
-          this.logger.log(`Job ${ job.id } has no local file - triggering download and analysis`);
+          this.logger.log(`Job ${job.id} has no local file - triggering download and analysis`);
           await this.printJobService.triggerFileAnalysis(job.id);
         }
 
@@ -155,7 +159,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
           await this.printJobService.updateJobMetadata(printerId, filePath, {
             gcodePrintTimeSeconds: estimatedTime ? Math.round(estimatedTime) : null,
-            nozzleDiameterMm: null, // Not in websocket data
+            nozzleDiameterMm: null,
             filamentDiameterMm: null,
             filamentDensityGramsCm3: null,
             filamentUsedMm: filament?.length ? Math.round(filament.length) : null,
@@ -206,7 +210,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
         // Trigger file download and analysis if needed
         if (job && !job.fileStorageId && job.analysisState === "NOT_ANALYZED") {
-          this.logger.log(`Job ${ job.id } has no local file - triggering download and analysis`);
+          this.logger.log(`Job ${job.id} has no local file - triggering download and analysis`);
           await this.printJobService.triggerFileAnalysis(job.id);
         }
       }
@@ -245,7 +249,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
         // Trigger file download and analysis if needed
         if (job && !job.fileStorageId && job.analysisState === "NOT_ANALYZED") {
-          this.logger.log(`Job ${ job.id } has no local file - triggering download and analysis`);
+          this.logger.log(`Job ${job.id} has no local file - triggering download and analysis`);
           await this.printJobService.triggerFileAnalysis(job.id);
         }
       }
@@ -292,7 +296,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
 
         // Trigger file download and analysis if needed
         if (job && !job.fileStorageId && job.analysisState === "NOT_ANALYZED") {
-          this.logger.log(`Job ${ job.id } has no local file - triggering download and analysis`);
+          this.logger.log(`Job ${job.id} has no local file - triggering download and analysis`);
           await this.printJobService.triggerFileAnalysis(job.id);
         }
 
@@ -333,7 +337,7 @@ export class PrinterEventsCache extends KeyDiffCache<PrinterEventsCacheDto> {
         // Check if there's an active print job - if so, it was cancelled
         const activeJob = await this.printJobService.getActivePrintJob(printerId);
         if (activeJob && activeJob.status === "PRINTING") {
-          this.logger.log(`Print job ${ activeJob.id } transitioned to IDLE - marking as cancelled`);
+          this.logger.log(`Print job ${activeJob.id} transitioned to IDLE - marking as cancelled`);
           await this.printJobService.handlePrintCancelled(printerId, "Print stopped");
         }
       } else if (state === "ERROR" && filename) {

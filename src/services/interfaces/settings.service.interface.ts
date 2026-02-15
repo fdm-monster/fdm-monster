@@ -1,4 +1,4 @@
-import { SettingsDto } from "@/services/interfaces/settings.dto";
+import type { SettingsDto } from "@/services/interfaces/settings.dto";
 import {
   credentialCoreSettingUpdateSchema,
   frontendSettingsUpdateSchema,

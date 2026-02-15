@@ -20,7 +20,7 @@ export const frontendSettingsUpdateSchema = z.object({
   gridRows: z.number().int().min(1),
   largeTiles: z.boolean(),
   tilePreferCancelOverQuickStop: z.boolean(),
-  gridNameSortDirection: z.enum(['horizontal', 'vertical']).optional(),
+  gridNameSortDirection: z.enum(["horizontal", "vertical"]).optional(),
 });
 
 export const jwtSecretCredentialSettingUpdateSchema = z.object({
