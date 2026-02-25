@@ -72,7 +72,7 @@
     "basic-ftp": "5.2.0",
     "bcryptjs": "3.0.3",
     "better-sqlite3": "12.6.2",
-    "class-validator": "0.14.3",
+    "class-validator": "0.14.4",
     "connect-history-api-fallback": "2.0.0",
     "cookie-parser": "1.4.7",
     "cors": "2.8.6",
