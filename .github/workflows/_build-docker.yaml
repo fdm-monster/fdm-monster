@@ -55,7 +55,7 @@ jobs:
 
       - name: Build and push regular
         id: docker_build_regular
-        uses: docker/build-push-action@8913706d4eb4f40f0a9bb76943d0893e39dd0ffb
+        uses: docker/build-push-action@38de52285e81fd0f16d3daa03e5191519d097b28
         with:
           push: ${{ inputs.push }}
           context: "{{defaultContext}}"
@@ -69,7 +69,7 @@ jobs:
 
       - name: Build and push mDNS
         id: docker_build_mdns
-        uses: docker/build-push-action@8913706d4eb4f40f0a9bb76943d0893e39dd0ffb
+        uses: docker/build-push-action@38de52285e81fd0f16d3daa03e5191519d097b28
         with:
           push: ${{ inputs.push }}
           context: "{{defaultContext}}"
