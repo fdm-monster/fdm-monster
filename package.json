@@ -87,7 +87,7 @@
     "lodash": "4.17.23",
     "luxon": "3.7.2",
     "mqtt": "5.15.0",
-    "multer": "2.1.0",
+    "multer": "2.1.1",
     "octokit": "3.2.2",
     "passport": "0.7.0",
     "passport-anonymous": "1.0.1",
