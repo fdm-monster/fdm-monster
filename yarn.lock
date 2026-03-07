@@ -591,7 +591,7 @@ __metadata:
     "@types/js-yaml": "npm:4.0.9"
     "@types/lodash": "npm:4.17.24"
     "@types/luxon": "npm:3.7.1"
-    "@types/multer": "npm:2.0.0"
+    "@types/multer": "npm:2.1.0"
     "@types/node": "npm:24.11.0"
     "@types/passport-anonymous": "npm:1.0.5"
     "@types/passport-jwt": "npm:4.0.1"
@@ -3092,12 +3092,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/multer@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@types/multer@npm:2.0.0"
+"@types/multer@npm:2.1.0":
+  version: 2.1.0
+  resolution: "@types/multer@npm:2.1.0"
   dependencies:
     "@types/express": "npm:*"
-  checksum: 10c0/375b0e77c4675c2ff27d1170e469df48dced928cc9fcd077ead111a20d0f2c01921fd25e20e25426604d6d3e311b37da2bc03ce47523d06adafba5c4b8077b67
+  checksum: 10c0/f1f512918f79c5dac007d8d30de74372ad24932b34b43d09f250178dcce6da426297e0ea9c939322545519f133cd525dca0552781967d05f43d782ff0b169333
   languageName: node
   linkType: hard
 
