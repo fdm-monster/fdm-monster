@@ -107,10 +107,13 @@ export class FileStorageService implements IFileStorageService {
     }
 
     let subdir = "gcode";
+    let fileType: "gcode" | "3mf" | "bgcode" = "gcode";
     if (fileExt === ".3mf" || file.originalname.includes(".gcode.3mf")) {
       subdir = "3mf";
+      fileType = "3mf";
     } else if (fileExt === ".bgcode") {
       subdir = "bgcode";
+      fileType = "bgcode";
     }
 
     const targetDir = join(this.storageBasePath, subdir);
@@ -123,6 +126,14 @@ export class FileStorageService implements IFileStorageService {
     } else {
       throw new Error("File has no path or buffer");
     }
+
+    await this.createFileRecord({
+      parentId: 0,
+      type: fileType,
+      name: file.originalname,
+      fileGuid: fileId,
+      metadata: null,
+    });
 
     this.logger.log(`Saved file ${file.originalname} as ${fileId}`);
     return fileId;
@@ -158,6 +169,11 @@ export class FileStorageService implements IFileStorageService {
       await rm(thumbnailDir, { recursive: true, force: true });
       this.logger.debug(`Deleted thumbnails for ${fileStorageId}`);
     } catch {
+    }
+
+    const fileRecord = await this.getFileRecordByGuid(fileStorageId);
+    if (fileRecord) {
+      await this.deleteFileRecord(fileRecord.id);
     }
 
     this.logger.log(`Deleted file ${fileStorageId}`);
@@ -411,51 +427,67 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  async listAllFiles(): Promise<Array<{
-    fileStorageId: string;
-    fileName: string;
-    fileFormat: string;
-    fileSize: number;
-    fileHash: string;
-    createdAt: Date;
-    thumbnailCount: number;
-    metadata?: any;
-  }>> {
+  async listAllFiles(options?: {
+    page?: number;
+    pageSize?: number;
+    type?: "gcode" | "3mf" | "bgcode";
+    sortBy?: "createdAt" | "name" | "type";
+    sortOrder?: "ASC" | "DESC";
+  }): Promise<{
+    files: Array<{
+      fileStorageId: string;
+      fileName: string;
+      fileFormat: string;
+      fileSize: number;
+      fileHash: string;
+      createdAt: Date;
+      thumbnailCount: number;
+      metadata?: any;
+    }>;
+    page: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+  }> {
+    const result = await this.listFileRecords(undefined, options);
     const files: any[] = [];
 
-    for (const subdir of this.STORAGE_SUBDIRS) {
-      const dirPath = join(this.storageBasePath, subdir);
+    for (const record of result.items) {
+      if (record.type === 'dir') continue;
+
+      const filePath = await this.findFilePath(record.fileGuid);
+      if (!filePath) {
+        this.logger.warn(`FileRecord ${record.id} has fileGuid ${record.fileGuid} but file not found on disk`);
+        continue;
+      }
+
       try {
-        const dirFiles = await readdir(dirPath);
+        const stats = await stat(filePath);
+        const metadata = await this.loadMetadata(record.fileGuid);
+        const thumbnails = await this.listThumbnails(record.fileGuid);
 
-        for (const file of dirFiles) {
-          if (file.endsWith('_thumbnails') || file.endsWith('.json')) continue;
-
-          const fileId = path.parse(file).name;
-          const filePath = join(dirPath, file);
-          const stats = await stat(filePath);
-
-          const metadata = await this.loadMetadata(fileId);
-
-          const thumbnails = await this.listThumbnails(fileId);
-
-          files.push({
-            fileStorageId: fileId,
-            fileName: metadata?._fileName || file,
-            fileFormat: subdir,
-            fileSize: stats.size,
-            fileHash: metadata?._fileHash || '',
-            createdAt: stats.birthtime,
-            thumbnailCount: thumbnails.length,
-            metadata: metadata,
-          });
-        }
+        files.push({
+          fileStorageId: record.fileGuid,
+          fileName: metadata?._originalFileName || record.name,
+          fileFormat: record.type,
+          fileSize: stats.size,
+          fileHash: metadata?._fileHash || '',
+          createdAt: record.createdAt,
+          thumbnailCount: thumbnails.length,
+          metadata: metadata,
+        });
       } catch (error) {
-        this.logger.error(`Error listing files in ${subdir}`, error);
+        this.logger.error(`Error getting file info for ${record.fileGuid}`, error);
       }
     }
 
-    return files.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return {
+      files,
+      page: result.page,
+      pageSize: result.pageSize,
+      totalCount: result.totalCount,
+      totalPages: result.totalPages,
+    };
   }
 
   async getFileInfo(fileStorageId: string): Promise<{
@@ -493,16 +525,43 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  async listFileRecords(parentId?: number): Promise<FileRecord[]> {
-    if (parentId !== undefined) {
-      return await this.fileRecordRepository.find({
-        where: { parentId },
-        order: { createdAt: "DESC" },
-      });
+  async listFileRecords(
+    parentId?: number,
+    options?: {
+      page?: number;
+      pageSize?: number;
+      type?: "gcode" | "3mf" | "bgcode";
+      sortBy?: "createdAt" | "name" | "type";
+      sortOrder?: "ASC" | "DESC";
     }
-    return await this.fileRecordRepository.find({
-      order: { createdAt: "DESC" },
+  ): Promise<{ items: FileRecord[]; totalCount: number; page: number; pageSize: number; totalPages: number }> {
+    const page = options?.page || 1;
+    const pageSize = options?.pageSize || 50;
+    const sortBy = options?.sortBy || "createdAt";
+    const sortOrder = options?.sortOrder || "DESC";
+
+    const where: any = {};
+    if (parentId !== undefined) {
+      where.parentId = parentId;
+    }
+    if (options?.type) {
+      where.type = options.type;
+    }
+
+    const [items, totalCount] = await this.fileRecordRepository.findAndCount({
+      where,
+      order: { [sortBy]: sortOrder },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
+
+    return {
+      items,
+      totalCount,
+      page,
+      pageSize,
+      totalPages: Math.ceil(totalCount / pageSize),
+    };
   }
 
   async getFileRecordById(id: number): Promise<FileRecord | null> {

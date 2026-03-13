@@ -1,4 +1,4 @@
-import { before, DELETE, GET, POST, route } from "awilix-express";
+import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
 import { Request, Response } from "express";
 import { authorizeRoles, authenticate } from "@/middleware/authenticate";
@@ -29,10 +29,22 @@ export class FileStorageController {
   @GET()
   async listFiles(req: Request, res: Response) {
     try {
-      const files = await this.fileStorageService.listAllFiles();
+      const page = req.query.page ? Number.parseInt(req.query.page as string) : 1;
+      const pageSize = req.query.pageSize ? Number.parseInt(req.query.pageSize as string) : 50;
+      const type = req.query.type as "gcode" | "3mf" | "bgcode" | undefined;
+      const sortBy = (req.query.sortBy as "createdAt" | "name" | "type") || "createdAt";
+      const sortOrder = (req.query.sortOrder as "ASC" | "DESC") || "DESC";
+
+      const result = await this.fileStorageService.listAllFiles({
+        page,
+        pageSize,
+        type,
+        sortBy,
+        sortOrder,
+      });
 
       res.send({
-        files: files.map(file => {
+        files: result.files.map(file => {
           const thumbnails = (file.metadata?._thumbnails || []).map((thumb: any) => ({
             index: thumb.index,
             width: thumb.width,
@@ -51,7 +63,10 @@ export class FileStorageController {
             metadata: file.metadata,
           };
         }),
-        totalCount: files.length,
+        page: result.page,
+        pageSize: result.pageSize,
+        totalCount: result.totalCount,
+        totalPages: result.totalPages,
       });
     } catch (error) {
       this.logger.error(`Failed to list files: ${error}`);
@@ -97,6 +112,56 @@ export class FileStorageController {
     } catch (error) {
       this.logger.error(`Failed to get file metadata for ${fileStorageId}: ${error}`);
       res.status(500).send({ error: "Failed to get file metadata" });
+    }
+  }
+
+  /**
+   * Update file metadata (rename)
+   * PATCH /api/file-storage/:fileStorageId
+   */
+  @PATCH()
+  @route("/:fileStorageId")
+  async updateFileMetadata(req: Request, res: Response) {
+    const { fileStorageId } = req.params as { fileStorageId: string };
+    const { originalFileName } = req.body as { originalFileName?: string };
+
+    if (!originalFileName) {
+      res.status(400).send({ error: "originalFileName is required" });
+      return;
+    }
+
+    try {
+      const fileRecord = await this.fileStorageService.getFileRecordByGuid(fileStorageId);
+      if (!fileRecord) {
+        res.status(404).send({ error: "File not found" });
+        return;
+      }
+
+      await this.fileStorageService.updateFileRecord(fileRecord.id, {
+        name: originalFileName,
+      });
+
+      const metadata = await this.fileStorageService.loadMetadata(fileStorageId);
+      if (metadata) {
+        metadata._originalFileName = originalFileName;
+        await this.fileStorageService.saveMetadata(
+          fileStorageId,
+          metadata,
+          metadata._fileHash,
+          originalFileName,
+          metadata._thumbnails
+        );
+      }
+
+      this.logger.log(`Updated file metadata for ${fileStorageId}: ${originalFileName}`);
+      res.send({
+        message: "File metadata updated",
+        fileStorageId,
+        fileName: originalFileName,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to update file metadata for ${fileStorageId}: ${error}`);
+      res.status(500).send({ error: "Failed to update file metadata" });
     }
   }
 

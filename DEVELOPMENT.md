@@ -17,12 +17,121 @@ This document tracks all development efforts, phases, and changes made to the pr
 
 *(In progress; not yet closed)*
 
-### Effort: Project Foundation & Infrastructure (v0.1.0)
+### Effort: File Management CRUD API (v0.3.0)
 
-**Status:** ✓ Phase 1 Complete — Awaiting Closure Approval
-**Phase:** 1 of 3 — File Storage Entity & CRUD Implementation
+**Status:** ✓ Phase 3 Complete — Awaiting Closure Approval
+**Phase:** 3 of 4 — Pagination, Filtering & PATCH Endpoint
 **Started:** 2026-03-13
 **Phase 1 Completed:** 2026-03-13
+**Phase 2 Completed:** 2026-03-13
+**Phase 3 Completed:** 2026-03-13
+
+#### Phase 3 — Pagination, Filtering & PATCH Endpoint ✓
+
+**Objective:** Add pagination, filtering, sorting to list endpoint and PATCH endpoint for file renaming
+
+**Requirements (Validated ✅)**
+1. Pagination support (page, pageSize, totalCount, totalPages)
+2. Filtering by file type (gcode/3mf/bgcode)
+3. Sorting by createdAt, name, or type
+4. PATCH endpoint for renaming files
+
+### Changes
+- `src/services/file-storage.service.ts` — Enhanced FileRecord querying
+  - `listFileRecords()` now supports pagination/filtering/sorting options (lines 510-547)
+  - `listAllFiles()` returns paginated results with metadata (lines 430-491)
+- `src/controllers/file-storage.controller.ts` — Enhanced API endpoints
+  - GET `/api/file-storage` accepts query params (page, pageSize, type, sortBy, sortOrder) (lines 29-75)
+  - PATCH `/api/file-storage/:id` for renaming files (lines 118-166)
+
+### Test Coverage
+- `test/api/file-storage-controller-integration.test.ts` — 27 tests, all passing
+  - Phase 1 tests (16 tests) - Basic endpoints
+  - Phase 2 tests (5 tests) - FileRecord integration
+  - Phase 3 tests (6 tests) - Pagination, filtering, sorting, PATCH:
+    - Pagination with page/pageSize
+    - Filter by file type
+    - Sort by name (ASC/DESC)
+    - PATCH rename file (success, 404, 400)
+
+### API Changes
+- **GET /api/file-storage** - Added query parameters:
+  - `?page=1&pageSize=20` - Pagination (default: page=1, pageSize=50)
+  - `?type=gcode` - Filter by file type
+  - `?sortBy=name&sortOrder=ASC` - Sort results
+  - Response includes: `page`, `pageSize`, `totalCount`, `totalPages`
+- **PATCH /api/file-storage/:id** - New endpoint:
+  - Body: `{ "originalFileName": "new-name.gcode" }`
+  - Updates FileRecord name and metadata JSON sidecar
+  - Returns: `{ "message", "fileStorageId", "fileName" }`
+
+### Deferred to Phase 4
+- Add `PERMS.FileStorage.*` constants to authorization
+- Bulk operations (delete, analyze)
+
+#### Phase 2 — FileRecord Integration ✓
+
+**Objective:** Integrate FileRecord entity with existing FileStorage upload/delete/list operations
+
+**Requirements (Validated ✅)**
+1. Create FileRecord on file upload
+2. Delete FileRecord on file deletion
+3. List files from FileRecords instead of filesystem scan
+4. Backfill script for existing files
+
+### Changes
+- `src/services/file-storage.service.ts` — Integrated FileRecord CRUD into upload/delete/list flows
+  - `saveFile()` creates FileRecord after physical file save (lines 130-136)
+  - `deleteFile()` deletes FileRecord after physical file delete (lines 174-177)
+  - `listAllFiles()` queries FileRecords instead of filesystem scan (lines 440-472)
+
+### New Files
+- `src/tasks/backfill-file-records.task.ts` — Backfill FileRecords for existing files on disk
+- `test/api/file-storage-controller-integration.test.ts` — Extended with 5 FileRecord integration tests (21 tests total)
+
+### Test Coverage
+- `test/api/file-storage-controller-integration.test.ts` — 21 tests, all passing
+  - Phase 1 tests (16 tests) - FileStorage API endpoints
+  - Phase 2 tests (5 tests) - FileRecord integration:
+    - FileRecord creation on upload
+    - FileRecord deletion on delete
+    - List files from FileRecords
+    - File type categorization (gcode/3mf/bgcode)
+
+### Deferred to Phase 3
+- Pagination/filtering on list endpoint
+- PATCH endpoint for metadata updates
+- Sorting support
+
+### Deferred to Phase 4
+- Add `PERMS.FileStorage.*` constants to authorization
+- Bulk operations (delete, analyze)
+
+#### Phase 1 — FileStorage API Integration Testing ✓
+
+**Objective:** Create real integration tests for FileStorageController endpoints without service mocks
+
+**Requirements (Validated ✅)**
+1. Integration tests for all 6 existing FileStorage endpoints
+2. Tests use real file operations (no service mocks)
+3. Tests verify full upload-analyze-delete workflow
+4. Coverage for concurrent operations and error cases
+
+### New Files
+- `test/api/file-storage-controller-integration.test.ts` — 16 integration tests for FileStorageController
+
+---
+
+## Closed Efforts
+
+*(Completed and stable)*
+
+### Effort: Project Foundation & Infrastructure (v0.1.0)
+
+**Status:** ✓ Closed
+**Phase:** 1 of 3 — File Storage Entity & CRUD Implementation
+**Started:** 2026-03-13
+**Completed:** 2026-03-13
 
 #### Phase 1 — File Storage Entity & CRUD Implementation ✓
 
@@ -190,10 +299,10 @@ Use this template when logging new efforts:
 
 | Metric | Value |
 |--------|-------|
-| Total Efforts (All Time) | 1 (active) |
-| Closed Efforts | 0 |
+| Total Efforts (All Time) | 2 |
+| Closed Efforts | 1 |
 | Active Phases | 1 (pending closure) |
-| Files Created (YTD) | 4 |
+| Files Created (YTD) | 5 |
 | Files Modified (YTD) | 3 |
 
 ---
