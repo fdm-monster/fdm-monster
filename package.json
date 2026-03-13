@@ -125,7 +125,7 @@
     "@types/passport-anonymous": "1.0.5",
     "@types/passport-jwt": "4.0.1",
     "@types/semver": "7.7.1",
-    "@types/supertest": "6.0.3",
+    "@types/supertest": "7.2.0",
     "@types/uuid": "10.0.0",
     "@types/ws": "8.18.1",
     "chokidar": "5.0.0",
