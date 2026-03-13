@@ -5,7 +5,7 @@ import { Floor } from "@/entities/floor.entity";
 import { FloorPosition } from "@/entities/floor-position.entity";
 import { Printer } from "@/entities/printer.entity";
 import { Settings } from "@/entities/settings.entity";
-import { PrintJob, RefreshToken, User, PrinterMaintenanceLog } from "@/entities";
+import { PrintJob, RefreshToken, User, PrinterMaintenanceLog, FileRecord } from "@/entities";
 import { CameraStream } from "@/entities/camera-stream.entity";
 import { Role } from "@/entities/role.entity";
 import { UserRole } from "@/entities/user-role.entity";
@@ -31,6 +31,7 @@ import { ChangeFloorNonUniqueOrder1767370191762 } from "@/migrations/17673701917
 import { RenameGroupToTag1767432108916 } from "@/migrations/1767432108916-RenameGroupToTag";
 import { AddPrintJob1767451444137 } from "@/migrations/1767451444137-AddPrintJob";
 import { AddPrinterMaintenanceLog1767909428129 } from "@/migrations/1767909428129-AddPrinterMaintenanceLog";
+import { CreateFileRecordTable1773442074582 } from "@/migrations/1773442074582-CreateFileRecordTable";
 
 const databaseFilePath = getDatabaseFilePath();
 
@@ -52,7 +53,8 @@ export const AppDataSource = new DataSource({
     Tag,
     PrinterTag,
     PrintJob,
-    PrinterMaintenanceLog
+    PrinterMaintenanceLog,
+    FileRecord
   ],
   migrations: [
     InitSqlite1706829146617,
@@ -70,7 +72,8 @@ export const AppDataSource = new DataSource({
     ChangeFloorNonUniqueOrder1767370191762,
     RenameGroupToTag1767432108916,
     AddPrintJob1767451444137,
-    AddPrinterMaintenanceLog1767909428129
+    AddPrinterMaintenanceLog1767909428129,
+    CreateFileRecordTable1773442074582
   ],
   subscribers: [],
 });

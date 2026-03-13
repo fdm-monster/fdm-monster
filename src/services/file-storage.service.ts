@@ -1,5 +1,6 @@
 import { Repository } from "typeorm";
 import { PrintJob } from "@/entities/print-job.entity";
+import { FileRecord } from "@/entities/file-record.entity";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { AppConstants } from "@/server.constants";
@@ -9,6 +10,7 @@ import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access }
 import { createHash } from "node:crypto";
 import { existsSync, createReadStream, statSync } from "node:fs";
 import { Readable } from "node:stream";
+import { NotFoundException, ConflictException } from "@/exceptions/runtime.exceptions";
 
 export interface IFileStorageService {
   saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
@@ -23,19 +25,26 @@ export interface IFileStorageService {
   hasMetadata(fileStorageId: string): Promise<boolean>;
   getDeterministicId(fileHash: string, fileName: string): string;
   findDuplicateByOriginalFileName(originalFileName: string): Promise<{fileStorageId: string; metadata: any} | null>;
-  saveThumbnails(fileStorageId: string, thumbnails: Array<{data?: string; format?: string; width?: number; height?: number}>): Promise<Array<{index: number; path: string; filename: string; width: number; height: number; format: string; size: number}>>;
   getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null>;
   listThumbnails(fileStorageId: string): Promise<string[]>;
+  listFileRecords(parentId?: number): Promise<FileRecord[]>;
+  getFileRecordById(id: number): Promise<FileRecord | null>;
+  getFileRecordByGuid(guid: string): Promise<FileRecord | null>;
+  createFileRecord(data: Partial<FileRecord>): Promise<FileRecord>;
+  updateFileRecord(id: number, data: Partial<FileRecord>): Promise<FileRecord>;
+  deleteFileRecord(id: number): Promise<void>;
 }
 
 export class FileStorageService implements IFileStorageService {
   printJobRepository: Repository<PrintJob>;
+  fileRecordRepository: Repository<FileRecord>;
   private readonly logger;
   private readonly storageBasePath: string;
   private readonly STORAGE_SUBDIRS = ["gcode", "3mf", "bgcode"] as const;
 
   constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService) {
     this.printJobRepository = typeormService.getDataSource().getRepository(PrintJob);
+    this.fileRecordRepository = typeormService.getDataSource().getRepository(FileRecord);
     this.logger = loggerFactory(FileStorageService.name);
 
     this.storageBasePath = join(getMediaPath(), AppConstants.defaultPrintFilesStorage);
@@ -482,6 +491,81 @@ export class FileStorageService implements IFileStorageService {
       this.logger.error(`Error getting file info for ${fileStorageId}`, error);
       return null;
     }
+  }
+
+  async listFileRecords(parentId?: number): Promise<FileRecord[]> {
+    if (parentId !== undefined) {
+      return await this.fileRecordRepository.find({
+        where: { parentId },
+        order: { createdAt: "DESC" },
+      });
+    }
+    return await this.fileRecordRepository.find({
+      order: { createdAt: "DESC" },
+    });
+  }
+
+  async getFileRecordById(id: number): Promise<FileRecord | null> {
+    return await this.fileRecordRepository.findOne({
+      where: { id },
+    });
+  }
+
+  async getFileRecordByGuid(guid: string): Promise<FileRecord | null> {
+    return await this.fileRecordRepository.findOne({
+      where: { fileGuid: guid },
+    });
+  }
+
+  async createFileRecord(data: Partial<FileRecord>): Promise<FileRecord> {
+    if (data.fileGuid) {
+      const existing = await this.getFileRecordByGuid(data.fileGuid);
+      if (existing) {
+        throw new ConflictException(
+          `File record with fileGuid "${data.fileGuid}" already exists`,
+          existing.id.toString()
+        );
+      }
+    }
+
+    const record = this.fileRecordRepository.create(data);
+    const saved = await this.fileRecordRepository.save(record);
+
+    this.logger.log(`Created file record ${saved.id}: ${saved.name} (type: ${saved.type})`);
+    return saved;
+  }
+
+  async updateFileRecord(id: number, data: Partial<FileRecord>): Promise<FileRecord> {
+    const record = await this.getFileRecordById(id);
+    if (!record) {
+      throw new NotFoundException(`File record ${id} not found`);
+    }
+
+    if (data.fileGuid && data.fileGuid !== record.fileGuid) {
+      const existing = await this.getFileRecordByGuid(data.fileGuid);
+      if (existing) {
+        throw new ConflictException(
+          `File record with fileGuid "${data.fileGuid}" already exists`,
+          existing.id.toString()
+        );
+      }
+    }
+
+    Object.assign(record, data);
+    const updated = await this.fileRecordRepository.save(record);
+
+    this.logger.log(`Updated file record ${id}`);
+    return updated;
+  }
+
+  async deleteFileRecord(id: number): Promise<void> {
+    const record = await this.getFileRecordById(id);
+    if (!record) {
+      throw new NotFoundException(`File record ${id} not found`);
+    }
+
+    await this.fileRecordRepository.remove(record);
+    this.logger.log(`Deleted file record ${id}: ${record.name}`);
   }
 }
 

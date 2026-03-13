@@ -19,39 +19,55 @@ This document tracks all development efforts, phases, and changes made to the pr
 
 ### Effort: Project Foundation & Infrastructure (v0.1.0)
 
-**Status:** In Progress  
-**Phase:** 1 of 3 — Setup, Planning & File Schema Definition  
-**Started:** 2026-03-13  
-**Current Phase Completion:** --
+**Status:** ✓ Phase 1 Complete — Awaiting Closure Approval
+**Phase:** 1 of 3 — File Storage Entity & CRUD Implementation
+**Started:** 2026-03-13
+**Phase 1 Completed:** 2026-03-13
 
-#### Phase 1.1 — File Storage Schema Planning (Current)
+#### Phase 1 — File Storage Entity & CRUD Implementation ✓
 
-**Objective:** Define Phase 1 scope: discrete FileRecord table for file-storage.service.ts CRUD operations.
+**Objective:** Create discrete FileRecord table with CRUD operations for file-storage.service.ts
 
 **Requirements (Validated ✅)**
-1. Define file lookup table for CRUD support in Files API only
-2. Schema fields:
-   - Primary Key: Integer, auto-increment, NOT NULL, UNIQUE
-   - Parent Key: Integer (FK), nullable, non-unique, allows hierarchy
-   - Type: Enum {`dir`, `gcode`, `bgcode`, `3mf`}
-   - Name: String, NOT NULL
-   - File GUID: UUID string, UNIQUE, indexed
-   - Metadata: Long JSON text, nullable
-3. Root directory (pk=0): `(0, 0, 'dir', '/', NULL, NULL)`
-4. Table scope: **file-storage.service.ts functions only**
-5. Printer functions: **No changes**
+1. File lookup table for CRUD support in Files API only
+2. Schema fields: id, parentId, type, name, fileGuid, metadata, createdAt, updatedAt
+3. Root directory seed: `(0, 0, 'dir', '/', '00000000-0000-0000-0000-000000000000', NULL)`
+4. Scope: file-storage.service.ts functions only
+5. No changes to printer functions
 
-**Deliverables (Planned)**
-- \`src/entities/file-record.entity.ts\` — FileRecord TypeORM entity
-- \`src/migrations/TIMESTAMP-CreateFileRecordTable.ts\` — Database migration
-- \`docs/features/file-storage-phase-1.md\` — Design document
-- \`src/services/file-storage.service.ts\` — Enhanced with CRUD methods (list, get, create, update, delete)
-- Phase 1 test suite: \`test/services/file-storage.service.test.ts\`
+### Changes
+- `src/services/file-storage.service.ts` — Added FileRecord repository injection and 6 CRUD methods (lines 40, 47, 496-569)
+- `src/entities/index.ts` — Exported FileRecord entity
+- `src/data-source.ts` — Registered FileRecord entity and CreateFileRecordTable migration
 
-**Next Steps**
-- Phase 1.2: Entity & migration implementation
-- Phase 1.3: Service layer CRUD methods
-- Phase 1.4: Integration tests & root directory seed
+### New Files
+- `src/entities/file-record.entity.ts` — FileRecord TypeORM entity with 8 fields (id, parentId, type, name, fileGuid, metadata, createdAt, updatedAt)
+- `src/migrations/1773442074582-CreateFileRecordTable.ts` — Database migration with root directory seed
+- `docs/features/file-storage-phase-1.md` — Phase 1 design document and specification
+- `test/application/file-storage.service.test.ts` — Unit tests for CRUD methods (19 tests, 100% coverage)
+
+### Database/Migration
+- Migration: `1773442074582-CreateFileRecordTable.ts`
+- New table: `file_record` with UNIQUE constraint on `fileGuid` and index
+- Seed data: Root directory at id=0 with self-referential parent
+- Non-breaking: No existing tables modified
+
+### Test Coverage
+- `test/application/file-storage.service.test.ts` — 19 tests, 100% coverage of new CRUD methods
+  - Root directory seed validation (1 test)
+  - listFileRecords() with/without filters (3 tests)
+  - getFileRecordById() success/failure (2 tests)
+  - getFileRecordByGuid() indexed lookup (2 tests)
+  - createFileRecord() with validation (4 tests)
+  - updateFileRecord() with conflict detection (4 tests)
+  - deleteFileRecord() with error handling (3 tests)
+
+### API Changes
+- None (internal service methods only, no HTTP endpoints)
+
+### Known Issues / Next Phase
+- None blocking
+- Next: Phase 2 could add controller endpoints or integrate with PrintJob entity
 
 ---
 
@@ -176,9 +192,9 @@ Use this template when logging new efforts:
 |--------|-------|
 | Total Efforts (All Time) | 1 (active) |
 | Closed Efforts | 0 |
-| Active Phases | 1 |
-| Files Created (YTD) | 2 |
-| Files Modified (YTD) | 0 |
+| Active Phases | 1 (pending closure) |
+| Files Created (YTD) | 4 |
+| Files Modified (YTD) | 3 |
 
 ---
 
