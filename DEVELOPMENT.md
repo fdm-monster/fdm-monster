@@ -65,9 +65,12 @@ This document tracks all development efforts, phases, and changes made to the pr
   - Updates FileRecord name and metadata JSON sidecar
   - Returns: `{ "message", "fileStorageId", "fileName" }`
 
-### Deferred to Phase 4
-- Add `PERMS.FileStorage.*` constants to authorization
-- Bulk operations (delete, analyze)
+### Deferred from Phase 4
+- Permission-based access control → See `docs/features/file-storage-permissions-deferred.md`
+
+### Next: Phase 4 — Bulk Operations
+- POST /api/file-storage/bulk/delete
+- POST /api/file-storage/bulk/analyze
 
 #### Phase 2 — FileRecord Integration ✓
 
@@ -98,14 +101,8 @@ This document tracks all development efforts, phases, and changes made to the pr
     - List files from FileRecords
     - File type categorization (gcode/3mf/bgcode)
 
-### Deferred to Phase 3
-- Pagination/filtering on list endpoint
-- PATCH endpoint for metadata updates
-- Sorting support
-
-### Deferred to Phase 4
-- Add `PERMS.FileStorage.*` constants to authorization
-- Bulk operations (delete, analyze)
+### Deferred from Phase 4
+- Permission-based access control → See `docs/features/file-storage-permissions-deferred.md`
 
 #### Phase 1 — FileStorage API Integration Testing ✓
 
