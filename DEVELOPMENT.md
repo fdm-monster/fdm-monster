@@ -8,7 +8,7 @@ This document tracks all development efforts, phases, and changes made to the pr
 
 - **Project:** FDM Monster (3D printer farm management server)
 - **Repository:** fdm-monster/fdm-monster
-- **Last Updated:** 2026-03-13
+- **Last Updated:** 2026-03-14
 - **Development Paradigm:** AI-assisted, effort-based phases with explicit phase transitions
 
 ---
@@ -19,13 +19,14 @@ This document tracks all development efforts, phases, and changes made to the pr
 
 ### Effort: File Management CRUD API (v0.3.0)
 
-**Status:** ✓ Phase 3 Complete (with pagination bugfix) — Ready for Phase 4
-**Phase:** 3 of 4 — Pagination, Filtering & PATCH Endpoint
+**Status:** ✓ Complete — All Phases Finished
+**Phase:** 4 of 4 — Bulk Operations
 **Started:** 2026-03-13
 **Phase 1 Completed:** 2026-03-13
 **Phase 2 Completed:** 2026-03-13
 **Phase 3 Completed:** 2026-03-13
 **Pagination Bugfix:** 2026-03-13
+**Phase 4 Completed:** 2026-03-14
 
 #### Phase 3 — Pagination, Filtering & PATCH Endpoint ✓
 
@@ -86,12 +87,56 @@ This document tracks all development efforts, phases, and changes made to the pr
 ### Deferred from Phase 4
 - Permission-based access control → See `docs/features/file-storage-permissions-deferred.md`
 
-### Next: Phase 4 — Bulk Operations
-**Deliverables:**
-1. POST /api/file-storage/bulk/delete - Delete multiple files
-2. POST /api/file-storage/bulk/analyze - Re-analyze multiple files
-3. Integration tests for bulk endpoints (8+ tests)
-4. Error handling for partial failures
+#### Phase 4 — Bulk Operations ✓
+
+**Objective:** Add bulk delete and bulk analyze endpoints with partial failure handling
+
+**Requirements (Validated ✅)**
+1. Bulk delete endpoint with partial failure support
+2. Bulk analyze endpoint with partial failure support
+3. Integration tests for both endpoints (14 tests total)
+4. Error handling that continues processing on individual failures
+
+### Changes
+- `src/controllers/file-storage.controller.ts` — Added bulk operations endpoints
+  - POST `/api/file-storage/bulk/delete` (lines 29-66)
+  - POST `/api/file-storage/bulk/analyze` (lines 68-125)
+  - Both endpoints check file existence before processing
+  - Both continue processing on individual failures and return error details
+
+### Test Coverage
+- `test/api/file-storage-controller-integration.test.ts` — 41 tests, all passing
+  - Phase 1-3 tests (27 tests) - Previous functionality
+  - Phase 4 tests (14 tests) - Bulk operations:
+    - Bulk delete success (3 files)
+    - Bulk delete partial failure (1 valid, 1 invalid)
+    - Bulk delete validation (empty array, not array, exceeds 100 limit)
+    - Bulk delete all files not found
+    - Bulk delete FileRecord cleanup verification
+    - Bulk analyze success (3 files)
+    - Bulk analyze partial failure (1 valid, 1 invalid)
+    - Bulk analyze validation (empty array, not array, exceeds 100 limit)
+    - Bulk analyze all files not found
+    - Bulk analyze metadata update verification
+
+### API Changes
+- **POST /api/file-storage/bulk/delete** - New endpoint:
+  - Body: `{ "fileIds": ["id1", "id2", "id3"] }`
+  - Max 100 files per request
+  - Response: `{ "deleted": N, "failed": N, "errors": [{ "fileId", "error" }] }`
+  - Deletes physical files, metadata, and FileRecords
+
+- **POST /api/file-storage/bulk/analyze** - New endpoint:
+  - Body: `{ "fileIds": ["id1", "id2", "id3"] }`
+  - Max 100 files per request
+  - Response: `{ "analyzed": N, "failed": N, "errors": [{ "fileId", "error" }] }`
+  - Re-analyzes files, updates metadata and thumbnails
+
+### Implementation Notes
+- Both endpoints check file existence before processing to ensure accurate failure tracking
+- Error handling continues processing remaining files after individual failures
+- HTTP 200 returned even if all files fail (partial success pattern)
+- FileRecord deletion handled automatically by FileStorageService.deleteFile()
 
 #### Phase 2 — FileRecord Integration ✓
 

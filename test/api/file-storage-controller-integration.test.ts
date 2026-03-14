@@ -417,4 +417,222 @@ describe("FileStorageController - Real Integration", () => {
       await fileStorageService.deleteFile(fileStorageId);
     });
   });
+
+  describe("POST /api/file-storage/bulk/delete - Bulk delete files", () => {
+    it("should delete multiple files successfully", async () => {
+      const fileIds: string[] = [];
+      for (let i = 0; i < 3; i++) {
+        const res = await uploadFile(`bulk-delete-test-${i}.gcode`, SIMPLE_GCODE);
+        expectOkResponse(res);
+        fileIds.push(res.body.fileStorageId);
+      }
+
+      const bulkDeleteRes = await testRequest
+        .post(`${baseRoute}/bulk/delete`)
+        .send({ fileIds });
+
+      expectOkResponse(bulkDeleteRes);
+      expect(bulkDeleteRes.body.deleted).toBe(3);
+      expect(bulkDeleteRes.body.failed).toBe(0);
+      expect(bulkDeleteRes.body.errors).toEqual([]);
+
+      for (const fileId of fileIds) {
+        const getRes = await testRequest.get(`${baseRoute}/${fileId}`);
+        expectNotFoundResponse(getRes);
+      }
+    });
+
+    it("should handle partial failures gracefully", async () => {
+      const uploadRes = await uploadFile("bulk-delete-partial.gcode", SIMPLE_GCODE);
+      expectOkResponse(uploadRes);
+      const validId = uploadRes.body.fileStorageId;
+      const invalidId = "non-existent-file-id-12345";
+
+      const bulkDeleteRes = await testRequest
+        .post(`${baseRoute}/bulk/delete`)
+        .send({ fileIds: [validId, invalidId] });
+
+      expectOkResponse(bulkDeleteRes);
+      expect(bulkDeleteRes.body.deleted).toBe(1);
+      expect(bulkDeleteRes.body.failed).toBe(1);
+      expect(bulkDeleteRes.body.errors).toHaveLength(1);
+      expect(bulkDeleteRes.body.errors[0].fileId).toBe(invalidId);
+      expect(bulkDeleteRes.body.errors[0].error).toBeDefined();
+
+      const getRes = await testRequest.get(`${baseRoute}/${validId}`);
+      expectNotFoundResponse(getRes);
+    });
+
+    it("should return 400 when fileIds is not an array", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/bulk/delete`)
+        .send({ fileIds: "not-an-array" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("array");
+    });
+
+    it("should return 400 when fileIds is empty", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/bulk/delete`)
+        .send({ fileIds: [] });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("non-empty");
+    });
+
+    it("should return 400 when fileIds exceeds limit", async () => {
+      const fileIds = Array.from({ length: 101 }, (_, i) => `file-${i}`);
+      const res = await testRequest
+        .post(`${baseRoute}/bulk/delete`)
+        .send({ fileIds });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("100");
+    });
+
+    it("should handle all files not found", async () => {
+      const bulkDeleteRes = await testRequest
+        .post(`${baseRoute}/bulk/delete`)
+        .send({ fileIds: ["not-found-1", "not-found-2", "not-found-3"] });
+
+      expectOkResponse(bulkDeleteRes);
+      expect(bulkDeleteRes.body.deleted).toBe(0);
+      expect(bulkDeleteRes.body.failed).toBe(3);
+      expect(bulkDeleteRes.body.errors).toHaveLength(3);
+    });
+
+    it("should delete FileRecords for bulk deleted files", async () => {
+      const fileIds: string[] = [];
+      for (let i = 0; i < 2; i++) {
+        const res = await uploadFile(`bulk-delete-record-${i}.gcode`, SIMPLE_GCODE);
+        expectOkResponse(res);
+        fileIds.push(res.body.fileStorageId);
+      }
+
+      for (const fileId of fileIds) {
+        const record = await fileStorageService.getFileRecordByGuid(fileId);
+        expect(record).toBeTruthy();
+      }
+
+      const bulkDeleteRes = await testRequest
+        .post(`${baseRoute}/bulk/delete`)
+        .send({ fileIds });
+
+      expectOkResponse(bulkDeleteRes);
+      expect(bulkDeleteRes.body.deleted).toBe(2);
+
+      for (const fileId of fileIds) {
+        const record = await fileStorageService.getFileRecordByGuid(fileId);
+        expect(record).toBeNull();
+      }
+    });
+  });
+
+  describe("POST /api/file-storage/bulk/analyze - Bulk analyze files", () => {
+    it("should analyze multiple files successfully", async () => {
+      const timestamp = Date.now();
+      const fileIds: string[] = [];
+      for (let i = 0; i < 3; i++) {
+        const res = await uploadFile(`bulk-analyze-test-${timestamp}-${i}.gcode`, SIMPLE_GCODE);
+        expectOkResponse(res);
+        fileIds.push(res.body.fileStorageId);
+      }
+
+      const bulkAnalyzeRes = await testRequest
+        .post(`${baseRoute}/bulk/analyze`)
+        .send({ fileIds });
+
+      expectOkResponse(bulkAnalyzeRes);
+      expect(bulkAnalyzeRes.body.analyzed).toBe(3);
+      expect(bulkAnalyzeRes.body.failed).toBe(0);
+      expect(bulkAnalyzeRes.body.errors).toEqual([]);
+
+      await Promise.all(fileIds.map((id) => fileStorageService.deleteFile(id)));
+    });
+
+    it("should handle partial failures gracefully", async () => {
+      const timestamp = Date.now();
+      const uploadRes = await uploadFile(`bulk-analyze-partial-${timestamp}.gcode`, SIMPLE_GCODE);
+      expectOkResponse(uploadRes);
+      const validId = uploadRes.body.fileStorageId;
+      const invalidId = "non-existent-file-id-67890";
+
+      const bulkAnalyzeRes = await testRequest
+        .post(`${baseRoute}/bulk/analyze`)
+        .send({ fileIds: [validId, invalidId] });
+
+      expectOkResponse(bulkAnalyzeRes);
+      expect(bulkAnalyzeRes.body.analyzed).toBe(1);
+      expect(bulkAnalyzeRes.body.failed).toBe(1);
+      expect(bulkAnalyzeRes.body.errors).toHaveLength(1);
+      expect(bulkAnalyzeRes.body.errors[0].fileId).toBe(invalidId);
+      expect(bulkAnalyzeRes.body.errors[0].error).toBeDefined();
+
+      await fileStorageService.deleteFile(validId);
+    });
+
+    it("should return 400 when fileIds is not an array", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/bulk/analyze`)
+        .send({ fileIds: "not-an-array" });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("array");
+    });
+
+    it("should return 400 when fileIds is empty", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/bulk/analyze`)
+        .send({ fileIds: [] });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("non-empty");
+    });
+
+    it("should return 400 when fileIds exceeds limit", async () => {
+      const fileIds = Array.from({ length: 101 }, (_, i) => `file-${i}`);
+      const res = await testRequest
+        .post(`${baseRoute}/bulk/analyze`)
+        .send({ fileIds });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("100");
+    });
+
+    it("should handle all files not found", async () => {
+      const bulkAnalyzeRes = await testRequest
+        .post(`${baseRoute}/bulk/analyze`)
+        .send({ fileIds: ["not-found-1", "not-found-2"] });
+
+      expect(bulkAnalyzeRes.status).toBe(200);
+      expect(bulkAnalyzeRes.body.analyzed).toBe(0);
+      expect(bulkAnalyzeRes.body.failed).toBe(2);
+      expect(bulkAnalyzeRes.body.errors).toHaveLength(2);
+    });
+
+    it("should update metadata after bulk analyze", async () => {
+      const timestamp = Date.now();
+      const uploadRes = await uploadFile(`bulk-analyze-metadata-${timestamp}.gcode`, SIMPLE_GCODE);
+      expectOkResponse(uploadRes);
+      const fileId = uploadRes.body.fileStorageId;
+
+      const metadataBefore = await fileStorageService.loadMetadata(fileId);
+      const hashBefore = metadataBefore?._fileHash;
+
+      const bulkAnalyzeRes = await testRequest
+        .post(`${baseRoute}/bulk/analyze`)
+        .send({ fileIds: [fileId] });
+
+      expectOkResponse(bulkAnalyzeRes);
+      expect(bulkAnalyzeRes.body.analyzed).toBe(1);
+
+      const metadataAfter = await fileStorageService.loadMetadata(fileId);
+      expect(metadataAfter).toBeDefined();
+      expect(metadataAfter?._fileHash).toBe(hashBefore);
+      expect(metadataAfter?._originalFileName).toBe(`bulk-analyze-metadata-${timestamp}.gcode`);
+
+      await fileStorageService.deleteFile(fileId);
+    });
+  });
 });

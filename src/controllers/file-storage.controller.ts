@@ -26,6 +26,108 @@ export class FileStorageController {
     this.logger = loggerFactory(FileStorageController.name);
   }
 
+  @POST()
+  @route("/bulk/delete")
+  async bulkDeleteFiles(req: Request, res: Response) {
+    const { fileIds } = req.body as { fileIds?: string[] };
+
+    if (!Array.isArray(fileIds) || fileIds.length === 0) {
+      res.status(400).send({ error: "fileIds must be a non-empty array" });
+      return;
+    }
+
+    if (fileIds.length > 100) {
+      res.status(400).send({ error: "Maximum 100 files can be deleted at once" });
+      return;
+    }
+
+    let deleted = 0;
+    let failed = 0;
+    const errors: Array<{ fileId: string; error: string }> = [];
+
+    for (const fileId of fileIds) {
+      try {
+        const fileExists = await this.fileStorageService.fileExists(fileId);
+        if (!fileExists) {
+          throw new Error("File not found");
+        }
+        await this.fileStorageService.deleteFile(fileId);
+        deleted++;
+        this.logger.log(`Bulk delete: deleted file ${fileId}`);
+      } catch (error) {
+        failed++;
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        errors.push({ fileId, error: errorMessage });
+        this.logger.error(`Bulk delete: failed to delete file ${fileId}: ${errorMessage}`);
+      }
+    }
+
+    res.send({
+      deleted,
+      failed,
+      errors,
+    });
+  }
+
+  @POST()
+  @route("/bulk/analyze")
+  async bulkAnalyzeFiles(req: Request, res: Response) {
+    const { fileIds } = req.body as { fileIds?: string[] };
+
+    if (!Array.isArray(fileIds) || fileIds.length === 0) {
+      res.status(400).send({ error: "fileIds must be a non-empty array" });
+      return;
+    }
+
+    if (fileIds.length > 100) {
+      res.status(400).send({ error: "Maximum 100 files can be analyzed at once" });
+      return;
+    }
+
+    let analyzed = 0;
+    let failed = 0;
+    const errors: Array<{ fileId: string; error: string }> = [];
+
+    for (const fileId of fileIds) {
+      try {
+        const filePath = this.fileStorageService.getFilePath(fileId);
+        const fileExists = await this.fileStorageService.fileExists(fileId);
+        if (!fileExists) {
+          throw new Error("File not found");
+        }
+
+        const existingMetadata = await this.fileStorageService.loadMetadata(fileId);
+        const analysisResult = await this.fileAnalysisService.analyzeFile(filePath);
+        const metadata = analysisResult.metadata;
+        const thumbnails = analysisResult.thumbnails;
+
+        const fileHash = await this.fileStorageService.calculateFileHash(filePath);
+        const originalFileName = existingMetadata?._originalFileName || fileId;
+        metadata.fileName = originalFileName;
+
+        const thumbnailMetadata = thumbnails.length > 0
+          ? await this.fileStorageService.saveThumbnails(fileId, thumbnails)
+          : [];
+
+        await this.fileStorageService.saveMetadata(fileId, metadata, fileHash, originalFileName, thumbnailMetadata);
+
+        analyzed++;
+        this.logger.log(`Bulk analyze: analyzed file ${fileId}`);
+      } catch (error) {
+        failed++;
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        errors.push({ fileId, error: errorMessage });
+        this.logger.error(`Bulk analyze: failed to analyze file ${fileId}: ${errorMessage}`);
+      }
+    }
+
+    res.send({
+      analyzed,
+      failed,
+      errors,
+    });
+  }
+
   @GET()
   async listFiles(req: Request, res: Response) {
     try {
