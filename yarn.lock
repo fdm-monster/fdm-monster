@@ -3874,9 +3874,9 @@ __metadata:
   linkType: hard
 
 "bare-os@npm:^3.0.1":
-  version: 3.7.1
-  resolution: "bare-os@npm:3.7.1"
-  checksum: 10c0/66f4eb063314b4187a5f6d89bc93b2aa1fa39598fa6898b85780199a799a26b1ee3cd66aa4b9f2ed41f4095ac75de048d22fbde57c9c6dd0bd9e4f0fa317a254
+  version: 3.8.0
+  resolution: "bare-os@npm:3.8.0"
+  checksum: 10c0/2211c5f9734c7d3c387a6ba2ff7fd6df805736a1d9b865a1b9e2ba0904782340ae9b9a58eb359e7e4b50d457a1b656290cc3c8d1628d5df5d95d327eeb3dab63
   languageName: node
   linkType: hard
 
@@ -6756,9 +6756,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.11.1":
-  version: 1.12.39
-  resolution: "libphonenumber-js@npm:1.12.39"
-  checksum: 10c0/0d5c9703975e48b6bc1d2b8510f10eb562934c9ab10fb29b0669db1927fe3ef64ede20b5ee98d0a6707d4e354ea8239bd2639c3f99d76343e493d0ed71c26f16
+  version: 1.12.40
+  resolution: "libphonenumber-js@npm:1.12.40"
+  checksum: 10c0/bd4aaa2052d76abeb58c6febf737e22562b7e5abf7a6a8708b7f9fa0ed8cef5a74f2a616163425fb220b49062a0d311d87869c566b547915fd8a3b5c85b275e2
   languageName: node
   linkType: hard
 
@@ -6877,9 +6877,9 @@ __metadata:
   linkType: hard
 
 "lru-cache@npm:^11.0.0, lru-cache@npm:^11.1.0, lru-cache@npm:^11.2.1":
-  version: 11.2.6
-  resolution: "lru-cache@npm:11.2.6"
-  checksum: 10c0/73bbffb298760e71b2bfe8ebc16a311c6a60ceddbba919cfedfd8635c2d125fbfb5a39b71818200e67973b11f8d59c5a9e31d6f90722e340e90393663a66e5cd
+  version: 11.2.7
+  resolution: "lru-cache@npm:11.2.7"
+  checksum: 10c0/549cdb59488baa617135fc12159cafb1a97f91079f35093bb3bcad72e849fc64ace636d244212c181dfdf1a99bbfa90757ff303f98561958ee4d0f885d9bd5f7
   languageName: node
   linkType: hard
 
