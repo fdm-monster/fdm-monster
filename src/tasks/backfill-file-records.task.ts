@@ -6,6 +6,17 @@ import { join } from "node:path";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 
+export interface BackfillFileRecordsStats {
+  filesScanned: number;
+  recordsCreated: number;
+  recordsExisting: number;
+  errors: number;
+}
+
+export interface BackfillFileRecordsOptions {
+  quiet?: boolean;
+}
+
 export class BackfillFileRecordsTask {
   private readonly logger;
 
@@ -16,8 +27,12 @@ export class BackfillFileRecordsTask {
     this.logger = loggerFactory(BackfillFileRecordsTask.name);
   }
 
-  async execute(): Promise<void> {
-    this.logger.log("Starting FileRecord backfill task...");
+  async execute(options: BackfillFileRecordsOptions = {}): Promise<BackfillFileRecordsStats> {
+    const quiet = options.quiet ?? false;
+
+    if (!quiet) {
+      this.logger.log("Starting FileRecord backfill task...");
+    }
 
     const storageBasePath = join(getMediaPath(), AppConstants.defaultPrintFilesStorage);
     const STORAGE_SUBDIRS = ["gcode", "3mf", "bgcode"] as const;
@@ -45,7 +60,9 @@ export class BackfillFileRecordsTask {
 
           if (existingRecord) {
             totalRecordsExisting++;
-            this.logger.debug(`FileRecord already exists for ${fileId}, skipping`);
+            if (!quiet) {
+              this.logger.debug(`FileRecord already exists for ${fileId}, skipping`);
+            }
             continue;
           }
 
@@ -69,7 +86,9 @@ export class BackfillFileRecordsTask {
             });
 
             totalRecordsCreated++;
-            this.logger.log(`Created FileRecord for ${fileId} (${originalFileName})`);
+            if (!quiet) {
+              this.logger.log(`Created FileRecord for ${fileId} (${originalFileName})`);
+            }
           } catch (error) {
             totalErrors++;
             this.logger.error(`Failed to create FileRecord for ${fileId}:`, error);
@@ -80,10 +99,21 @@ export class BackfillFileRecordsTask {
       }
     }
 
-    this.logger.log(`FileRecord backfill complete:`);
-    this.logger.log(`  Files scanned: ${totalFilesScanned}`);
-    this.logger.log(`  Records created: ${totalRecordsCreated}`);
-    this.logger.log(`  Records existing: ${totalRecordsExisting}`);
-    this.logger.log(`  Errors: ${totalErrors}`);
+    const stats: BackfillFileRecordsStats = {
+      filesScanned: totalFilesScanned,
+      recordsCreated: totalRecordsCreated,
+      recordsExisting: totalRecordsExisting,
+      errors: totalErrors,
+    };
+
+    if (!quiet) {
+      this.logger.log(`FileRecord backfill complete:`);
+      this.logger.log(`  Files scanned: ${stats.filesScanned}`);
+      this.logger.log(`  Records created: ${stats.recordsCreated}`);
+      this.logger.log(`  Records existing: ${stats.recordsExisting}`);
+      this.logger.log(`  Errors: ${stats.errors}`);
+    }
+
+    return stats;
   }
 }

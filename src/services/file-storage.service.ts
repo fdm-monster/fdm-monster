@@ -449,7 +449,7 @@ export class FileStorageService implements IFileStorageService {
     totalCount: number;
     totalPages: number;
   }> {
-    const result = await this.listFileRecords(undefined, options);
+    const result = await this.listFileRecords(undefined, { ...options, paginate: true });
     const files: any[] = [];
 
     for (const record of result.items) {
@@ -528,15 +528,14 @@ export class FileStorageService implements IFileStorageService {
   async listFileRecords(
     parentId?: number,
     options?: {
+      paginate?: boolean;
       page?: number;
       pageSize?: number;
       type?: "gcode" | "3mf" | "bgcode";
       sortBy?: "createdAt" | "name" | "type";
       sortOrder?: "ASC" | "DESC";
     }
-  ): Promise<{ items: FileRecord[]; totalCount: number; page: number; pageSize: number; totalPages: number }> {
-    const page = options?.page || 1;
-    const pageSize = options?.pageSize || 50;
+  ): Promise<FileRecord[] | { items: FileRecord[]; totalCount: number; page: number; pageSize: number; totalPages: number }> {
     const sortBy = options?.sortBy || "createdAt";
     const sortOrder = options?.sortOrder || "DESC";
 
@@ -548,20 +547,30 @@ export class FileStorageService implements IFileStorageService {
       where.type = options.type;
     }
 
-    const [items, totalCount] = await this.fileRecordRepository.findAndCount({
+    if (options?.paginate) {
+      const page = options.page || 1;
+      const pageSize = options.pageSize || 50;
+
+      const [items, totalCount] = await this.fileRecordRepository.findAndCount({
+        where,
+        order: { [sortBy]: sortOrder },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
+
+      return {
+        items,
+        totalCount,
+        page,
+        pageSize,
+        totalPages: Math.ceil(totalCount / pageSize),
+      };
+    }
+
+    return await this.fileRecordRepository.find({
       where,
       order: { [sortBy]: sortOrder },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
     });
-
-    return {
-      items,
-      totalCount,
-      page,
-      pageSize,
-      totalPages: Math.ceil(totalCount / pageSize),
-    };
   }
 
   async getFileRecordById(id: number): Promise<FileRecord | null> {

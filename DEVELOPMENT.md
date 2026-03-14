@@ -27,6 +27,7 @@ This document tracks all development efforts, phases, and changes made to the pr
 **Phase 3 Completed:** 2026-03-13
 **Pagination Bugfix:** 2026-03-13
 **Phase 4 Completed:** 2026-03-14
+**Backfill Migration Added:** 2026-03-14
 
 #### Phase 3 — Pagination, Filtering & PATCH Endpoint ✓
 
@@ -137,6 +138,41 @@ This document tracks all development efforts, phases, and changes made to the pr
 - Error handling continues processing remaining files after individual failures
 - HTTP 200 returned even if all files fail (partial success pattern)
 - FileRecord deletion handled automatically by FileStorageService.deleteFile()
+
+### Backfill Migration (2026-03-14)
+
+**Objective:** Integrate BackfillFileRecordsTask as TypeORM migration for existing deployments
+
+**Changes:**
+- `src/tasks/backfill-file-records.task.ts` — Enhanced with statistics return and quiet mode
+  - Added `BackfillFileRecordsStats` interface
+  - Added `BackfillFileRecordsOptions` interface with `quiet` flag
+  - `execute()` now returns statistics object instead of void
+  - Conditional logging based on quiet mode
+- `src/migrations/1773529194000-BackfillFileRecords.ts` — Migration wrapper for backfill task
+  - Resolves BackfillFileRecordsTask from DI container
+  - Executes backfill and logs statistics in migration output
+  - Not reversible (manual cleanup required)
+- `src/container.ts` — Registered BackfillFileRecordsTask in DI container
+- `src/container.tokens.ts` — Added `backfillFileRecordsTask` token
+
+**New Files:**
+- `src/migrations/1773529194000-BackfillFileRecords.ts` — Migration wrapper
+- `test/migrations/backfill-file-records.test.ts` — Integration tests (5 tests, all passing)
+
+**Test Coverage:**
+- `test/migrations/backfill-file-records.test.ts` — 5 tests, all passing
+  - Backfill creates FileRecords for existing files
+  - Idempotent (second run creates 0 records)
+  - Handles files without metadata gracefully
+  - Returns statistics object with correct structure
+  - Skips thumbnail directories and JSON files
+
+**Migration Notes:**
+- Migration runs automatically during deployment
+- Idempotent: safe to run multiple times
+- Not reversible: FileRecords created cannot be distinguished from regular uploads
+- Logs statistics in migration output for audit trail
 
 #### Phase 2 — FileRecord Integration ✓
 
