@@ -71,7 +71,7 @@
     "axios": "1.13.6",
     "basic-ftp": "5.2.0",
     "bcryptjs": "3.0.3",
-    "better-sqlite3": "12.6.2",
+    "better-sqlite3": "12.8.0",
     "class-validator": "0.15.1",
     "connect-history-api-fallback": "2.0.0",
     "cookie-parser": "1.4.7",
