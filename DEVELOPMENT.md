@@ -84,8 +84,8 @@ This document tracks all development efforts, phases, and changes made to the pr
 **Test Changes:**
 - `test/api/file-storage-controller-integration.test.ts` — Updated pagination assertions to be lenient
 
-### Deferred from Phase 4
-- Permission-based access control → See `docs/features/file-storage-permissions-deferred.md`
+### Removed from Scope (2026-03-14)
+- **Permission-based access control** → Managed in frontend code (not backend concern)
 
 #### Phase 4 — Bulk Operations ✓
 
@@ -166,9 +166,6 @@ This document tracks all development efforts, phases, and changes made to the pr
     - FileRecord deletion on delete
     - List files from FileRecords
     - File type categorization (gcode/3mf/bgcode)
-
-### Deferred from Phase 4
-- Permission-based access control → See `docs/features/file-storage-permissions-deferred.md`
 
 #### Phase 1 — FileStorage API Integration Testing ✓
 
@@ -255,33 +252,33 @@ This document tracks all development efforts, phases, and changes made to the pr
 
 ### Queued Efforts (Not Yet Started)
 
-1. **Effort: SQLite Metadata Storage (v0.2.0)**
-   - Migrate file metadata from JSON sidecars to dedicated TypeORM `FileRecord` entity
-   - Create queryable indices for `fileHash`, `originalFileName`, `fileStorageId`
-   - Maintain referential integrity between `PrintJob` and `FileRecord`
-   - Phases: Design → Implementation → Migration → Testing
+*(No queued efforts at this time)*
 
-2. **Effort: File Management CRUD API (v0.3.0)**
-   - Add missing endpoints: `PATCH`, bulk delete, pagination, manual job creation
-   - Enhance permission system (add `PERMS.FileStorage.*` constants)
-   - Full test coverage for all endpoints
-   - Phases: API Design → Controller Implementation → Service Layer → Testing
+---
 
-3. **Effort: Multi-Plate 3MF Support (v0.4.0)**
-   - Wire `analyzeMultiPlate3MF()` into upload flow
-   - Create one job per plate; handle thumbnails per plate
-   - Update UI/API to represent multi-plate jobs
-   - Phases: Analysis → Storage → API → UI
+## Removed from Roadmap (2026-03-14)
 
-4. **Effort: Moonraker Metadata Normalization (v0.5.0)**
-   - Create mapper to normalize `ServerFileMetadataDto` → `PrintJobMetadata`
-   - Integrate with existing metadata storage
-   - Phases: Design → Mapper Implementation → Integration Tests
+The following efforts have been removed from the project roadmap:
 
-5. **Effort: Thumbnail Format Handling (v0.6.0)**
-   - Support QOI format conversion (to PNG or base64)
-   - Unified thumbnail API
-   - Phases: Format Support → API Enhancement → Testing
+1. **~~Effort: SQLite Metadata Storage (v0.2.0)~~** — REMOVED (Redundant)
+   - Already completed in v0.3.0 (FileRecord integration)
+   - FileRecord entity already stores metadata and provides queryable indices
+
+2. **~~Effort: File Management CRUD API (v0.3.0)~~** — COMPLETED
+   - ✓ All phases complete (see above)
+   - Permission system enhancement removed (managed in frontend)
+
+3. **~~Effort: Multi-Plate 3MF Support (v0.4.0)~~** — REMOVED
+   - **Reason:** Not a priority on product roadmap
+   - **Original scope:** Wire `analyzeMultiPlate3MF()`, create jobs per plate, handle thumbnails per plate
+
+4. **~~Effort: Moonraker Metadata Normalization (v0.5.0)~~** — REMOVED
+   - **Reason:** Will become larger initiative on product roadmap (out of scope for current effort)
+   - **Original scope:** Mapper for `ServerFileMetadataDto` → `PrintJobMetadata`
+
+5. **~~Effort: Thumbnail Format Handling (v0.6.0)~~** — REMOVED
+   - **Reason:** Not on product roadmap
+   - **Original scope:** QOI format conversion to PNG/base64
 
 ---
 
