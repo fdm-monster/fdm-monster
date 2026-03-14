@@ -455,13 +455,13 @@ export class FileStorageService implements IFileStorageService {
     for (const record of result.items) {
       if (record.type === 'dir') continue;
 
-      const filePath = await this.findFilePath(record.fileGuid);
-      if (!filePath) {
-        this.logger.warn(`FileRecord ${record.id} has fileGuid ${record.fileGuid} but file not found on disk`);
-        continue;
-      }
-
       try {
+        const filePath = await this.findFilePath(record.fileGuid);
+        if (!filePath) {
+          this.logger.warn(`FileRecord ${record.id} has fileGuid ${record.fileGuid} but file not found on disk - skipping`);
+          continue;
+        }
+
         const stats = await stat(filePath);
         const metadata = await this.loadMetadata(record.fileGuid);
         const thumbnails = await this.listThumbnails(record.fileGuid);

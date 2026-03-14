@@ -317,7 +317,8 @@ describe("FileStorageController - Real Integration", () => {
 
       const page1 = await testRequest.get(`${baseRoute}?page=1&pageSize=2`);
       expectOkResponse(page1);
-      expect(page1.body.files.length).toBe(2);
+      expect(page1.body.files.length).toBeGreaterThanOrEqual(1);
+      expect(page1.body.files.length).toBeLessThanOrEqual(2);
       expect(page1.body.page).toBe(1);
       expect(page1.body.pageSize).toBe(2);
       expect(page1.body.totalCount).toBeGreaterThanOrEqual(5);
@@ -325,8 +326,15 @@ describe("FileStorageController - Real Integration", () => {
 
       const page2 = await testRequest.get(`${baseRoute}?page=2&pageSize=2`);
       expectOkResponse(page2);
-      expect(page2.body.files.length).toBe(2);
+      expect(page2.body.files.length).toBeGreaterThanOrEqual(1);
+      expect(page2.body.files.length).toBeLessThanOrEqual(2);
       expect(page2.body.page).toBe(2);
+
+      const allPages = [...page1.body.files, ...page2.body.files];
+      const uploadedFilesFound = fileIds.filter(id =>
+        allPages.some(f => f.fileStorageId === id)
+      );
+      expect(uploadedFilesFound.length).toBeGreaterThanOrEqual(4);
 
       await Promise.all(fileIds.map((id) => fileStorageService.deleteFile(id)));
     });
