@@ -495,7 +495,7 @@ __metadata:
     "@types/multer": "npm:2.0.0"
     "@types/node": "npm:24.10.13"
     "@types/ws": "npm:8.18.1"
-    axios: "npm:1.13.5"
+    axios: "npm:1.13.6"
     better-sqlite3: "npm:12.6.2"
     chalk: "npm:5.6.2"
     dotenv: "npm:17.3.1"
@@ -3244,17 +3244,6 @@ __metadata:
   dependencies:
     fast-glob: "npm:^3.3.3"
   checksum: 10c0/44b0c51b955547d7375d86af5811f837ead0920695d2a5ba5516f791f3e7345f2ba328240302ca4fda38b1766efae93efd62452d0b1cd58c8299abb4dab2f1ef
-  languageName: node
-  linkType: hard
-
-"axios@npm:1.13.5":
-  version: 1.13.5
-  resolution: "axios@npm:1.13.5"
-  dependencies:
-    follow-redirects: "npm:^1.15.11"
-    form-data: "npm:^4.0.5"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/abf468c34f2d145f3dc7dbc0f1be67e520630624307bda69a41bbe8d386bd672d87b4405c4ee77f9ff54b235ab02f96a9968fb00e75b13ce64706e352a3068fd
   languageName: node
   linkType: hard
 

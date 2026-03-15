@@ -17,7 +17,7 @@
     "bambu:diagnostic": "cross-env NODE_ENV=development node --enable-source-maps dist/bambu-mqtt-diagnostic.console.js"
   },
   "dependencies": {
-    "axios": "1.13.5",
+    "axios": "1.13.6",
     "better-sqlite3": "12.6.2",
     "chalk": "5.6.2",
     "dotenv": "17.3.1",
