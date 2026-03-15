@@ -3,6 +3,12 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
+  build:{
+    ssr: true,
+    rolldownOptions: {
+      input: "src/index.ts",
+    }
+  },
   fmt: {
     printWidth: 120,
     ignorePatterns: ["**/*.yml", "**/*.yaml", "**/*.md", "**/*.json", ".all-contributorsrc"],
@@ -25,7 +31,7 @@ export default defineConfig({
     deps: {
       skipNodeModulesBundle: true,
     },
-    onSuccess: process.env.NODE_ENV === "development" ? "node --enable-source-maps dist/index.js" : undefined,
+    onSuccess: process.env.START_SERVER === "true" ? "node --enable-source-maps dist/index.js" : undefined,
   },
   test: {
     globals: true,
