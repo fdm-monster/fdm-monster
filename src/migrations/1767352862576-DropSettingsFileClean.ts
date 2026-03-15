@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class DropSettingsFileClean1767352862576 implements MigrationInterface {
-    name = 'DropSettingsFileClean1767352862576'
+  name = "DropSettingsFileClean1767352862576";
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "temporary_settings" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "server" text NOT NULL,
@@ -14,7 +14,7 @@ export class DropSettingsFileClean1767352862576 implements MigrationInterface {
                 "timeout" text NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_settings"(
                     "id",
                     "server",
@@ -31,21 +31,21 @@ export class DropSettingsFileClean1767352862576 implements MigrationInterface {
                 "timeout"
             FROM "settings"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "settings"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_settings"
                 RENAME TO "settings"
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             ALTER TABLE "settings"
                 RENAME TO "temporary_settings"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "settings" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "server" text NOT NULL,
@@ -56,7 +56,7 @@ export class DropSettingsFileClean1767352862576 implements MigrationInterface {
                 "timeout" text NOT NULL
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "settings"(
                     "id",
                     "server",
@@ -73,9 +73,8 @@ export class DropSettingsFileClean1767352862576 implements MigrationInterface {
                 "timeout"
             FROM "temporary_settings"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_settings"
         `);
-    }
-
+  }
 }

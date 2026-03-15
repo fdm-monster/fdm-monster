@@ -1,7 +1,7 @@
 import { AxiosPromise } from "axios";
-import { LoginDto } from "@/services/interfaces/login.dto";
-import { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.dto";
-import { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
+import type { LoginDto } from "@/services/interfaces/login.dto";
+import type { ServerConfigDto } from "@/services/moonraker/dto/server/server-config.dto";
+import type { SettingsDto } from "@/services/octoprint/dto/settings/settings.dto";
 import { ConnectionState } from "@/services/octoprint/dto/connection/connection-state.type";
 import { Flags } from "@/services/moonraker/dto/octoprint-compat/api-printer.dto";
 import { z } from "zod";

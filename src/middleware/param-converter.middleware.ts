@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { validateInput } from "@/handlers/validators";
 import { idRulesV2 } from "@/controllers/validation/generic.validation";
 
@@ -39,11 +39,9 @@ function createParamDecorator(
         return res.status(400).send(`Invalid number: ${paramName}`);
       }
     } else {
-      // No conversion for other types
       return res.status(400).send(`Unknown type of: ${paramName}`);
     }
 
-    // Validate an id type so it fits with the database
     if (validateIdAsType === Number) {
       try {
         await validateInput({ id: convertedValue }, idRulesV2);

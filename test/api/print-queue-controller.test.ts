@@ -13,31 +13,36 @@ describe("PrintQueueController", () => {
   let printJobService: PrintJobService;
   let printQueueService: PrintQueueService;
   let fileStorageService: FileStorageService;
-  const baseRoute = `${ AppConstants.apiRoute }/print-queue`;
+  const baseRoute = `${AppConstants.apiRoute}/print-queue`;
 
   beforeAll(async () => {
     // Mock printer API factory to prevent actual file uploads
     const mockPrinterApi = {
-      uploadFile: jest.fn().mockResolvedValue(undefined),
+      uploadFile: vi.fn().mockResolvedValue(undefined),
     };
     const mockPrinterApiFactory = {
-      getById: jest.fn().mockReturnValue(mockPrinterApi),
+      getById: vi.fn().mockReturnValue(mockPrinterApi),
     };
 
     // Mock file storage service to prevent writing to real media folder
     const mockFileStorageService = {
-      saveFile: jest.fn().mockResolvedValue("mock-file-storage-id"),
-      ensureStorageDirectories: jest.fn().mockResolvedValue(undefined),
-      getFilePath: jest.fn().mockReturnValue("/mock/path/file.gcode"),
-      getFileSize: jest.fn().mockReturnValue(1024),
-      readFile: jest.fn().mockReturnValue(Buffer.from("; mock gcode\nG28\n")),
-      readFileStream: jest.fn().mockReturnValue(Readable.from([Buffer.from("; test gcode\nG28\n")])),
+      saveFile: vi.fn().mockResolvedValue("mock-file-storage-id"),
+      ensureStorageDirectories: vi.fn().mockResolvedValue(undefined),
+      getFilePath: vi.fn().mockReturnValue("/mock/path/file.gcode"),
+      getFileSize: vi.fn().mockReturnValue(1024),
+      readFile: vi.fn().mockReturnValue(Buffer.from("; mock gcode\nG28\n")),
+      readFileStream: vi.fn().mockReturnValue(Readable.from([Buffer.from("; test gcode\nG28\n")])),
     };
 
-    const { request, container } = await setupTestApp(false, {
-      [DITokens.printerApiFactory]: asValue(mockPrinterApiFactory),
-      [DITokens.fileStorageService]: asValue(mockFileStorageService)
-    }, true, false);
+    const { request, container } = await setupTestApp(
+      false,
+      {
+        [DITokens.printerApiFactory]: asValue(mockPrinterApiFactory),
+        [DITokens.fileStorageService]: asValue(mockFileStorageService),
+      },
+      true,
+      false,
+    );
 
     testRequest = request;
     printJobService = container.resolve<PrintJobService>(DITokens.printJobService);
@@ -47,9 +52,7 @@ describe("PrintQueueController", () => {
 
   describe("GET /print-queue - Global Queue", () => {
     it("should return paginated global queue", async () => {
-      const res = await testRequest
-        .get(`${baseRoute}?page=1&pageSize=50`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}?page=1&pageSize=50`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("items");
@@ -61,9 +64,7 @@ describe("PrintQueueController", () => {
     });
 
     it("should validate page parameters", async () => {
-      const res = await testRequest
-        .get(`${baseRoute}?page=0&pageSize=300`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}?page=0&pageSize=300`).set("Accept", "application/json");
 
       expect(res.status).toBe(400);
       expect(res.body.error).toContain("Invalid page or pageSize");
@@ -96,9 +97,7 @@ describe("PrintQueueController", () => {
 
       await printQueueService.addToQueue(printer.id, job.id);
 
-      const res = await testRequest
-        .get(`${baseRoute}?page=1&pageSize=50`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}?page=1&pageSize=50`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       const queueItem = res.body.items.find((item: any) => item.jobId === job.id);
@@ -114,9 +113,7 @@ describe("PrintQueueController", () => {
     it("should return queue for specific printer", async () => {
       const printer = await createTestPrinter(testRequest);
 
-      const res = await testRequest
-        .get(`${baseRoute}/${printer.id}`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}/${printer.id}`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("printerId", printer.id);
@@ -126,9 +123,7 @@ describe("PrintQueueController", () => {
     });
 
     it("should validate printer ID", async () => {
-      const res = await testRequest
-        .get(`${baseRoute}/invalid`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}/invalid`).set("Accept", "application/json");
 
       expect(res.status).toBe(400);
       expect(res.text).toContain("Invalid number: printerId");
@@ -137,9 +132,7 @@ describe("PrintQueueController", () => {
     it("should return empty queue for printer with no queued jobs", async () => {
       const printer = await createTestPrinter(testRequest);
 
-      const res = await testRequest
-        .get(`${baseRoute}/${printer.id}`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}/${printer.id}`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body.queue).toEqual([]);
@@ -238,10 +231,7 @@ describe("PrintQueueController", () => {
       });
 
       // Add first job
-      await testRequest
-        .post(`${baseRoute}/${printer.id}/add/${job1.id}`)
-        .set("Accept", "application/json")
-        .send({});
+      await testRequest.post(`${baseRoute}/${printer.id}/add/${job1.id}`).set("Accept", "application/json").send({});
 
       // Add second job at position 0 (front of queue)
       const res = await testRequest
@@ -261,10 +251,7 @@ describe("PrintQueueController", () => {
     });
 
     it("should validate printer ID and job ID", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/invalid/add/invalid`)
-        .set("Accept", "application/json")
-        .send({});
+      const res = await testRequest.post(`${baseRoute}/invalid/add/invalid`).set("Accept", "application/json").send({});
 
       expect(res.status).toBe(400);
       expect(res.text).toContain("Invalid number: printerId");
@@ -313,9 +300,7 @@ describe("PrintQueueController", () => {
       await printQueueService.addToQueue(printer.id, job.id);
 
       // Remove from queue
-      const res = await testRequest
-        .delete(`${baseRoute}/${printer.id}/${job.id}`)
-        .set("Accept", "application/json");
+      const res = await testRequest.delete(`${baseRoute}/${printer.id}/${job.id}`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body.message).toContain("Job removed from queue");
@@ -361,9 +346,7 @@ describe("PrintQueueController", () => {
       }
 
       // Remove middle job
-      await testRequest
-        .delete(`${baseRoute}/${printer.id}/${jobs[1].id}`)
-        .set("Accept", "application/json");
+      await testRequest.delete(`${baseRoute}/${printer.id}/${jobs[1].id}`).set("Accept", "application/json");
 
       // Verify positions are compacted
       const job0 = await printJobService.printJobRepository.findOne({ where: { id: jobs[0].id } });
@@ -374,9 +357,7 @@ describe("PrintQueueController", () => {
     });
 
     it("should validate printer ID and job ID", async () => {
-      const res = await testRequest
-        .delete(`${baseRoute}/invalid/invalid`)
-        .set("Accept", "application/json");
+      const res = await testRequest.delete(`${baseRoute}/invalid/invalid`).set("Accept", "application/json");
 
       expect(res.status).toBe(400);
       expect(res.text).toContain("Invalid number: printerId");
@@ -491,9 +472,7 @@ describe("PrintQueueController", () => {
         await printQueueService.addToQueue(printer.id, job.id);
       }
 
-      const res = await testRequest
-        .delete(`${baseRoute}/${printer.id}/clear`)
-        .set("Accept", "application/json");
+      const res = await testRequest.delete(`${baseRoute}/${printer.id}/clear`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body.message).toContain("Queue cleared");
@@ -505,9 +484,7 @@ describe("PrintQueueController", () => {
     });
 
     it("should validate printer ID", async () => {
-      const res = await testRequest
-        .delete(`${baseRoute}/invalid/clear`)
-        .set("Accept", "application/json");
+      const res = await testRequest.delete(`${baseRoute}/invalid/clear`).set("Accept", "application/json");
 
       expect(res.status).toBe(400);
       expect(res.text).toContain("Invalid number: printerId");
@@ -541,9 +518,7 @@ describe("PrintQueueController", () => {
       });
       await printQueueService.addToQueue(printer.id, job.id);
 
-      const res = await testRequest
-        .get(`${baseRoute}/${printer.id}/next`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}/${printer.id}/next`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body.printerId).toBe(printer.id);
@@ -555,18 +530,14 @@ describe("PrintQueueController", () => {
     it("should return null when queue is empty", async () => {
       const printer = await createTestPrinter(testRequest);
 
-      const res = await testRequest
-        .get(`${baseRoute}/${printer.id}/next`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}/${printer.id}/next`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body.nextJob).toBeNull();
     });
 
     it("should validate printer ID", async () => {
-      const res = await testRequest
-        .get(`${baseRoute}/invalid/next`)
-        .set("Accept", "application/json");
+      const res = await testRequest.get(`${baseRoute}/invalid/next`).set("Accept", "application/json");
 
       expect(res.status).toBe(400);
       expect(res.text).toContain("Invalid number: printerId");
@@ -600,9 +571,7 @@ describe("PrintQueueController", () => {
       });
       await printQueueService.addToQueue(printer.id, job.id);
 
-      const res = await testRequest
-        .post(`${baseRoute}/${printer.id}/process`)
-        .set("Accept", "application/json");
+      const res = await testRequest.post(`${baseRoute}/${printer.id}/process`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body.message).toContain("Processing next job");
@@ -613,9 +582,7 @@ describe("PrintQueueController", () => {
     it("should return message when queue is empty", async () => {
       const printer = await createTestPrinter(testRequest);
 
-      const res = await testRequest
-        .post(`${baseRoute}/${printer.id}/process`)
-        .set("Accept", "application/json");
+      const res = await testRequest.post(`${baseRoute}/${printer.id}/process`).set("Accept", "application/json");
 
       expect(res.status).toBe(200);
       expect(res.body.message).toContain("Queue is empty");
@@ -623,9 +590,7 @@ describe("PrintQueueController", () => {
     });
 
     it("should validate printer ID", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/invalid/process`)
-        .set("Accept", "application/json");
+      const res = await testRequest.post(`${baseRoute}/invalid/process`).set("Accept", "application/json");
 
       expect(res.status).toBe(400);
       expect(res.text).toContain("Invalid number: printerId");
@@ -728,9 +693,7 @@ describe("PrintQueueController", () => {
     });
 
     it("should validate printer ID and job ID", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/invalid/submit/invalid`)
-        .set("Accept", "application/json");
+      const res = await testRequest.post(`${baseRoute}/invalid/submit/invalid`).set("Accept", "application/json");
 
       expect(res.status).toBe(400);
       expect(res.text).toContain("Invalid number: printerId");
@@ -739,9 +702,7 @@ describe("PrintQueueController", () => {
     it("should return error for non-existent job", async () => {
       const printer = await createTestPrinter(testRequest);
 
-      const res = await testRequest
-        .post(`${baseRoute}/${printer.id}/submit/999999`)
-        .set("Accept", "application/json");
+      const res = await testRequest.post(`${baseRoute}/${printer.id}/submit/999999`).set("Accept", "application/json");
 
       expect(res.status).toBe(500);
       expect(res.body.error).toContain("Failed to submit job to printer");
@@ -771,4 +732,3 @@ describe("PrintQueueController", () => {
     });
   });
 });
-

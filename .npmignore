@@ -48,7 +48,7 @@ test
 !dist/**/*
 !*.md
 !.env.template
-!.swcrc
+!vite.config.ts
 !package.json
 !yarn.lock
 !.yarn

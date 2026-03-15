@@ -1,19 +1,17 @@
 FROM node:24-bookworm-slim AS production
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ca-certificates curl
+COPY .yarn/releases ./.yarn/releases
+COPY vite.config.ts tsconfig.json package.json yarn.lock .yarnrc.yml ./
 
-RUN yarn global add pm2
-
-COPY .swcrc tsconfig.json package.json jest.config.js yarn.lock ./
-# Timeout is needed for yarn install to work on arm64 emulation (qemu)
-RUN yarn install 
+RUN yarn workspaces focus
 
 COPY src/ ./src/
 COPY test/ ./test/
 COPY .env.template \
     README.md \
-    LICENSE CODE_OF_CONDUCT.md \
+    LICENSE \
+    CODE_OF_CONDUCT.md \
     CONTRIBUTING.md \
     SECURITY.md \
     .dockerignore ./

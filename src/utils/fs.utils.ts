@@ -1,7 +1,16 @@
 import { existsSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { AppConstants } from "@/server.constants";
 import { getEnvOrDefault } from "@/utils/env.utils";
+
+/**
+ * Get __dirname equivalent in ESM
+ * @param importMetaUrl - Pass import.meta.url from the calling module
+ */
+export function getDirname(importMetaUrl: string): string {
+  return dirname(fileURLToPath(importMetaUrl));
+}
 
 export function getDatabaseFilePath() {
   const dbFile = getEnvOrDefault(AppConstants.DATABASE_FILE, AppConstants.defaultDatabaseFile);
@@ -37,5 +46,5 @@ export function ensureDirExists(dir: string) {
  * Root where code is hosted, avoid using excessively
  */
 export function superRootPath() {
-  return join(__dirname, "../..");
+  return join(getDirname(import.meta.url), "../..");
 }

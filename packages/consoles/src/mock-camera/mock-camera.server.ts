@@ -2,7 +2,7 @@ import express from "express";
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
-import { DEFAULT_IMAGE_BASE64 } from "./default-image.js";
+import { DEFAULT_IMAGE_BASE64 } from "./default-image";
 
 const port = process.argv[2] ? Number.parseInt(process.argv[2]) : 8181;
 const fps = process.argv[3] ? Number.parseInt(process.argv[3]) : 10;
@@ -32,22 +32,23 @@ interface Frame {
 
 let customFrames: Frame[] = [];
 try {
-  const files = fs.readdirSync(framesDir)
-    .filter(f => {
+  const files = fs
+    .readdirSync(framesDir)
+    .filter((f) => {
       const lower = f.toLowerCase();
-      return lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.png');
+      return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png");
     })
     .sort((a, b) => a.localeCompare(b));
 
   if (files.length > 0) {
     console.log(`[CAMERA:${port}] Loading ${files.length} custom frame(s) from ${framesDir}`);
-    customFrames = files.map(f => {
+    customFrames = files.map((f) => {
       const filePath = path.join(framesDir, f);
       const data = fs.readFileSync(filePath);
-      const contentType = f.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+      const contentType = f.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg";
       return { data, contentType };
     });
-    console.log(`[CAMERA:${port}] Loaded custom frames: ${files.join(', ')}`);
+    console.log(`[CAMERA:${port}] Loaded custom frames: ${files.join(", ")}`);
   }
 } catch (error) {
   console.error(`[CAMERA:${port}] Error loading custom frames:`, error);
@@ -55,8 +56,8 @@ try {
 
 // Load default frame from embedded base64
 const defaultFrame: Frame = {
-  data: Buffer.from(DEFAULT_IMAGE_BASE64, 'base64'),
-  contentType: 'image/jpeg'
+  data: Buffer.from(DEFAULT_IMAGE_BASE64, "base64"),
+  contentType: "image/jpeg",
 };
 console.log(`[CAMERA:${port}] Loaded default frame from embedded image`);
 
@@ -78,11 +79,11 @@ app.get("/", (req, res) => {
 
   // Set headers for MJPEG stream
   res.writeHead(200, {
-    'Content-Type': 'multipart/x-mixed-replace; boundary=--FRAME',
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0',
-    'Connection': 'close'
+    "Content-Type": "multipart/x-mixed-replace; boundary=--FRAME",
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    Pragma: "no-cache",
+    Expires: "0",
+    Connection: "close",
   });
 
   // Send frames at specified FPS
@@ -91,12 +92,12 @@ app.get("/", (req, res) => {
       const frame = generateFrame();
 
       // Write multipart frame with boundary
-      res.write('--FRAME\r\n');
+      res.write("--FRAME\r\n");
       res.write(`Content-Type: ${frame.contentType}\r\n`);
       res.write(`Content-Length: ${frame.data.length}\r\n`);
-      res.write('\r\n');
+      res.write("\r\n");
       res.write(frame.data);
-      res.write('\r\n');
+      res.write("\r\n");
     } catch (error) {
       console.error(`[CAMERA:${port}] Error sending frame:`, error);
       clearInterval(intervalId);
@@ -109,13 +110,13 @@ app.get("/", (req, res) => {
   activeIntervals.add(intervalId);
 
   // Clean up on client disconnect
-  req.on('close', () => {
+  req.on("close", () => {
     console.log(`[CAMERA:${port}] Client disconnected`);
     clearInterval(intervalId);
     activeIntervals.delete(intervalId);
   });
 
-  res.on('error', (error) => {
+  res.on("error", (error) => {
     console.error(`[CAMERA:${port}] Response error:`, error);
     clearInterval(intervalId);
     activeIntervals.delete(intervalId);
@@ -129,31 +130,31 @@ app.get("/snapshot", (req, res) => {
   try {
     const frame = generateFrame();
     res.writeHead(200, {
-      'Content-Type': frame.contentType,
-      'Content-Length': frame.data.length,
-      'Cache-Control': 'no-cache'
+      "Content-Type": frame.contentType,
+      "Content-Length": frame.data.length,
+      "Cache-Control": "no-cache",
     });
     res.end(frame.data);
   } catch (error) {
     console.error(`[CAMERA:${port}] Error generating snapshot:`, error);
-    res.status(500).json({ error: 'Failed to generate snapshot' });
+    res.status(500).json({ error: "Failed to generate snapshot" });
   }
 });
 
 // Status endpoint
 app.get("/status", (req, res) => {
   res.json({
-    status: 'online',
+    status: "online",
     fps: fps,
     customFrames: customFrames.length,
-    framesDir: framesDir
+    framesDir: framesDir,
   });
 });
 
 // 404 handler
 app.use((req, res) => {
   console.log(`[CAMERA:${port}] ${req.method.toUpperCase()} ${req.url} Not found`);
-  res.status(404).json({ error: 'Not Found' });
+  res.status(404).json({ error: "Not Found" });
 });
 
 server.listen(port, () => {
@@ -162,7 +163,7 @@ server.listen(port, () => {
   console.log(`[CAMERA:${port}] Snapshot: http://localhost:${port}/snapshot`);
   console.log(`[CAMERA:${port}] Status: http://localhost:${port}/status`);
   console.log(`[CAMERA:${port}] FPS: ${fps}`);
-  const framesString = customFrames.length > 0 ? `${customFrames.length} loaded` : 'none (using placeholder)';
+  const framesString = customFrames.length > 0 ? `${customFrames.length} loaded` : "none (using placeholder)";
   console.log(`[CAMERA:${port}] Custom frames: ${framesString}`);
   if (customFrames.length === 0) {
     console.log(`[CAMERA:${port}] Tip: Add .jpg or .png files to ${framesDir} to use custom frames`);
@@ -175,7 +176,7 @@ function shutdown(signal: string) {
 
   // Clear all active intervals
   console.log(`[CAMERA:${port}] Clearing ${activeIntervals.size} active stream(s)...`);
-  activeIntervals.forEach(interval => clearInterval(interval));
+  activeIntervals.forEach((interval) => clearInterval(interval));
   activeIntervals.clear();
 
   // Close the server
@@ -191,5 +192,5 @@ function shutdown(signal: string) {
   }, 5000);
 }
 
-process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));

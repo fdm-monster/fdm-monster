@@ -1,11 +1,11 @@
 import { before, DELETE, GET, PATCH, POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { authorizeRoles, authenticate } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { FileStorageService } from "@/services/file-storage.service";
 import { MulterService } from "@/services/core/multer.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { BadRequestException } from "@/exceptions/runtime.exceptions";
@@ -308,7 +308,9 @@ export class FileStorageController {
       const metadata = analysisResult.metadata;
       const thumbnails = analysisResult.thumbnails;
 
-      this.logger.log(`Analysis complete for ${fileStorageId}: format=${metadata.fileFormat}, layers=${metadata.totalLayers}, time=${metadata.gcodePrintTimeSeconds}s, thumbnails=${thumbnails.length}`);
+      this.logger.log(
+        `Analysis complete for ${fileStorageId}: format=${metadata.fileFormat}, layers=${metadata.totalLayers}, time=${metadata.gcodePrintTimeSeconds}s, thumbnails=${thumbnails.length}`,
+      );
 
       const fileHash = await this.fileStorageService.calculateFileHash(filePath);
       const originalFileName = existingMetadata?._originalFileName || fileStorageId;
@@ -321,7 +323,13 @@ export class FileStorageController {
         this.logger.log(`Saved ${thumbnailMetadata.length} thumbnails for ${fileStorageId}`);
       }
 
-      await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, originalFileName, thumbnailMetadata);
+      await this.fileStorageService.saveMetadata(
+        fileStorageId,
+        metadata,
+        fileHash,
+        originalFileName,
+        thumbnailMetadata,
+      );
 
       res.send({
         message: "File analyzed successfully",
@@ -355,8 +363,8 @@ export class FileStorageController {
       }
 
       // Determine content type from magic bytes
-      const isJPG = thumbnail[0] === 0xFF && thumbnail[1] === 0xD8;
-      const isQOI = thumbnail[0] === 0x71 && thumbnail[1] === 0x6F && thumbnail[2] === 0x69 && thumbnail[3] === 0x66;
+      const isJPG = thumbnail[0] === 0xff && thumbnail[1] === 0xd8;
+      const isQOI = thumbnail[0] === 0x71 && thumbnail[1] === 0x6f && thumbnail[2] === 0x69 && thumbnail[3] === 0x66;
 
       // QOI format not supported by browser
       if (isQOI) {
@@ -364,8 +372,8 @@ export class FileStorageController {
         return;
       }
 
-      const mimeType = isJPG ? 'image/jpeg' : 'image/png';
-      const base64 = thumbnail.toString('base64');
+      const mimeType = isJPG ? "image/jpeg" : "image/png";
+      const base64 = thumbnail.toString("base64");
       res.send({
         thumbnailBase64: `data:${mimeType};base64,${base64}`,
       });
@@ -382,7 +390,7 @@ export class FileStorageController {
   @POST()
   @route("/upload")
   async uploadFile(req: Request, res: Response) {
-    const acceptedExtensions = ['.gcode', '.3mf', '.bgcode'];
+    const acceptedExtensions = [".gcode", ".3mf", ".bgcode"];
     const files = await this.multerService.multerLoadFileAsync(req, res, acceptedExtensions, true);
 
     if (!files?.length) {
@@ -410,11 +418,16 @@ export class FileStorageController {
       const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
       this.logger.log(`Saved ${file.originalname} as ${fileStorageId}`);
 
-      const thumbnailMetadata = thumbnails.length > 0
-        ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails)
-        : [];
+      const thumbnailMetadata =
+        thumbnails.length > 0 ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails) : [];
 
-      await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, file.originalname, thumbnailMetadata);
+      await this.fileStorageService.saveMetadata(
+        fileStorageId,
+        metadata,
+        fileHash,
+        file.originalname,
+        thumbnailMetadata,
+      );
 
       res.send({
         message: "File uploaded successfully",

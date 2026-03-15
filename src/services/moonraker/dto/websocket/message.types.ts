@@ -1,7 +1,7 @@
-import { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-event.dto";
+import type { JsonRpcEventDto } from "@/services/moonraker/dto/websocket/json-rpc-event.dto";
 import { NotifyFileListChangedParams } from "@/services/moonraker/dto/websocket/notify-filelist-changed.params";
 import { NotifyUpdateResponseParams } from "@/services/moonraker/dto/websocket/notify-update-response.params";
-import { MachineUpdateStatusDto } from "@/services/moonraker/dto/machine/machine-update-status.dto";
+import type { MachineUpdateStatusDto } from "@/services/moonraker/dto/machine/machine-update-status.dto";
 import { ThrottledState } from "@/services/moonraker/dto/process-stats.dto";
 import { NotifyProcStatUpdateParams } from "@/services/moonraker/dto/websocket/notify-proc-stat-update.params";
 import { NotifyHistoryChangedParams } from "@/services/moonraker/dto/websocket/notify-history-changed.params";
@@ -12,7 +12,7 @@ import { NotifyButtonEventParams } from "@/services/moonraker/dto/websocket/noti
 import { NotificationUpdateParams } from "@/services/moonraker/dto/websocket/notify-announcement-update.params";
 import { NotifyAnnouncementParams } from "@/services/moonraker/dto/websocket/notify-announcement.params";
 import { NotifySudoAlertParams } from "@/services/moonraker/dto/websocket/notify-sudo-alert.params";
-import { WebcamListDto } from "@/services/moonraker/dto/server-webcams/webcam-list.dto";
+import type { WebcamListDto } from "@/services/moonraker/dto/server-webcams/webcam-list.dto";
 import { NotifyActiveSpoolSetParams } from "@/services/moonraker/dto/websocket/notify-active-spool-set.params";
 import { NotifySpoolmanStatusChangedParams } from "@/services/moonraker/dto/websocket/notify-spoolman-status-changed";
 import { NotifyAgentEventParams } from "@/services/moonraker/dto/websocket/notify-agent-event.params";

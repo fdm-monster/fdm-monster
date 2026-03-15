@@ -1,5 +1,5 @@
 import { IsAlphanumeric } from "class-validator";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, type Relation } from "typeorm";
 import { PrinterTag } from "@/entities/printer-tag.entity";
 import { OctoprintType } from "@/services/printer-api.interface";
 
@@ -35,7 +35,7 @@ export class Printer {
   })
   enabled: boolean;
 
-  @Column({ type: "varchar", nullable: true, })
+  @Column({ type: "varchar", nullable: true })
   disabledReason: string | null;
 
   @Column({
@@ -43,10 +43,7 @@ export class Printer {
   })
   assignee?: string;
 
-  @OneToMany(
-    () => PrinterTag,
-    (pc) => pc.printer,
-  )
+  @OneToMany(() => PrinterTag, (pc) => pc.printer)
   printerTags: Relation<PrinterTag>[];
 
   @CreateDateColumn({ type: "int" })

@@ -6,11 +6,7 @@ import TestAgent from "supertest/lib/agent";
 
 export const tagRoute = AppConstants.apiRoute + "/printer-tag";
 
-export async function createTestTag(
-  request: TestAgent<Test>,
-  name = "TestTag",
-  color = "#FFFFFF"
-) {
+export async function createTestTag(request: TestAgent<Test>, name = "TestTag", color = "#FFFFFF") {
   const createResponse = await request.post(tagRoute).send({
     name,
     color,
@@ -21,4 +17,3 @@ export async function createTestTag(
     printers: expect.any(Array),
   }) as TagWithPrintersDto;
 }
-

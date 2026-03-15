@@ -25,7 +25,7 @@ M140 S0
 
   const uploadFile = (filename: string, content: string, additionalFields?: Record<string, string>) => {
     const request = testRequest
-      .post(`${ baseRoute }/files/local`)
+      .post(`${baseRoute}/files/local`)
       .set("Accept", "application/json")
       .set("X-Api-Key", validApiKey);
 
@@ -40,39 +40,30 @@ M140 S0
 
   const uploadFileWithoutAuth = (filename: string, content: string) => {
     return testRequest
-      .post(`${ baseRoute }/files/local`)
+      .post(`${baseRoute}/files/local`)
       .set("Accept", "application/json")
       .attach("file", Buffer.from(content), filename);
   };
 
   const uploadFileWithApiKey = (filename: string, content: string, apiKey: string) => {
     return testRequest
-      .post(`${ baseRoute }/files/local`)
+      .post(`${baseRoute}/files/local`)
       .set("Accept", "application/json")
       .set("X-Api-Key", apiKey)
       .attach("file", Buffer.from(content), filename);
   };
 
   const listFiles = () => {
-    return testRequest
-      .get(`${ baseRoute }/files`)
-      .set("Accept", "application/json")
-      .set("X-Api-Key", validApiKey);
+    return testRequest.get(`${baseRoute}/files`).set("Accept", "application/json").set("X-Api-Key", validApiKey);
   };
-  
+
   const getVersion = () => {
-    return testRequest
-      .get(`${ baseRoute }/version`)
-      .set("Accept", "application/json")
-      .set("X-Api-Key", validApiKey);
+    return testRequest.get(`${baseRoute}/version`).set("Accept", "application/json").set("X-Api-Key", validApiKey);
   };
 
   // Helper to get server info
   const getServer = () => {
-    return testRequest
-      .get(`${ baseRoute }/server`)
-      .set("Accept", "application/json")
-      .set("X-Api-Key", validApiKey);
+    return testRequest.get(`${baseRoute}/server`).set("Accept", "application/json").set("X-Api-Key", validApiKey);
   };
 
   // Helper for common upload response assertions
@@ -107,14 +98,14 @@ M140 S0
     let mockFileIdCounter = 0;
     const uploadedFilenames: Map<string, string> = new Map(); // Track uploaded filenames
 
-    jest.spyOn(fileStorageService, 'saveFile').mockImplementation(async (file) => {
-      const fileId = `mock-file-id-${ ++mockFileIdCounter }`;
+    vi.spyOn(fileStorageService, "saveFile").mockImplementation(async (file) => {
+      const fileId = `mock-file-id-${++mockFileIdCounter}`;
       uploadedFilenames.set(file.originalname, fileId);
       return fileId;
     });
-    jest.spyOn(fileStorageService, 'calculateFileHash').mockResolvedValue('mock-hash-abc123');
-    jest.spyOn(fileStorageService, 'getFilePath').mockImplementation((id: string) => `/mock/path/${ id }`);
-    jest.spyOn(fileStorageService, 'findDuplicateByOriginalFileName').mockImplementation(async (filename: string) => {
+    vi.spyOn(fileStorageService, "calculateFileHash").mockResolvedValue("mock-hash-abc123");
+    vi.spyOn(fileStorageService, "getFilePath").mockImplementation((id: string) => `/mock/path/${id}`);
+    vi.spyOn(fileStorageService, "findDuplicateByOriginalFileName").mockImplementation(async (filename: string) => {
       const existingFileId = uploadedFilenames.get(filename);
       if (existingFileId) {
         return {
@@ -130,7 +121,7 @@ M140 S0
     // Clean up the API key
     await settingsStore.deleteSlicerApiKey();
     // Restore mocks
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("GET /api/version - OctoPrint version endpoint", () => {
@@ -240,7 +231,7 @@ M140 S0
 
     it("should return 400 when no file is uploaded", async () => {
       const res = await testRequest
-        .post(`${ baseRoute }/files/local`)
+        .post(`${baseRoute}/files/local`)
         .set("Accept", "application/json")
         .set("X-Api-Key", validApiKey);
 
@@ -253,7 +244,7 @@ M140 S0
       const formats = ["gcode", "3mf", "bgcode"];
 
       for (const ext of formats) {
-        const res = await uploadFile(`test.${ ext }`, SIMPLE_GCODE);
+        const res = await uploadFile(`test.${ext}`, SIMPLE_GCODE);
         expect(res.status).toBe(201);
         expect(res.body.done).toBe(true);
       }
@@ -263,7 +254,7 @@ M140 S0
       const invalidExtensions = ["txt", "pdf", "zip", "stl"];
 
       for (const ext of invalidExtensions) {
-        const res = await uploadFile(`test.${ ext }`, "test content");
+        const res = await uploadFile(`test.${ext}`, "test content");
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty("error");
       }
@@ -309,7 +300,7 @@ G1 X20 Y20 E5 F1500
     it("should handle upload errors gracefully", async () => {
       // Try uploading with invalid data
       const res = await testRequest
-        .post(`${ baseRoute }/files/local`)
+        .post(`${baseRoute}/files/local`)
         .set("Accept", "application/json")
         .set("X-Api-Key", validApiKey)
         .send({ invalid: "data" });
@@ -363,7 +354,7 @@ G1 X20 Y20 E5 F1500
 
     it("should handle multiple concurrent uploads", async () => {
       const uploads = Array.from({ length: 3 }, (_, i) =>
-        uploadFile(`concurrent-${ i }.gcode`, `G28\nG1 X${ i * 10 } Y${ i * 10 }\n`),
+        uploadFile(`concurrent-${i}.gcode`, `G28\nG1 X${i * 10} Y${i * 10}\n`),
       );
 
       const results = await Promise.all(uploads);
@@ -411,7 +402,6 @@ G1 X20 Y20 E5 F1500
   });
 
   describe("API Key Authentication", () => {
-
     describe("POST /api/files/local with X-Api-Key header", () => {
       it("should accept upload with valid X-Api-Key header", async () => {
         const res = await uploadFile("api-key-test.gcode", SIMPLE_GCODE);
@@ -455,7 +445,7 @@ G1 X20 Y20 E5 F1500
       it("should reject list with invalid X-Api-Key when login is required", async () => {
         await withLoginRequired(async () => {
           const res = await testRequest
-            .get(`${ baseRoute }/files`)
+            .get(`${baseRoute}/files`)
             .set("Accept", "application/json")
             .set("X-Api-Key", "invalid-api-key");
 
@@ -480,13 +470,13 @@ G1 X20 Y20 E5 F1500
       });
 
       it("GET /api/version should reject without API key", async () => {
-        const res = await testRequest.get(`${ baseRoute }/version`).set("Accept", "application/json");
+        const res = await testRequest.get(`${baseRoute}/version`).set("Accept", "application/json");
 
         expect(res.status).toBe(401);
       });
 
       it("GET /api/server should reject without API key", async () => {
-        const res = await testRequest.get(`${ baseRoute }/server`).set("Accept", "application/json");
+        const res = await testRequest.get(`${baseRoute}/server`).set("Accept", "application/json");
 
         expect(res.status).toBe(401);
       });
@@ -532,4 +522,3 @@ G1 X20 Y20 E5 F1500
     });
   });
 });
-

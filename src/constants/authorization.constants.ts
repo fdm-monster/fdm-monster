@@ -1,5 +1,3 @@
-import { union } from "lodash";
-
 export const AUTH_ERROR_REASON = {
   // Before login
   IncorrectCredentials: "IncorrectCredentials",
@@ -88,20 +86,24 @@ export const ROLES = {
 export type RoleName = (typeof ROLES)[keyof typeof ROLES];
 
 export const ROLE_PERMS: Record<RoleName, PermissionName[]> = {
-  [ROLES.ADMIN]: union(
-    allPerms(PERM_GROUP.Jobs),
-    allPerms(PERM_GROUP.Floors),
-    allPerms(PERM_GROUP.PrinterFiles),
-    allPerms(PERM_GROUP.PrinterSettings),
-    allPerms(PERM_GROUP.ServerInfo),
-    allPerms(PERM_GROUP.PrinterMaintenanceLog),
-  ),
-  [ROLES.OPERATOR]: union(
-    allPerms(PERM_GROUP.Jobs),
-    allPerms(PERM_GROUP.Floors),
-    allPerms(PERM_GROUP.PrinterFiles),
-    allPerms(PERM_GROUP.PrinterSettings),
-    allPerms(PERM_GROUP.PrinterMaintenanceLog),
-  ),
+  [ROLES.ADMIN]: [
+    ...new Set([
+      ...allPerms(PERM_GROUP.Jobs),
+      ...allPerms(PERM_GROUP.Floors),
+      ...allPerms(PERM_GROUP.PrinterFiles),
+      ...allPerms(PERM_GROUP.PrinterSettings),
+      ...allPerms(PERM_GROUP.ServerInfo),
+      ...allPerms(PERM_GROUP.PrinterMaintenanceLog),
+    ]),
+  ],
+  [ROLES.OPERATOR]: [
+    ...new Set([
+      ...allPerms(PERM_GROUP.Jobs),
+      ...allPerms(PERM_GROUP.Floors),
+      ...allPerms(PERM_GROUP.PrinterFiles),
+      ...allPerms(PERM_GROUP.PrinterSettings),
+      ...allPerms(PERM_GROUP.PrinterMaintenanceLog),
+    ]),
+  ],
   [ROLES.GUEST]: [],
 };

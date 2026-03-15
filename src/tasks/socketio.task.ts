@@ -1,4 +1,4 @@
-import { IO_MESSAGES, SocketIoGateway } from "@/state/socket-io.gateway";
+import { SocketIoGateway, IO_MESSAGES } from "@/state/socket-io.gateway";
 import { socketIoConnectedEvent } from "@/constants/event.constants";
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterEventsCache } from "@/state/printer-events.cache";
@@ -7,7 +7,7 @@ import { FileUploadTrackerCache } from "@/state/file-upload-tracker.cache";
 import EventEmitter2 from "eventemitter2";
 import { PrinterCache } from "@/state/printer.cache";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 
 export class SocketIoTask {
   logger: LoggerService;

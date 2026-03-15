@@ -1,4 +1,3 @@
-import { MoonrakerApi } from "@/services/moonraker.api";
 import { DITokens } from "@/container.tokens";
 import { setupTestApp } from "../test-server";
 import { AwilixContainer } from "awilix";

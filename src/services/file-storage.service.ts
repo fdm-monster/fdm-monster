@@ -20,11 +20,31 @@ export interface IFileStorageService {
   getFileSize(fileStorageId: string): number;
   calculateFileHash(filePath: string): Promise<string>;
   validateUniqueFilename(fileName: string): Promise<void>;
-  saveMetadata(fileStorageId: string, metadata: any, fileHash?: string, originalFileName?: string, thumbnailMetadata?: any[]): Promise<void>;
+  saveMetadata(
+    fileStorageId: string,
+    metadata: any,
+    fileHash?: string,
+    originalFileName?: string,
+    thumbnailMetadata?: any[],
+  ): Promise<void>;
   loadMetadata(fileStorageId: string): Promise<any | null>;
   hasMetadata(fileStorageId: string): Promise<boolean>;
   getDeterministicId(fileHash: string, fileName: string): string;
-  findDuplicateByOriginalFileName(originalFileName: string): Promise<{fileStorageId: string; metadata: any} | null>;
+  findDuplicateByOriginalFileName(originalFileName: string): Promise<{ fileStorageId: string; metadata: any } | null>;
+  saveThumbnails(
+    fileStorageId: string,
+    thumbnails: Array<{ data?: string; format?: string; width?: number; height?: number }>,
+  ): Promise<
+    Array<{
+      index: number;
+      path: string;
+      filename: string;
+      width: number;
+      height: number;
+      format: string;
+      size: number;
+    }>
+  >;
   getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null>;
   listThumbnails(fileStorageId: string): Promise<string[]>;
   listFileRecords(parentId?: number): Promise<FileRecord[]>;
@@ -65,11 +85,8 @@ export class FileStorageService implements IFileStorageService {
     const filePath = this.getFilePath(fileStorageId);
     const stream = createReadStream(filePath);
 
-    stream.on("error", err => {
-      this.logger.error(
-        `Failed to read file ${fileStorageId}: ${err.message}`,
-        err,
-      );
+    stream.on("error", (err) => {
+      this.logger.error(`Failed to read file ${fileStorageId}: ${err.message}`, err);
     });
 
     return stream;
@@ -84,10 +101,9 @@ export class FileStorageService implements IFileStorageService {
   async validateUniqueFilename(fileName: string): Promise<void> {
     const existing = await this.findDuplicateByOriginalFileName(fileName);
     if (existing) {
-      const { ConflictException } = await import("@/exceptions/runtime.exceptions");
       throw new ConflictException(
         `A file named "${fileName}" already exists in storage. Please rename the file, delete the existing file (ID: ${existing.fileStorageId}), or choose a different name.`,
-        existing.fileStorageId
+        existing.fileStorageId,
       );
     }
   }
@@ -97,9 +113,9 @@ export class FileStorageService implements IFileStorageService {
 
     let fileId: string;
     if (fileHash) {
-      const nameHash = createHash('sha256')
+      const nameHash = createHash("sha256")
         .update(fileHash + file.originalname)
-        .digest('hex')
+        .digest("hex")
         .substring(0, 32);
       fileId = `${nameHash.substring(0, 8)}-${nameHash.substring(8, 12)}-${nameHash.substring(12, 16)}-${nameHash.substring(16, 20)}-${nameHash.substring(20, 32)}`;
     } else {
@@ -161,15 +177,13 @@ export class FileStorageService implements IFileStorageService {
     try {
       await unlink(metadataPath);
       this.logger.debug(`Deleted metadata JSON for ${fileStorageId}`);
-    } catch {
-    }
+    } catch {}
 
-    const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, '_thumbnails');
+    const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, "_thumbnails");
     try {
       await rm(thumbnailDir, { recursive: true, force: true });
       this.logger.debug(`Deleted thumbnails for ${fileStorageId}`);
-    } catch {
-    }
+    } catch {}
 
     const fileRecord = await this.getFileRecordByGuid(fileStorageId);
     if (fileRecord) {
@@ -179,7 +193,7 @@ export class FileStorageService implements IFileStorageService {
     this.logger.log(`Deleted file ${fileStorageId}`);
   }
 
-  getFilePath(fileStorageId: string) : string {
+  getFilePath(fileStorageId: string): string {
     for (const subdir of this.STORAGE_SUBDIRS) {
       for (const ext of [".gcode", ".3mf", ".bgcode", ""]) {
         const fullPath = join(this.storageBasePath, subdir, fileStorageId + ext);
@@ -200,9 +214,9 @@ export class FileStorageService implements IFileStorageService {
   }
 
   getDeterministicId(fileHash: string, fileName: string): string {
-    const nameHash = createHash('sha256')
+    const nameHash = createHash("sha256")
       .update(fileHash + fileName)
-      .digest('hex')
+      .digest("hex")
       .substring(0, 32);
     return `${nameHash.substring(0, 8)}-${nameHash.substring(8, 12)}-${nameHash.substring(12, 16)}-${nameHash.substring(16, 20)}-${nameHash.substring(20, 32)}`;
   }
@@ -212,12 +226,11 @@ export class FileStorageService implements IFileStorageService {
       const dirPath = join(this.storageBasePath, subdir);
       try {
         const files = await readdir(dirPath);
-        const matchingFile = files.find(f => f.startsWith(fileStorageId));
+        const matchingFile = files.find((f) => f.startsWith(fileStorageId));
         if (matchingFile) {
           return join(dirPath, matchingFile);
         }
-      } catch {
-      }
+      } catch {}
     }
 
     return null;
@@ -245,7 +258,7 @@ export class FileStorageService implements IFileStorageService {
         const dirFiles = await readdir(dirPath);
 
         for (const file of dirFiles) {
-          if (file.endsWith('_thumbnails') || file.endsWith('.json')) continue;
+          if (file.endsWith("_thumbnails") || file.endsWith(".json")) continue;
 
           const fileId = path.parse(file).name;
           const metadata = await this.loadMetadata(fileId);
@@ -265,7 +278,13 @@ export class FileStorageService implements IFileStorageService {
     return null;
   }
 
-  async saveMetadata(fileStorageId: string, metadata: any, fileHash?: string, originalFileName?: string, thumbnailMetadata?: any[]): Promise<void> {
+  async saveMetadata(
+    fileStorageId: string,
+    metadata: any,
+    fileHash?: string,
+    originalFileName?: string,
+    thumbnailMetadata?: any[],
+  ): Promise<void> {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) {
       this.logger.warn(`Cannot save metadata - file ${fileStorageId} not found`);
@@ -285,8 +304,7 @@ export class FileStorageService implements IFileStorageService {
       if (existing._thumbnails && !thumbnailMetadata) {
         existingThumbnails = existing._thumbnails;
       }
-    } catch {
-    }
+    } catch {}
 
     const metadataWithMeta = {
       ...metadata,
@@ -298,7 +316,7 @@ export class FileStorageService implements IFileStorageService {
     };
 
     await writeFile(metadataPath, JSON.stringify(metadataWithMeta, null, 2), "utf8");
-    const thumbnailMeta = thumbnailMetadata ? ` with ${thumbnailMetadata.length} thumbnail(s)` : '';
+    const thumbnailMeta = thumbnailMetadata ? ` with ${thumbnailMetadata.length} thumbnail(s)` : "";
     this.logger.debug(`Saved metadata for ${fileStorageId}${thumbnailMeta}`);
   }
 
@@ -312,7 +330,7 @@ export class FileStorageService implements IFileStorageService {
     try {
       const content = await readFile(metadataPath, "utf8");
       return JSON.parse(content);
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -332,15 +350,20 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  async saveThumbnails(fileStorageId: string, thumbnails: Array<{data?: string; format?: string; width?: number; height?: number}>): Promise<Array<{
-    index: number;
-    path: string;
-    filename: string;
-    width: number;
-    height: number;
-    format: string;
-    size: number;
-  }>> {
+  async saveThumbnails(
+    fileStorageId: string,
+    thumbnails: Array<{ data?: string; format?: string; width?: number; height?: number }>,
+  ): Promise<
+    Array<{
+      index: number;
+      path: string;
+      filename: string;
+      width: number;
+      height: number;
+      format: string;
+      size: number;
+    }>
+  > {
     const savedThumbnails: Array<any> = [];
 
     if (!thumbnails || thumbnails.length === 0) {
@@ -353,13 +376,12 @@ export class FileStorageService implements IFileStorageService {
       return savedThumbnails;
     }
 
-    const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, '_thumbnails');
+    const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, "_thumbnails");
 
     try {
       await rm(thumbnailDir, { recursive: true, force: true });
       this.logger.debug(`Cleared old thumbnails for ${fileStorageId}`);
-    } catch {
-    }
+    } catch {}
 
     await mkdir(thumbnailDir, { recursive: true });
 
@@ -367,12 +389,12 @@ export class FileStorageService implements IFileStorageService {
       const thumb = thumbnails[i];
       if (!thumb.data) continue;
 
-      const ext = thumb.format?.toLowerCase() || 'png';
+      const ext = thumb.format?.toLowerCase() || "png";
       const filename = `thumb_${i}.${ext}`;
       const thumbPath = join(thumbnailDir, filename);
 
       try {
-        const buffer = Buffer.from(thumb.data, 'base64');
+        const buffer = Buffer.from(thumb.data, "base64");
         await writeFile(thumbPath, buffer);
 
         const relativePath = path.relative(this.storageBasePath, thumbPath);
@@ -387,7 +409,9 @@ export class FileStorageService implements IFileStorageService {
           size: buffer.length,
         });
 
-        this.logger.debug(`Saved thumbnail ${i} for ${fileStorageId} (${thumb.width}x${thumb.height}, ${buffer.length} bytes)`);
+        this.logger.debug(
+          `Saved thumbnail ${i} for ${fileStorageId} (${thumb.width}x${thumb.height}, ${buffer.length} bytes)`,
+        );
       } catch (error) {
         this.logger.warn(`Failed to save thumbnail ${i} for ${fileStorageId}: ${error}`);
       }
@@ -400,14 +424,13 @@ export class FileStorageService implements IFileStorageService {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) return null;
 
-    const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, '_thumbnails');
+    const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, "_thumbnails");
 
-    for (const ext of ['png', 'jpg', 'jpeg', 'qoi']) {
+    for (const ext of ["png", "jpg", "jpeg", "qoi"]) {
       const thumbPath = join(thumbnailDir, `thumb_${index}.${ext}`);
       try {
         return await readFile(thumbPath);
-      } catch {
-      }
+      } catch {}
     }
 
     return null;
@@ -417,11 +440,11 @@ export class FileStorageService implements IFileStorageService {
     const filePath = await this.findFilePath(fileStorageId);
     if (!filePath) return [];
 
-    const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, '_thumbnails');
+    const thumbnailDir = filePath.replace(/\.(gcode|3mf|bgcode)$/i, "_thumbnails");
 
     try {
       const files = await readdir(thumbnailDir);
-      return files.filter(f => f.startsWith('thumb_')).sort((a, b) => a.localeCompare(b));
+      return files.filter((f) => f.startsWith("thumb_")).sort((a, b) => a.localeCompare(b));
     } catch {
       return [];
     }
@@ -488,6 +511,17 @@ export class FileStorageService implements IFileStorageService {
     const result = await this.listFileRecords(undefined, { ...options, paginate: true });
     const files: any[] = [];
 
+          files.push({
+            fileStorageId: fileId,
+            fileName: metadata?._fileName || file,
+            fileFormat: subdir,
+            fileSize: stats.size,
+            fileHash: metadata?._fileHash || "",
+            createdAt: stats.birthtime,
+            thumbnailCount: thumbnails.length,
+            metadata: metadata,
+          });
+          
     for (const record of result.items) {
       if (record.type === 'dir') continue;
 
@@ -566,7 +600,7 @@ export class FileStorageService implements IFileStorageService {
         fileName: metadata?._originalFileName || basename(filePath),
         fileFormat: ext,
         fileSize: stats.size,
-        fileHash: metadata?._fileHash || '',
+        fileHash: metadata?._fileHash || "",
         createdAt: stats.birthtime,
         thumbnailCount: thumbnails.length,
         metadata: metadata,
@@ -688,4 +722,3 @@ export class FileStorageService implements IFileStorageService {
     this.logger.log(`Deleted file record ${id}: ${record.name}`);
   }
 }
-

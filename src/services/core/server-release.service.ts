@@ -2,7 +2,7 @@ import semver from "semver";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
 import { GithubService } from "@/services/core/github.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { Octokit } from "octokit";
 
 export class ServerReleaseService {
@@ -87,7 +87,14 @@ export class ServerReleaseService {
     }
 
     const packageVersion = this.serverVersion;
-    if (!this.installedReleaseFound) {
+    if (this.installedReleaseFound) {
+      this.logger.log(
+        `\x1b[36mCurrent release was found in github releases.\x1b[0m
+    Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
+    Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
+    Thanks for using FDM Monster!`,
+      );
+    } else {
       this.logger.log(
         `\x1b[36mCurrent release tag not found in github releases.\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
@@ -95,29 +102,22 @@ export class ServerReleaseService {
     Thanks for using FDM Monster!`,
       );
       return;
-    } else {
-      this.logger.log(
-        `\x1b[36mCurrent release was found in github releases.\x1b[0m
-    Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
-    Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
-    Thanks for using FDM Monster!`,
-      );
     }
 
     if (!!packageVersion && latestReleaseState.updateAvailable) {
-      if (!!this.airGapped) {
+      if (this.airGapped) {
         this.logger.warn(
           `Installed release: ${packageVersion}. Skipping update check (air-gapped/disconnected from internet)`,
         );
       } else {
         this.logger.log(`Update available! New version: ${latestReleaseTag} (prerelease: ${latestRelease.prerelease})`);
       }
-    } else if (!packageVersion) {
+    } else if (packageVersion) {
+      return this.logger.log(`Installed release: ${packageVersion}. You are up to date!`);
+    } else {
       return this.logger.error(
         "Cant check release as package.json version environment variable is not set. Make sure FDM Server is run from a 'package.json' or NPM context.",
       );
-    } else {
-      return this.logger.log(`Installed release: ${packageVersion}. You are up to date!`);
     }
   }
 }

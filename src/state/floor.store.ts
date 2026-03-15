@@ -1,8 +1,8 @@
 import { KeyDiffCache } from "@/utils/cache/key-diff.cache";
 import { LoggerService } from "@/handlers/logger";
-import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
+import type { IFloorService } from "@/services/interfaces/floor.service.interface";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
+import type { CreateFloorDto, FloorDto, PositionDto, UpdateFloorDto } from "@/services/interfaces/floor.dto";
 
 export class FloorStore extends KeyDiffCache<FloorDto> {
   private readonly logger: LoggerService;
