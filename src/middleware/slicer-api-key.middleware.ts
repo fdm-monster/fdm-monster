@@ -1,7 +1,7 @@
 import { inject } from "awilix-express";
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { SettingsStore } from "@/state/settings.store";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 
 /**

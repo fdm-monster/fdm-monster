@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class RenameGroupToTag1767432108916 implements MigrationInterface {
-  name = 'RenameGroupToTag1767432108916'
+  name = "RenameGroupToTag1767432108916";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -81,5 +81,4 @@ export class RenameGroupToTag1767432108916 implements MigrationInterface {
     `);
     await queryRunner.dropTable("printer_tag");
   }
-
 }

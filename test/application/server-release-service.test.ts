@@ -1,7 +1,7 @@
 import { AppConstants } from "@/server.constants";
 import { configureContainer } from "@/container";
 import { DITokens } from "@/container.tokens";
-import { asClass, asFunction, AwilixContainer } from "awilix";
+import { asFunction, AwilixContainer } from "awilix";
 import { AxiosMock } from "../mocks/axios.mock";
 import { ServerReleaseService } from "@/services/core/server-release.service";
 import nock from "nock";

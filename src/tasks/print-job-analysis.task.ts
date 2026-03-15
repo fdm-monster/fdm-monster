@@ -1,5 +1,5 @@
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { TaskService } from "@/services/interfaces/task.interfaces";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { FileAnalysisService } from "@/services/file-analysis.service";
@@ -113,7 +113,13 @@ export class PrintJobAnalysisTask implements TaskService {
 
       // Cache metadata to JSON with thumbnail index
       const fileHash = job.fileHash || undefined;
-      await this.fileStorageService.saveMetadata(job.fileStorageId, metadata, fileHash, job.fileName, thumbnailMetadata);
+      await this.fileStorageService.saveMetadata(
+        job.fileStorageId,
+        metadata,
+        fileHash,
+        job.fileName,
+        thumbnailMetadata,
+      );
       this.logger.log(`Cached metadata JSON for job ${job.id}`);
     }
 
@@ -145,4 +151,3 @@ export class PrintJobAnalysisTask implements TaskService {
     return null;
   }
 }
-

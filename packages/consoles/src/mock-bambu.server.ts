@@ -35,7 +35,7 @@ import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
 import selfsigned from "selfsigned";
-import { SecureContextOptions } from "node:tls";
+import type { SecureContextOptions } from "node:tls";
 
 const DEFAULT_PORT = 990;
 const DEFAULT_MQTT_PORT = 8883;
@@ -115,7 +115,7 @@ let publishInterval: NodeJS.Timeout | null = null;
   const tlsCerts = await generateSelfSignedCert();
 
   const ftpServer = new FtpSrv({
-    url: `ftps://0.0.0.0:${port}`,  // ftps:// for IMPLICIT TLS
+    url: `ftps://0.0.0.0:${port}`, // ftps:// for IMPLICIT TLS
     pasv_url: "127.0.0.1",
     pasv_min: 1024,
     pasv_max: 1048,
@@ -205,7 +205,9 @@ let publishInterval: NodeJS.Timeout | null = null;
         bed_target_temper: isPrinting ? 60 : 0,
         chamber_temper: 30,
         mc_percent: isFinished ? 100 : Math.round(printProgress),
-        mc_remaining_time: hasJob ? Math.round(Math.max(0, (PRINT_DURATION - (Date.now() - printStartTime) / 1000) / 60)) : 0,
+        mc_remaining_time: hasJob
+          ? Math.round(Math.max(0, (PRINT_DURATION - (Date.now() - printStartTime) / 1000) / 60))
+          : 0,
         mc_print_stage: hasJob ? printingLabel : "idle",
         gcode_state: gcodeState,
         gcode_file: fileName || "",
@@ -272,7 +274,7 @@ let publishInterval: NodeJS.Timeout | null = null;
           publishState(sequenceId);
         } else {
           hasReceivedPushall = true;
-          console.log(`[BAMBU MOCK MQTT] Starting periodic state publishing every ${ MESSAGE_INTERVAL }ms`);
+          console.log(`[BAMBU MOCK MQTT] Starting periodic state publishing every ${MESSAGE_INTERVAL}ms`);
 
           publishState(sequenceId);
           publishInterval = setInterval(publishState, MESSAGE_INTERVAL);

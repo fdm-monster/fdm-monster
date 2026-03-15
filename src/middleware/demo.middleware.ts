@@ -1,9 +1,9 @@
 import { ForbiddenError } from "@/exceptions/runtime.exceptions";
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { inject } from "awilix-express";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { IConfigService } from "@/services/core/config.service";
-import { IUserService } from "@/services/interfaces/user-service.interface";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
+import type { IConfigService } from "@/services/core/config.service";
+import type { IUserService } from "@/services/interfaces/user-service.interface";
 
 export const demoUserNotAllowed = inject(
   (userService: IUserService, configService: IConfigService, loggerFactory: ILoggerFactory) => {

@@ -177,7 +177,7 @@ export class BambuApiStub implements IPrinterApi {
     throw new Error("Method not implemented");
   }
 
-  homeAxes(axes: { x?: boolean; y?: boolean; z?: boolean }): Promise<void> {
+  homeAxes(_axes: { x?: boolean; y?: boolean; z?: boolean }): Promise<void> {
     this.logger.warn("[STUB] homeAxes not implemented for Bambu Lab printers");
     throw new Error("Method not implemented");
   }
@@ -220,17 +220,17 @@ export class BambuApiStub implements IPrinterApi {
     });
 
     return {
-      dirs: mapped.filter(i => i.dir),
-      files: mapped.filter(i => !i.dir),
+      dirs: mapped.filter((i) => i.dir),
+      files: mapped.filter((i) => !i.dir),
     };
   }
 
-  downloadFile(path: string): AxiosPromise<NodeJS.ReadableStream> {
+  downloadFile(_path: string): AxiosPromise<NodeJS.ReadableStream> {
     this.logger.warn("[STUB] downloadFile not implemented via HTTP for Bambu Lab printers");
     throw new Error("Method not implemented. Use FTP adapter directly if needed.");
   }
 
-  getFileChunk(path: string, startBytes: number, endBytes: number): AxiosPromise<string> {
+  getFileChunk(_path: string, _startBytes: number, _endBytes: number): AxiosPromise<string> {
     this.logger.warn("[STUB] getFileChunk not implemented for Bambu Lab printers");
     throw new Error("Method not implemented");
   }
@@ -259,7 +259,7 @@ export class BambuApiStub implements IPrinterApi {
     await this.client.ftp.deleteFile(`/${path}`);
   }
 
-  deleteFolder(path: string): Promise<void> {
+  deleteFolder(_path: string): Promise<void> {
     this.logger.warn("[STUB] deleteFolder not implemented for Bambu Lab printers");
     throw new Error("Method not implemented");
   }

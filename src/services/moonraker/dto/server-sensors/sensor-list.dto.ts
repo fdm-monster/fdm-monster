@@ -1,4 +1,4 @@
-import { SensorDto } from "@/services/moonraker/dto/server-sensors/sensor-info.dto";
+import type { SensorDto } from "@/services/moonraker/dto/server-sensors/sensor-info.dto";
 
 export interface SensorListDto {
   sensors: Sensors;

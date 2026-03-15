@@ -4,7 +4,7 @@ import { rmSync, readdirSync } from "node:fs";
 import { AppConstants } from "@/server.constants";
 import { isParsableDate } from "@/utils/time.utils";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { getMediaPath } from "@/utils/fs.utils";
 
 export class LogDumpService {

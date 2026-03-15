@@ -19,7 +19,6 @@ export class BambuFtpAdapterStub {
     loggerFactory: ILoggerFactory,
     private readonly eventEmitter2: EventEmitter2,
   ) {
-    this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory("BambuFtpAdapterStub");
   }
 
@@ -35,7 +34,7 @@ export class BambuFtpAdapterStub {
 
     this.isConnecting = true;
 
-    this.logger.log(`[STUB] Connecting to Bambu FTP at ${ host }:990`);
+    this.logger.log(`[STUB] Connecting to Bambu FTP at ${host}:990`);
 
     // Simulate connection delay
     await new Promise((resolve) => setTimeout(resolve, 100));

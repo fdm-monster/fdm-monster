@@ -10,11 +10,11 @@ import {
   ValidationException,
 } from "@/exceptions/runtime.exceptions";
 import { AppConstants } from "@/server.constants";
-import { NextFunction, Response, Request } from "express";
+import type { NextFunction, Response, Request } from "express";
 import { AxiosError } from "axios";
 import { EntityNotFoundError } from "typeorm";
-import { FailedDependencyException } from "@/exceptions/failed-dependency.exception"
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import { FailedDependencyException } from "@/exceptions/failed-dependency.exception";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 
 export class ExceptionFilter {
@@ -32,8 +32,8 @@ export class ExceptionFilter {
         stack: err.stack || err?.response?.data,
         url: _req?.url,
         method: _req?.method,
-        userAgent: _req?.headers?.['user-agent'],
-        errorType: err.constructor.name
+        userAgent: _req?.headers?.["user-agent"],
+        errorType: err.constructor.name,
       });
     }
     if (err.isAxiosError) {
@@ -119,6 +119,13 @@ export class ExceptionFilter {
 }
 
 // Backward compatibility - keep the function export for existing code
-export function exceptionFilter(_err: AxiosError | any, _req: any | Request, _res: Response, _next: NextFunction): void {
-  throw new Error("Use ExceptionFilter class instead of exceptionFilter function. Please inject ExceptionFilter and use .handle method.");
+export function exceptionFilter(
+  _err: AxiosError | any,
+  _req: any | Request,
+  _res: Response,
+  _next: NextFunction,
+): void {
+  throw new Error(
+    "Use ExceptionFilter class instead of exceptionFilter function. Please inject ExceptionFilter and use .handle method.",
+  );
 }

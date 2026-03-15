@@ -9,14 +9,14 @@ import { dump, load } from "js-yaml";
 import { LoggerService } from "@/handlers/logger";
 import { PrinterCache } from "@/state/printer.cache";
 import { FloorStore } from "@/state/floor.store";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { IPrinterService } from "@/services/interfaces/printer.service.interface";
-import { IFloorService } from "@/services/interfaces/floor.service.interface";
-import { IPrinterTagService } from "@/services/interfaces/printer-tag.service.interface";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
+import type { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import type { IFloorService } from "@/services/interfaces/floor.service.interface";
+import type { IPrinterTagService } from "@/services/interfaces/printer-tag.service.interface";
 import { BambuType, MoonrakerType, OctoprintType, PrusaLinkType } from "@/services/printer-api.interface";
 import { z } from "zod";
-import { IUserService } from "@/services/interfaces/user-service.interface";
-import { IRoleService } from "@/services/interfaces/role-service.interface";
+import type { IUserService } from "@/services/interfaces/user-service.interface";
+import type { IRoleService } from "@/services/interfaces/role-service.interface";
 import { SettingsStore } from "@/state/settings.store";
 
 export class YamlService {
@@ -58,7 +58,7 @@ export class YamlService {
       }
 
       if (exportUsers && importSpec.users && importSpec.users.length > 0) {
-        this.logger.log(`Importing users (${ importSpec.users.length } users)`);
+        this.logger.log(`Importing users (${importSpec.users.length} users)`);
         await this.importUsers(importSpec.users, databaseTypeSqlite);
       }
     }
@@ -85,22 +85,22 @@ export class YamlService {
     this.logger.log("Analysing tags for import");
     const { updateByNameTags, insertTags } = await this.analyseUpsertTags(importData.tags ?? []);
 
-    this.logger.log(`Performing pure insert printers (${ insertPrinters.length } printers)`);
+    this.logger.log(`Performing pure insert printers (${insertPrinters.length} printers)`);
     const printerIdMap: { [k: number]: number } = {};
     for (const newPrinter of insertPrinters) {
       try {
         const state = await this.printerService.create({ ...newPrinter });
         if (!newPrinter.id) {
-          throw new Error(`Saved ID was empty ${ JSON.stringify(newPrinter) }`);
+          throw new Error(`Saved ID was empty ${JSON.stringify(newPrinter)}`);
         }
         printerIdMap[newPrinter.id] = state.id;
       } catch (error) {
-        this.logger.error(`Failed to create printer ${ newPrinter.name }:`, error);
+        this.logger.error(`Failed to create printer ${newPrinter.name}:`, error);
         // Continue with next printer - don't let one failure break the entire import
       }
     }
 
-    this.logger.log(`Performing update import printers (${ updateByPropertyPrinters.length } printers)`);
+    this.logger.log(`Performing update import printers (${updateByPropertyPrinters.length} printers)`);
     for (const updatePrinterSpec of updateByPropertyPrinters) {
       try {
         const updateId = updatePrinterSpec.printerId;
@@ -120,12 +120,12 @@ export class YamlService {
 
         printerIdMap[originalPrinterId] = state.id;
       } catch (error) {
-        this.logger.error(`Failed to update printer ${ updatePrinterSpec.value.name }:`, error);
+        this.logger.error(`Failed to update printer ${updatePrinterSpec.value.name}:`, error);
         // Continue with next printer - don't let one failure break the entire import
       }
     }
 
-    this.logger.log(`Performing pure create floors (${ insertFloors.length } floors)`);
+    this.logger.log(`Performing pure create floors (${insertFloors.length} floors)`);
     const floorIdMap: { [k: number]: number } = {};
     for (const newFloor of insertFloors) {
       try {
@@ -154,12 +154,12 @@ export class YamlService {
         const createdFloor = await this.floorStore.create({ ...newFloor });
         floorIdMap[originalFloorId] = createdFloor.id;
       } catch (error) {
-        this.logger.error(`Failed to create floor ${ newFloor.name }:`, error);
+        this.logger.error(`Failed to create floor ${newFloor.name}:`, error);
         // Continue with next floor - don't let one failure break the entire import
       }
     }
 
-    this.logger.log(`Performing update of floors (${ updateByPropertyFloors.length } floors)`);
+    this.logger.log(`Performing update of floors (${updateByPropertyFloors.length} floors)`);
     for (const updateFloorSpec of updateByPropertyFloors) {
       try {
         const updateId = updateFloorSpec.floorId;
@@ -194,19 +194,19 @@ export class YamlService {
         const newFloor = await this.floorStore.update(updateId, updatedFloor);
         floorIdMap[originalFloorId] = newFloor.id;
       } catch (error) {
-        this.logger.error(`Failed to update floor ${ updateFloorSpec.value.name }:`, error);
+        this.logger.error(`Failed to update floor ${updateFloorSpec.value.name}:`, error);
         // Continue with next floor - don't let one failure break the entire import
       }
     }
 
     await this.floorStore.loadStore();
 
-    this.logger.log(`Performing pure create tags (${ insertTags.length } tags)`);
+    this.logger.log(`Performing pure create tags (${insertTags.length} tags)`);
     for (const tag of insertTags) {
       try {
         const createdTag = await this.printerTagService.createTag({
           name: tag.name,
-          color: tag.color
+          color: tag.color,
         });
         for (const printer of tag.printers) {
           const knownPrinterId = printerIdMap[printer.printerId] satisfies number | undefined;
@@ -215,17 +215,17 @@ export class YamlService {
           try {
             await this.printerTagService.addPrinterToTag(createdTag.id, knownPrinterId);
           } catch (error) {
-            this.logger.error(`Failed to add printer ${ knownPrinterId } to tag ${ tag.name }:`, error);
+            this.logger.error(`Failed to add printer ${knownPrinterId} to tag ${tag.name}:`, error);
             // Continue with next printer in tag
           }
         }
       } catch (error) {
-        this.logger.error(`Failed to create tag ${ tag.name }:`, error);
+        this.logger.error(`Failed to create tag ${tag.name}:`, error);
         // Continue with next tag - don't let one failure break the entire import
       }
     }
 
-    this.logger.log(`Performing update of tag printer links (${ updateByNameTags.length } tags)`);
+    this.logger.log(`Performing update of tag printer links (${updateByNameTags.length} tags)`);
     for (const updateTagSpec of updateByNameTags) {
       try {
         const existingTag = await this.printerTagService.getPrintersByTag(updateTagSpec.tagId);
@@ -238,7 +238,7 @@ export class YamlService {
           try {
             await this.printerTagService.removePrinterFromTag(existingTag.id, unwantedId);
           } catch (error) {
-            this.logger.error(`Failed to remove printer ${ unwantedId } from tag ${ existingTag.name }:`, error);
+            this.logger.error(`Failed to remove printer ${unwantedId} from tag ${existingTag.name}:`, error);
             // Continue with next printer
           }
         }
@@ -246,12 +246,12 @@ export class YamlService {
           try {
             await this.printerTagService.addPrinterToTag(existingTag.id, nonExistingNewId);
           } catch (error) {
-            this.logger.error(`Failed to add printer ${ nonExistingNewId } to tag ${ existingTag.name }:`, error);
+            this.logger.error(`Failed to add printer ${nonExistingNewId} to tag ${existingTag.name}:`, error);
             // Continue with next printer
           }
         }
       } catch (error) {
-        this.logger.error(`Failed to update tag ${ updateTagSpec.value.name }:`, error);
+        this.logger.error(`Failed to update tag ${updateTagSpec.value.name}:`, error);
         // Continue with next tag - don't let one failure break the entire import
       }
     }
@@ -280,7 +280,7 @@ export class YamlService {
 
     if (settings.wizard?.wizardCompleted) {
       const importedWizardVersion: number = settings.wizard.wizardVersion;
-      this.logger.log(`Marking wizard as completed with version: ${ importedWizardVersion }`);
+      this.logger.log(`Marking wizard as completed with version: ${importedWizardVersion}`);
       await this.settingsStore.setWizardCompleted(importedWizardVersion);
     }
 
@@ -289,8 +289,10 @@ export class YamlService {
       if (jwtExpiresIn || refreshTokenAttempts || refreshTokenExpiry) {
         await this.settingsStore.updateCoreCredentialSettings({
           jwtExpiresIn: jwtExpiresIn ?? (await this.settingsStore.getCredentialSettings()).jwtExpiresIn,
-          refreshTokenAttempts: refreshTokenAttempts ?? (await this.settingsStore.getCredentialSettings()).refreshTokenAttempts,
-          refreshTokenExpiry: refreshTokenExpiry ?? (await this.settingsStore.getCredentialSettings()).refreshTokenExpiry,
+          refreshTokenAttempts:
+            refreshTokenAttempts ?? (await this.settingsStore.getCredentialSettings()).refreshTokenAttempts,
+          refreshTokenExpiry:
+            refreshTokenExpiry ?? (await this.settingsStore.getCredentialSettings()).refreshTokenExpiry,
         });
         this.logger.log("Imported credential settings");
       }
@@ -331,7 +333,7 @@ export class YamlService {
       // Update the password hash directly (without re-hashing)
       await this.userService.updatePasswordHashUnsafeByUsername(user.username, user.passwordHash);
     }
-    this.logger.log(`Imported ${ users.length } users`);
+    this.logger.log(`Imported ${users.length} users`);
   }
 
   async validateSystemTablesEmpty(importSpec: YamlExportSchema) {
@@ -358,7 +360,7 @@ export class YamlService {
     }
 
     if (errors.length > 0) {
-      throw new Error(`Import validation failed:\n${ errors.join("\n") }`);
+      throw new Error(`Import validation failed:\n${errors.join("\n")}`);
     }
   }
 
@@ -542,7 +544,7 @@ export class YamlService {
           password,
           assignee: p.assignee,
           flowRate: p.flowRate,
-          feedRate: p.feedRate
+          feedRate: p.feedRate,
         };
       });
     }

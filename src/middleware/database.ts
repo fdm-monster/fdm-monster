@@ -1,5 +1,5 @@
 import { DITokens } from "@/container.tokens";
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 
 /**
  * 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting

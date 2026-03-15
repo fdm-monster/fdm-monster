@@ -1,7 +1,7 @@
 import EventEmitter2 from "eventemitter2";
 import { SettingsStore } from "@/state/settings.store";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { Client, FileInfo } from "basic-ftp";
 import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/constants/event.constants";
 import { unlinkSync, createReadStream, mkdirSync, existsSync } from "node:fs";
@@ -24,8 +24,6 @@ export class BambuFtpAdapter {
     loggerFactory: ILoggerFactory,
     private readonly eventEmitter2: EventEmitter2,
   ) {
-    this.settingsStore = settingsStore;
-    this.eventEmitter2 = eventEmitter2;
     this.logger = loggerFactory(BambuFtpAdapter.name);
   }
 
@@ -65,10 +63,12 @@ export class BambuFtpAdapter {
         port: 990,
         user: "bblp",
         password: sanitizedAccessCode,
-        secure: 'implicit',
+        secure: "implicit",
         secureOptions: {
-          checkServerIdentity: () => { return undefined; },
-          rejectUnauthorized:  false,
+          checkServerIdentity: () => {
+            return undefined;
+          },
+          rejectUnauthorized: false,
         },
       });
 

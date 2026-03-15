@@ -47,7 +47,6 @@ if (!host || !accessCode || !serial) {
 const MQTT_PORT = 8883;
 const MQTT_USERNAME = "bblp";
 const RECONNECT_PERIOD = 5000;
-const COMMAND_TIMEOUT = 10000;
 
 // State
 let client: MqttClient | null = null;
@@ -268,7 +267,9 @@ function printState() {
   if (lastState.spd_lvl !== undefined) {
     const speedNames: Record<number, string> = { 1: "Silent", 2: "Standard", 3: "Sport", 4: "Ludicrous" };
     console.log("------------------------------------------------------------------");
-    console.log(`  Speed Level:    ${speedNames[lastState.spd_lvl] || lastState.spd_lvl} (${lastState.spd_mag ?? 100}%)`);
+    console.log(
+      `  Speed Level:    ${speedNames[lastState.spd_lvl] || lastState.spd_lvl} (${lastState.spd_mag ?? 100}%)`,
+    );
   }
 
   // WiFi
