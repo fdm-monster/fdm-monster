@@ -1,23 +1,21 @@
 import { SwaggerGenerator } from "./generator";
 import { Application, static as expressStatic } from "express";
 import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { AppConstants } from "@/server.constants";
 import { ensureDirExists, getMediaPath } from "@/utils/fs.utils";
 import { LoggerService } from "@/handlers/logger";
 import { writeFile } from "node:fs/promises";
 
-// Find swagger-ui-dist path
 function getSwaggerUiDistPath(): string {
   try {
-    // Try to resolve from node_modules
-    return dirname(require.resolve("swagger-ui-dist/package.json"));
+    const resolved = import.meta.resolve("swagger-ui-dist/package.json");
+    return dirname(fileURLToPath(resolved));
   } catch {
-    // Fallback for different module resolution scenarios
     return join(process.cwd(), "node_modules", "swagger-ui-dist");
   }
 }
 
-// Swagger UI HTML template that loads from local static files
 function generateSwaggerHTML(): string {
   return `
 <!DOCTYPE html>
@@ -63,9 +61,7 @@ export async function setupSwagger(app: Application, logger: LoggerService) {
   const generator = new SwaggerGenerator(logger);
   const specification = await generator.generate();
 
-  // Conditionally save specification to file
   const generateJsonFile = process.env[AppConstants.GENERATE_SWAGGER_JSON] === "true";
-
   if (generateJsonFile) {
     try {
       const mediaPath = getMediaPath();
@@ -81,17 +77,12 @@ export async function setupSwagger(app: Application, logger: LoggerService) {
     }
   }
 
-  // Serve swagger-ui-dist static files
   const swaggerUiPath = getSwaggerUiDistPath();
   app.use("/api-docs/static", expressStatic(swaggerUiPath));
-
-  // Serve OpenAPI spec as JSON
   app.get("/api-docs/swagger.json", (_req, res) => {
     res.setHeader("Content-Type", "application/json");
     res.send(specification);
   });
-
-  // Serve Swagger UI HTML
   app.get("/api-docs", (_req, res) => {
     res.setHeader("Content-Type", "text/html");
     res.send(generateSwaggerHTML());

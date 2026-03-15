@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddPrintJob1767451444137 implements MigrationInterface {
-    name = 'AddPrintJob1767451444137'
+  name = "AddPrintJob1767451444137";
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "print_job" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "printerId" integer,
@@ -29,7 +29,7 @@ export class AddPrintJob1767451444137 implements MigrationInterface {
                 "queueGroup" varchar
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "temporary_print_job" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "printerId" integer,
@@ -56,7 +56,7 @@ export class AddPrintJob1767451444137 implements MigrationInterface {
                 SET NULL ON UPDATE NO ACTION
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_print_job"(
                     "id",
                     "printerId",
@@ -103,21 +103,21 @@ export class AddPrintJob1767451444137 implements MigrationInterface {
                 "queueGroup"
             FROM "print_job"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "print_job"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_print_job"
                 RENAME TO "print_job"
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             ALTER TABLE "print_job"
                 RENAME TO "temporary_print_job"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "print_job" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "printerId" integer,
@@ -142,7 +142,7 @@ export class AddPrintJob1767451444137 implements MigrationInterface {
                 "queueGroup" varchar
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "print_job"(
                     "id",
                     "printerId",
@@ -189,12 +189,11 @@ export class AddPrintJob1767451444137 implements MigrationInterface {
                 "queueGroup"
             FROM "temporary_print_job"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_print_job"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "print_job"
         `);
-    }
-
+  }
 }

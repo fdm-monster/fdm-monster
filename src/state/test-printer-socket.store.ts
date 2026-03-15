@@ -7,16 +7,16 @@ import { SocketIoGateway } from "@/state/socket-io.gateway";
 import { SocketFactory } from "@/services/socket.factory";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { errorSummary } from "@/utils/error.utils";
 import { captureException } from "@sentry/node";
 import { SOCKET_STATE } from "@/shared/dtos/socket-state.type";
-import { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
+import type { IWebsocketAdapter } from "@/services/websocket-adapter.interface";
 import { moonrakerEvent } from "@/services/moonraker/constants/moonraker.constants";
 import { bambuEvent } from "@/services/bambu/bambu-mqtt.adapter";
 import { prusaLinkEvent } from "@/services/prusa-link/constants/prusalink.constants";
 import { printerEvents } from "@/constants/event.constants";
-import { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
+import type { OctoPrintEventDto } from "@/services/octoprint/dto/octoprint-event.dto";
 import { z } from "zod";
 
 // Use a large number range for test printer IDs to avoid conflicts with real printers

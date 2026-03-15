@@ -27,7 +27,7 @@ export class ThreeMFParser {
     const zipEntries = zip.getEntries();
 
     // Check for metadata.json first (some slicers may use this)
-    const metadataJsonEntry = zipEntries.find(e => e.entryName === "metadata.json");
+    const metadataJsonEntry = zipEntries.find((e) => e.entryName === "metadata.json");
     let metadata: Record<string, any> = {};
 
     if (metadataJsonEntry) {
@@ -37,7 +37,9 @@ export class ThreeMFParser {
       metadata = this.normalizeJsonMetadata(jsonData);
     } else {
       // Extract metadata from 3D model XML
-      const modelEntry = zipEntries.find(e => e.entryName === "3D/3dmodel.model" || e.entryName === "Metadata/model_settings.config");
+      const modelEntry = zipEntries.find(
+        (e) => e.entryName === "3D/3dmodel.model" || e.entryName === "Metadata/model_settings.config",
+      );
       metadata = modelEntry ? this.extractMetadataFromXML(modelEntry.getData().toString("utf8")) : {};
     }
 
@@ -139,12 +141,15 @@ export class ThreeMFParser {
       slicerVersion: topLevelSlicerVersion,
       maxLayerZ: topLevelMaxZ,
       totalLayers: topLevelLayers,
-      thumbnails: thumbnails.length > 0 ? thumbnails.map(t => ({
-        width: t.width,
-        height: t.height,
-        format: t.format,
-        dataLength: t.data?.length || 0,
-      })) : undefined,
+      thumbnails:
+        thumbnails.length > 0
+          ? thumbnails.map((t) => ({
+              width: t.width,
+              height: t.height,
+              format: t.format,
+              dataLength: t.data?.length || 0,
+            }))
+          : undefined,
       plates: plates.length > 0 ? plates : undefined,
     };
 
@@ -215,7 +220,9 @@ export class ThreeMFParser {
     const plates: NonNullable<ThreeMFMetadata["plates"]> = [];
 
     // Look for Bambu Lab plate structure (but not .gcode.md5 files)
-    const plateEntries = zipEntries.filter(e => e.entryName.match(/Metadata\/plate_\d+\.gcode$/)  && !e.entryName.endsWith('.md5'));
+    const plateEntries = zipEntries.filter(
+      (e) => e.entryName.match(/Metadata\/plate_\d+\.gcode$/) && !e.entryName.endsWith(".md5"),
+    );
 
     if (plateEntries.length === 0) {
       // Single plate file or non-Bambu format
@@ -235,12 +242,13 @@ export class ThreeMFParser {
       const metadata = this.parseGCodeHeader(gcodeContent);
 
       // Find thumbnails for this plate
-      const plateThumbs = zipEntries.filter(e =>
-        e.entryName.includes(`plate_${plateMatch[1]}`) &&
-        (e.entryName.endsWith(".png") || e.entryName.endsWith(".jpg"))
+      const plateThumbs = zipEntries.filter(
+        (e) =>
+          e.entryName.includes(`plate_${plateMatch[1]}`) &&
+          (e.entryName.endsWith(".png") || e.entryName.endsWith(".jpg")),
       );
 
-      const plateThumbnails: ParsedThumbnail[] = plateThumbs.map(t => {
+      const plateThumbnails: ParsedThumbnail[] = plateThumbs.map((t) => {
         const format = t.entryName.endsWith(".png") ? "PNG" : "JPG";
         const imageData = t.getData();
 
@@ -262,20 +270,12 @@ export class ThreeMFParser {
         };
       });
       const printTime = this.parseTime(
-        metadata.model_printing_time ||
-        metadata.total_estimated_time ||
-        metadata.print_time
+        metadata.model_printing_time || metadata.total_estimated_time || metadata.print_time,
       );
       const filamentWeight = this.parseFloat(
-        metadata.total_filament_weight_g ||
-        metadata.filament_weight ||
-        metadata.total_filament_weight
+        metadata.total_filament_weight_g || metadata.filament_weight || metadata.total_filament_weight,
       );
-      const layerCount = this.parseInt(
-        metadata.total_layer_number ||
-        metadata.layer_count ||
-        metadata.total_layers
-      );
+      const layerCount = this.parseInt(metadata.total_layer_number || metadata.layer_count || metadata.total_layers);
 
       // Extract all available Bambu metadata from G-code header + config
       const plateMetadata = {
@@ -284,14 +284,9 @@ export class ThreeMFParser {
         filamentUsedGrams: filamentWeight,
         totalLayers: layerCount,
         filamentUsedMm: this.parseFloat(
-          metadata.total_filament_length_mm ||
-          metadata.filament_length_mm ||
-          metadata.filament_used_mm
+          metadata.total_filament_length_mm || metadata.filament_length_mm || metadata.filament_used_mm,
         ),
-        filamentUsedCm3: this.parseFloat(
-          metadata.total_filament_volume_cm3 ||
-          metadata.filament_volume_cm3
-        ),
+        filamentUsedCm3: this.parseFloat(metadata.total_filament_volume_cm3 || metadata.filament_volume_cm3),
         filamentDensityGramsCm3: this.parseFloat(metadata.filament_density),
         filamentDiameterMm: this.parseFloat(metadata.filament_diameter) || 1.75,
         maxLayerZ: this.parseFloat(metadata.max_z_height || metadata.max_layer_z),
@@ -299,31 +294,30 @@ export class ThreeMFParser {
         nozzleDiameterMm: this.parseFloat(metadata.nozzle_diameter),
         layerHeight: this.parseFloat(metadata.layer_height),
         firstLayerHeight: this.parseFloat(
-          metadata.first_layer_height ||
-          metadata.initial_layer_height ||
-          metadata.initial_layer_print_height
+          metadata.first_layer_height || metadata.initial_layer_height || metadata.initial_layer_print_height,
         ),
         bedTemperature: this.parseFloat(
           metadata.bed_temperature_actual ||
-          metadata.bed_temperature ||
-          metadata.bed_temp ||
-          metadata.bed_temperature_initial_layer
+            metadata.bed_temperature ||
+            metadata.bed_temp ||
+            metadata.bed_temperature_initial_layer,
         ),
         nozzleTemperature: this.parseFloat(
-          metadata.nozzle_temperature ||
-          metadata.nozzle_temp ||
-          metadata.nozzle_temperature_initial_layer
+          metadata.nozzle_temperature || metadata.nozzle_temp || metadata.nozzle_temperature_initial_layer,
         ),
         fillDensity: metadata.sparse_infill_density || metadata.infill_density || metadata.fill_density || null,
         filamentType: metadata.filament_type || null,
         printerModel: metadata.printer_model || null,
         objects: [],
-        thumbnails: plateThumbnails.length > 0 ? plateThumbnails.map(t => ({
-          width: t.width,
-          height: t.height,
-          format: t.format,
-          dataLength: t.data?.length || 0,
-        })) : undefined,
+        thumbnails:
+          plateThumbnails.length > 0
+            ? plateThumbnails.map((t) => ({
+                width: t.width,
+                height: t.height,
+                format: t.format,
+                dataLength: t.data?.length || 0,
+              }))
+            : undefined,
       };
 
       plates.push(plateMetadata);
@@ -361,13 +355,13 @@ export class ThreeMFParser {
 
           // Remove bracketed units from key: "total_filament_weight_[g]" -> "total_filament_weight_g"
           // Also normalize special chars: [cm^3] -> cm3
-          key = key.replace(/\[([^\]]+)\]/g, (_, unit) => unit.replace(/\^/g, ''));
+          key = key.replace(/\[([^\]]+)\]/g, (_, unit) => unit.replace(/\^/g, ""));
 
           // Split value on semicolon and take first part (handles "11m 15s; total estimated time: 18m 15s")
-          value = value.split(';')[0].trim();
+          value = value.split(";")[0].trim();
 
           // Remove remaining bracketed units and percentages from value
-          value = value.replace(/\s*\[.*?\]\s*/g, ''); // Remove [units]
+          value = value.replace(/\s*\[.*?\]\s*/g, ""); // Remove [units]
 
           // Store the value (don't overwrite if already set from header)
           if (!metadata[key]) {
@@ -393,9 +387,8 @@ export class ThreeMFParser {
   private extractThumbnails(zipEntries: AdmZip.IZipEntry[]): ParsedThumbnail[] {
     const thumbnails: ParsedThumbnail[] = [];
 
-    const thumbEntries = zipEntries.filter(e =>
-      e.entryName.match(/Metadata\/.*\.(png|jpg|jpeg)/i) ||
-      e.entryName.match(/Thumbnails\/.*/i)
+    const thumbEntries = zipEntries.filter(
+      (e) => e.entryName.match(/Metadata\/.*\.(png|jpg|jpeg)/i) || e.entryName.match(/Thumbnails\/.*/i),
     );
 
     for (const entry of thumbEntries) {
@@ -456,4 +449,3 @@ export class ThreeMFParser {
     return null;
   }
 }
-

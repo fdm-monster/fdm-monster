@@ -1,13 +1,13 @@
 import { PrinterSocketStore } from "@/state/printer-socket.store";
 import { PrinterCache } from "@/state/printer.cache";
-import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import type { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { captureException } from "@sentry/node";
 import { errorSummary } from "@/utils/error.utils";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { PrinterApiFactory } from "@/services/printer-api.factory";
-import { IPrinterApi, ReprintFileDto, ReprintState } from "@/services/printer-api.interface";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import { ReprintState, type IPrinterApi, type ReprintFileDto } from "@/services/printer-api.interface";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 
 interface BatchSingletonModel {
   success?: boolean;

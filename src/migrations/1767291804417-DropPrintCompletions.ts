@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class DropPrintCompletions1767291804417 implements MigrationInterface {
-  name = 'DropPrintCompletions1767291804417'
+  name = "DropPrintCompletions1767291804417";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`

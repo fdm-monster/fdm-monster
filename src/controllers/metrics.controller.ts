@@ -1,7 +1,7 @@
 import { GET, route } from "awilix-express";
 import { register } from "prom-client";
-import { Request, Response } from "express";
-import { IConfigService } from "@/services/core/config.service";
+import type { Request, Response } from "express";
+import type { IConfigService } from "@/services/core/config.service";
 import { AppConstants } from "@/server.constants";
 
 @route("/metrics")

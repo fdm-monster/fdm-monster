@@ -1,19 +1,19 @@
 export interface BgCodeBlockHeader {
-  type: BgCodeBlockType,
-  compression: BgCodeCompression,
-  uncompressedSize: number,
-  compressedSize: number,
-  blockSize: number,
-  blockStartOffset: number,
-  headerSize: BgCodeHeaderSize,
-  parameterOffset: number,
-  parametersSize: number,
-  parameters: BgCodeThumbnailParameters | BgCodeGenericEncodingParameters | BgCodeGcodeEncodingParameters,
-  dataOffset: number,
-  dataSize: number,
-  checksumOffset: number,
-  checksumSize: number,
-  checksumType: number
+  type: BgCodeBlockType;
+  compression: BgCodeCompression;
+  uncompressedSize: number;
+  compressedSize: number;
+  blockSize: number;
+  blockStartOffset: number;
+  headerSize: BgCodeHeaderSize;
+  parameterOffset: number;
+  parametersSize: number;
+  parameters: BgCodeThumbnailParameters | BgCodeGenericEncodingParameters | BgCodeGcodeEncodingParameters;
+  dataOffset: number;
+  dataSize: number;
+  checksumOffset: number;
+  checksumSize: number;
+  checksumType: number;
 }
 
 export const BgCodeBlockTypes = {
@@ -25,7 +25,7 @@ export const BgCodeBlockTypes = {
   GCode: 1,
 } as const;
 
-export type BgCodeBlockType = typeof BgCodeBlockTypes[keyof typeof BgCodeBlockTypes];
+export type BgCodeBlockType = (typeof BgCodeBlockTypes)[keyof typeof BgCodeBlockTypes];
 
 export const BgCodeBlockTypeName: Record<BgCodeBlockType, string> = {
   [BgCodeBlockTypes.FileMetadata]: "FileMetadata",
@@ -54,14 +54,11 @@ export const BgCodeCompression = {
   Heatshrink_12_4: 3,
 } as const;
 
-export type BgCodeCompression =
-  typeof BgCodeCompression[keyof typeof BgCodeCompression];
+export type BgCodeCompression = (typeof BgCodeCompression)[keyof typeof BgCodeCompression];
 
 export const BgCodeCompressionInfo: Record<
   BgCodeCompression,
-  | { kind: "none" }
-  | { kind: "deflate" }
-  | { kind: "heatshrink"; window: number; lookahead: number }
+  { kind: "none" } | { kind: "deflate" } | { kind: "heatshrink"; window: number; lookahead: number }
 > = {
   0: { kind: "none" },
   1: { kind: "deflate" },
@@ -78,23 +75,23 @@ export const BgCodeCompressionName: Record<BgCodeCompression, string> = {
 
 export const BgCodeChecksumTypes = {
   None: 0,
-  Crc32: 1
-}
+  Crc32: 1,
+};
 
-export type BgCodeChecksumType = typeof BgCodeChecksumTypes[keyof typeof BgCodeChecksumTypes];
+export type BgCodeChecksumType = (typeof BgCodeChecksumTypes)[keyof typeof BgCodeChecksumTypes];
 
 export const BgCodeChecksumTypeSize: Record<BgCodeChecksumType, number> = {
   [BgCodeChecksumTypes.None]: 0,
-  [BgCodeChecksumTypes.Crc32]: 4
-}
+  [BgCodeChecksumTypes.Crc32]: 4,
+};
 
 export const BgCodeThumbnailFormats = {
   PNG: 0,
   JPG: 1,
   QOI: 2,
-}
+};
 
-export type BgCodeThumbnailFormat = typeof BgCodeThumbnailFormats[keyof typeof BgCodeThumbnailFormats];
+export type BgCodeThumbnailFormat = (typeof BgCodeThumbnailFormats)[keyof typeof BgCodeThumbnailFormats];
 
 export const BgCodeThumbnailFormatName: Record<BgCodeThumbnailFormat, string> = {
   [BgCodeThumbnailFormats.PNG]: "PNG",
@@ -109,9 +106,9 @@ export const BgCodeThumbnailFormatExtension: Record<BgCodeThumbnailFormat, strin
 };
 
 export interface BgCodeThumbnailParameters {
-  format: BgCodeThumbnailFormat,
-  width: number,
-  height: number,
+  format: BgCodeThumbnailFormat;
+  width: number;
+  height: number;
 }
 
 export interface BgCodeGenericEncodingParameters {
@@ -125,7 +122,7 @@ export interface BgCodeGcodeEncodingParameters {
 export const GcodeEncodingTypes = {
   None: 0,
   MeatPack: 1,
-  MeatPackKeepingComments: 2
-}
+  MeatPackKeepingComments: 2,
+};
 
-export type GcodeEncodingType = typeof GcodeEncodingTypes[keyof typeof GcodeEncodingTypes];
+export type GcodeEncodingType = (typeof GcodeEncodingTypes)[keyof typeof GcodeEncodingTypes];

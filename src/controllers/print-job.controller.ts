@@ -1,6 +1,6 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
 import { AppConstants } from "@/server.constants";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { authorizeRoles, authenticate } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import { searchJobsSchema, searchJobsPagedSchema } from "@/services/validators/print-job.validation";
@@ -8,7 +8,7 @@ import { validateInput } from "@/handlers/validators";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { FileStorageService } from "@/services/file-storage.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { ParamId } from "@/middleware/param-converter.middleware";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
@@ -73,7 +73,7 @@ export class PrintJobController {
           } catch {}
         }
         return { ...job, thumbnails };
-      })
+      }),
     );
 
     res.send({ items: itemsWithThumbnails, count, pages: Math.ceil(count / pageSize) });
@@ -85,7 +85,7 @@ export class PrintJobController {
   async getJob(req: Request, res: Response) {
     const jobId = req.local.id;
 
-    const job = await this.printJobService.getJobByIdOrFail(jobId, ['printer']);
+    const job = await this.printJobService.getJobByIdOrFail(jobId, ["printer"]);
 
     try {
       let thumbnails: any[] = [];
@@ -114,7 +114,7 @@ export class PrintJobController {
     try {
       if (["PENDING", "QUEUED"].includes(job.status)) {
         res.status(400).send({
-          error: "Can only mark jobs which are not \"PENDING\" | \"QUEUED\" as completed",
+          error: 'Can only mark jobs which are not "PENDING" | "QUEUED" as completed',
           currentStatus: job.status,
           suggestion: "This endpoint is for resolving jobs with unknown state",
         });
@@ -289,7 +289,13 @@ export class PrintJobController {
       await this.printJobService.handleFileAnalyzed(jobId, metadata, thumbnails);
 
       const fileHash = job.fileHash || undefined;
-      await this.fileStorageService.saveMetadata(job.fileStorageId, metadata, fileHash, job.fileName, thumbnailMetadata);
+      await this.fileStorageService.saveMetadata(
+        job.fileStorageId,
+        metadata,
+        fileHash,
+        job.fileName,
+        thumbnailMetadata,
+      );
 
       this.logger.log(`Successfully re-analyzed job ${jobId}`);
 
@@ -315,7 +321,7 @@ export class PrintJobController {
   async deleteJob(req: Request, res: Response) {
     const jobId = req.local.id;
     const job = await this.printJobService.getJobByIdOrFail(jobId);
-    const deleteFileParam = req.query.deleteFile === 'true';
+    const deleteFileParam = req.query.deleteFile === "true";
 
     if (job.status === "PRINTING" || job.status === "PAUSED") {
       res.status(400).send({
@@ -327,7 +333,6 @@ export class PrintJobController {
     }
 
     try {
-
       const fileStorageId = job.fileStorageId;
       const fileName = job.fileName;
 

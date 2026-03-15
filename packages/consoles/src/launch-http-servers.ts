@@ -1,6 +1,9 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const startPort = 1234;
 const instanceCount = 10; // Start with 5 printers, adjust as needed
 

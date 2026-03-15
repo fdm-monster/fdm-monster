@@ -1,0 +1,44 @@
+{
+  "name": "@fdm-monster/consoles",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vp pack",
+    "dev": "cross-env NODE_ENV=development vp pack --watch",
+    "http-receivers": "node dist/launch-http-servers.js",
+    "github-releases": "cross-env NODE_ENV=development node --watch --enable-source-maps dist/download-github-releases.js",
+    "typeorm:create": "tsx src/typeorm-create.ts",
+    "typeorm:generate": "tsx src/typeorm-generate.ts",
+    "typeorm:migrate": "tsx src/typeorm-migrate.ts",
+    "mock:octoprint": "cross-env NODE_ENV=development node --enable-source-maps dist/mock-octoprint.server.js",
+    "mock:bambu": "cross-env NODE_ENV=development node --enable-source-maps dist/mock-bambu.server.js",
+    "mock:camera": "cross-env NODE_ENV=development node --enable-source-maps dist/mock-camera/mock-camera.server.js",
+    "bambu:diagnostic": "cross-env NODE_ENV=development node --enable-source-maps dist/bambu-mqtt-diagnostic.console.js"
+  },
+  "dependencies": {
+    "axios": "1.13.5",
+    "better-sqlite3": "12.6.2",
+    "chalk": "5.6.2",
+    "dotenv": "17.3.1",
+    "express": "4.22.1",
+    "ftp-srv": "4.6.3",
+    "mqtt": "5.15.0",
+    "multer": "2.1.1",
+    "selfsigned": "5.5.0",
+    "typeorm": "0.3.28",
+    "ws": "8.19.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.1",
+    "@types/multer": "2.0.0",
+    "@types/node": "24.10.13",
+    "@types/ws": "8.18.1",
+    "ts-node": "10.9.2",
+    "tsconfig-paths": "4.2.0",
+    "tsx": "4.19.2",
+    "typescript": "5.9.3",
+    "vite-plus": "latest"
+  }
+}

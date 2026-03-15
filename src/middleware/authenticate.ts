@@ -1,12 +1,12 @@
 import { inject } from "awilix-express";
 import { AuthenticationError, AuthorizationError } from "@/exceptions/runtime.exceptions";
-import { NextFunction, Request, Response } from "express";
-import { AUTH_ERROR_REASON, PermissionName, RoleName } from "@/constants/authorization.constants";
+import type { NextFunction, Request, Response } from "express";
+import { AUTH_ERROR_REASON, type PermissionName, type RoleName } from "@/constants/authorization.constants";
 import { SettingsStore } from "@/state/settings.store";
 import { AuthService } from "@/services/authentication/auth.service";
-import { ILoggerFactory } from "@/handlers/logger-factory";
-import { IRoleService } from "@/services/interfaces/role-service.interface";
-import { IPermissionService } from "@/services/interfaces/permission.service.interface";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
+import type { IRoleService } from "@/services/interfaces/role-service.interface";
+import type { IPermissionService } from "@/services/interfaces/permission.service.interface";
 
 export const authenticate = () =>
   inject(

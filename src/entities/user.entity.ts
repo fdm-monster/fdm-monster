@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, Relation } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, type Relation } from "typeorm";
 import { RefreshToken } from "@/entities/refresh-token.entity";
 import { UserRole } from "@/entities/user-role.entity";
 
@@ -36,16 +36,9 @@ export class User {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(
-    () => UserRole,
-    (ur) => ur.user,
-    { eager: true },
-  )
+  @OneToMany(() => UserRole, (ur) => ur.user, { eager: true })
   roles?: Relation<UserRole>[];
 
-  @OneToMany(
-    () => RefreshToken,
-    (refreshToken) => refreshToken.user,
-  )
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens: RefreshToken[];
 }

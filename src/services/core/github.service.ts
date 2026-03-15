@@ -1,17 +1,8 @@
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { Octokit } from "octokit";
-import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import { Octokit, RequestError } from "octokit";
 
 export class GithubService {
-  private readonly logger: LoggerService;
-
-  constructor(
-    loggerFactory: ILoggerFactory,
-    private readonly octokitService: Octokit,
-  ) {
-    this.logger = loggerFactory(GithubService.name);
-  }
+  constructor(private readonly octokitService: Octokit) {}
 
   async wasAuthenticated() {
     const result = (await this.octokitService.auth()) as { type: string };
@@ -29,7 +20,7 @@ export class GithubService {
         repo,
       });
     } catch (e: any) {
-      if (e?.name === "HttpError" && e.status == 404) {
+      if (e instanceof RequestError && e.status === 404) {
         throw new NotFoundException(`Could not find latest release`);
       }
 
@@ -44,7 +35,7 @@ export class GithubService {
         repo,
       });
     } catch (e: any) {
-      if (e?.name === "HttpError" && e.status == 404) {
+      if (e instanceof RequestError && e.status === 404) {
         throw new NotFoundException(`Could not find releases`);
       }
 
@@ -59,8 +50,8 @@ export class GithubService {
         repo,
         tag,
       })
-      .catch((e) => {
-        if (e.name === "HttpError" && e.status == 404) {
+      .catch((e: any) => {
+        if (e instanceof RequestError && e.status === 404) {
           throw new NotFoundException(`Could not find release with tag ${tag}`);
         }
 
@@ -78,8 +69,8 @@ export class GithubService {
         repo,
         asset_id: assetId,
       })
-      .catch((e) => {
-        if (e.name === "HttpError" && e.status == 404) {
+      .catch((e: any) => {
+        if (e instanceof RequestError && e.status === 404) {
           throw new NotFoundException(`Could not find asset with id ${assetId}`);
         }
 

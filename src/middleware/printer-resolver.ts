@@ -1,9 +1,9 @@
-import { Request } from "express";
+import type { Request } from "express";
 import { currentPrinterToken, printerApiToken, printerIdToken, printerLoginToken } from "@/middleware/printer";
-import { IPrinterApi } from "@/services/printer-api.interface";
-import { LoginDto } from "@/services/interfaces/login.dto";
+import type { IPrinterApi } from "@/services/printer-api.interface";
+import type { LoginDto } from "@/services/interfaces/login.dto";
 import { InternalServerException, ValidationException } from "@/exceptions/runtime.exceptions";
-import { PrinterDto } from "@/services/interfaces/printer.dto";
+import type { PrinterDto } from "@/services/interfaces/printer.dto";
 
 export function getScopedPrinter(req: Request) {
   const errors: string[] = [];

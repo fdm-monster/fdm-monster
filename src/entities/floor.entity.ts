@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, type Relation } from "typeorm";
 import { FloorPosition } from "./floor-position.entity";
 
 @Entity()
@@ -12,10 +12,6 @@ export class Floor {
   @Column()
   order: number;
 
-  @OneToMany(
-    () => FloorPosition,
-    (gp) => gp.floor,
-    { eager: true },
-  )
+  @OneToMany(() => FloorPosition, (gp) => gp.floor, { eager: true })
   printers: Relation<FloorPosition>[];
 }

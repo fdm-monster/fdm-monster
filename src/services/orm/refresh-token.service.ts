@@ -1,13 +1,13 @@
 import { BaseService } from "@/services/orm/base.service";
 import { RefreshToken } from "@/entities";
-import { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
+import type { IRefreshTokenService } from "@/services/interfaces/refresh-token.service.interface";
 import { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { v4 as uuidv4 } from "uuid";
 import { AppConstants } from "@/server.constants";
 import { SettingsStore } from "@/state/settings.store";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { LessThan } from "typeorm";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";

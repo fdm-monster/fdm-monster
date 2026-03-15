@@ -13,13 +13,13 @@ import {
   bambuSupportSchema,
 } from "@/services/validators/settings-service.validation";
 import { SettingsStore } from "@/state/settings.store";
-import { Request, Response } from "express";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { Request, Response } from "express";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
 import { PrinterCache } from "@/state/printer.cache";
 import { BambuType, PrusaLinkType, MoonrakerType } from "@/services/printer-api.interface";
-import { IPrinterService } from "@/services/interfaces/printer.service.interface";
+import type { IPrinterService } from "@/services/interfaces/printer.service.interface";
 import { PrinterThumbnailCache } from "@/state/printer-thumbnail.cache";
 import { loginRequiredSchema, registrationEnabledSchema } from "@/controllers/validation/setting.validation";
 

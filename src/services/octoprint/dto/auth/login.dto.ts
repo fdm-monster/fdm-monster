@@ -1,4 +1,4 @@
-import { UserDto } from "@/services/octoprint/dto/access/user.dto";
+import type { UserDto } from "@/services/octoprint/dto/access/user.dto";
 
 export interface OP_LoginDto extends UserDto {
   _is_external_client: boolean;

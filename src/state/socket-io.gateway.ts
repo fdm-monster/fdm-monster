@@ -3,11 +3,11 @@ import { socketIoConnectedEvent } from "@/constants/event.constants";
 import { SettingsStore } from "@/state/settings.store";
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { Server as HttpServer } from "http";
 import { getPassportJwtOptions, verifyUserCallback } from "@/middleware/passport";
-import { IConfigService } from "@/services/core/config.service";
-import { IUserService } from "@/services/interfaces/user-service.interface";
+import type { IConfigService } from "@/services/core/config.service";
+import type { IUserService } from "@/services/interfaces/user-service.interface";
 import { authorize } from "@/middleware/socketio.middleware";
 import { Counter, Gauge } from "prom-client";
 

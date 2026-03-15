@@ -1,7 +1,7 @@
 import { BaseService } from "@/services/orm/base.service";
 import { RegisterUserDto, UserDto } from "@/services/interfaces/user.dto";
 import { User } from "@/entities";
-import { IUserService } from "@/services/interfaces/user-service.interface";
+import type { IUserService } from "@/services/interfaces/user-service.interface";
 import { In } from "typeorm";
 import { InternalServerException, NotFoundException } from "@/exceptions/runtime.exceptions";
 import { validateInput } from "@/handlers/validators";
@@ -9,7 +9,7 @@ import { newPasswordSchema, registerUserSchema } from "@/services/validators/use
 import { comparePasswordHash, hashPassword } from "@/utils/crypto.utils";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { UserRoleService } from "@/services/orm/user-role.service";
-import { RoleName, ROLES } from "@/constants/authorization.constants";
+import { ROLES, type RoleName } from "@/constants/authorization.constants";
 import { RoleService } from "@/services/orm/role.service";
 
 export class UserService extends BaseService(User, UserDto) implements IUserService {

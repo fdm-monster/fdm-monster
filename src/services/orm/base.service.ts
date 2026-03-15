@@ -1,10 +1,10 @@
-import { IBaseService, Type } from "@/services/orm/base.interface";
+import { Type, type IBaseService } from "@/services/orm/base.interface";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { DeepPartial, EntityNotFoundError, EntityTarget, FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { validate } from "class-validator";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
-import { DEFAULT_PAGE, IPagination } from "@/services/interfaces/page.interface";
+import { DEFAULT_PAGE, type IPagination } from "@/services/interfaces/page.interface";
 
 export function BaseService<
   T extends { id: number },

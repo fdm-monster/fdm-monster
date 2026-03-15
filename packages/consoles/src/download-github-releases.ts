@@ -1,6 +1,10 @@
 import axios from "axios";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 interface Release {
   tag_name: string;
@@ -11,10 +15,10 @@ interface Release {
 
 const fetchReleases = async () => {
   try {
-    const response = await axios.get<Release[]>("https://api.github.com/repos/fdm-monster/fdm-monster-client-next/releases");
+    const response = await axios.get<Release[]>(
+      "https://api.github.com/repos/fdm-monster/fdm-monster-client-next/releases",
+    );
     const releases = response.data;
-
-    // Filter relevant information from each release
     const releaseData = releases.map((release) => ({
       tag_name: release.tag_name,
       name: release.name,
@@ -22,7 +26,6 @@ const fetchReleases = async () => {
       body: release.body,
     }));
 
-    // Write data to a JSON file
     const outputPath = path.join(__dirname, "github-releases-client-slim-oct-2024.data.json");
     fs.writeFileSync(outputPath, JSON.stringify(releaseData, null, 2));
     console.log(`Releases data written to ${outputPath}`);
@@ -37,8 +40,6 @@ const fetchLatest = async () => {
       "https://api.github.com/repos/fdm-monster/fdm-monster-client-next/releases/latest",
     );
     const release = response.data;
-
-    // Filter relevant information from each release
     const releaseData = {
       tag_name: release.tag_name,
       name: release.name,
@@ -46,7 +47,6 @@ const fetchLatest = async () => {
       body: release.body,
     };
 
-    // Write data to a JSON file
     const outputPath = path.join(__dirname, "github-releases-latest-client-slim.data.json");
     fs.writeFileSync(outputPath, JSON.stringify(releaseData, null, 2));
     console.log(`Releases data written to ${outputPath}`);

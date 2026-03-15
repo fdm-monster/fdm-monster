@@ -45,7 +45,7 @@ export class BGCodeParser {
     try {
       const { version, checksumType } = await parseFileHeader(fileHandle);
       if (version !== 1) {
-        throw new Error(`Unsupported BGCode version: ${ version }`);
+        throw new Error(`Unsupported BGCode version: ${version}`);
       }
 
       const blockHeaders = await parseBlockHeaders(fileHandle, stats.size, checksumType, true);
@@ -53,11 +53,12 @@ export class BGCodeParser {
       const metadata = await extractMetadataFromBlocks(fileHandle, blockHeaders);
       const thumbnails = await this.extractThumbnailsFromBlocks(fileHandle, blockHeaders);
 
-      const isMmu = this.isMmuData(metadata.nozzle_diameter) ||
+      const isMmu =
+        this.isMmuData(metadata.nozzle_diameter) ||
         this.isMmuData(metadata.temperature) ||
         this.isMmuData(metadata.filament_used_mm) ||
         this.isMmuData(metadata.bed_temperature) ||
-        this.isMmuData(metadata.filament_type, ';');
+        this.isMmuData(metadata.filament_type, ";");
 
       const normalized: BGCodeMetadata = {
         fileName,
@@ -69,45 +70,68 @@ export class BGCodeParser {
         isMmu: isMmu || undefined,
         gcodePrintTimeSeconds: this.parseTime(metadata.estimated_printing_time_normal_mode || metadata.print_time),
         gcodePrintTimeSecondsSilent: this.parseTime(metadata.estimated_printing_time_silent_mode),
-        nozzleDiameterMm: isMmu ? this.parseNumberArray(metadata.nozzle_diameter) : this.parseFirstValue(metadata.nozzle_diameter),
-        filamentDiameterMm: isMmu ? this.parseNumberArray(metadata.filament_diameter) : (this.parseFirstValue(metadata.filament_diameter) || 1.75),
-        filamentDensityGramsCm3: isMmu ? this.parseNumberArray(metadata.filament_density) : this.parseFirstValue(metadata.filament_density),
-        filamentUsedMm: isMmu ? this.parseNumberArray(metadata.filament_used_mm) : this.parseFirstValue(metadata.filament_used_mm),
-        filamentUsedCm3: isMmu ? this.parseNumberArray(metadata.filament_used_cm3) : this.parseFirstValue(metadata.filament_used_cm3),
-        filamentUsedGrams: isMmu ? this.parseNumberArray(metadata.filament_used_g) : this.parseFirstValue(metadata.filament_used_g),
-        totalFilamentUsedGrams: isMmu ? this.sumNumberArray(this.parseNumberArray(metadata.filament_used_g)) : this.parseFirstValue(metadata.filament_used_g),
+        nozzleDiameterMm: isMmu
+          ? this.parseNumberArray(metadata.nozzle_diameter)
+          : this.parseFirstValue(metadata.nozzle_diameter),
+        filamentDiameterMm: isMmu
+          ? this.parseNumberArray(metadata.filament_diameter)
+          : this.parseFirstValue(metadata.filament_diameter) || 1.75,
+        filamentDensityGramsCm3: isMmu
+          ? this.parseNumberArray(metadata.filament_density)
+          : this.parseFirstValue(metadata.filament_density),
+        filamentUsedMm: isMmu
+          ? this.parseNumberArray(metadata.filament_used_mm)
+          : this.parseFirstValue(metadata.filament_used_mm),
+        filamentUsedCm3: isMmu
+          ? this.parseNumberArray(metadata.filament_used_cm3)
+          : this.parseFirstValue(metadata.filament_used_cm3),
+        filamentUsedGrams: isMmu
+          ? this.parseNumberArray(metadata.filament_used_g)
+          : this.parseFirstValue(metadata.filament_used_g),
+        totalFilamentUsedGrams: isMmu
+          ? this.sumNumberArray(this.parseNumberArray(metadata.filament_used_g))
+          : this.parseFirstValue(metadata.filament_used_g),
         layerHeight: this.parseFloat(metadata.layer_height),
         firstLayerHeight: this.parseFloat(metadata.first_layer_height || metadata.initial_layer_height),
-        bedTemperature: isMmu ? this.parseNumberArray(metadata.bed_temperature) : this.parseFirstValue(metadata.bed_temperature),
-        nozzleTemperature: isMmu ? this.parseNumberArray(metadata.temperature) : this.parseFirstValue(metadata.temperature),
+        bedTemperature: isMmu
+          ? this.parseNumberArray(metadata.bed_temperature)
+          : this.parseFirstValue(metadata.bed_temperature),
+        nozzleTemperature: isMmu
+          ? this.parseNumberArray(metadata.temperature)
+          : this.parseFirstValue(metadata.temperature),
         fillDensity: metadata.fill_density || null,
-        filamentType: isMmu ? this.parseStringArray(metadata.filament_type, ';') : this.parseFirstCsvValue(metadata.filament_type),
+        filamentType: isMmu
+          ? this.parseStringArray(metadata.filament_type, ";")
+          : this.parseFirstCsvValue(metadata.filament_type),
         printerModel: metadata.printer_model || null,
         slicerVersion: metadata.producer || null,
         maxLayerZ: this.parseFloat(metadata.max_layer_z),
         totalLayers: this.parseInt(metadata.total_layers || metadata.layer_count),
-        thumbnails: thumbnails.length > 0 ? thumbnails.map(t => ({
-          width: t.width,
-          height: t.height,
-          format: t.format,
-          dataLength: t.data?.length || 0,
-        })) : undefined,
-        blocks: blockHeaders.map(b => ({
-          type: BgCodeBlockTypeName[b.type] || `Unknown(${ b.type })`,
+        thumbnails:
+          thumbnails.length > 0
+            ? thumbnails.map((t) => ({
+                width: t.width,
+                height: t.height,
+                format: t.format,
+                dataLength: t.data?.length || 0,
+              }))
+            : undefined,
+        blocks: blockHeaders.map((b) => ({
+          type: BgCodeBlockTypeName[b.type] || `Unknown(${b.type})`,
           compressedSize: b.compressedSize,
           uncompressedSize: b.uncompressedSize,
-          compression: BgCodeCompressionName[b.compression] || `Unknown(${ b.compression })`,
+          compression: BgCodeCompressionName[b.compression] || `Unknown(${b.compression})`,
         })),
       };
 
       return {
         raw: {
           _thumbnails: thumbnails,
-          blocks: blockHeaders.map(b => ({
-            type: BgCodeBlockTypeName[b.type] || `Unknown(${ b.type })`,
+          blocks: blockHeaders.map((b) => ({
+            type: BgCodeBlockTypeName[b.type] || `Unknown(${b.type})`,
             compressedSize: b.compressedSize,
             uncompressedSize: b.uncompressedSize,
-            compression: BgCodeCompressionName[b.compression] || `Unknown(${ b.compression })`,
+            compression: BgCodeCompressionName[b.compression] || `Unknown(${b.compression})`,
           })),
         },
         normalized,
@@ -119,11 +143,11 @@ export class BGCodeParser {
 
   private async extractThumbnailsFromBlocks(
     fileHandle: any,
-    blockHeaders: BgCodeBlockHeader[]
+    blockHeaders: BgCodeBlockHeader[],
   ): Promise<ParsedThumbnail[]> {
     const thumbnails: ParsedThumbnail[] = [];
 
-    const thumbnailBlocks = blockHeaders.filter(b => b.type === BgCodeBlockTypes.Thumbnail);
+    const thumbnailBlocks = blockHeaders.filter((b) => b.type === BgCodeBlockTypes.Thumbnail);
 
     for (const header of thumbnailBlocks) {
       const parameters = header.parameters as BgCodeThumbnailParameters;
@@ -137,7 +161,7 @@ export class BGCodeParser {
         width: parameters.width,
         height: parameters.height,
         format: processed.extension,
-        data: processed.data.toString('base64'),
+        data: processed.data.toString("base64"),
       });
     }
 
@@ -179,7 +203,7 @@ export class BGCodeParser {
   private parseFirstValue(value: string | undefined): number | null {
     if (!value) return null;
 
-    const firstValue = value.split(',')[0].trim();
+    const firstValue = value.split(",")[0].trim();
     const num = Number.parseFloat(firstValue);
     return Number.isNaN(num) ? null : num;
   }
@@ -191,19 +215,28 @@ export class BGCodeParser {
 
   private parseNumberArray(value: string | undefined): number[] | null {
     if (!value) return null;
-    const values = value.split(',').map(v => Number.parseFloat(v.trim())).filter(n => !Number.isNaN(n));
+    const values = value
+      .split(",")
+      .map((v) => Number.parseFloat(v.trim()))
+      .filter((n) => !Number.isNaN(n));
     return values.length > 0 ? values : null;
   }
 
-  private parseStringArray(value: string | undefined, separator: string = ';'): string[] | null {
+  private parseStringArray(value: string | undefined, separator: string = ";"): string[] | null {
     if (!value) return null;
-    const values = value.split(separator).map(v => v.trim()).filter(v => v.length > 0);
+    const values = value
+      .split(separator)
+      .map((v) => v.trim())
+      .filter((v) => v.length > 0);
     return values.length > 0 ? values : null;
   }
 
-  private isMmuData(value: string | undefined, separator: string = ','): boolean {
+  private isMmuData(value: string | undefined, separator: string = ","): boolean {
     if (!value) return false;
-    const parts = value.split(separator).map(v => v.trim()).filter(v => v.length > 0);
+    const parts = value
+      .split(separator)
+      .map((v) => v.trim())
+      .filter((v) => v.length > 0);
     return parts.length > 1;
   }
 

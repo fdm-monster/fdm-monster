@@ -3,7 +3,7 @@ import { uploadDoneEvent, uploadFailedEvent, uploadProgressEvent } from "@/const
 import EventEmitter2 from "eventemitter2";
 import { LoggerService } from "@/handlers/logger";
 import { AxiosProgressEvent } from "axios";
-import { ILoggerFactory } from "@/handlers/logger-factory";
+import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { TrackedUpload } from "@/services/interfaces/file-upload-tracker.interface";
 
 export class FileUploadTrackerCache {

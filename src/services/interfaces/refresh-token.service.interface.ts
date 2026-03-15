@@ -1,4 +1,4 @@
-import { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
+import type { RefreshTokenDto } from "@/services/interfaces/refresh-token.dto";
 import { RefreshToken } from "@/entities";
 
 export interface IRefreshTokenService<Entity = RefreshToken> {

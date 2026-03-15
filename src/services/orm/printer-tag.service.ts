@@ -1,7 +1,7 @@
 import { BaseService } from "@/services/orm/base.service";
 import { PrinterTag } from "@/entities/printer-tag.entity";
 import { CreateTagDto, PrinterTagDto } from "@/services/interfaces/printer-tag.dto";
-import { IPrinterTagService } from "@/services/interfaces/printer-tag.service.interface";
+import type { IPrinterTagService } from "@/services/interfaces/printer-tag.service.interface";
 import { Repository } from "typeorm";
 import { Tag } from "@/entities/tag.entity";
 import { TypeormService } from "@/services/typeorm/typeorm.service";

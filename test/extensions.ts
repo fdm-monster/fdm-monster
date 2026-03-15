@@ -34,15 +34,15 @@ export function expectValidationError(
     path: issue.path.join("."),
   }));
 
-  if (!exact) {
+  if (exact) {
+    // For exact matching, both arrays should have the same errors
+    expect(zodIssues).toEqual(expect.arrayContaining(expectedErrors));
+    expect(expectedErrors).toEqual(expect.arrayContaining(zodIssues));
+  } else {
     const missingErrors = expectedErrors.filter(
       (expected) => !zodIssues.some((actual) => actual.code === expected.code && actual.path === expected.path),
     );
     expect(missingErrors).toEqual([]);
-  } else {
-    // For exact matching, both arrays should have the same errors
-    expect(zodIssues).toEqual(expect.arrayContaining(expectedErrors));
-    expect(expectedErrors).toEqual(expect.arrayContaining(zodIssues));
   }
 }
 
