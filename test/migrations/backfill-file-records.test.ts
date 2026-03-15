@@ -28,10 +28,13 @@ describe("BackfillFileRecords Migration", () => {
     }
 
     writeFileSync(join(gcodeDir, `${testFileId}.gcode`), "G28\nG1 X10 Y10\n");
-    writeFileSync(join(gcodeDir, `${testFileId}.gcode.json`), JSON.stringify({
-      _originalFileName: "test-backfill.gcode",
-      _fileHash: "abc123"
-    }));
+    writeFileSync(
+      join(gcodeDir, `${testFileId}.gcode.json`),
+      JSON.stringify({
+        _originalFileName: "test-backfill.gcode",
+        _fileHash: "abc123",
+      }),
+    );
 
     let record = await fileStorageService.getFileRecordByGuid(testFileId);
     expect(record).toBeNull();
@@ -75,15 +78,15 @@ describe("BackfillFileRecords Migration", () => {
   it("should return statistics object", async () => {
     const stats = await backfillTask.execute({ quiet: true });
 
-    expect(stats).toHaveProperty('filesScanned');
-    expect(stats).toHaveProperty('recordsCreated');
-    expect(stats).toHaveProperty('recordsExisting');
-    expect(stats).toHaveProperty('errors');
+    expect(stats).toHaveProperty("filesScanned");
+    expect(stats).toHaveProperty("recordsCreated");
+    expect(stats).toHaveProperty("recordsExisting");
+    expect(stats).toHaveProperty("errors");
 
-    expect(typeof stats.filesScanned).toBe('number');
-    expect(typeof stats.recordsCreated).toBe('number');
-    expect(typeof stats.recordsExisting).toBe('number');
-    expect(typeof stats.errors).toBe('number');
+    expect(typeof stats.filesScanned).toBe("number");
+    expect(typeof stats.recordsCreated).toBe("number");
+    expect(typeof stats.recordsExisting).toBe("number");
+    expect(typeof stats.errors).toBe("number");
   });
 
   it("should skip thumbnail directories and json files", async () => {

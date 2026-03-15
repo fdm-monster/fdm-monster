@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateFileRecordTable1773442074582 implements MigrationInterface {
-  name = 'CreateFileRecordTable1773442074582'
+  name = "CreateFileRecordTable1773442074582";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`

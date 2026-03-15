@@ -482,13 +482,12 @@ export class FileStorageService implements IFileStorageService {
 
     const orphanedIds: number[] = [];
     for (const record of allRecords) {
-      if (record.type === 'dir') continue;
+      if (record.type === "dir") continue;
 
       const filePath = await this.findFilePath(record.fileGuid);
       if (!filePath) {
         this.logger.warn(
-          `FileRecord ${record.id} (${record.fileGuid}) will be deleted - ` +
-          `physical file missing: ${record.name}`
+          `FileRecord ${record.id} (${record.fileGuid}) will be deleted - ` + `physical file missing: ${record.name}`,
         );
         orphanedIds.push(record.id);
       }
@@ -500,8 +499,8 @@ export class FileStorageService implements IFileStorageService {
         .createQueryBuilder()
         .delete()
         .from(FileRecord)
-        .where('id IN (:...ids)', { ids: orphanedIds })
-        .andWhere('type != :type', { type: 'dir' })
+        .where("id IN (:...ids)", { ids: orphanedIds })
+        .andWhere("type != :type", { type: "dir" })
         .execute();
 
       this.logger.log(`Deleted ${orphanedIds.length} orphaned FileRecords during list operation`);
@@ -511,19 +510,8 @@ export class FileStorageService implements IFileStorageService {
     const result = await this.listFileRecords(undefined, { ...options, paginate: true });
     const files: any[] = [];
 
-          files.push({
-            fileStorageId: fileId,
-            fileName: metadata?._fileName || file,
-            fileFormat: subdir,
-            fileSize: stats.size,
-            fileHash: metadata?._fileHash || "",
-            createdAt: stats.birthtime,
-            thumbnailCount: thumbnails.length,
-            metadata: metadata,
-          });
-          
     for (const record of result.items) {
-      if (record.type === 'dir') continue;
+      if (record.type === "dir") continue;
 
       try {
         const filePath = await this.findFilePath(record.fileGuid);
@@ -542,7 +530,7 @@ export class FileStorageService implements IFileStorageService {
           fileName: metadata?._originalFileName || record.name,
           fileFormat: record.type,
           fileSize: stats.size,
-          fileHash: metadata?._fileHash || '',
+          fileHash: metadata?._fileHash || "",
           createdAt: record.createdAt,
           thumbnailCount: thumbnails.length,
           metadata: metadata,
@@ -558,7 +546,7 @@ export class FileStorageService implements IFileStorageService {
 
     if (orphanedIds.length > 0) {
       // Build where clause matching the filter used in listFileRecords
-      const where: any = { type: Not('dir') };
+      const where: any = { type: Not("dir") };
       if (options?.type) {
         where.type = options.type;
       }
@@ -620,8 +608,10 @@ export class FileStorageService implements IFileStorageService {
       type?: "gcode" | "3mf" | "bgcode";
       sortBy?: "createdAt" | "name" | "type";
       sortOrder?: "ASC" | "DESC";
-    }
-  ): Promise<FileRecord[] | { items: FileRecord[]; totalCount: number; page: number; pageSize: number; totalPages: number }> {
+    },
+  ): Promise<
+    FileRecord[] | { items: FileRecord[]; totalCount: number; page: number; pageSize: number; totalPages: number }
+  > {
     const sortBy = options?.sortBy || "createdAt";
     const sortOrder = options?.sortOrder || "DESC";
 
@@ -677,7 +667,7 @@ export class FileStorageService implements IFileStorageService {
       if (existing) {
         throw new ConflictException(
           `File record with fileGuid "${data.fileGuid}" already exists`,
-          existing.id.toString()
+          existing.id.toString(),
         );
       }
     }
@@ -700,7 +690,7 @@ export class FileStorageService implements IFileStorageService {
       if (existing) {
         throw new ConflictException(
           `File record with fileGuid "${data.fileGuid}" already exists`,
-          existing.id.toString()
+          existing.id.toString(),
         );
       }
     }

@@ -155,10 +155,10 @@ export class SlicerCompatController {
   @route("/files")
   async listFiles(req: Request, res: Response) {
     try {
-      const files = await this.fileStorageService.listAllFiles();
+      const result = await this.fileStorageService.listAllFiles();
 
       // Convert to known format
-      const knownFiles = files.map((file) => ({
+      const knownFiles = result.files.map((file) => ({
         name: file.metadata?._originalFileName || file.fileName,
         path: file.fileStorageId,
         type: "machinecode",

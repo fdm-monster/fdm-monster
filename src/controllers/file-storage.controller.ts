@@ -105,9 +105,8 @@ export class FileStorageController {
         const originalFileName = existingMetadata?._originalFileName || fileId;
         metadata.fileName = originalFileName;
 
-        const thumbnailMetadata = thumbnails.length > 0
-          ? await this.fileStorageService.saveThumbnails(fileId, thumbnails)
-          : [];
+        const thumbnailMetadata =
+          thumbnails.length > 0 ? await this.fileStorageService.saveThumbnails(fileId, thumbnails) : [];
 
         await this.fileStorageService.saveMetadata(fileId, metadata, fileHash, originalFileName, thumbnailMetadata);
 
@@ -146,7 +145,7 @@ export class FileStorageController {
       });
 
       res.send({
-        files: result.files.map(file => {
+        files: result.files.map((file) => {
           const thumbnails = (file.metadata?._thumbnails || []).map((thumb: any) => ({
             index: thumb.index,
             width: thumb.width,
@@ -251,7 +250,7 @@ export class FileStorageController {
           metadata,
           metadata._fileHash,
           originalFileName,
-          metadata._thumbnails
+          metadata._thumbnails,
         );
       }
 

@@ -33,6 +33,13 @@ describe("FileStorageController - Real Integration", () => {
     if (!existsSync(testDataDir)) {
       mkdirSync(testDataDir, { recursive: true });
     }
+
+    const allRecords = await fileStorageService["fileRecordRepository"].find();
+    for (const record of allRecords) {
+      if (record.id !== 0) {
+        await fileStorageService["fileRecordRepository"].remove(record);
+      }
+    }
   });
 
   describe("GET /api/file-storage - List files", () => {
@@ -44,7 +51,8 @@ describe("FileStorageController - Real Integration", () => {
     });
 
     it("should return list of files after upload", async () => {
-      const uploadRes = await uploadFile("integration-list-test.gcode", SIMPLE_GCODE);
+      const timestamp = Date.now();
+      const uploadRes = await uploadFile(`integration-list-test-${timestamp}.gcode`, SIMPLE_GCODE);
       expectOkResponse(uploadRes);
       const fileStorageId = uploadRes.body.fileStorageId;
 
@@ -189,7 +197,8 @@ describe("FileStorageController - Real Integration", () => {
 
   describe("Real file operations workflow", () => {
     it("should complete full upload-analyze-retrieve-delete workflow", async () => {
-      const uploadRes = await uploadFile("integration-workflow-test.gcode", SIMPLE_GCODE);
+      const timestamp = Date.now();
+      const uploadRes = await uploadFile(`integration-workflow-test-${timestamp}.gcode`, SIMPLE_GCODE);
       expectOkResponse(uploadRes);
       const fileStorageId = uploadRes.body.fileStorageId;
       expect(fileStorageId).toBeDefined();
@@ -267,7 +276,7 @@ describe("FileStorageController - Real Integration", () => {
       const fileStorageId = uploadRes.body.fileStorageId;
 
       const result = await fileStorageService.listAllFiles();
-      const foundFile = result.files.find(f => f.fileStorageId === fileStorageId);
+      const foundFile = result.files.find((f) => f.fileStorageId === fileStorageId);
 
       expect(foundFile).toBeDefined();
       expect(foundFile?.fileName).toBe(`filerecord-list-test-${timestamp}.gcode`);
@@ -331,16 +340,15 @@ describe("FileStorageController - Real Integration", () => {
       expect(page2.body.page).toBe(2);
 
       const allPages = [...page1.body.files, ...page2.body.files];
-      const uploadedFilesFound = fileIds.filter(id =>
-        allPages.some(f => f.fileStorageId === id)
-      );
+      const uploadedFilesFound = fileIds.filter((id) => allPages.some((f) => f.fileStorageId === id));
       expect(uploadedFilesFound.length).toBeGreaterThanOrEqual(2);
 
       await Promise.all(fileIds.map((id) => fileStorageService.deleteFile(id)));
     });
 
     it("should filter files by type", async () => {
-      const gcodeRes = await uploadFile("filter-gcode.gcode", SIMPLE_GCODE);
+      const timestamp = Date.now();
+      const gcodeRes = await uploadFile(`filter-gcode-${timestamp}.gcode`, SIMPLE_GCODE);
       expectOkResponse(gcodeRes);
       const gcodeId = gcodeRes.body.fileStorageId;
 
@@ -352,8 +360,9 @@ describe("FileStorageController - Real Integration", () => {
     });
 
     it("should sort files by name", async () => {
+      const timestamp = Date.now();
       const fileIds: string[] = [];
-      const names = ["charlie.gcode", "alpha.gcode", "bravo.gcode"];
+      const names = [`charlie-${timestamp}.gcode`, `alpha-${timestamp}.gcode`, `bravo-${timestamp}.gcode`];
       for (const name of names) {
         const res = await uploadFile(name, SIMPLE_GCODE);
         expectOkResponse(res);
@@ -363,13 +372,11 @@ describe("FileStorageController - Real Integration", () => {
       const sortedRes = await testRequest.get(`${baseRoute}?sortBy=name&sortOrder=ASC&pageSize=100`);
       expectOkResponse(sortedRes);
 
-      const uploadedFiles = sortedRes.body.files.filter((f: any) =>
-        names.includes(f.fileName)
-      );
+      const uploadedFiles = sortedRes.body.files.filter((f: any) => names.includes(f.fileName));
       expect(uploadedFiles.length).toBe(3);
-      expect(uploadedFiles[0].fileName).toBe("alpha.gcode");
-      expect(uploadedFiles[1].fileName).toBe("bravo.gcode");
-      expect(uploadedFiles[2].fileName).toBe("charlie.gcode");
+      expect(uploadedFiles[0].fileName).toBe(`alpha-${timestamp}.gcode`);
+      expect(uploadedFiles[1].fileName).toBe(`bravo-${timestamp}.gcode`);
+      expect(uploadedFiles[2].fileName).toBe(`charlie-${timestamp}.gcode`);
 
       await Promise.all(fileIds.map((id) => fileStorageService.deleteFile(id)));
     });
@@ -397,9 +404,7 @@ describe("FileStorageController - Real Integration", () => {
     });
 
     it("should return 404 for non-existent file", async () => {
-      const res = await testRequest
-        .patch(`${baseRoute}/non-existent-id`)
-        .send({ originalFileName: "new-name.gcode" });
+      const res = await testRequest.patch(`${baseRoute}/non-existent-id`).send({ originalFileName: "new-name.gcode" });
 
       expect(res.status).toBe(404);
     });
@@ -427,9 +432,7 @@ describe("FileStorageController - Real Integration", () => {
         fileIds.push(res.body.fileStorageId);
       }
 
-      const bulkDeleteRes = await testRequest
-        .post(`${baseRoute}/bulk/delete`)
-        .send({ fileIds });
+      const bulkDeleteRes = await testRequest.post(`${baseRoute}/bulk/delete`).send({ fileIds });
 
       expectOkResponse(bulkDeleteRes);
       expect(bulkDeleteRes.body.deleted).toBe(3);
@@ -448,9 +451,7 @@ describe("FileStorageController - Real Integration", () => {
       const validId = uploadRes.body.fileStorageId;
       const invalidId = "non-existent-file-id-12345";
 
-      const bulkDeleteRes = await testRequest
-        .post(`${baseRoute}/bulk/delete`)
-        .send({ fileIds: [validId, invalidId] });
+      const bulkDeleteRes = await testRequest.post(`${baseRoute}/bulk/delete`).send({ fileIds: [validId, invalidId] });
 
       expectOkResponse(bulkDeleteRes);
       expect(bulkDeleteRes.body.deleted).toBe(1);
@@ -464,18 +465,14 @@ describe("FileStorageController - Real Integration", () => {
     });
 
     it("should return 400 when fileIds is not an array", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/bulk/delete`)
-        .send({ fileIds: "not-an-array" });
+      const res = await testRequest.post(`${baseRoute}/bulk/delete`).send({ fileIds: "not-an-array" });
 
       expect(res.status).toBe(400);
       expect(res.body.error).toContain("array");
     });
 
     it("should return 400 when fileIds is empty", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/bulk/delete`)
-        .send({ fileIds: [] });
+      const res = await testRequest.post(`${baseRoute}/bulk/delete`).send({ fileIds: [] });
 
       expect(res.status).toBe(400);
       expect(res.body.error).toContain("non-empty");
@@ -483,9 +480,7 @@ describe("FileStorageController - Real Integration", () => {
 
     it("should return 400 when fileIds exceeds limit", async () => {
       const fileIds = Array.from({ length: 101 }, (_, i) => `file-${i}`);
-      const res = await testRequest
-        .post(`${baseRoute}/bulk/delete`)
-        .send({ fileIds });
+      const res = await testRequest.post(`${baseRoute}/bulk/delete`).send({ fileIds });
 
       expect(res.status).toBe(400);
       expect(res.body.error).toContain("100");
@@ -515,9 +510,7 @@ describe("FileStorageController - Real Integration", () => {
         expect(record).toBeTruthy();
       }
 
-      const bulkDeleteRes = await testRequest
-        .post(`${baseRoute}/bulk/delete`)
-        .send({ fileIds });
+      const bulkDeleteRes = await testRequest.post(`${baseRoute}/bulk/delete`).send({ fileIds });
 
       expectOkResponse(bulkDeleteRes);
       expect(bulkDeleteRes.body.deleted).toBe(2);
@@ -539,9 +532,7 @@ describe("FileStorageController - Real Integration", () => {
         fileIds.push(res.body.fileStorageId);
       }
 
-      const bulkAnalyzeRes = await testRequest
-        .post(`${baseRoute}/bulk/analyze`)
-        .send({ fileIds });
+      const bulkAnalyzeRes = await testRequest.post(`${baseRoute}/bulk/analyze`).send({ fileIds });
 
       expectOkResponse(bulkAnalyzeRes);
       expect(bulkAnalyzeRes.body.analyzed).toBe(3);
@@ -573,18 +564,14 @@ describe("FileStorageController - Real Integration", () => {
     });
 
     it("should return 400 when fileIds is not an array", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/bulk/analyze`)
-        .send({ fileIds: "not-an-array" });
+      const res = await testRequest.post(`${baseRoute}/bulk/analyze`).send({ fileIds: "not-an-array" });
 
       expect(res.status).toBe(400);
       expect(res.body.error).toContain("array");
     });
 
     it("should return 400 when fileIds is empty", async () => {
-      const res = await testRequest
-        .post(`${baseRoute}/bulk/analyze`)
-        .send({ fileIds: [] });
+      const res = await testRequest.post(`${baseRoute}/bulk/analyze`).send({ fileIds: [] });
 
       expect(res.status).toBe(400);
       expect(res.body.error).toContain("non-empty");
@@ -592,9 +579,7 @@ describe("FileStorageController - Real Integration", () => {
 
     it("should return 400 when fileIds exceeds limit", async () => {
       const fileIds = Array.from({ length: 101 }, (_, i) => `file-${i}`);
-      const res = await testRequest
-        .post(`${baseRoute}/bulk/analyze`)
-        .send({ fileIds });
+      const res = await testRequest.post(`${baseRoute}/bulk/analyze`).send({ fileIds });
 
       expect(res.status).toBe(400);
       expect(res.body.error).toContain("100");
@@ -620,9 +605,7 @@ describe("FileStorageController - Real Integration", () => {
       const metadataBefore = await fileStorageService.loadMetadata(fileId);
       const hashBefore = metadataBefore?._fileHash;
 
-      const bulkAnalyzeRes = await testRequest
-        .post(`${baseRoute}/bulk/analyze`)
-        .send({ fileIds: [fileId] });
+      const bulkAnalyzeRes = await testRequest.post(`${baseRoute}/bulk/analyze`).send({ fileIds: [fileId] });
 
       expectOkResponse(bulkAnalyzeRes);
       expect(bulkAnalyzeRes.body.analyzed).toBe(1);

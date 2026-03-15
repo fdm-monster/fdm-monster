@@ -49,8 +49,8 @@ describe("FileStorageService - FileRecord CRUD", () => {
       const records = await service.listFileRecords();
 
       expect(records.length).toBeGreaterThanOrEqual(3);
-      expect(records.some(r => r.fileGuid === guid1)).toBe(true);
-      expect(records.some(r => r.fileGuid === guid2)).toBe(true);
+      expect(records.some((r) => r.fileGuid === guid1)).toBe(true);
+      expect(records.some((r) => r.fileGuid === guid2)).toBe(true);
     });
 
     it("should filter by parentId when provided", async () => {
@@ -200,7 +200,7 @@ describe("FileStorageService - FileRecord CRUD", () => {
           type: "gcode",
           name: "second.gcode",
           fileGuid: guid,
-        })
+        }),
       ).rejects.toThrow(ConflictException);
     });
   });
@@ -227,9 +227,7 @@ describe("FileStorageService - FileRecord CRUD", () => {
     });
 
     it("should throw NotFoundException when ID does not exist", async () => {
-      await expect(
-        service.updateFileRecord(999999, { name: "nonexistent.gcode" })
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.updateFileRecord(999999, { name: "nonexistent.gcode" })).rejects.toThrow(NotFoundException);
     });
 
     it("should throw ConflictException when changing fileGuid to existing GUID", async () => {
@@ -250,9 +248,7 @@ describe("FileStorageService - FileRecord CRUD", () => {
         fileGuid: guid2,
       });
 
-      await expect(
-        service.updateFileRecord(record1.id, { fileGuid: guid2 })
-      ).rejects.toThrow(ConflictException);
+      await expect(service.updateFileRecord(record1.id, { fileGuid: guid2 })).rejects.toThrow(ConflictException);
     });
 
     it("should allow updating fileGuid to same value", async () => {
@@ -291,9 +287,7 @@ describe("FileStorageService - FileRecord CRUD", () => {
     });
 
     it("should throw NotFoundException when ID does not exist", async () => {
-      await expect(
-        service.deleteFileRecord(999999)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.deleteFileRecord(999999)).rejects.toThrow(NotFoundException);
     });
 
     it("should allow deleting record after deletion attempt", async () => {
@@ -307,9 +301,7 @@ describe("FileStorageService - FileRecord CRUD", () => {
 
       await service.deleteFileRecord(created.id);
 
-      await expect(
-        service.deleteFileRecord(created.id)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.deleteFileRecord(created.id)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -359,7 +351,6 @@ describe("FileStorageService - FileRecord CRUD", () => {
       expect(afterList?.type).toBe("dir");
     });
 
-
     it("should batch delete multiple orphaned records efficiently", async () => {
       // Create 5 orphaned records
       const orphanGuids = Array.from({ length: 5 }, () => randomUUID());
@@ -370,24 +361,20 @@ describe("FileStorageService - FileRecord CRUD", () => {
             type: "gcode",
             name: `batch-orphan-${idx}.gcode`,
             fileGuid: guid,
-          })
-        )
+          }),
+        ),
       );
 
       // Verify all exist before listing
-      const beforeCount = await Promise.all(
-        orphanRecords.map(r => service.getFileRecordById(r.id))
-      );
-      expect(beforeCount.filter(r => r !== null).length).toBe(5);
+      const beforeCount = await Promise.all(orphanRecords.map((r) => service.getFileRecordById(r.id)));
+      expect(beforeCount.filter((r) => r !== null).length).toBe(5);
 
       // List files - should delete all orphans in one batch
       await service.listAllFiles({ page: 1, pageSize: 50 });
 
       // Verify all deleted after listing
-      const afterCount = await Promise.all(
-        orphanRecords.map(r => service.getFileRecordById(r.id))
-      );
-      expect(afterCount.filter(r => r !== null).length).toBe(0);
+      const afterCount = await Promise.all(orphanRecords.map((r) => service.getFileRecordById(r.id)));
+      expect(afterCount.filter((r) => r !== null).length).toBe(0);
     });
   });
 });

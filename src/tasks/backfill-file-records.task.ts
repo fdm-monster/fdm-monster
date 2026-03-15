@@ -22,7 +22,7 @@ export class BackfillFileRecordsTask {
 
   constructor(
     loggerFactory: ILoggerFactory,
-    private readonly fileStorageService: FileStorageService
+    private readonly fileStorageService: FileStorageService,
   ) {
     this.logger = loggerFactory(BackfillFileRecordsTask.name);
   }
@@ -49,7 +49,7 @@ export class BackfillFileRecordsTask {
         const files = await readdir(dirPath);
 
         for (const file of files) {
-          if (file.endsWith('_thumbnails') || file.endsWith('.json')) {
+          if (file.endsWith("_thumbnails") || file.endsWith(".json")) {
             continue;
           }
 

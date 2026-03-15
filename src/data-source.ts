@@ -50,7 +50,7 @@ export const AppDataSource = new DataSource({
     PrinterTag,
     PrintJob,
     PrinterMaintenanceLog,
-    FileRecord
+    FileRecord,
   ],
   migrations: [
     InitSqlite1706829146617,
@@ -69,7 +69,7 @@ export const AppDataSource = new DataSource({
     RenameGroupToTag1767432108916,
     AddPrintJob1767451444137,
     AddPrinterMaintenanceLog1767909428129,
-    CreateFileRecordTable1773442074582
+    CreateFileRecordTable1773442074582,
   ],
   subscribers: [],
 });
