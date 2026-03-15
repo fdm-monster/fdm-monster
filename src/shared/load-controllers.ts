@@ -1,4 +1,11 @@
-import { FindControllersResult, getStateAndTarget, HttpVerbs, IStateAndTarget, makeInvoker, rollUpState } from "awilix-express";
+import {
+  FindControllersResult,
+  getStateAndTarget,
+  HttpVerbs,
+  IStateAndTarget,
+  makeInvoker,
+  rollUpState,
+} from "awilix-express";
 import { Router } from "express";
 import { ClassOrFunctionReturning } from "awilix";
 
@@ -13,7 +20,9 @@ export async function loadControllersFunc(): Promise<Router> {
 
 export async function findControllers(): Promise<FindControllersResult> {
   const modules = await Promise.all(
-    Object.values(controllerModules).map((load) => (load as () => Promise<unknown>)().then(extractStateAndTargetFromExports)),
+    Object.values(controllerModules).map((load) =>
+      (load as () => Promise<unknown>)().then(extractStateAndTargetFromExports),
+    ),
   );
   return modules.flat();
 }
