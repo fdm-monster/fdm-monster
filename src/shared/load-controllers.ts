@@ -1,54 +1,24 @@
-import {
-  FindControllersResult,
-  getStateAndTarget,
-  HttpVerbs,
-  IStateAndTarget,
-  makeInvoker,
-  rollUpState,
-} from "awilix-express";
+import { FindControllersResult, getStateAndTarget, HttpVerbs, IStateAndTarget, makeInvoker, rollUpState } from "awilix-express";
 import { Router } from "express";
 import { ClassOrFunctionReturning } from "awilix";
-import glob from "fast-glob";
-import { pathToFileURL, fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
 
-async function globImport(pattern: string, baseDir: string) {
-  const files = await glob(pattern, { cwd: baseDir, absolute: true });
-
-  const imports: Record<string, () => Promise<any>> = {};
-  for (const file of files) {
-    imports[file] = () => import(pathToFileURL(file).href);
-  }
-
-  return imports;
-}
+const controllerModules = import.meta.glob("@/controllers/*.controller.ts");
 
 export async function loadControllersFunc(): Promise<Router> {
-  const result = findControllers();
-
-  const found = await result;
+  const found = await findControllers();
   const router = Router();
   found.forEach(_registerController.bind(null, router));
   return router;
 }
 
 export async function findControllers(): Promise<FindControllersResult> {
-  let result: Record<string, () => Promise<any>>;
-
-  if (process.env.VITEST === "true") {
-    // @ts-ignore - Vite feature
-    result = import.meta.glob("@/controllers/*.controller.*");
-  } else {
-    const baseDir = join(dirname(fileURLToPath(import.meta.url)), "..");
-    result = await globImport("controllers/*.controller.js", baseDir);
-  }
-
-  const paths = Object.keys(result);
-  const controllers = await Promise.all(paths.map((path) => result[path]().then(extractStateAndTargetFromExports)));
-  return controllers.flat();
+  const modules = await Promise.all(
+    Object.values(controllerModules).map((load) => (load as () => Promise<unknown>)().then(extractStateAndTargetFromExports)),
+  );
+  return modules.flat();
 }
 
-function extractStateAndTargetFromExports(exports: any): FindControllersResult {
+function extractStateAndTargetFromExports(exports: unknown): FindControllersResult {
   const items: FindControllersResult = [];
 
   if (exports) {
@@ -58,9 +28,8 @@ function extractStateAndTargetFromExports(exports: any): FindControllersResult {
       return items;
     }
 
-    // loop through exports - this will cover named as well as a default export
-    for (const key of Object.keys(exports)) {
-      const stateAndTarget = getStateAndTarget(exports[key]);
+    for (const key of Object.keys(exports as object)) {
+      const stateAndTarget = getStateAndTarget((exports as Record<string, unknown>)[key]);
       if (stateAndTarget) {
         items.push(stateAndTarget);
       }
@@ -87,7 +56,6 @@ function _registerController(router: Router, stateAndTarget: IStateAndTarget | n
       (router as any)[method](
         methodCfg.paths,
         ...methodCfg.beforeMiddleware,
-        /*tslint:disable-next-line*/
         makeInvoker(target as ClassOrFunctionReturning<any>)(methodName as any),
         ...methodCfg.afterMiddleware,
       );
