@@ -7,7 +7,7 @@ These rules govern AI-assisted development on this project. They ensure consiste
 ### 1. Index All Changes
 **Requirement:** Maintain a running index of all modifications made during development.
 
-- **How:** After each effort/phase, append to `DEVELOPMENT.md` in the root directory
+- **How:** After each effort/phase, append to `docs/ai-docs/tracking/DEVELOPMENT.md`
 - **Format:** 
   ```markdown
   ## Effort: [Effort Name] (v[semver]-[phase])
@@ -106,9 +106,11 @@ These rules govern AI-assisted development on this project. They ensure consiste
 **Requirement:** All documentation is written in Markdown format (`.md` files).
 
 - **Where:**
-  - Feature/API design: `docs/[feature-name].md`
+  - Feature/API design: `docs/features/[feature-name].md`
   - Architecture decisions: `docs/architecture/[topic].md`
-  - Development progress: `DEVELOPMENT.md` (root)
+  - Development progress: `docs/ai-docs/tracking/DEVELOPMENT.md`
+  - Project definition: `docs/ai-docs/project/PROJECT_DEFINITION.md`
+  - Project resume: `docs/ai-docs/project/PROJECT_RESUME.md`
   - User-facing guides: update `README.md` or `docs/guides/`
 
 - **Format Standards:**
@@ -154,12 +156,12 @@ These rules govern AI-assisted development on this project. They ensure consiste
   
 - **Phase Tracking in Code:**
   - Add effort name/version to commit messages: `feat(effort/sqlite-metadata): v0.1.0-phase-1 - create FileRecord entity`
-  - Update `DEVELOPMENT.md` after each phase closes (see Rule 1)
+  - Update `docs/ai-docs/tracking/DEVELOPMENT.md` after each phase closes (see Rule 1)
   - Use effort name as prefix in variable/method names when introducing cross-cutting changes (e.g., `FileRecordService`)
 
 - **Transition Process:**
   1. Complete all tasks for current phase
-  2. Update `DEVELOPMENT.md` with changes made
+  2. Update `docs/ai-docs/tracking/DEVELOPMENT.md` with changes made
   3. **Await confirmation from user** (Rule 6) before starting next phase
 
 ---
@@ -182,7 +184,7 @@ These rules govern AI-assisted development on this project. They ensure consiste
   - New API endpoints: [list]
   
   ### Changes Index
-  See **DEVELOPMENT.md** for full changelog.
+  See **docs/ai-docs/tracking/DEVELOPMENT.md** for full changelog.
   
   ### Next Steps
   - Phase [N+1]: [description]
@@ -192,7 +194,7 @@ These rules govern AI-assisted development on this project. They ensure consiste
   ```
 
 - **Actions:**
-  - If **Yes:** Proceed to next phase, update `DEVELOPMENT.md` with phase closure date
+  - If **Yes:** Proceed to next phase, update `docs/ai-docs/tracking/DEVELOPMENT.md` with phase closure date
   - If **No:** Iterate on current phase until ready
   - If **pivot:** Acknowledge and start new effort with fresh phase 1
 
@@ -210,7 +212,12 @@ These rules govern AI-assisted development on this project. They ensure consiste
 
 ### Key Directories
 src/ ├── controllers/ # HTTP handlers ├── services/ # Business logic (orm/, authentication/, moonraker/, etc.) ├── entities/ # TypeORM entities ├── utils/ # Utilities (parsers/, cache/, etc.) ├── state/ # In-memory caches, stores (not persisted) ├── middleware/ # Express middleware └── migrations/ # TypeORM migrations
-test/ # Jest tests (mirror src/ structure) docs/ # Feature/architecture documentation DEVELOPMENT.md # Version-tracked changelog
+test/ # Jest tests (mirror src/ structure)
+docs/ # Feature/architecture documentation
+  ai-docs/ # AI-specific project tracking
+    project/ # PROJECT_DEFINITION.md, PROJECT_RESUME.md
+    tracking/ # DEVELOPMENT.md (changelog)
+    planning/ # Phase planning documents
 
 ### Existing Conventions
 - **DI Container:** Awilix (see `src/container.ts`)
@@ -230,7 +237,7 @@ test/ # Jest tests (mirror src/ structure) docs/ # Feature/architecture document
 
 | Goal | Rule | Action |
 |------|------|--------|
-| Track what was changed | Rule 1 | Update `DEVELOPMENT.md` per effort/phase |
+| Track what was changed | Rule 1 | Update `docs/ai-docs/tracking/DEVELOPMENT.md` per effort/phase |
 | Write clean code | Rule 2 | Use naming, extraction, types — not comments |
 | Stay consistent | Rule 3 | Match patterns in `biome.json` and existing code |
 | Document decisions | Rule 4 | Write `.md` files in `docs/` |
@@ -275,7 +282,7 @@ These rules are living documents. If a rule is unclear, too strict, or impractic
   - **Entity definitions** (schema only; tested via ORM integration tests)
   - **Configuration files** (constants, enums; verified via imports)
   - **Legacy code** (only new code requires unit tests)
-  - Document any exemption in the `DEVELOPMENT.md` changeset
+  - Document any exemption in the `docs/ai-docs/tracking/DEVELOPMENT.md` changeset
 
 #### **Rule 7B: Use Realistic Test Data & Avoid Guaranteed Success**
 
@@ -372,7 +379,7 @@ These rules are living documents. If a rule is unclear, too strict, or impractic
 
 | Goal | Rule | Action |
 |------|------|--------|
-| Track what was changed | Rule 1 | Update `DEVELOPMENT.md` per effort/phase |
+| Track what was changed | Rule 1 | Update `docs/ai-docs/tracking/DEVELOPMENT.md` per effort/phase |
 | Write clean code | Rule 2 | Use naming, extraction, types — not comments |
 | Stay consistent | Rule 3 | Match patterns in `biome.json` and existing code |
 | Document decisions | Rule 4 | Write `.md` files in `docs/` |
