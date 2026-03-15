@@ -2,8 +2,9 @@ FROM node:24-bookworm-slim AS production
 WORKDIR /app
 
 COPY .yarn/releases ./.yarn/releases
-COPY vite.config.ts tsconfig.json package.json yarn.lock ./
-RUN yarn workspaces focus . --production
+COPY vite.config.ts tsconfig.json package.json yarn.lock .yarnrc.yml ./
+
+RUN yarn workspaces focus
 
 COPY src/ ./src/
 COPY test/ ./test/

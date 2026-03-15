@@ -4,7 +4,9 @@ WORKDIR /build
 COPY .yarn/releases ./.yarn/releases
 COPY vite.config.ts tsconfig.json package.json yarn.lock .yarnrc.yml ./
 
-RUN yarn workspaces focus . --immutable
+# Hack: allows immutable lock check without limited yarn workspaces command
+COPY packages ./packages
+RUN yarn install --immutable
 
 COPY src/ ./src/
 
@@ -13,13 +15,14 @@ RUN yarn run build
 FROM node:24-bookworm-slim AS production
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ca-certificates curl
+RUN apt update && apt install -y ca-certificates curl &&  \
+    apt clean && rm -rf /var/lib/apt/lists/*
 
 RUN yarn global add pm2
 COPY .yarn/releases ./.yarn/releases
 
 COPY vite.config.ts tsconfig.json package.json yarn.lock .yarnrc.yml ./
-RUN yarn workspaces focus . --production
+RUN yarn workspaces focus --production
 
 COPY .env.template \
     README.md \
