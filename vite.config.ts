@@ -3,11 +3,11 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
-  build:{
+  build: {
     ssr: true,
     rolldownOptions: {
       input: "src/index.ts",
-    }
+    },
   },
   fmt: {
     printWidth: 120,
@@ -45,15 +45,8 @@ export default defineConfig({
       provider: "v8",
       reporter: ["clover", "json", "lcov", "text"],
       include: ["src/**/*.ts"],
-      exclude: [
-        "**/node_modules/**",
-        "test/**",
-        "coverage/**",
-        "docker/**",
-        "media/**",
-        "setups/**",
-      ],
+      exclude: ["**/node_modules/**", "test/**", "coverage/**", "docker/**", "media/**", "setups/**"],
     },
-    exclude: ["**/node_modules/**", "**/dist/**", "**/coverage/**", "setups/**"]
+    exclude: ["**/node_modules/**", "**/dist/**", "**/coverage/**", "setups/**"],
   },
 });

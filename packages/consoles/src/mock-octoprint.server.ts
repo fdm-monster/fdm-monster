@@ -1,17 +1,12 @@
 import express from "express";
 import multer from "multer";
 import fs from "node:fs";
-import path from "node:path";
+import path, { dirname } from "node:path";
 import { WebSocketServer, WebSocket } from "ws";
 import http from "node:http";
 import { z } from "zod";
 import * as console from "node:console";
-import {
-  connectionSuccessResponse,
-  filesSuccessResponse,
-  printerHistorySuccessResponse,
-} from "./utils/api-messages";
-import { dirname } from "node:path";
+import { connectionSuccessResponse, filesSuccessResponse, printerHistorySuccessResponse } from "./utils/api-messages";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
