@@ -4,7 +4,7 @@ WORKDIR /build
 COPY .yarn/releases ./.yarn/releases
 COPY vite.config.ts tsconfig.json package.json yarn.lock .yarnrc.yml ./
 
-RUN yarn install --immutable
+RUN yarn workspaces focus . --immutable
 
 COPY src/ ./src/
 
@@ -21,11 +21,12 @@ RUN yarn global add pm2
 COPY .yarn/releases ./.yarn/releases
 
 COPY vite.config.ts tsconfig.json package.json yarn.lock .yarnrc.yml ./
-RUN yarn workspaces focus --all --production
+RUN yarn workspaces focus . --production
 
 COPY .env.template \
     README.md \
-    LICENSE CODE_OF_CONDUCT.md \
+    LICENSE \
+    CODE_OF_CONDUCT.md \
     CONTRIBUTING.md \
     SECURITY.md \
     .dockerignore ./
