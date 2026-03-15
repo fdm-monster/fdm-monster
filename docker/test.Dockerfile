@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y ca-certificates curl
 
 RUN yarn global add pm2
 
-COPY .swcrc tsconfig.json package.json jest.config.js yarn.lock ./
+COPY vite.config.ts tsconfig.json package.json jest.config.js yarn.lock ./
 # Timeout is needed for yarn install to work on arm64 emulation (qemu)
 RUN yarn install 
 

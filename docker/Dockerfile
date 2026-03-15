@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y ca-certificates curl
 RUN yarn global add pm2
 COPY .yarn/releases ./.yarn/releases
 
-COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
+COPY vite.config.ts tsconfig.json package.json yarn.lock .yarnrc.yml ./
 RUN yarn workspaces focus --all --production
 
 COPY .env.template \
