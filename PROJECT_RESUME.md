@@ -1,9 +1,9 @@
 # Project Resume — FDM Monster Development
 
-**Date Saved:** 2026-03-13
+**Date Saved:** 2026-03-14
 **Branch:** file-explorer
-**Current Effort:** v0.3.0 File Management CRUD API
-**Current Phase:** Ready for Phase 4 (Bulk Operations)
+**Current Effort:** v0.3.0 File Management CRUD API — ✓ COMPLETE
+**Current Phase:** All phases complete, ready for merge
 
 ---
 
@@ -15,24 +15,25 @@ I'm continuing development on the FDM Monster project (3D printer farm managemen
 IMPORTANT CONTEXT:
 1. Read .cursorrules for operational rules (80% test coverage, no comments, etc.)
 2. Read DEVELOPMENT.md for current project state
-3. I'm working on v0.3.0 Phase 4 - Bulk Operations
 
 CURRENT STATUS:
-- v0.3.0 Phases 1-3 are COMPLETE (27 tests passing)
-- Phase 3 pagination bug has been FIXED
-- Permission-based access control has been DEFERRED (see docs/features/file-storage-permissions-deferred.md)
+- v0.3.0 File Management CRUD API is COMPLETE (all 4 phases)
+- All technical debt items RESOLVED
+- 63 tests passing (22 unit + 41 integration)
+- Branch file-explorer is ahead by 10 commits, ready to merge
 
-NEXT TASK: v0.3.0 Phase 4 — Bulk Operations
-Deliverables:
-1. POST /api/file-storage/bulk/delete - Delete multiple files
-2. POST /api/file-storage/bulk/analyze - Re-analyze multiple files
-3. Integration tests for bulk endpoints (8+ tests)
-4. Error handling for partial failures
+COMPLETED WORK:
+✓ Phase 1 - FileStorage API Integration Testing
+✓ Phase 2 - FileRecord Integration
+✓ Phase 3 - Pagination, Filtering & PATCH Endpoint
+✓ Phase 4 - Bulk Operations
+✓ Backfill Migration Integration
+✓ Self-Healing Orphaned Records Cleanup
 
-BEFORE STARTING:
+BEFORE STARTING NEW WORK:
 - Confirm you've read .cursorrules and understand operational rules
-- Confirm you've read DEVELOPMENT.md and understand current state
-- Ask if I want to proceed with Phase 4 or if there are other priorities
+- Confirm you've read DEVELOPMENT.md for complete project history
+- Ask what the next development priority is
 ```
 
 ---
@@ -41,9 +42,9 @@ BEFORE STARTING:
 
 ### Branch Information
 - **Branch:** file-explorer
-- **Ahead of origin:** 6 commits
+- **Ahead of origin:** 10 commits
 - **Uncommitted changes:** None
-- **Last commit:** docs: Update DEVELOPMENT.md with Phase 3 completion and bugfix details (41857325)
+- **Last commit:** feat: Implement self-healing orphaned FileRecord cleanup (41e39f00)
 
 ### Work Completed (v0.3.0)
 
@@ -67,11 +68,25 @@ BEFORE STARTING:
 - PATCH /api/file-storage/:id for renaming files
 - Added 6 integration tests (27 total)
 
-#### Bugfix — Pagination Issue ✓
-- Fixed pagination bug where in-memory filtering broke page counts
-- Created `CleanupOrphanedFileRecordsTask` to remove orphaned FileRecords
-- Updated pagination test to be more lenient (1-2 files per page)
-- All 27 tests passing
+#### Phase 4 — Bulk Operations ✓
+- POST /api/file-storage/bulk/delete - Delete multiple files with partial failure handling
+- POST /api/file-storage/bulk/analyze - Re-analyze multiple files with partial failure handling
+- Added 14 integration tests (41 total)
+- Error handling continues processing on individual failures
+
+#### Backfill Migration Integration ✓
+- Integrated BackfillFileRecordsTask as TypeORM migration (1773529194000-BackfillFileRecords.ts)
+- Runs automatically during deployment, idempotent
+- Enhanced task with statistics return and quiet mode
+- Added 5 migration tests (all passing)
+
+#### Self-Healing Orphaned Records Cleanup ✓
+- Enhanced listAllFiles() with automatic orphaned record detection and deletion
+- Pre-scans ALL FileRecords (across all pages) for missing physical files
+- Batch deletes with single SQL query, recalculates pagination counts
+- Skips directory records (type='dir') - they're virtual
+- Removed CleanupOrphanedFileRecordsTask (replaced by inline cleanup)
+- Added 3 orphan cleanup tests
 
 ### Deferred Items
 
@@ -79,42 +94,6 @@ BEFORE STARTING:
 - **Reason:** Permission management out of scope for current effort
 - **Documentation:** `docs/features/file-storage-permissions-deferred.md`
 - **Estimated Effort:** 6-10 hours
-- **Details:**
-  - Add PERMS.FileStorage.* constants
-  - Add @before(permission()) middleware to all endpoints
-  - Write 28+ permission tests (ADMIN/OPERATOR/GUEST/unauthenticated)
-  - Follow PrinterFilesController pattern
-
-### Next Work (v0.3.0 Phase 4)
-
-#### Bulk Operations
-**Deliverables:**
-1. **POST /api/file-storage/bulk/delete**
-   - Body: `{ "fileIds": ["id1", "id2", "id3"] }`
-   - Response: `{ "deleted": 3, "failed": 0, "errors": [] }`
-   - Handle partial failures gracefully
-
-2. **POST /api/file-storage/bulk/analyze**
-   - Body: `{ "fileIds": ["id1", "id2", "id3"] }`
-   - Response: `{ "analyzed": 3, "failed": 0, "errors": [] }`
-   - Re-analyze file metadata and thumbnails
-
-3. **Integration Tests (8+ tests)**
-   - Bulk delete: success, partial failure, validation errors
-   - Bulk analyze: success, partial failure, validation errors
-   - Edge cases: empty array, non-existent IDs, large batches
-
-4. **Error Handling**
-   - Continue processing on individual failures
-   - Return detailed error information per file
-   - Maintain transaction consistency for FileRecord cleanup
-
-**Implementation Notes:**
-- Follow existing pattern in FileStorageController
-- Use FileStorageService methods (deleteFile, analyzeFile)
-- Consider rate limiting or batch size caps (max 100?)
-- Ensure FileRecord cleanup happens for bulk deletes
-- Follow Rule 7: ≥80% test coverage, realistic assertions
 
 ---
 
@@ -158,11 +137,15 @@ BEFORE STARTING:
 ## Git History (Recent Commits)
 
 ```
+41e39f00 feat: Implement self-healing orphaned FileRecord cleanup
+b434e9b0 feat: Integrate BackfillFileRecordsTask as migration
+6e28998a docs: Remove deferred features from roadmap
+abc1e0c5 feat(v0.3.0): Complete Phase 4 - Bulk Operations
 41857325 docs: Update DEVELOPMENT.md with Phase 3 completion and bugfix details
 89f8965a fix: Resolve pagination bug in listAllFiles and add orphaned record cleanup
 a02624c9 docs: Defer permission-based access control from v0.3.0 Phase 4
 1505e59e feat: Complete File Management CRUD API (v0.3.0) - Phases 1-3
-5e9bdaa5 feat: Close v0.1.0 Phase 1 - FileRecord entity and CRUD operations
+5b384418 feat(v0.1.0): Add FileRecord entity and CRUD operations
 643ee780 Setup AI management
 ```
 
@@ -170,10 +153,10 @@ a02624c9 docs: Defer permission-based access control from v0.3.0 Phase 4
 
 ## Test Status
 
-**Total Tests:** 46 (27 integration + 19 unit)
+**Total Tests:** 63 (41 integration + 22 unit)
 **Status:** All passing ✓
 
-### Integration Tests (27)
+### Integration Tests (41)
 - GET /api/file-storage - List files (2 tests)
 - GET /api/file-storage/:id - Get metadata (2 tests)
 - POST /api/file-storage/upload - Upload (5 tests)
@@ -184,12 +167,19 @@ a02624c9 docs: Defer permission-based access control from v0.3.0 Phase 4
 - FileRecord integration (5 tests)
 - Pagination/filtering (3 tests)
 - PATCH metadata (3 tests)
+- Bulk operations (14 tests)
 
-### Unit Tests (19)
+### Unit Tests (22)
 - FileRecord CRUD operations
 - Root directory seed validation
 - Conflict detection and error handling
+- Orphaned record cleanup (3 tests)
 - 100% coverage of FileStorageService CRUD methods
+
+### Migration Tests (5)
+- BackfillFileRecords migration integration
+- Idempotency validation
+- Statistics tracking
 
 ---
 
@@ -226,7 +216,7 @@ CREATE INDEX "IDX_file_record_fileGuid" ON "file_record" ("fileGuid");
 - `POST /api/file-storage/:id/analyze` - Re-analyze file
 - `GET /api/file-storage/:id/thumbnail/:index` - Get thumbnail
 
-### To Be Implemented (Phase 4)
+### Bulk Operations (Phase 4) ✓
 - `POST /api/file-storage/bulk/delete` - Bulk delete files
 - `POST /api/file-storage/bulk/analyze` - Bulk re-analyze files
 
@@ -234,32 +224,36 @@ CREATE INDEX "IDX_file_record_fileGuid" ON "file_record" ("fileGuid");
 
 ## How to Resume Development
 
-### Option 1: Continue with Phase 4 (Recommended)
+### Option 1: Merge Completed Work (Recommended)
 ```
-I'm ready to continue. Please begin v0.3.0 Phase 4 - Bulk Operations.
-```
-
-### Option 2: Review Current State
-```
-Before starting Phase 4, please review the current implementation:
-1. Show me the FileStorageController endpoints
-2. Explain the current error handling pattern
-3. Review the test structure for integration tests
+Ready to merge v0.3.0 File Management CRUD API to main branch.
+Please help me create a pull request.
 ```
 
-### Option 3: Different Priority
+### Option 2: Start New Feature
 ```
-I want to work on [different task] instead. Can you help me with [description]?
+I want to start a new development effort. Here's what I'm planning:
+[Describe new feature or task]
+```
+
+### Option 3: Review Completed Work
+```
+Before merging, please review:
+1. Summary of all changes in v0.3.0
+2. Test coverage report
+3. Database migration status
 ```
 
 ---
 
 ## Known Issues & Technical Debt
 
-1. **Pagination with Orphaned Records**
-   - Pagination may return fewer items than pageSize if orphaned FileRecords exist
-   - Mitigated by CleanupOrphanedFileRecordsTask (not yet integrated into app bootstrap)
-   - Low priority: orphaned records should be rare given correct file creation/deletion
+**All technical debt items resolved! ✓**
+
+~~1. **Pagination with Orphaned Records**~~ ✓ RESOLVED (2026-03-14)
+   - Self-healing cleanup implemented in listAllFiles()
+   - Automatic detection and deletion of orphaned FileRecords
+   - Batch SQL deletion with accurate pagination count recalculation
 
 ~~2. **Backfill Task Not Integrated**~~ ✓ RESOLVED (2026-03-14)
    - Integrated as TypeORM migration: `1773529194000-BackfillFileRecords.ts`
