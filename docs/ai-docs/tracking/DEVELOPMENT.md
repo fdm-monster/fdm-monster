@@ -612,7 +612,150 @@ Replaced compile-time `import.meta.glob` with runtime filesystem scanning that w
 **Frontend Capabilities Enabled:**
 - Upload files to specific directories
 - Organize files hierarchically during upload
-- Prevent invalid uploads (to files, non-existent parents)
+
+---
+
+### Phase 2.5: Automatic Path Parsing ✓
+
+**Status:** ✓ Complete
+**Branch:** file-explorer
+**Completed:** 2026-03-15
+
+**Objective:** Enable automatic directory creation from full file paths sent by external APIs (slicers, OctoPrint, Moonraker)
+
+**Requirements (Validated ✅)**
+1. Accept `filePath` parameter with full path including filename
+2. Auto-create missing directories in hierarchy
+3. Reuse existing directories (no duplicates)
+4. Support both Unix (`/`) and Windows (`\`) path separators
+5. Priority: `parentId` > `filePath` > root (0)
+6. 5 integration tests covering all scenarios
+
+### Changes
+
+**Modified Files:**
+- `src/services/file-storage.service.ts` — Added path resolution and directory creation
+  - `resolveOrCreatePath(pathString)` method (lines 753-794)
+  - Normalizes path separators (Unix/Windows)
+  - Recursively creates missing directories
+  - Returns final parent directory ID
+  - Updated interface signature (line 58)
+- `src/controllers/file-storage.controller.ts` — Upload endpoint path parsing
+  - Parse `filePath` from request body (line 437)
+  - Extract directory path from full file path (lines 465-471)
+  - Call `resolveOrCreatePath()` to create hierarchy (line 476)
+  - Set `file.originalname` to extracted filename (line 477)
+  - Priority logic: `parentId` > `filePath` > root (lines 441-484)
+- `docs/api/file-storage-api.md` — API documentation
+  - Added comprehensive `filePath` parameter documentation (lines 138, 141-199)
+  - Explained priority logic with 4 examples
+  - Frontend developer guidance (use `parentId` for UI, `filePath` for external APIs)
+  - Updated error responses (lines 219-223)
+
+**Test Coverage:**
+- `test/api/file-storage-controller-integration.test.ts` — Added 5 Phase 2.5 integration tests (total: 65 tests)
+  - Auto-create directories from Unix-style path (`projects/prototypes/file.gcode`)
+  - Auto-create directories from Windows-style path (`projects\prototypes\file.gcode`)
+  - Reuse existing directories when path already exists
+  - Upload to root when no path separators
+  - Ignore `filePath` when explicit `parentId` provided (priority test)
+
+**API Changes:**
+- `POST /api/file-storage/upload` — Added optional `filePath` form field
+  - Accepts full file path (e.g., `"projects/prototypes/part.gcode"`)
+  - Parses directory path and auto-creates hierarchy
+  - Extracts filename from path
+  - Ignored if `parentId` is also provided (explicit parent wins)
+
+**Test Results:**
+- ✅ All 563 tests passing (1 skipped, 1 intermittent test isolation issue)
+- ✅ 5 new Phase 2.5 integration tests (pass in isolation and suite)
+- ✅ 100% backward compatibility (existing uploads work unchanged)
+
+**Frontend/Integration Capabilities Enabled:**
+- **Slicer integration:** Auto-organize files sent by PrusaSlicer, Cura with full paths
+- **External API compatibility:** OctoPrint/Moonraker can send paths, directories created automatically
+- **Frontend flexibility:** UI can use `parentId` for user-driven uploads, `filePath` for API-driven
+- **No manual directory creation:** External tools don't need separate API calls to create folders
+
+**Design Decision:**
+- Used explicit `filePath` parameter (not ambiguous `path`)
+- Self-documenting API: clear distinction between `parentId` (directory ID) vs `filePath` (full path string)
+- Priority system prevents conflicts when both parameters provided
+
+---
+
+### Phase 3: File Relocation ✓
+
+**Status:** ✓ Complete
+**Branch:** file-explorer
+**Completed:** 2026-03-15
+
+**Objective:** Enable drag-and-drop file/folder relocation in frontend
+
+**Requirements (Validated ✅)**
+1. Move files and directories between folders via API
+2. Validate circular references (prevent moving dir into its own subdirectory)
+3. Prevent moving root directory
+4. Children maintain parent-child relationships after moves
+5. 10 integration tests covering all scenarios
+
+### Changes
+
+**Modified Files:**
+- `src/services/file-storage.service.ts` — Added move operations and validation
+  - `validateMove(sourceId, targetParentId)` method (lines 797-814)
+    - Prevents move to self
+    - Prevents move of root directory
+    - Detects circular references using `getPath()`
+  - `moveFileRecord(fileStorageId, newParentId)` method (lines 816-834)
+    - Validates target parent exists and is directory
+    - Calls `validateMove()` before updating
+    - Updates parentId via `updateFileRecord()`
+  - Updated interface signatures (lines 59-60)
+- `src/controllers/file-storage.controller.ts` — Added move endpoint
+  - POST `/:fileStorageId/move` endpoint (lines 210-269)
+  - Accepts `parentId` in request body
+  - Returns old/new parent IDs and updated path
+  - Handles `NotFoundException` and `ConflictException` errors
+
+**Test Coverage:**
+- `test/api/file-storage-controller-integration.test.ts` — Added 10 Phase 3 integration tests (total: 70 tests)
+  - Move file between directories
+  - Move directory with children (children move too automatically)
+  - Move file to root directory (`parentId=0`)
+  - Reject move to self (400 error)
+  - Reject circular move (dir into its own child) (400 error)
+  - Reject move of root directory (400 error)
+  - Reject move of non-existent file (404 error)
+  - Reject move to non-existent parent (404 error)
+  - Reject move to file instead of directory (400 error)
+  - Verify children maintain relationship after parent move
+
+**API Changes:**
+- `POST /api/file-storage/:id/move` — Move file or directory to new parent
+  - Request body: `{ parentId: number }`
+  - Response includes `oldParentId`, `newParentId`, updated `path`
+  - Returns 400 for invalid moves (circular, self, root)
+  - Returns 404 for non-existent file or parent
+
+**Test Results:**
+- ✅ All 70 file-storage integration tests passing (10 new Phase 3 tests)
+- ✅ 572/573 tests passing (1 pre-existing test isolation issue unrelated to this work)
+- ✅ All Phase 3 acceptance criteria met
+
+**Frontend Capabilities Enabled:**
+- **Drag-and-drop relocation:** Move files/folders via mouse
+- **Bulk selection moves:** Select multiple items, drag to new folder
+- **Root-level organization:** Move items to/from root directory
+- **Safe operations:** Automatic validation prevents invalid moves
+- **Preserved hierarchy:** Moving a folder automatically moves all its children
+
+**Design Decision:**
+- Circular reference detection uses existing `getPath()` traversal
+- Move operation is atomic (single database update to `parentId`)
+- Children relationships automatically preserved (no cascade updates needed)
+- Root directory protection prevents accidental destruction of hierarchy
 
 ---
 

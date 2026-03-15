@@ -17,11 +17,16 @@ describe("FileStorageController - Real Integration", () => {
   const testDataDir = path.join(__dirname, "..", "api", "test-data");
   const SIMPLE_GCODE = "G28\nG1 X10 Y10 Z0.2 F1500\nG1 X20 Y20 E0.5\n";
 
-  const uploadFile = (filename: string, content: string) => {
-    return testRequest
+  const uploadFile = (filename: string, content: string, options?: { filePath?: string }) => {
+    const req = testRequest
       .post(`${baseRoute}/upload`)
-      .set("Accept", "application/json")
-      .attach("file", Buffer.from(content), filename);
+      .set("Accept", "application/json");
+
+    if (options?.filePath) {
+      req.field("filePath", options.filePath);
+    }
+
+    return req.attach("file", Buffer.from(content), filename);
   };
 
   beforeAll(async () => {
@@ -878,6 +883,382 @@ describe("FileStorageController - Real Integration", () => {
       expect(fileRecord?.name).toBe("test-verify-parent.gcode");
 
       await fileStorageService.deleteFile(res.body.fileStorageId);
+    });
+  });
+
+  describe("Phase 2.5: Automatic Path Parsing", () => {
+    afterEach(async () => {
+      const records = await fileStorageService["fileRecordRepository"].find({
+        where: [
+          { name: "projects" },
+          { name: "prototypes" },
+          { name: "nested" },
+          { name: "test-path.gcode" },
+          { name: "windows-path.gcode" },
+          { name: "deep-path.gcode" },
+          { name: "simple.gcode" },
+        ],
+      });
+
+      for (const record of records) {
+        try {
+          if (record.type === "gcode") {
+            await fileStorageService.deleteFile(record.fileGuid);
+          } else {
+            await fileStorageService.deleteFileRecord(record.id);
+          }
+        } catch {}
+      }
+    });
+
+    it("should auto-create directories from Unix-style path in filename", async () => {
+      const res = await uploadFile("test-path.gcode", SIMPLE_GCODE, {
+        filePath: "projects/prototypes/test-path.gcode",
+      });
+
+      expectOkResponse(res);
+      expect(res.body.fileName).toBe("test-path.gcode");
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(res.body.fileStorageId);
+      expect(fileRecord).toBeDefined();
+      expect(fileRecord?.name).toBe("test-path.gcode");
+      expect(fileRecord?.parentId).not.toBe(0);
+
+      const parentDir = await fileStorageService.getFileRecordById(fileRecord!.parentId);
+      expect(parentDir).toBeDefined();
+      expect(parentDir?.name).toBe("prototypes");
+      expect(parentDir?.type).toBe("dir");
+
+      const grandparentDir = await fileStorageService.getFileRecordById(parentDir!.parentId);
+      expect(grandparentDir).toBeDefined();
+      expect(grandparentDir?.name).toBe("projects");
+      expect(grandparentDir?.type).toBe("dir");
+      expect(grandparentDir?.parentId).toBe(0);
+
+      await fileStorageService.deleteFile(res.body.fileStorageId);
+    });
+
+    it("should auto-create directories from Windows-style path in filename", async () => {
+      const res = await uploadFile("windows-path.gcode", SIMPLE_GCODE, {
+        filePath: "projects\\prototypes\\windows-path.gcode",
+      });
+
+      expectOkResponse(res);
+      expect(res.body.fileName).toBe("windows-path.gcode");
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(res.body.fileStorageId);
+      expect(fileRecord).toBeDefined();
+      expect(fileRecord?.name).toBe("windows-path.gcode");
+
+      const parentDir = await fileStorageService.getFileRecordById(fileRecord!.parentId);
+      expect(parentDir).toBeDefined();
+      expect(parentDir?.name).toBe("prototypes");
+
+      await fileStorageService.deleteFile(res.body.fileStorageId);
+    });
+
+    it("should reuse existing directories when path already exists", async () => {
+      const firstRes = await uploadFile("test-path.gcode", SIMPLE_GCODE, {
+        filePath: "nested/test-path.gcode",
+      });
+      expectOkResponse(firstRes);
+
+      const firstRecord = await fileStorageService.getFileRecordByGuid(firstRes.body.fileStorageId);
+      const firstParentId = firstRecord!.parentId;
+
+      const secondRes = await uploadFile("deep-path.gcode", SIMPLE_GCODE, {
+        filePath: "nested/deep-path.gcode",
+      });
+      expectOkResponse(secondRes);
+
+      const secondRecord = await fileStorageService.getFileRecordByGuid(secondRes.body.fileStorageId);
+      expect(secondRecord!.parentId).toBe(firstParentId);
+
+      const dirs = await fileStorageService["fileRecordRepository"].find({
+        where: { name: "nested", type: "dir" },
+      });
+      expect(dirs.length).toBe(1);
+
+      await fileStorageService.deleteFile(firstRes.body.fileStorageId);
+      await fileStorageService.deleteFile(secondRes.body.fileStorageId);
+    });
+
+    it("should upload to root when filename has no path separators", async () => {
+      const res = await uploadFile("simple.gcode", SIMPLE_GCODE);
+
+      expectOkResponse(res);
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(res.body.fileStorageId);
+      expect(fileRecord).toBeDefined();
+      expect(fileRecord?.parentId).toBe(0);
+      expect(fileRecord?.name).toBe("simple.gcode");
+
+      await fileStorageService.deleteFile(res.body.fileStorageId);
+    });
+
+    it("should ignore path parsing when explicit parentId is provided", async () => {
+      const testDir = await fileStorageService.createFileRecord({
+        parentId: 0,
+        type: "dir",
+        name: "explicit-parent",
+        fileGuid: crypto.randomUUID(),
+        metadata: null,
+      });
+
+      const res = await testRequest
+        .post(`${baseRoute}/upload`)
+        .set("Accept", "application/json")
+        .field("parentId", testDir.id.toString())
+        .field("filePath", "should/ignore/path.gcode")
+        .attach("file", Buffer.from(SIMPLE_GCODE), "path.gcode");
+
+      expectOkResponse(res);
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(res.body.fileStorageId);
+      expect(fileRecord).toBeDefined();
+      expect(fileRecord?.parentId).toBe(testDir.id);
+      expect(fileRecord?.name).toBe("path.gcode");
+
+      const shouldDir = await fileStorageService["fileRecordRepository"].findOne({
+        where: { name: "should", type: "dir" },
+      });
+      expect(shouldDir).toBeNull();
+
+      await fileStorageService.deleteFile(res.body.fileStorageId);
+      await fileStorageService.deleteFileRecord(testDir.id);
+    });
+  });
+
+  describe("Phase 3: File Relocation", () => {
+    let sourceDir: FileRecord;
+    let targetDir: FileRecord;
+    let testFile: string;
+
+    beforeEach(async () => {
+      sourceDir = await fileStorageService.createFileRecord({
+        parentId: 0,
+        type: "dir",
+        name: "source-folder",
+        fileGuid: crypto.randomUUID(),
+        metadata: null,
+      });
+
+      targetDir = await fileStorageService.createFileRecord({
+        parentId: 0,
+        type: "dir",
+        name: "target-folder",
+        fileGuid: crypto.randomUUID(),
+        metadata: null,
+      });
+    });
+
+    afterEach(async () => {
+      try {
+        if (testFile) {
+          await fileStorageService.deleteFile(testFile);
+        }
+      } catch {}
+
+      try {
+        await fileStorageService.deleteFileRecord(sourceDir.id);
+      } catch {}
+
+      try {
+        await fileStorageService.deleteFileRecord(targetDir.id);
+      } catch {}
+    });
+
+    it("should move file between directories", async () => {
+      const uploadRes = await uploadFile("movable.gcode", SIMPLE_GCODE, { filePath: "source-folder/movable.gcode" });
+      expectOkResponse(uploadRes);
+      testFile = uploadRes.body.fileStorageId;
+
+      const moveRes = await testRequest
+        .post(`${baseRoute}/${testFile}/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: targetDir.id });
+
+      expectOkResponse(moveRes);
+      expect(moveRes.body.message).toBe("File moved successfully");
+      expect(moveRes.body.oldParentId).toBe(sourceDir.id);
+      expect(moveRes.body.newParentId).toBe(targetDir.id);
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(testFile);
+      expect(fileRecord?.parentId).toBe(targetDir.id);
+    });
+
+    it("should move directory with children (children move too)", async () => {
+      const childDir = await fileStorageService.createFileRecord({
+        parentId: sourceDir.id,
+        type: "dir",
+        name: "child-dir",
+        fileGuid: crypto.randomUUID(),
+        metadata: null,
+      });
+
+      const uploadRes = await uploadFile("nested.gcode", SIMPLE_GCODE);
+      expectOkResponse(uploadRes);
+      testFile = uploadRes.body.fileStorageId;
+
+      await fileStorageService.updateFileRecord((await fileStorageService.getFileRecordByGuid(testFile))!.id, {
+        parentId: childDir.id,
+      });
+
+      const sourceDirRecord = await fileStorageService.getFileRecordById(sourceDir.id);
+      const moveRes = await testRequest
+        .post(`${baseRoute}/${sourceDirRecord!.fileGuid}/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: targetDir.id });
+
+      expectOkResponse(moveRes);
+
+      const movedSourceDir = await fileStorageService.getFileRecordById(sourceDir.id);
+      expect(movedSourceDir?.parentId).toBe(targetDir.id);
+
+      const childAfterMove = await fileStorageService.getFileRecordById(childDir.id);
+      expect(childAfterMove?.parentId).toBe(sourceDir.id);
+
+      await fileStorageService.deleteFileRecord(childDir.id);
+    });
+
+    it("should move file to root directory (parentId=0)", async () => {
+      const uploadRes = await uploadFile("to-root.gcode", SIMPLE_GCODE, { filePath: "source-folder/to-root.gcode" });
+      expectOkResponse(uploadRes);
+      testFile = uploadRes.body.fileStorageId;
+
+      const moveRes = await testRequest
+        .post(`${baseRoute}/${testFile}/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: 0 });
+
+      expectOkResponse(moveRes);
+      expect(moveRes.body.newParentId).toBe(0);
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(testFile);
+      expect(fileRecord?.parentId).toBe(0);
+    });
+
+    it("should reject move to self (400 error)", async () => {
+      const sourceDirRecord = await fileStorageService.getFileRecordById(sourceDir.id);
+      const moveRes = await testRequest
+        .post(`${baseRoute}/${sourceDirRecord!.fileGuid}/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: sourceDir.id });
+
+      expect(moveRes.statusCode).toBe(400);
+      expect(moveRes.body.error).toContain("Cannot move item into itself");
+    });
+
+    it("should reject circular move (dir into its own child) (400 error)", async () => {
+      const childDir = await fileStorageService.createFileRecord({
+        parentId: sourceDir.id,
+        type: "dir",
+        name: "child-circular",
+        fileGuid: crypto.randomUUID(),
+        metadata: null,
+      });
+
+      const sourceDirRecord = await fileStorageService.getFileRecordById(sourceDir.id);
+      const moveRes = await testRequest
+        .post(`${baseRoute}/${sourceDirRecord!.fileGuid}/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: childDir.id });
+
+      expect(moveRes.statusCode).toBe(400);
+      expect(moveRes.body.error).toContain("circular reference");
+
+      await fileStorageService.deleteFileRecord(childDir.id);
+    });
+
+    it("should reject move of root directory (400 error)", async () => {
+      const rootRecord = await fileStorageService.getFileRecordById(0);
+      const moveRes = await testRequest
+        .post(`${baseRoute}/${rootRecord!.fileGuid}/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: targetDir.id });
+
+      expect(moveRes.statusCode).toBe(400);
+      expect(moveRes.body.error).toContain("Cannot move root directory");
+    });
+
+    it("should reject move of non-existent file (404 error)", async () => {
+      const moveRes = await testRequest
+        .post(`${baseRoute}/non-existent-file-id/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: targetDir.id });
+
+      expect(moveRes.statusCode).toBe(404);
+      expect(moveRes.body.error).toContain("not found");
+    });
+
+    it("should reject move to non-existent parent (404 error)", async () => {
+      const uploadRes = await uploadFile("orphan.gcode", SIMPLE_GCODE);
+      expectOkResponse(uploadRes);
+      testFile = uploadRes.body.fileStorageId;
+
+      const moveRes = await testRequest
+        .post(`${baseRoute}/${testFile}/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: 99999 });
+
+      expect(moveRes.statusCode).toBe(404);
+      expect(moveRes.body.error).toContain("not found");
+    });
+
+    it("should reject move to file instead of directory (400 error)", async () => {
+      const uploadRes1 = await uploadFile("target-file.gcode", SIMPLE_GCODE);
+      expectOkResponse(uploadRes1);
+      const targetFileId = uploadRes1.body.fileStorageId;
+
+      const uploadRes2 = await uploadFile("source-file.gcode", SIMPLE_GCODE);
+      expectOkResponse(uploadRes2);
+      testFile = uploadRes2.body.fileStorageId;
+
+      const targetFileRecord = await fileStorageService.getFileRecordByGuid(targetFileId);
+
+      const moveRes = await testRequest
+        .post(`${baseRoute}/${testFile}/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: targetFileRecord!.id });
+
+      expect(moveRes.statusCode).toBe(400);
+      expect(moveRes.body.error).toContain("not a directory");
+
+      await fileStorageService.deleteFile(targetFileId);
+    });
+
+    it("should verify children maintain relationship after parent move", async () => {
+      const childDir = await fileStorageService.createFileRecord({
+        parentId: sourceDir.id,
+        type: "dir",
+        name: "child-maintain",
+        fileGuid: crypto.randomUUID(),
+        metadata: null,
+      });
+
+      const uploadRes = await uploadFile("child-file.gcode", SIMPLE_GCODE);
+      expectOkResponse(uploadRes);
+      testFile = uploadRes.body.fileStorageId;
+
+      await fileStorageService.updateFileRecord((await fileStorageService.getFileRecordByGuid(testFile))!.id, {
+        parentId: childDir.id,
+      });
+
+      const sourceDirRecord = await fileStorageService.getFileRecordById(sourceDir.id);
+      const moveRes = await testRequest
+        .post(`${baseRoute}/${sourceDirRecord!.fileGuid}/move`)
+        .set("Accept", "application/json")
+        .send({ parentId: targetDir.id });
+
+      expectOkResponse(moveRes);
+
+      const childAfterMove = await fileStorageService.getFileRecordById(childDir.id);
+      expect(childAfterMove?.parentId).toBe(sourceDir.id);
+
+      const fileAfterMove = await fileStorageService.getFileRecordByGuid(testFile);
+      expect(fileAfterMove?.parentId).toBe(childDir.id);
+
+      await fileStorageService.deleteFileRecord(childDir.id);
     });
   });
 });

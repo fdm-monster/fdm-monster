@@ -128,22 +128,75 @@ Retrieve metadata for a specific stored file.
 
 **\`POST /api/file-storage/upload\`** or **\`POST /api/file-storage\`**
 
-Upload and analyze a new file.
+Upload and analyze a new file with optional directory placement.
 
 **Request:**
 - Content-Type: \`multipart/form-data\`
 - Fields:
   - \`file\` (required): File to upload (\`.gcode\`, \`.bgcode\`, \`.3mf\`)
-  - \`parentId\` (optional): **NEW (v0.4.0 Phase 2)** Target directory ID (default: 0 = root)
+  - \`parentId\` (optional): **NEW (v0.4.0 Phase 2)** Target directory ID (numeric)
+  - \`filePath\` (optional): **NEW (v0.4.0 Phase 2.5)** Full file path for auto-creating directory hierarchy (string)
   - \`startPrint\` (optional): Start print immediately (true/false)
 
-**Example:**
+**Directory Placement Priority:**
+1. **\`parentId\`** (highest priority) - If provided, file is placed in specified directory ID
+2. **\`filePath\`** - If provided (and no \`parentId\`), path is parsed and directories auto-created
+3. **Root directory** (default) - If neither provided, file is placed in root (ID=0)
+
+**\`filePath\` Parameter Usage:**
+
+The \`filePath\` parameter enables automatic directory creation from external APIs (OctoPrint, Moonraker, slicers) that send full file paths. When provided:
+- Parses directory path from full file path
+- Auto-creates missing directories in hierarchy
+- Reuses existing directories (no duplicates)
+- Supports both Unix (\`/\`) and Windows (\`\\\`) path separators
+- Extracts filename and stores in correct parent directory
+
+**Frontend Developer Notes:**
+- **Use \`parentId\` for UI-driven uploads** - When user selects target folder from tree view
+- **Use \`filePath\` for external integrations** - When receiving full paths from external APIs
+- **Don't use both** - \`parentId\` takes precedence; \`filePath\` is ignored if \`parentId\` is set
+
+**Examples:**
+
+**Example 1: Upload to specific directory (UI-driven)**
 \`\`\`bash
 curl -X POST http://localhost:3000/api/file-storage/upload \\
   -H "Authorization: Bearer YOUR_TOKEN" \\
   -F "file=@model.gcode" \\
-  -F "parentId=5"
+  -F "parentId=5"  # User selected "Projects" folder (ID=5)
 \`\`\`
+Result: File stored in directory ID=5
+
+**Example 2: Auto-create directory hierarchy (external API)**
+\`\`\`bash
+curl -X POST http://localhost:3000/api/file-storage/upload \\
+  -H "Authorization: Bearer YOUR_TOKEN" \\
+  -F "file=@model.gcode" \\
+  -F "filePath=projects/prototypes/part.gcode"  # Full path from slicer
+\`\`\`
+Result:
+- Creates directory "projects" (if missing)
+- Creates directory "prototypes" under "projects" (if missing)
+- Stores "part.gcode" in "projects/prototypes"
+
+**Example 3: Priority demonstration (parentId wins)**
+\`\`\`bash
+curl -X POST http://localhost:3000/api/file-storage/upload \\
+  -H "Authorization: Bearer YOUR_TOKEN" \\
+  -F "file=@model.gcode" \\
+  -F "parentId=8" \\
+  -F "filePath=ignored/path.gcode"  # This is ignored!
+\`\`\`
+Result: File stored in directory ID=8, no directories created from filePath
+
+**Example 4: Upload to root (default)**
+\`\`\`bash
+curl -X POST http://localhost:3000/api/file-storage/upload \\
+  -H "Authorization: Bearer YOUR_TOKEN" \\
+  -F "file=@model.gcode"  # No parentId or filePath
+\`\`\`
+Result: File stored in root directory (ID=0)
 
 **Response (200 OK):**
 \`\`\`json
@@ -163,13 +216,14 @@ curl -X POST http://localhost:3000/api/file-storage/upload \\
 \`\`\`
 
 **Errors:**
-- \`400 Bad Request\` — No file, invalid format, file too large, invalid parentId, or parent is not a directory
-- \`404 Not Found\` — Parent directory not found
+- \`400 Bad Request\` — No file, invalid format, file too large, invalid parentId, parent is not a directory, or failed to resolve filePath
+- \`404 Not Found\` — Parent directory (from parentId) not found
 - \`409 Conflict\` — File already exists (same name)
+- \`500 Internal Server Error\` — Failed to create directories from filePath
 - \`401 Unauthorized\`, \`403 Forbidden\` — Authentication/authorization
 
 **Backward Compatibility:**
-- Omitting \`parentId\` defaults to root directory (0)
+- Omitting both \`parentId\` and \`filePath\` defaults to root directory (0)
 - Existing upload workflows continue to work unchanged
 
 ---

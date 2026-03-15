@@ -55,6 +55,9 @@ export interface IFileStorageService {
   deleteFileRecord(id: number): Promise<void>;
   getPath(fileRecordId: number): Promise<FileRecord[]>;
   validateParentDirectory(parentId: number): Promise<void>;
+  resolveOrCreatePath(pathString: string): Promise<number>;
+  moveFileRecord(fileStorageId: string, newParentId: number): Promise<FileRecord>;
+  validateMove(sourceId: number, targetParentId: number): Promise<void>;
 }
 
 export class FileStorageService implements IFileStorageService {
@@ -747,5 +750,86 @@ export class FileStorageService implements IFileStorageService {
     if (parent.type !== "dir") {
       throw new ConflictException(`Parent ${parentId} is not a directory (type: ${parent.type})`);
     }
+  }
+
+  async resolveOrCreatePath(pathString: string): Promise<number> {
+    if (!pathString || pathString === "/" || pathString === ".") {
+      return 0;
+    }
+
+    const normalizedPath = pathString.replace(/\\/g, "/").replace(/^\/+/, "").replace(/\/+$/, "");
+
+    if (!normalizedPath) {
+      return 0;
+    }
+
+    const segments = normalizedPath.split("/").filter((s) => s.length > 0);
+
+    let currentParentId = 0;
+
+    for (const segment of segments) {
+      const existing = await this.fileRecordRepository.findOne({
+        where: {
+          parentId: currentParentId,
+          name: segment,
+          type: "dir",
+        },
+      });
+
+      if (existing) {
+        currentParentId = existing.id;
+      } else {
+        const newDir = await this.createFileRecord({
+          name: segment,
+          type: "dir",
+          parentId: currentParentId,
+          fileGuid: this.getDeterministicId(segment, `dir-${Date.now()}`),
+        });
+
+        this.logger.log(`Auto-created directory: ${segment} (id: ${newDir.id}, parent: ${currentParentId})`);
+        currentParentId = newDir.id;
+      }
+    }
+
+    return currentParentId;
+  }
+
+  async validateMove(sourceId: number, targetParentId: number): Promise<void> {
+    if (sourceId === targetParentId) {
+      throw new ConflictException("Cannot move item into itself");
+    }
+
+    if (sourceId === 0) {
+      throw new ConflictException("Cannot move root directory");
+    }
+
+    if (targetParentId !== 0) {
+      const targetPath = await this.getPath(targetParentId);
+      const isDescendant = targetPath.some((record) => record.id === sourceId);
+
+      if (isDescendant) {
+        throw new ConflictException("Cannot move directory into its own subdirectory (circular reference)");
+      }
+    }
+  }
+
+  async moveFileRecord(fileStorageId: string, newParentId: number): Promise<FileRecord> {
+    const fileRecord = await this.getFileRecordByGuid(fileStorageId);
+
+    if (!fileRecord) {
+      throw new NotFoundException(`File ${fileStorageId} not found`);
+    }
+
+    if (newParentId !== 0) {
+      await this.validateParentDirectory(newParentId);
+    }
+
+    await this.validateMove(fileRecord.id, newParentId);
+
+    const updatedRecord = await this.updateFileRecord(fileRecord.id, { parentId: newParentId });
+
+    this.logger.log(`Moved ${fileRecord.name} (id: ${fileRecord.id}) from parent ${fileRecord.parentId} to ${newParentId}`);
+
+    return updatedRecord;
   }
 }

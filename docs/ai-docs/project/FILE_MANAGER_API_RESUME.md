@@ -4,7 +4,7 @@
 **Last Updated:** 2026-03-15
 **Branch:** file-explorer
 **Current Effort:** v0.4.0 Frontend File Manager API Support
-**Current Phase:** Phase 2 Complete - Ready to Start Phase 3
+**Current Phase:** Phase 2.5 In Progress - Automatic Path Parsing (95% complete)
 
 ---
 
@@ -40,7 +40,26 @@ PHASE 2 COMPLETED (2026-03-15):
 ✓ All 558 tests passing
 ✓ Backward compatible (no parentId = root)
 
-NEXT TASK: Start Phase 3 - File Relocation
+PHASE 2.5 IN PROGRESS (2026-03-15):
+✓ resolveOrCreatePath() service method implemented
+✓ Controller updated to accept filePath form field
+✓ 5 integration tests written
+⚠ Tests 60% updated (need to fix last test + remove debug logs)
+⚠ Need to run full test suite to verify
+
+CURRENT ISSUE DISCOVERED:
+- Multer strips directory paths from filenames in multipart uploads
+- SOLUTION: Accept path via separate `filePath` form field
+- External APIs (OctoPrint, Moonraker) can send: `filePath: "projects/prototypes/file.gcode"`
+- Frontend can send: `filePath: "projects/prototypes/file.gcode"` + filename: "file.gcode"
+
+NEXT IMMEDIATE STEPS:
+1. Update last test (should ignore path parsing when explicit parentId provided)
+2. Remove debug console.log statements from controller
+3. Run full test suite (npm test -- file-storage-controller-integration.test.ts)
+4. If passing, run all tests (npm test)
+5. Update DEVELOPMENT.md with Phase 2.5 completion
+6. Then proceed to Phase 3 - File Relocation
 ```
 
 ---
@@ -156,11 +175,68 @@ Enable frontend file manager to support:
 
 **Status:** ✅ Complete (2026-03-15)
 
-**Goal:** Enable frontend to upload files directly to specific folders.
+---
+
+### Phase 2.5: Automatic Path Parsing from External APIs (Priority 1)
+
+**Status:** ⚠️ In Progress (2026-03-15) - 95% Complete
+
+**Goal:** Enable automatic directory creation when external APIs send file paths instead of just filenames.
+
+**Background:**
+- User reported missing use case: external APIs (OctoPrint, Moonraker) may send full file paths
+- Multer strips directory info from filename in multipart uploads
+- Solution: Accept optional `filePath` form field for path information
 
 **Tasks:**
 
-1. **Add `parentId` parameter to `POST /api/v2/file-storage/upload`**
+1. **Add `resolveOrCreatePath(pathString)` service method** ✅
+   - File: `src/services/file-storage.service.ts`
+   - Parses path string (Unix or Windows style)
+   - Recursively creates missing directories
+   - Reuses existing directories
+   - Returns final parent directory ID
+
+2. **Modify `POST /api/v2/file-storage/upload` to accept `filePath` field** ✅
+   - File: `src/controllers/file-storage.controller.ts`
+   - New optional field: `filePath` (multipart form data)
+   - Priority: `parentId` > `filePath` > root
+   - If `filePath` provided, parse directory path and create as needed
+   - Extract filename from path
+
+3. **Integration Tests** ⚠️ (4/5 complete)
+   - File: `test/api/file-storage-controller-integration.test.ts`
+   - ✅ Unix-style path (`projects/prototypes/file.gcode`)
+   - ✅ Windows-style path (`projects\prototypes\file.gcode`)
+   - ✅ Reuse existing directories
+   - ✅ Upload to root when no path
+   - ⚠️ Ignore filePath when parentId provided (needs update)
+
+**Remaining Work:**
+1. Update last test case (explicit parentId ignores filePath)
+2. Remove debug console.log statements
+3. Verify all 5 tests pass
+4. Run full test suite
+
+**Acceptance Criteria:**
+- ✅ `filePath` field auto-creates directory hierarchy
+- ✅ Both Unix (`/`) and Windows (`\`) separators supported
+- ✅ Existing directories reused (no duplicates)
+- ⚠️ `parentId` takes precedence over `filePath`
+- ⚠️ 5 integration tests passing
+- ⚠️ ≥80% code coverage
+
+**Estimated Effort:** 2-3 hours (1.5 hours spent)
+
+---
+
+### Phase 2 (Original): File Upload to Directories
+
+**Status:** ✅ Complete (2026-03-15)
+
+**Tasks:**
+
+1. **Add `parentId` parameter to `POST /api/v2/file-storage/upload`** ✅
    - File: `src/controllers/file-storage.controller.ts`
    - Method: `uploadFile(req, res)`
    - Changes:
