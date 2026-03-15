@@ -328,7 +328,7 @@ __metadata:
     "@types/node": "npm:24.10.13"
     "@types/ws": "npm:8.18.1"
     axios: "npm:1.13.6"
-    better-sqlite3: "npm:12.6.2"
+    better-sqlite3: "npm:12.8.0"
     chalk: "npm:5.6.2"
     dotenv: "npm:17.3.1"
     express: "npm:4.22.1"
@@ -3129,17 +3129,6 @@ __metadata:
   version: 4.0.0
   resolution: "before-after-hook@npm:4.0.0"
   checksum: 10c0/9f8ae8d1b06142bcfb9ef6625226b5e50348bb11210f266660eddcf9734e0db6f9afc4cb48397ee3f5ac0a3728f3ae401cdeea88413f7bed748a71db84657be2
-  languageName: node
-  linkType: hard
-
-"better-sqlite3@npm:12.6.2":
-  version: 12.6.2
-  resolution: "better-sqlite3@npm:12.6.2"
-  dependencies:
-    bindings: "npm:^1.5.0"
-    node-gyp: "npm:latest"
-    prebuild-install: "npm:^7.1.1"
-  checksum: 10c0/a58fb3f7a7f5469ba0b8de0855aa67396ff34f951a6975746e4b21987f530be6a34427d1d4bd5958cf48c67ed7ba1df038ae163d2ee9d944237f6b8112f6640d
   languageName: node
   linkType: hard
 
