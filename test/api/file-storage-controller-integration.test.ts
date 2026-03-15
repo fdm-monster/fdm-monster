@@ -7,6 +7,7 @@ import TestAgent from "supertest/lib/agent";
 import { Test } from "supertest";
 import path from "node:path";
 import { existsSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import crypto from "node:crypto";
 
 describe("FileStorageController - Real Integration", () => {
   let testRequest: TestAgent<Test>;
@@ -759,6 +760,124 @@ describe("FileStorageController - Real Integration", () => {
 
         await fileStorageService.deleteFileRecord(subdir.id);
       });
+    });
+  });
+
+  describe("Phase 2: Upload to Directory", () => {
+    let testDirectory: any;
+
+    beforeEach(async () => {
+      testDirectory = await fileStorageService.createFileRecord({
+        parentId: 0,
+        type: "dir",
+        name: "test-uploads",
+        fileGuid: crypto.randomUUID(),
+        metadata: null,
+      });
+    });
+
+    afterEach(async () => {
+      if (testDirectory) {
+        await fileStorageService.deleteFileRecord(testDirectory.id);
+      }
+    });
+
+    it("should upload to root (no parentId provided) - backward compatible", async () => {
+      const res = await uploadFile("test-root-default.gcode", SIMPLE_GCODE);
+
+      expectOkResponse(res);
+      expect(res.body.fileStorageId).toBeDefined();
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(res.body.fileStorageId);
+      expect(fileRecord).toBeDefined();
+      expect(fileRecord?.parentId).toBe(0);
+
+      await fileStorageService.deleteFile(res.body.fileStorageId);
+    });
+
+    it("should upload to root (parentId=0 explicit)", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/upload`)
+        .set("Accept", "application/json")
+        .field("parentId", "0")
+        .attach("file", Buffer.from(SIMPLE_GCODE), "test-root-explicit.gcode");
+
+      expectOkResponse(res);
+      expect(res.body.fileStorageId).toBeDefined();
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(res.body.fileStorageId);
+      expect(fileRecord).toBeDefined();
+      expect(fileRecord?.parentId).toBe(0);
+
+      await fileStorageService.deleteFile(res.body.fileStorageId);
+    });
+
+    it("should upload to existing subdirectory", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/upload`)
+        .set("Accept", "application/json")
+        .field("parentId", testDirectory.id.toString())
+        .attach("file", Buffer.from(SIMPLE_GCODE), "test-subdir.gcode");
+
+      expectOkResponse(res);
+      expect(res.body.fileStorageId).toBeDefined();
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(res.body.fileStorageId);
+      expect(fileRecord).toBeDefined();
+      expect(fileRecord?.parentId).toBe(testDirectory.id);
+      expect(fileRecord?.name).toBe("test-subdir.gcode");
+
+      await fileStorageService.deleteFile(res.body.fileStorageId);
+    });
+
+    it("should reject upload to non-existent directory (404 error)", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/upload`)
+        .set("Accept", "application/json")
+        .field("parentId", "99999")
+        .attach("file", Buffer.from(SIMPLE_GCODE), "test-invalid.gcode");
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toContain("not found");
+    });
+
+    it("should reject upload to file instead of directory (400 error)", async () => {
+      const fileRes = await uploadFile("test-file-parent.gcode", SIMPLE_GCODE);
+      expectOkResponse(fileRes);
+
+      const fileRecord = await fileStorageService.getFileRecordByGuid(fileRes.body.fileStorageId);
+
+      const res = await testRequest
+        .post(`${baseRoute}/upload`)
+        .set("Accept", "application/json")
+        .field("parentId", fileRecord?.id.toString())
+        .attach("file", Buffer.from(SIMPLE_GCODE), "test-to-file.gcode");
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain("not a directory");
+
+      await fileStorageService.deleteFile(fileRes.body.fileStorageId);
+    });
+
+    it("should verify uploaded file has correct parentId in database", async () => {
+      const res = await testRequest
+        .post(`${baseRoute}/upload`)
+        .set("Accept", "application/json")
+        .field("parentId", testDirectory.id.toString())
+        .attach("file", Buffer.from(SIMPLE_GCODE), "test-verify-parent.gcode");
+
+      expectOkResponse(res);
+
+      const fileRecord = await fileStorageService["fileRecordRepository"].findOne({
+        where: { fileGuid: res.body.fileStorageId },
+      });
+
+      expect(fileRecord).toBeDefined();
+      expect(fileRecord?.parentId).toBe(testDirectory.id);
+      expect(fileRecord?.type).toBe("gcode");
+      expect(fileRecord?.name).toBe("test-verify-parent.gcode");
+
+      await fileStorageService.deleteFile(res.body.fileStorageId);
     });
   });
 });

@@ -2,7 +2,7 @@
 
 **Status:** Draft
 **Version:** 2.0 (v0.4.0 enhancements)
-**Last Updated:** 2026-03-14
+**Last Updated:** 2026-03-15
 
 ## Overview
 
@@ -134,8 +134,16 @@ Upload and analyze a new file.
 - Content-Type: \`multipart/form-data\`
 - Fields:
   - \`file\` (required): File to upload (\`.gcode\`, \`.bgcode\`, \`.3mf\`)
-  - \`parentId\` (optional): **NEW (v0.4.0)** Target directory ID (default: 0 = root)
+  - \`parentId\` (optional): **NEW (v0.4.0 Phase 2)** Target directory ID (default: 0 = root)
   - \`startPrint\` (optional): Start print immediately (true/false)
+
+**Example:**
+\`\`\`bash
+curl -X POST http://localhost:3000/api/file-storage/upload \\
+  -H "Authorization: Bearer YOUR_TOKEN" \\
+  -F "file=@model.gcode" \\
+  -F "parentId=5"
+\`\`\`
 
 **Response (200 OK):**
 \`\`\`json
@@ -155,9 +163,14 @@ Upload and analyze a new file.
 \`\`\`
 
 **Errors:**
-- \`400 Bad Request\` — No file, invalid format, file too large
+- \`400 Bad Request\` — No file, invalid format, file too large, invalid parentId, or parent is not a directory
+- \`404 Not Found\` — Parent directory not found
 - \`409 Conflict\` — File already exists (same name)
 - \`401 Unauthorized\`, \`403 Forbidden\` — Authentication/authorization
+
+**Backward Compatibility:**
+- Omitting \`parentId\` defaults to root directory (0)
+- Existing upload workflows continue to work unchanged
 
 ---
 

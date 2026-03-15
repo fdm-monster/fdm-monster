@@ -8,7 +8,7 @@ import { MulterService } from "@/services/core/multer.service";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { FileAnalysisService } from "@/services/file-analysis.service";
-import { BadRequestException } from "@/exceptions/runtime.exceptions";
+import { BadRequestException, NotFoundException, ConflictException } from "@/exceptions/runtime.exceptions";
 import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { extname } from "node:path";
 
@@ -435,6 +435,30 @@ export class FileStorageController {
     const file = files[0];
     await this.fileStorageService.validateUniqueFilename(file.originalname);
 
+    const parentIdRaw = req.body.parentId;
+    const parentId = parentIdRaw ? Number.parseInt(parentIdRaw, 10) : 0;
+
+    if (Number.isNaN(parentId)) {
+      res.status(400).send({ error: "Invalid parentId - must be a number" });
+      return;
+    }
+
+    if (parentId !== 0) {
+      try {
+        await this.fileStorageService.validateParentDirectory(parentId);
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          res.status(404).send({ error: error.message });
+          return;
+        }
+        if (error instanceof ConflictException) {
+          res.status(400).send({ error: error.message });
+          return;
+        }
+        throw error;
+      }
+    }
+
     const ext = extname(file.originalname);
     const tempPathWithExt = file.path + ext;
 
@@ -446,7 +470,7 @@ export class FileStorageController {
       const analysisResult = await this.fileAnalysisService.analyzeFile(tempPathWithExt);
       const { metadata, thumbnails } = analysisResult;
 
-      const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
+      const fileStorageId = await this.fileStorageService.saveFile(file, fileHash, parentId);
       this.logger.log(`Saved ${file.originalname} as ${fileStorageId}`);
 
       const thumbnailMetadata =

@@ -561,3 +561,58 @@ Replaced compile-time `import.meta.glob` with runtime filesystem scanning that w
 
 ---
 
+### Phase 2: File Upload to Directories ✓
+
+**Status:** ✓ Complete
+**Branch:** file-explorer
+**Completed:** 2026-03-15
+
+**Objective:** Enable frontend to upload files directly to specific folders
+
+**Requirements (Validated ✅)**
+1. Add `parentId` parameter to upload endpoint
+2. Validate parent directory exists and is type `"dir"`
+3. Default to root (0) if omitted (backward compatible)
+4. 6 integration tests covering all scenarios
+
+### Changes
+
+**Modified Files:**
+- `src/services/file-storage.service.ts` — Added directory validation
+  - `validateParentDirectory(parentId)` method (lines 740-750)
+  - Updated `saveFile()` to accept `parentId` parameter (line 113)
+  - Updated interface signature (line 16)
+- `src/controllers/file-storage.controller.ts` — Upload endpoint enhancements
+  - Parse `parentId` from request body (lines 438-444)
+  - Validate parent directory before upload (lines 446-460)
+  - Pass `parentId` to `saveFile()` (line 473)
+  - Added imports for `NotFoundException`, `ConflictException` (line 11)
+
+**Test Coverage:**
+- `test/api/file-storage-controller-integration.test.ts` — Added 6 Phase 2 integration tests (total: 61 tests)
+  - Upload to root (no `parentId`) - backward compatibility
+  - Upload to root (`parentId=0` explicit)
+  - Upload to existing subdirectory
+  - Reject upload to non-existent directory (404)
+  - Reject upload to file instead of directory (400)
+  - Verify correct `parentId` in database
+
+**API Changes:**
+- `POST /api/file-storage/upload` — Added optional `parentId` form field
+  - Default: 0 (root directory)
+  - Validates parent exists and is type `"dir"`
+  - Returns 404 if parent not found
+  - Returns 400 if parent is not a directory or invalid format
+
+**Test Results:**
+- ✅ All 558 tests passing (1 skipped)
+- ✅ 6 new Phase 2 integration tests
+- ✅ 100% backward compatibility (existing uploads work unchanged)
+
+**Frontend Capabilities Enabled:**
+- Upload files to specific directories
+- Organize files hierarchically during upload
+- Prevent invalid uploads (to files, non-existent parents)
+
+---
+

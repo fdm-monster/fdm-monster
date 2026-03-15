@@ -4,7 +4,7 @@
 **Last Updated:** 2026-03-15
 **Branch:** file-explorer
 **Current Effort:** v0.4.0 Frontend File Manager API Support
-**Current Phase:** Phase 1 Complete - Ready to Start Phase 2
+**Current Phase:** Phase 2 Complete - Ready to Start Phase 3
 
 ---
 
@@ -19,8 +19,8 @@ IMPORTANT CONTEXT:
 3. Read docs/api/file-storage-api.md for current endpoint reference
 4. Read docs/ai-docs/tracking/DEVELOPMENT.md for Phase 1 completion details
 
-CURRENT STATUS: Phase 1 Complete - Ready for Phase 2
-CURRENT PHASE: Phase 2 of 4 (File Upload to Directories)
+CURRENT STATUS: Phase 2 Complete - Ready for Phase 3
+CURRENT PHASE: Phase 3 of 4 (File Relocation)
 
 BACKGROUND:
 This effort adds backend API support for the frontend file manager's hierarchical
@@ -31,10 +31,16 @@ PHASE 1 COMPLETED (2026-03-15):
 ✓ GET /api/v2/file-storage?parentId={id} - Directory filtering
 ✓ GET /api/v2/file-storage/:id/path - Breadcrumb trail
 ✓ 8 integration tests passing
-✓ All 552 tests passing
 ✓ Production build issue fixed (import.meta.glob)
 
-NEXT TASK: Start Phase 2 - File Upload to Directories
+PHASE 2 COMPLETED (2026-03-15):
+✓ POST /api/file-storage/upload with parentId parameter
+✓ validateParentDirectory() validation method
+✓ 6 integration tests passing
+✓ All 558 tests passing
+✓ Backward compatible (no parentId = root)
+
+NEXT TASK: Start Phase 3 - File Relocation
 ```
 
 ---
@@ -148,7 +154,7 @@ Enable frontend file manager to support:
 
 ### Phase 2: File Upload to Directories (Priority 1)
 
-**Status:** Not Started
+**Status:** ✅ Complete (2026-03-15)
 
 **Goal:** Enable frontend to upload files directly to specific folders.
 
@@ -502,7 +508,7 @@ describe("FileStorageController - v0.4.0 Enhancements", () => {
 
 ### Phase Completion Checklist
 - [x] **Phase 1:** Directory filtering & breadcrumb navigation working, 8 tests passing ✅
-- [ ] **Phase 2:** Upload to directory working, 6 tests passing
+- [x] **Phase 2:** Upload to directory working, 6 tests passing ✅
 - [ ] **Phase 3:** File relocation working with circular detection, 10 tests passing
 - [ ] **Phase 4:** Bulk operations & tree view working, 12 tests passing
 

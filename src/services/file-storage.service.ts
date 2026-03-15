@@ -13,7 +13,7 @@ import { Readable } from "node:stream";
 import { NotFoundException, ConflictException } from "@/exceptions/runtime.exceptions";
 
 export interface IFileStorageService {
-  saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
+  saveFile(file: Express.Multer.File, fileHash?: string, parentId?: number): Promise<string>;
   getFile(fileStorageId: string): Promise<Buffer>;
   deleteFile(fileStorageId: string): Promise<void>;
   getFilePath(fileStorageId: string): string;
@@ -54,6 +54,7 @@ export interface IFileStorageService {
   updateFileRecord(id: number, data: Partial<FileRecord>): Promise<FileRecord>;
   deleteFileRecord(id: number): Promise<void>;
   getPath(fileRecordId: number): Promise<FileRecord[]>;
+  validateParentDirectory(parentId: number): Promise<void>;
 }
 
 export class FileStorageService implements IFileStorageService {
@@ -109,7 +110,7 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  async saveFile(file: Express.Multer.File, fileHash?: string): Promise<string> {
+  async saveFile(file: Express.Multer.File, fileHash?: string, parentId: number = 0): Promise<string> {
     const fileExt = extname(file.originalname).toLowerCase();
 
     let fileId: string;
@@ -145,7 +146,7 @@ export class FileStorageService implements IFileStorageService {
     }
 
     await this.createFileRecord({
-      parentId: 0,
+      parentId,
       type: fileType,
       name: file.originalname,
       fileGuid: fileId,
@@ -734,5 +735,17 @@ export class FileStorageService implements IFileStorageService {
     }
 
     return path;
+  }
+
+  async validateParentDirectory(parentId: number): Promise<void> {
+    const parent = await this.getFileRecordById(parentId);
+
+    if (!parent) {
+      throw new NotFoundException(`Parent directory ${parentId} not found`);
+    }
+
+    if (parent.type !== "dir") {
+      throw new ConflictException(`Parent ${parentId} is not a directory (type: ${parent.type})`);
+    }
   }
 }
