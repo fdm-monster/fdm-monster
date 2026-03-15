@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { PrintJob } from "@/entities/print-job.entity";
 import { FileRecord } from "@/entities/file-record.entity";
 import { ILoggerFactory } from "@/handlers/logger-factory";
@@ -449,6 +449,42 @@ export class FileStorageService implements IFileStorageService {
     totalCount: number;
     totalPages: number;
   }> {
+    // First, check ALL file records (across all pages) for orphans and clean them up
+    const allRecords = (await this.listFileRecords(undefined, {
+      type: options?.type,
+      sortBy: options?.sortBy,
+      sortOrder: options?.sortOrder,
+      // Don't paginate - get ALL records to check for orphans
+    })) as FileRecord[];
+
+    const orphanedIds: number[] = [];
+    for (const record of allRecords) {
+      if (record.type === 'dir') continue;
+
+      const filePath = await this.findFilePath(record.fileGuid);
+      if (!filePath) {
+        this.logger.warn(
+          `FileRecord ${record.id} (${record.fileGuid}) will be deleted - ` +
+          `physical file missing: ${record.name}`
+        );
+        orphanedIds.push(record.id);
+      }
+    }
+
+    // Batch delete orphaned records if any found
+    if (orphanedIds.length > 0) {
+      await this.fileRecordRepository
+        .createQueryBuilder()
+        .delete()
+        .from(FileRecord)
+        .where('id IN (:...ids)', { ids: orphanedIds })
+        .andWhere('type != :type', { type: 'dir' })
+        .execute();
+
+      this.logger.log(`Deleted ${orphanedIds.length} orphaned FileRecords during list operation`);
+    }
+
+    // Now get the paginated results (after cleanup)
     const result = await this.listFileRecords(undefined, { ...options, paginate: true });
     const files: any[] = [];
 
@@ -458,7 +494,8 @@ export class FileStorageService implements IFileStorageService {
       try {
         const filePath = await this.findFilePath(record.fileGuid);
         if (!filePath) {
-          this.logger.warn(`FileRecord ${record.id} has fileGuid ${record.fileGuid} but file not found on disk - skipping`);
+          // This shouldn't happen since we just cleaned up, but log if it does
+          this.logger.warn(`FileRecord ${record.id} still missing after cleanup - skipping`);
           continue;
         }
 
@@ -481,12 +518,27 @@ export class FileStorageService implements IFileStorageService {
       }
     }
 
+    // Recalculate accurate count after orphan deletion (if any were deleted)
+    let totalCount = result.totalCount;
+    let totalPages = result.totalPages;
+
+    if (orphanedIds.length > 0) {
+      // Build where clause matching the filter used in listFileRecords
+      const where: any = { type: Not('dir') };
+      if (options?.type) {
+        where.type = options.type;
+      }
+
+      totalCount = await this.fileRecordRepository.count({ where });
+      totalPages = Math.ceil(totalCount / result.pageSize);
+    }
+
     return {
       files,
       page: result.page,
       pageSize: result.pageSize,
-      totalCount: result.totalCount,
-      totalPages: result.totalPages,
+      totalCount,
+      totalPages,
     };
   }
 

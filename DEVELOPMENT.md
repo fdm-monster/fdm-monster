@@ -174,6 +174,35 @@ This document tracks all development efforts, phases, and changes made to the pr
 - Not reversible: FileRecords created cannot be distinguished from regular uploads
 - Logs statistics in migration output for audit trail
 
+### Orphaned Records Cleanup (2026-03-14)
+
+**Objective:** Automatically detect and delete orphaned FileRecords (database records without physical files)
+
+**Problem:** FileRecords could become orphaned if:
+- Physical files were manually deleted from disk
+- File deletion failed but FileRecord remained
+- Database restoration from backup didn't match disk state
+
+**Solution:** Inline SQL cleanup during `listAllFiles()` operation
+- Checks ALL FileRecords for missing physical files (across all pages)
+- Batch deletes orphaned records with single SQL query
+- Recalculates pagination counts after deletion for accuracy
+- Skips directory records (type='dir') - they're virtual with no physical file
+- Logs all orphaned records before deletion for audit trail
+
+**Changes:**
+- `src/services/file-storage.service.ts` — Enhanced `listAllFiles()` with self-healing cleanup (lines 452-542)
+  - Pre-scans all FileRecords before pagination
+  - Collects orphaned IDs (where physical file missing)
+  - Batch DELETE via SQL with safety check (type != 'dir')
+  - Recalculates accurate totalCount after cleanup
+- Removed `src/tasks/cleanup-orphaned-file-records.task.ts` (replaced by inline cleanup)
+
+**Test Coverage:**
+- `test/application/file-storage.service.test.ts` — 3 new tests (22 tests total, all passing)
+  - Orphaned FileRecords detected and deleted during listing
+  - Directory records preserved (not deleted)
+
 #### Phase 2 — FileRecord Integration ✓
 
 **Objective:** Integrate FileRecord entity with existing FileStorage upload/delete/list operations

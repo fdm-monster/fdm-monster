@@ -312,4 +312,82 @@ describe("FileStorageService - FileRecord CRUD", () => {
       ).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe("listAllFiles - orphaned record cleanup", () => {
+    it("should detect and delete orphaned FileRecords during listing", async () => {
+      // Create a FileRecord without a physical file (orphaned)
+      const orphanedGuid = randomUUID();
+      const orphanedRecord = await service.createFileRecord({
+        parentId: 0,
+        type: "gcode",
+        name: "orphaned.gcode",
+        fileGuid: orphanedGuid,
+      });
+
+      // Verify it exists in database
+      const beforeList = await service.getFileRecordById(orphanedRecord.id);
+      expect(beforeList).toBeTruthy();
+
+      // List files - should trigger orphan cleanup
+      await service.listAllFiles({ page: 1, pageSize: 50 });
+
+      // Verify orphaned record was deleted
+      const afterList = await service.getFileRecordById(orphanedRecord.id);
+      expect(afterList).toBeNull();
+    });
+
+    it("should not delete directory records during orphan cleanup", async () => {
+      // Create a directory record (no physical file expected)
+      const dirGuid = randomUUID();
+      const dirRecord = await service.createFileRecord({
+        parentId: 0,
+        type: "dir",
+        name: "test-directory",
+        fileGuid: dirGuid,
+      });
+
+      // Verify it exists
+      const beforeList = await service.getFileRecordById(dirRecord.id);
+      expect(beforeList).toBeTruthy();
+
+      // List files - should NOT delete directory records
+      await service.listAllFiles({ page: 1, pageSize: 50 });
+
+      // Verify directory still exists after listing
+      const afterList = await service.getFileRecordById(dirRecord.id);
+      expect(afterList).toBeTruthy();
+      expect(afterList?.type).toBe("dir");
+    });
+
+
+    it("should batch delete multiple orphaned records efficiently", async () => {
+      // Create 5 orphaned records
+      const orphanGuids = Array.from({ length: 5 }, () => randomUUID());
+      const orphanRecords = await Promise.all(
+        orphanGuids.map((guid, idx) =>
+          service.createFileRecord({
+            parentId: 0,
+            type: "gcode",
+            name: `batch-orphan-${idx}.gcode`,
+            fileGuid: guid,
+          })
+        )
+      );
+
+      // Verify all exist before listing
+      const beforeCount = await Promise.all(
+        orphanRecords.map(r => service.getFileRecordById(r.id))
+      );
+      expect(beforeCount.filter(r => r !== null).length).toBe(5);
+
+      // List files - should delete all orphans in one batch
+      await service.listAllFiles({ page: 1, pageSize: 50 });
+
+      // Verify all deleted after listing
+      const afterCount = await Promise.all(
+        orphanRecords.map(r => service.getFileRecordById(r.id))
+      );
+      expect(afterCount.filter(r => r !== null).length).toBe(0);
+    });
+  });
 });
