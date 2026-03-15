@@ -492,7 +492,7 @@ __metadata:
   resolution: "@fdm-monster/consoles@workspace:packages/consoles"
   dependencies:
     "@types/express": "npm:5.0.1"
-    "@types/multer": "npm:2.0.0"
+    "@types/multer": "npm:2.1.0"
     "@types/node": "npm:24.10.13"
     "@types/ws": "npm:8.18.1"
     axios: "npm:1.13.5"
@@ -2546,15 +2546,6 @@ __metadata:
   version: 2.1.0
   resolution: "@types/ms@npm:2.1.0"
   checksum: 10c0/5ce692ffe1549e1b827d99ef8ff71187457e0eb44adbae38fdf7b9a74bae8d20642ee963c14516db1d35fa2652e65f47680fdf679dcbde52bbfadd021f497225
-  languageName: node
-  linkType: hard
-
-"@types/multer@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@types/multer@npm:2.0.0"
-  dependencies:
-    "@types/express": "npm:*"
-  checksum: 10c0/375b0e77c4675c2ff27d1170e469df48dced928cc9fcd077ead111a20d0f2c01921fd25e20e25426604d6d3e311b37da2bc03ce47523d06adafba5c4b8077b67
   languageName: node
   linkType: hard
 
