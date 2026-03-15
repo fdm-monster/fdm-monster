@@ -73,7 +73,13 @@ describe("FileStorageController", () => {
 
   describe("GET /api/file-storage - List files", () => {
     beforeEach(() => {
-      vi.spyOn(fileStorageService, "listAllFiles").mockResolvedValue([]);
+      vi.spyOn(fileStorageService, "listAllFiles").mockResolvedValue({
+        files: [],
+        page: 1,
+        pageSize: 50,
+        totalCount: 0,
+        totalPages: 0,
+      });
     });
 
     it("should return empty array when no files exist", async () => {
@@ -84,18 +90,24 @@ describe("FileStorageController", () => {
     });
 
     it("should return list of files with metadata", async () => {
-      vi.spyOn(fileStorageService, "listAllFiles").mockResolvedValue([
-        {
-          fileStorageId: "file-123",
-          fileName: "test.gcode",
-          fileFormat: "gcode",
-          fileSize: 1024,
-          fileHash: "abc123",
-          createdAt: new Date(),
-          thumbnailCount: 2,
-          metadata: { _originalFileName: "test.gcode" },
-        },
-      ]);
+      vi.spyOn(fileStorageService, "listAllFiles").mockResolvedValue({
+        files: [
+          {
+            fileStorageId: "file-123",
+            fileName: "test.gcode",
+            fileFormat: "gcode",
+            fileSize: 1024,
+            fileHash: "abc123",
+            createdAt: new Date(),
+            thumbnailCount: 2,
+            metadata: { _originalFileName: "test.gcode" },
+          },
+        ],
+        page: 1,
+        pageSize: 50,
+        totalCount: 1,
+        totalPages: 1,
+      });
 
       const res = await testRequest.get(baseRoute);
       expectOkResponse(res);
