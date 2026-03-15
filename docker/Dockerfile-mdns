@@ -2,7 +2,7 @@ FROM node:24-bookworm-slim AS build
 WORKDIR /build
 
 COPY .yarn/releases ./.yarn/releases
-COPY .swcrc tsconfig.json package.json yarn.lock .yarnrc.yml ./
+COPY vite.config.ts tsconfig.json package.json yarn.lock .yarnrc.yml ./
 
 RUN yarn install --immutable
 
