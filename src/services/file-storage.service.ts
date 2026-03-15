@@ -53,6 +53,7 @@ export interface IFileStorageService {
   createFileRecord(data: Partial<FileRecord>): Promise<FileRecord>;
   updateFileRecord(id: number, data: Partial<FileRecord>): Promise<FileRecord>;
   deleteFileRecord(id: number): Promise<void>;
+  getPath(fileRecordId: number): Promise<FileRecord[]>;
 }
 
 export class FileStorageService implements IFileStorageService {
@@ -456,6 +457,7 @@ export class FileStorageService implements IFileStorageService {
     type?: "gcode" | "3mf" | "bgcode";
     sortBy?: "createdAt" | "name" | "type";
     sortOrder?: "ASC" | "DESC";
+    parentId?: number;
   }): Promise<{
     files: Array<{
       fileStorageId: string;
@@ -473,7 +475,7 @@ export class FileStorageService implements IFileStorageService {
     totalPages: number;
   }> {
     // First, check ALL file records (across all pages) for orphans and clean them up
-    const allRecords = (await this.listFileRecords(undefined, {
+    const allRecords = (await this.listFileRecords(options?.parentId, {
       type: options?.type,
       sortBy: options?.sortBy,
       sortOrder: options?.sortOrder,
@@ -507,7 +509,7 @@ export class FileStorageService implements IFileStorageService {
     }
 
     // Now get the paginated results (after cleanup)
-    const result = await this.listFileRecords(undefined, { ...options, paginate: true });
+    const result = await this.listFileRecords(options?.parentId, { ...options, paginate: true });
     const files: any[] = [];
 
     for (const record of result.items) {
@@ -710,5 +712,27 @@ export class FileStorageService implements IFileStorageService {
 
     await this.fileRecordRepository.remove(record);
     this.logger.log(`Deleted file record ${id}: ${record.name}`);
+  }
+
+  async getPath(fileRecordId: number): Promise<FileRecord[]> {
+    const path: FileRecord[] = [];
+    let current = await this.getFileRecordById(fileRecordId);
+
+    if (!current) {
+      throw new NotFoundException(`File record ${fileRecordId} not found`);
+    }
+
+    while (current && current.id !== 0) {
+      path.unshift(current);
+      if (current.parentId === null || current.parentId === 0) break;
+      current = await this.getFileRecordById(current.parentId);
+    }
+
+    if (path[0]?.id !== 0) {
+      const root = await this.getFileRecordById(0);
+      if (root) path.unshift(root);
+    }
+
+    return path;
   }
 }

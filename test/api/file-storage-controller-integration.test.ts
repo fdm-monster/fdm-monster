@@ -618,4 +618,147 @@ describe("FileStorageController - Real Integration", () => {
       await fileStorageService.deleteFile(fileId);
     });
   });
+
+  describe("Phase 1: Directory Filtering & Navigation", () => {
+    describe("GET /file-storage?parentId", () => {
+      it("should list root directory contents", async () => {
+        const timestamp = Date.now();
+        const uploadRes = await uploadFile(`phase1-root-${timestamp}.gcode`, SIMPLE_GCODE);
+        expectOkResponse(uploadRes);
+        const fileId = uploadRes.body.fileStorageId;
+
+        const listRes = await testRequest.get(`${baseRoute}?parentId=0`);
+        expectOkResponse(listRes);
+        expect(Array.isArray(listRes.body.files)).toBe(true);
+        expect(listRes.body.files.some((f: any) => f.fileStorageId === fileId)).toBe(true);
+
+        await fileStorageService.deleteFile(fileId);
+      });
+
+      it("should list subdirectory contents", async () => {
+        const subdir = await fileStorageService.createFileRecord({
+          name: "test-subdir",
+          type: "dir",
+          fileGuid: "00000000-0000-0000-0000-000000000001",
+          parentId: 0,
+        });
+
+        const timestamp = Date.now();
+        const uploadRes = await uploadFile(`phase1-subdir-${timestamp}.gcode`, SIMPLE_GCODE);
+        expectOkResponse(uploadRes);
+        const fileId = uploadRes.body.fileStorageId;
+
+        const fileRecord = await fileStorageService.getFileRecordByGuid(fileId);
+        await fileStorageService.updateFileRecord(fileRecord!.id, { parentId: subdir.id });
+
+        const listRes = await testRequest.get(`${baseRoute}?parentId=${subdir.id}`);
+        expectOkResponse(listRes);
+        expect(Array.isArray(listRes.body.files)).toBe(true);
+        expect(listRes.body.files.some((f: any) => f.fileStorageId === fileId)).toBe(true);
+
+        await fileStorageService.deleteFile(fileId);
+        await fileStorageService.deleteFileRecord(subdir.id);
+      });
+
+      it("should return empty array for empty directory", async () => {
+        const emptyDir = await fileStorageService.createFileRecord({
+          name: "empty-dir",
+          type: "dir",
+          fileGuid: "00000000-0000-0000-0000-000000000002",
+          parentId: 0,
+        });
+
+        const listRes = await testRequest.get(`${baseRoute}?parentId=${emptyDir.id}`);
+        expectOkResponse(listRes);
+        expect(Array.isArray(listRes.body.files)).toBe(true);
+        expect(listRes.body.files.length).toBe(0);
+
+        await fileStorageService.deleteFileRecord(emptyDir.id);
+      });
+
+      it("should list all files when parentId is omitted (backward compatibility)", async () => {
+        const listRes = await testRequest.get(baseRoute);
+        expectOkResponse(listRes);
+        expect(Array.isArray(listRes.body.files)).toBe(true);
+        expect(listRes.body).toHaveProperty("page");
+        expect(listRes.body).toHaveProperty("pageSize");
+        expect(listRes.body).toHaveProperty("totalCount");
+      });
+    });
+
+    describe("GET /file-storage/:id/path", () => {
+      it("should return path for root directory", async () => {
+        const root = await fileStorageService.getFileRecordById(0);
+        expect(root).toBeDefined();
+
+        const pathRes = await testRequest.get(`${baseRoute}/${root!.fileGuid}/path`);
+        expectOkResponse(pathRes);
+        expect(Array.isArray(pathRes.body.path)).toBe(true);
+        expect(pathRes.body.path.length).toBe(1);
+        expect(pathRes.body.path[0].id).toBe(0);
+        expect(pathRes.body.path[0].name).toBe("/");
+        expect(pathRes.body.targetId).toBe(0);
+      });
+
+      it("should return full ancestry path for nested file", async () => {
+        const subdir1 = await fileStorageService.createFileRecord({
+          name: "models",
+          type: "dir",
+          fileGuid: "00000000-0000-0000-0000-000000000003",
+          parentId: 0,
+        });
+
+        const subdir2 = await fileStorageService.createFileRecord({
+          name: "prototypes",
+          type: "dir",
+          fileGuid: "00000000-0000-0000-0000-000000000004",
+          parentId: subdir1.id,
+        });
+
+        const timestamp = Date.now();
+        const uploadRes = await uploadFile(`phase1-nested-${timestamp}.gcode`, SIMPLE_GCODE);
+        expectOkResponse(uploadRes);
+        const fileId = uploadRes.body.fileStorageId;
+
+        const fileRecord = await fileStorageService.getFileRecordByGuid(fileId);
+        await fileStorageService.updateFileRecord(fileRecord!.id, { parentId: subdir2.id });
+
+        const pathRes = await testRequest.get(`${baseRoute}/${fileId}/path`);
+        expectOkResponse(pathRes);
+        expect(Array.isArray(pathRes.body.path)).toBe(true);
+        expect(pathRes.body.path.length).toBe(4);
+        expect(pathRes.body.path[0].name).toBe("/");
+        expect(pathRes.body.path[1].name).toBe("models");
+        expect(pathRes.body.path[2].name).toBe("prototypes");
+        expect(pathRes.body.path[3].name).toBe(`phase1-nested-${timestamp}.gcode`);
+
+        await fileStorageService.deleteFile(fileId);
+        await fileStorageService.deleteFileRecord(subdir2.id);
+        await fileStorageService.deleteFileRecord(subdir1.id);
+      });
+
+      it("should return 404 for non-existent file", async () => {
+        const res = await testRequest.get(`${baseRoute}/non-existent-guid-12345/path`);
+        expect(res.status).toBe(404);
+      });
+
+      it("should work for both files and directories", async () => {
+        const subdir = await fileStorageService.createFileRecord({
+          name: "test-dir-path",
+          type: "dir",
+          fileGuid: "00000000-0000-0000-0000-000000000005",
+          parentId: 0,
+        });
+
+        const pathRes = await testRequest.get(`${baseRoute}/${subdir.fileGuid}/path`);
+        expectOkResponse(pathRes);
+        expect(Array.isArray(pathRes.body.path)).toBe(true);
+        expect(pathRes.body.path.length).toBe(2);
+        expect(pathRes.body.path[0].name).toBe("/");
+        expect(pathRes.body.path[1].name).toBe("test-dir-path");
+
+        await fileStorageService.deleteFileRecord(subdir.id);
+      });
+    });
+  });
 });

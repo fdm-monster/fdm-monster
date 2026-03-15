@@ -50,27 +50,46 @@ Enable operators to manage 100+ printers from a single web interface, with featu
 - ✓ Self-healing orphaned record cleanup
 - ✓ 63 tests (41 integration + 22 unit)
 
+### Active Development
+
+| Version | Effort | Status | Target Completion |
+|---------|--------|--------|-------------------|
+| **v0.4.0** | **Frontend File Manager API Support** | 📝 Planning Complete | TBD |
+
+**v0.4.0 Deliverables:**
+- Directory filtering and navigation endpoints
+- Upload to specific directories
+- File/folder relocation with circular reference detection
+- Bulk move operations
+- Directory creation and tree view endpoints
+- 36 integration tests across 4 phases
+
+**Documentation:**
+- Feature spec: `docs/features/file-manager-api-enhancements.md`
+- Implementation plan: `docs/ai-docs/project/FILE_MANAGER_API_RESUME.md`
+- API reference: `docs/api/file-storage-api.md` (updated)
+
 ### Removed from Roadmap
 
 The following items were evaluated and removed from scope:
 
 | Version | Effort | Reason for Removal |
 |---------|--------|-------------------|
-| ~~**v0.4.0**~~ | ~~Multi-Plate 3MF Support~~ | Out of scope - not a current user need |
-| ~~**v0.5.0**~~ | ~~Moonraker Metadata Normalization~~ | Out of scope - existing parsers sufficient |
-| ~~**v0.6.0**~~ | ~~Thumbnail Format Handling (QOI)~~ | Out of scope - PNG/JPG support is adequate |
+| ~~**Multi-Plate 3MF Support**~~ | N/A | Out of scope - not a current user need |
+| ~~**Moonraker Metadata Normalization**~~ | N/A | Out of scope - existing parsers sufficient |
+| ~~**Thumbnail Format Handling (QOI)**~~ | N/A | Out of scope - PNG/JPG support is adequate |
 
 See `docs/features/file-storage-permissions-deferred.md` for detailed removal rationale.
 
-### Next Priorities
+### Future Priorities (Post v0.4.0)
 
-**Status:** Planning phase - awaiting direction
+**Status:** Deferred - pending v0.4.0 completion
 
 **Options for next development effort:**
 1. Permission-based access control for FileStorage endpoints
-2. New feature development (TBD based on user needs)
+2. Directory thumbnails (composite previews)
 3. Performance optimization and scaling
-4. Frontend integration improvements
+4. Additional frontend integration features
 
 ## Technology Stack
 

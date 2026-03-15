@@ -461,3 +461,103 @@ Mirror of \`src/\` structure with \`*.test.ts\` files
 If a rule, phase tracking approach, or documentation format needs adjustment, file an issue or discuss during phase confirmation.
 
 **Last reviewed:** 2026-03-13
+
+## Effort: File Manager API Enhancements (v0.4.0)
+
+**Status:** ✓ Phase 1 Complete  
+**Branch:** file-explorer  
+**Started:** 2026-03-15  
+**Phase 1 Completed:** 2026-03-15
+
+### Phase 1: Directory Filtering & Navigation ✓
+
+**Objective:** Enable frontend to display folder contents and breadcrumb navigation (read-only operations)
+
+**Requirements (Validated ✅)**
+1. Filter file listings by `parentId` (directory ID)
+2. Get breadcrumb path for any file or directory
+3. Maintain backward compatibility (no `parentId` = list all files)
+4. Support both files and directories in responses
+
+### Changes
+
+**Modified Files:**
+- `src/controllers/file-storage.controller.ts` — Added directory navigation endpoints
+  - `listFiles()` now accepts `parentId` query parameter (line 138)
+  - New endpoint: `GET /:fileStorageId/path` for breadcrumb trail (lines 180-208)
+- `src/services/file-storage.service.ts` — Added directory filtering and path traversal
+  - `listAllFiles()` accepts optional `parentId` parameter (line 459)
+  - Passes `parentId` to `listFileRecords()` for filtering (lines 477, 511)
+  - New method: `getPath(fileRecordId)` for breadcrumb ancestry traversal (lines 717-737)
+  - Interface updated with `getPath()` signature (line 56)
+
+**Test Coverage:**
+- `test/api/file-storage-controller-integration.test.ts` — Added 8 Phase 1 integration tests (total: 49 tests)
+  - List root directory contents
+  - List subdirectory contents
+  - List empty directory
+  - Backward compatibility (no `parentId` lists all)
+  - Get path for root directory
+  - Get path for nested file (full ancestry)
+  - 404 for non-existent file path
+  - Path works for both files and directories
+
+**API Changes:**
+- `GET /api/v2/file-storage?parentId={id}` — Filter files by parent directory (optional param)
+- `GET /api/v2/file-storage/:id/path` — Get breadcrumb path from root to target (new endpoint)
+
+**Test Results:**
+- ✅ All 552 tests passing (1 skipped)
+- ✅ 8 new Phase 1 integration tests
+- ✅ Backward compatibility verified (existing tests unchanged)
+
+**Frontend Capabilities Enabled:**
+- Display contents of specific folders
+- Show breadcrumb navigation (e.g., `/ > models > prototypes`)
+- Navigate directory hierarchy
+
+---
+
+## Infrastructure Fix: Production Build Runtime Error (v0.4.0-hotfix)
+
+**Status:** ✓ Complete  
+**Branch:** file-explorer  
+**Fixed:** 2026-03-15  
+**Issue:** Application failed to start in production mode
+
+### Problem
+
+Production build failed at runtime with:
+```
+TypeError: (intermediate value).glob is not a function
+at load-controllers.ts:12
+```
+
+**Root Cause:**  
+`import.meta.glob` is a Vite compile-time feature that wasn't being transformed during production builds with `unbundle: true`. The glob pattern needs resolution at build time, but unbundled mode copied code as-is.
+
+### Solution
+
+Replaced compile-time `import.meta.glob` with runtime filesystem scanning that works in both dev/test (`.ts` files) and production (`.js` files).
+
+### Changes
+
+**Modified Files:**
+- `src/shared/load-controllers.ts` — Replaced `import.meta.glob` with runtime discovery
+  - Added `getControllerModules()` using Node's `readdirSync` (lines 18-35)
+  - Dynamically scans `../controllers` directory at runtime
+  - Supports both `.controller.ts` (dev/test) and `.controller.js` (production)
+  - Gracefully handles missing directories
+
+**Test Coverage:**
+- ✅ All 552 tests passing (verified both modes work)
+- ✅ Production build starts successfully
+- ✅ No breaking changes to existing functionality
+
+**Impact:**
+- **Before:** Application could not run in production (`npm start` failed)
+- **After:** Application runs successfully in both development and production modes
+- Frontend team can now run and test against production builds
+
+---
+

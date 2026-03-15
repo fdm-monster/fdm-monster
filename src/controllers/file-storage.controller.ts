@@ -135,6 +135,7 @@ export class FileStorageController {
       const type = req.query.type as "gcode" | "3mf" | "bgcode" | undefined;
       const sortBy = (req.query.sortBy as "createdAt" | "name" | "type") || "createdAt";
       const sortOrder = (req.query.sortOrder as "ASC" | "DESC") || "DESC";
+      const parentId = req.query.parentId ? Number.parseInt(req.query.parentId as string) : undefined;
 
       const result = await this.fileStorageService.listAllFiles({
         page,
@@ -142,6 +143,7 @@ export class FileStorageController {
         type,
         sortBy,
         sortOrder,
+        parentId,
       });
 
       res.send({
@@ -172,6 +174,36 @@ export class FileStorageController {
     } catch (error) {
       this.logger.error(`Failed to list files: ${error}`);
       res.status(500).send({ error: "Failed to list files" });
+    }
+  }
+
+  @GET()
+  @route("/:fileStorageId/path")
+  async getFilePath(req: Request, res: Response) {
+    const { fileStorageId } = req.params as { fileStorageId: string };
+
+    try {
+      const fileRecord = await this.fileStorageService.getFileRecordByGuid(fileStorageId);
+      if (!fileRecord) {
+        res.status(404).send({ error: "File not found" });
+        return;
+      }
+
+      const path = await this.fileStorageService.getPath(fileRecord.id);
+
+      res.send({
+        path: path.map((record) => ({
+          id: record.id,
+          name: record.name,
+          type: record.type,
+          fileGuid: record.fileGuid,
+        })),
+        targetId: fileRecord.id,
+        targetName: fileRecord.name,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to get file path for ${fileStorageId}: ${error}`);
+      res.status(500).send({ error: "Failed to get file path" });
     }
   }
 

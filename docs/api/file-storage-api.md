@@ -1,8 +1,8 @@
 # File Storage API Reference
 
-**Status:** Draft  
-**Version:** 1.0  
-**Last Updated:** 2026-03-13
+**Status:** Draft
+**Version:** 2.0 (v0.4.0 enhancements)
+**Last Updated:** 2026-03-14
 
 ## Overview
 
@@ -34,6 +34,7 @@ List stored files with pagination and filtering.
 |-----------|------|---------|-------------|
 | \`page\` | integer | 1 | Page number (1-indexed) |
 | \`pageSize\` | integer | 20 | Items per page |
+| \`parentId\` | integer | — | **NEW (v0.4.0)** Filter by parent directory ID |
 | \`format\` | string | — | Filter by format: \`gcode\`, \`bgcode\`, \`3mf\` |
 | \`startDate\` | ISO 8601 | — | Filter by creation date (inclusive) |
 | \`endDate\` | ISO 8601 | — | Filter by creation date (inclusive) |
@@ -133,6 +134,7 @@ Upload and analyze a new file.
 - Content-Type: \`multipart/form-data\`
 - Fields:
   - \`file\` (required): File to upload (\`.gcode\`, \`.bgcode\`, \`.3mf\`)
+  - \`parentId\` (optional): **NEW (v0.4.0)** Target directory ID (default: 0 = root)
   - \`startPrint\` (optional): Start print immediately (true/false)
 
 **Response (200 OK):**

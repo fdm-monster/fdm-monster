@@ -8,8 +8,31 @@ import {
 } from "awilix-express";
 import { Router } from "express";
 import { ClassOrFunctionReturning } from "awilix";
+import { readdirSync, existsSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const controllerModules = import.meta.glob("@/controllers/*.controller.ts");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+async function getControllerModules(): Promise<Record<string, () => Promise<unknown>>> {
+  const controllersPath = join(__dirname, "../controllers");
+
+  if (!existsSync(controllersPath)) {
+    return {};
+  }
+
+  const files = readdirSync(controllersPath).filter(
+    (file) => file.endsWith(".controller.js") || file.endsWith(".controller.ts"),
+  );
+
+  const modules: Record<string, () => Promise<unknown>> = {};
+  for (const file of files) {
+    const modulePath = join(controllersPath, file);
+    modules[file] = () => import(modulePath);
+  }
+  return modules;
+}
 
 export async function loadControllersFunc(): Promise<Router> {
   const found = await findControllers();
@@ -19,6 +42,7 @@ export async function loadControllersFunc(): Promise<Router> {
 }
 
 export async function findControllers(): Promise<FindControllersResult> {
+  const controllerModules = await getControllerModules();
   const modules = await Promise.all(
     Object.values(controllerModules).map((load) =>
       (load as () => Promise<unknown>)().then(extractStateAndTargetFromExports),

@@ -1,20 +1,54 @@
 # Project Resume — FDM Monster Development
 
-**Date Saved:** 2026-03-14
+**Date Saved:** 2026-03-15
 **Branch:** file-explorer
-**Current Effort:** v0.3.0 File Management CRUD API — ✓ COMPLETE
-**Current Phase:** All phases complete, ready for merge
+**Current Effort:** v0.4.0 Frontend File Manager API Support — ✅ PHASE 1 COMPLETE
+**Current Phase:** Phase 1 Complete - Ready for Phase 2
 
 ---
 
 ## Quick Start Prompt for AI Assistant
+
+### For v0.4.0 Development (CURRENT)
+
+```
+I'm continuing development on FDM Monster v0.4.0 — Frontend File Manager API Support.
+
+IMPORTANT CONTEXT:
+1. Read .cursorrules for operational rules (80% test coverage, no comments, etc.)
+2. Read docs/features/file-manager-api-enhancements.md for complete API specification
+3. Read docs/ai-docs/project/FILE_MANAGER_API_RESUME.md for phase breakdown
+4. Read docs/ai-docs/tracking/DEVELOPMENT.md for Phase 1 completion details
+
+CURRENT STATUS:
+- ✅ v0.3.0 File Management CRUD API is COMPLETE
+- ✅ v0.4.0 Phase 1 COMPLETE (Directory Filtering & Navigation)
+- ✅ Production build issue FIXED (import.meta.glob runtime error)
+- 📋 Ready to Start Phase 2: File Upload to Directories
+
+PHASE 1 COMPLETED:
+- GET /api/v2/file-storage?parentId={id} - List directory contents
+- GET /api/v2/file-storage/:id/path - Breadcrumb trail
+- 8 integration tests passing
+- All 552 tests passing (1 skipped)
+
+NEXT STEPS:
+1. Start Phase 2: File Upload to Directories
+2. Add parentId parameter to POST /upload endpoint
+3. Add validateParentDirectory() helper method
+4. Add 6 integration tests for Phase 2
+
+Before starting, confirm you've read the specification documents above.
+```
+
+### For v0.3.0 Review/Merge (COMPLETE)
 
 ```
 I'm continuing development on the FDM Monster project (3D printer farm management).
 
 IMPORTANT CONTEXT:
 1. Read .cursorrules for operational rules (80% test coverage, no comments, etc.)
-2. Read DEVELOPMENT.md for current project state
+2. Read docs/ai-docs/project/PROJECT_RESUME.md for current project state
 
 CURRENT STATUS:
 - v0.3.0 File Management CRUD API is COMPLETE (all 4 phases)
@@ -30,10 +64,8 @@ COMPLETED WORK:
 ✓ Backfill Migration Integration
 ✓ Self-Healing Orphaned Records Cleanup
 
-BEFORE STARTING NEW WORK:
-- Confirm you've read .cursorrules and understand operational rules
-- Confirm you've read DEVELOPMENT.md for complete project history
-- Ask what the next development priority is
+NEXT ACTION:
+Ready to merge file-explorer branch or start v0.4.0 development.
 ```
 
 ---
