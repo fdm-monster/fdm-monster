@@ -464,10 +464,14 @@ If a rule, phase tracking approach, or documentation format needs adjustment, fi
 
 ## Effort: File Manager API Enhancements (v0.4.0)
 
-**Status:** ✓ Phase 1 Complete  
-**Branch:** file-explorer  
-**Started:** 2026-03-15  
+**Status:** ✓ Complete — All 4 Phases Finished
+**Branch:** file-explorer
+**Started:** 2026-03-15
 **Phase 1 Completed:** 2026-03-15
+**Phase 2 Completed:** 2026-03-15
+**Phase 2.5 Completed:** 2026-03-15
+**Phase 3 Completed:** 2026-03-15
+**Phase 4 Completed:** 2026-03-15
 
 ### Phase 1: Directory Filtering & Navigation ✓
 
@@ -756,6 +760,103 @@ Replaced compile-time `import.meta.glob` with runtime filesystem scanning that w
 - Move operation is atomic (single database update to `parentId`)
 - Children relationships automatically preserved (no cascade updates needed)
 - Root directory protection prevents accidental destruction of hierarchy
+
+---
+
+### Phase 4: Bulk Operations & Tree View ✓
+
+**Status:** ✓ Complete
+**Branch:** file-explorer
+**Completed:** 2026-03-15
+
+**Objective:** Enable bulk file operations and provide hierarchical tree structure for frontend tree view rendering
+
+**Requirements (Validated ✅)**
+1. Bulk move multiple files/directories to a target folder
+2. Create new directories via API
+3. Return full hierarchical tree structure
+4. Handle partial failures gracefully
+5. 12 integration tests covering all scenarios
+
+### Changes
+
+**Modified Files:**
+- `src/services/file-storage.service.ts` — Added tree building method
+  - `buildTree()` method (lines 836-874)
+    - Queries all FileRecords sorted by name
+    - Builds in-memory map for O(1) lookups
+    - Constructs nested tree structure with parent-child relationships
+    - Handles orphaned records gracefully (logs warning, adds to root)
+    - Returns root-level nodes with recursive children
+  - Updated interface signature (line 61)
+- `src/controllers/file-storage.controller.ts` — Added bulk operations and directory management
+  - POST `/bulk/move` endpoint (lines 130-178)
+    - Accepts `fileIds` array and `parentId`
+    - Max 100 files per request
+    - Continues processing on individual failures
+    - Returns `moved`, `failed`, and `errors` counts
+  - POST `/directories` endpoint (lines 180-249)
+    - Creates new directory with `name` and `parentId`
+    - Validates parent exists (if not root)
+    - Prevents duplicate directory names in same parent (409 conflict)
+    - Returns created directory with full breadcrumb path
+  - GET `/tree` endpoint (lines 251-261)
+    - Returns complete hierarchical tree structure
+    - Frontend can render tree view from single API call
+    - Includes root directory (id=0) with all children
+
+**Test Coverage:**
+- `test/api/file-storage-controller-integration.test.ts` — Added 12 Phase 4 integration tests (total: 82 tests)
+  - **Bulk move tests (5 tests):**
+    - Move multiple files to target directory
+    - Handle partial failures (1 valid, 1 invalid file)
+    - Reject empty fileIds array (400)
+    - Reject invalid parentId (400)
+    - Reject exceeding 100 file limit (400)
+  - **Directory creation tests (5 tests):**
+    - Create directory in root
+    - Create directory in parent directory (with path verification)
+    - Reject duplicate directory name in same parent (409)
+    - Reject empty directory name (400)
+    - Reject non-existent parent directory (404)
+  - **Tree view tests (2 tests):**
+    - Return hierarchical tree with nested children
+    - Return root directory when empty
+
+**API Changes:**
+- `POST /api/file-storage/bulk/move` — Move multiple files/directories at once
+  - Request body: `{ fileIds: string[], parentId: number }`
+  - Max 100 items per request
+  - Response: `{ moved: number, failed: number, errors: Array<{fileId, error}> }`
+  - Partial success pattern: returns 200 even if some fail
+- `POST /api/file-storage/directories` — Create new directory
+  - Request body: `{ name: string, parentId?: number }` (default parentId = 0)
+  - Response (201): `{ message, directory: {...}, path: [...] }`
+  - Returns full breadcrumb path of created directory
+  - 409 Conflict if duplicate name in parent
+  - 404 if parent directory not found
+- `GET /api/file-storage/tree` — Get complete file/directory hierarchy
+  - Response: `{ tree: TreeNode[] }` where `TreeNode = { id, fileGuid, name, type, parentId, children: TreeNode[] }`
+  - Single API call provides full tree structure for frontend rendering
+  - Root directory (id=0, name="/") always included
+
+**Test Results:**
+- ✅ All 82 file-storage integration tests passing (12 new Phase 4 tests)
+- ✅ All 586 tests passing across entire test suite
+- ✅ All Phase 4 acceptance criteria met
+
+**Frontend Capabilities Enabled:**
+- **Bulk operations:** Select multiple files, move all to target folder in one action
+- **Directory management:** Create new folders from UI
+- **Tree view rendering:** Single API call provides complete tree structure for sidebar navigation
+- **Partial success handling:** UI can show which files succeeded/failed in bulk operations
+
+**Implementation Notes:**
+- Bulk move uses existing `moveFileRecord()` method for each file, ensuring consistent validation
+- Directory creation reuses existing `createFileRecord()` and `validateParentDirectory()` logic
+- Tree building is efficient: single query + O(n) processing for all records
+- Orphaned records (missing parent) automatically added to root with warning log
+- Root directory always included in tree response (even when empty) for consistent UI rendering
 
 ---
 

@@ -832,4 +832,44 @@ export class FileStorageService implements IFileStorageService {
 
     return updatedRecord;
   }
+
+  async buildTree(): Promise<any[]> {
+    const allRecords = await this.fileRecordRepository.find({
+      order: { name: "ASC" },
+    });
+
+    const recordMap = new Map<number, any>();
+
+    for (const record of allRecords) {
+      recordMap.set(record.id, {
+        id: record.id,
+        fileGuid: record.fileGuid,
+        name: record.name,
+        type: record.type,
+        parentId: record.parentId,
+        children: [],
+      });
+    }
+
+    const rootNodes: any[] = [];
+
+    for (const record of allRecords) {
+      const node = recordMap.get(record.id);
+      if (record.parentId === 0) {
+        rootNodes.push(node);
+      } else {
+        const parentNode = recordMap.get(record.parentId);
+        if (parentNode) {
+          parentNode.children.push(node);
+        } else {
+          this.logger.warn(
+            `Orphaned record found: ${record.name} (id: ${record.id}, parent: ${record.parentId}) - parent does not exist`,
+          );
+          rootNodes.push(node);
+        }
+      }
+    }
+
+    return rootNodes;
+  }
 }

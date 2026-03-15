@@ -1261,4 +1261,248 @@ describe("FileStorageController - Real Integration", () => {
       await fileStorageService.deleteFileRecord(childDir.id);
     });
   });
+
+  describe("Phase 4: Bulk Operations & Tree View", () => {
+    describe("POST /bulk/move", () => {
+      it("should move multiple files to a target directory", async () => {
+        const targetDir = await fileStorageService.createFileRecord({
+          name: "target-dir-bulk-1",
+          type: "dir",
+          parentId: 0,
+          fileGuid: crypto.randomUUID(),
+        });
+
+        const upload1 = await uploadFile("file1.gcode", SIMPLE_GCODE);
+        expectOkResponse(upload1);
+        const upload2 = await uploadFile("file2.gcode", SIMPLE_GCODE);
+        expectOkResponse(upload2);
+
+        const response = await testRequest
+          .post(`${baseRoute}/bulk/move`)
+          .send({ fileIds: [upload1.body.fileStorageId, upload2.body.fileStorageId], parentId: targetDir.id });
+
+        expectOkResponse(response);
+        expect(response.body.moved).toBe(2);
+        expect(response.body.failed).toBe(0);
+        expect(response.body.errors).toEqual([]);
+
+        const movedFile1 = await fileStorageService.getFileRecordByGuid(upload1.body.fileStorageId);
+        const movedFile2 = await fileStorageService.getFileRecordByGuid(upload2.body.fileStorageId);
+
+        expect(movedFile1?.parentId).toBe(targetDir.id);
+        expect(movedFile2?.parentId).toBe(targetDir.id);
+
+        await fileStorageService.deleteFile(upload1.body.fileStorageId);
+        await fileStorageService.deleteFile(upload2.body.fileStorageId);
+        await fileStorageService.deleteFileRecord(targetDir.id);
+      });
+
+      it("should handle partial failures when moving multiple files", async () => {
+        const targetDir = await fileStorageService.createFileRecord({
+          name: "target-dir-bulk-2",
+          type: "dir",
+          parentId: 0,
+          fileGuid: crypto.randomUUID(),
+        });
+
+        const upload1 = await uploadFile("file-partial.gcode", SIMPLE_GCODE);
+        expectOkResponse(upload1);
+
+        const response = await testRequest
+          .post(`${baseRoute}/bulk/move`)
+          .send({ fileIds: [upload1.body.fileStorageId, "non-existent-file-id"], parentId: targetDir.id });
+
+        expectOkResponse(response);
+        expect(response.body.moved).toBe(1);
+        expect(response.body.failed).toBe(1);
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.body.errors[0].fileId).toBe("non-existent-file-id");
+
+        const movedFile1 = await fileStorageService.getFileRecordByGuid(upload1.body.fileStorageId);
+        expect(movedFile1?.parentId).toBe(targetDir.id);
+
+        await fileStorageService.deleteFile(upload1.body.fileStorageId);
+        await fileStorageService.deleteFileRecord(targetDir.id);
+      });
+
+      it("should reject bulk move with empty fileIds array (400)", async () => {
+        const response = await testRequest.post(`${baseRoute}/bulk/move`).send({ fileIds: [], parentId: 0 });
+
+        expect(response.status).toBe(400);
+      });
+
+      it("should reject bulk move with invalid parentId (400)", async () => {
+        const upload1 = await uploadFile(`file-invalid-parent-${Date.now()}.gcode`, SIMPLE_GCODE);
+        expectOkResponse(upload1);
+
+        const response = await testRequest
+          .post(`${baseRoute}/bulk/move`)
+          .send({ fileIds: [upload1.body.fileStorageId], parentId: "not-a-number" });
+
+        expect(response.status).toBe(400);
+
+        await fileStorageService.deleteFile(upload1.body.fileStorageId);
+      });
+
+      it("should reject bulk move with more than 100 files (400)", async () => {
+        const fileIds = Array.from({ length: 101 }, (_, i) => `file-${i}`);
+
+        const response = await testRequest.post(`${baseRoute}/bulk/move`).send({ fileIds, parentId: 0 });
+
+        expect(response.status).toBe(400);
+      });
+    });
+
+    describe("POST /directories", () => {
+      it("should create a new directory in root", async () => {
+        const response = await testRequest.post(`${baseRoute}/directories`).send({ name: "new-folder", parentId: 0 });
+
+        expect(response.status).toBe(201);
+        expect(response.body.message).toBe("Directory created successfully");
+        expect(response.body.directory.name).toBe("new-folder");
+        expect(response.body.directory.type).toBe("dir");
+        expect(response.body.directory.parentId).toBe(0);
+        expect(response.body.path).toHaveLength(2);
+        expect(response.body.path[0].id).toBe(0);
+        expect(response.body.path[1].name).toBe("new-folder");
+
+        await fileStorageService.deleteFileRecord(response.body.directory.id);
+      });
+
+      it("should create a new directory in a parent directory", async () => {
+        const parentDir = await fileStorageService.createFileRecord({
+          name: "parent-dir-test",
+          type: "dir",
+          parentId: 0,
+          fileGuid: crypto.randomUUID(),
+        });
+
+        const response = await testRequest
+          .post(`${baseRoute}/directories`)
+          .send({ name: "child-folder", parentId: parentDir.id });
+
+        expect(response.status).toBe(201);
+        expect(response.body.directory.name).toBe("child-folder");
+        expect(response.body.directory.parentId).toBe(parentDir.id);
+        expect(response.body.path).toHaveLength(3);
+        expect(response.body.path[0].id).toBe(0);
+        expect(response.body.path[1].name).toBe("parent-dir-test");
+        expect(response.body.path[2].name).toBe("child-folder");
+
+        await fileStorageService.deleteFileRecord(response.body.directory.id);
+        await fileStorageService.deleteFileRecord(parentDir.id);
+      });
+
+      it("should reject creating directory with duplicate name in same parent (409)", async () => {
+        const parentDir = await fileStorageService.createFileRecord({
+          name: "parent-dir-dup",
+          type: "dir",
+          parentId: 0,
+          fileGuid: crypto.randomUUID(),
+        });
+
+        const existingFolder = await fileStorageService.createFileRecord({
+          name: "existing-folder",
+          type: "dir",
+          parentId: parentDir.id,
+          fileGuid: crypto.randomUUID(),
+        });
+
+        const response = await testRequest
+          .post(`${baseRoute}/directories`)
+          .send({ name: "existing-folder", parentId: parentDir.id });
+
+        expect(response.status).toBe(409);
+
+        await fileStorageService.deleteFileRecord(existingFolder.id);
+        await fileStorageService.deleteFileRecord(parentDir.id);
+      });
+
+      it("should reject creating directory with empty name (400)", async () => {
+        const response = await testRequest.post(`${baseRoute}/directories`).send({ name: "", parentId: 0 });
+
+        expect(response.status).toBe(400);
+      });
+
+      it("should reject creating directory with non-existent parent (404)", async () => {
+        const response = await testRequest.post(`${baseRoute}/directories`).send({ name: "new-folder", parentId: 99999 });
+
+        expect(response.status).toBe(404);
+      });
+    });
+
+    describe("GET /tree", () => {
+      it("should return hierarchical tree structure with nested children", async () => {
+        const rootDir = await fileStorageService.createFileRecord({
+          name: "root-dir-tree",
+          type: "dir",
+          parentId: 0,
+          fileGuid: crypto.randomUUID(),
+        });
+
+        const childDir = await fileStorageService.createFileRecord({
+          name: "child-dir-tree",
+          type: "dir",
+          parentId: rootDir.id,
+          fileGuid: crypto.randomUUID(),
+        });
+
+        const upload1 = await uploadFile("tree-file1.gcode", SIMPLE_GCODE);
+        expectOkResponse(upload1);
+        const fileRecord1 = await fileStorageService.getFileRecordByGuid(upload1.body.fileStorageId);
+        await fileStorageService.updateFileRecord(fileRecord1!.id, { parentId: rootDir.id });
+
+        const upload2 = await uploadFile("tree-file2.gcode", SIMPLE_GCODE);
+        expectOkResponse(upload2);
+        const fileRecord2 = await fileStorageService.getFileRecordByGuid(upload2.body.fileStorageId);
+        await fileStorageService.updateFileRecord(fileRecord2!.id, { parentId: childDir.id });
+
+        const response = await testRequest.get(`${baseRoute}/tree`);
+
+        expectOkResponse(response);
+        expect(response.body.tree).toBeDefined();
+        expect(Array.isArray(response.body.tree)).toBe(true);
+
+        const rootDirNode = response.body.tree.find((node: any) => node.name === "root-dir-tree");
+        expect(rootDirNode).toBeDefined();
+        expect(rootDirNode.type).toBe("dir");
+        expect(rootDirNode.children).toHaveLength(2);
+
+        const childDirNode = rootDirNode.children.find((node: any) => node.name === "child-dir-tree");
+        expect(childDirNode).toBeDefined();
+        expect(childDirNode.children).toHaveLength(1);
+        expect(childDirNode.children[0].name).toBe("tree-file2.gcode");
+
+        const file1Node = rootDirNode.children.find((node: any) => node.name === "tree-file1.gcode");
+        expect(file1Node).toBeDefined();
+        expect(file1Node.type).toBe("gcode");
+
+        await fileStorageService.deleteFile(upload1.body.fileStorageId);
+        await fileStorageService.deleteFile(upload2.body.fileStorageId);
+        await fileStorageService.deleteFileRecord(childDir.id);
+        await fileStorageService.deleteFileRecord(rootDir.id);
+      });
+
+      it("should return empty tree when no files or directories exist", async () => {
+        const allRecords = await fileStorageService["fileRecordRepository"].find();
+        for (const record of allRecords) {
+          if (record.id !== 0) {
+            if (record.type === "gcode") {
+              await fileStorageService.deleteFile(record.fileGuid);
+            } else {
+              await fileStorageService.deleteFileRecord(record.id);
+            }
+          }
+        }
+
+        const response = await testRequest.get(`${baseRoute}/tree`);
+
+        expectOkResponse(response);
+        expect(response.body.tree).toHaveLength(1);
+        expect(response.body.tree[0].id).toBe(0);
+        expect(response.body.tree[0].name).toBe("/");
+        expect(response.body.tree[0].children).toEqual([]);
+      });
+    });
+  });
 });
