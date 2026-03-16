@@ -325,7 +325,7 @@ __metadata:
   dependencies:
     "@types/express": "npm:5.0.1"
     "@types/multer": "npm:2.1.0"
-    "@types/node": "npm:24.10.13"
+    "@types/node": "npm:24.12.0"
     "@types/ws": "npm:8.18.1"
     axios: "npm:1.13.6"
     better-sqlite3: "npm:12.6.2"
@@ -2406,15 +2406,6 @@ __metadata:
   dependencies:
     undici-types: "npm:~7.18.0"
   checksum: 10c0/70c508165b6758c4f88d4f91abca526c3985eee1985503d4c2bd994dbaf588e52ac57e571160f18f117d76e963570ac82bd20e743c18987e82564312b3b62119
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:24.10.13":
-  version: 24.10.13
-  resolution: "@types/node@npm:24.10.13"
-  dependencies:
-    undici-types: "npm:~7.16.0"
-  checksum: 10c0/4ff0b9b060b5477c0fec5b11a176f294be588104ab546295db65b17a92ba0a6077b52ad92dd3c0d2154198c7f9d0021e6c1d42b00c9ac7ebfd85632afbcc48a4
   languageName: node
   linkType: hard
 
