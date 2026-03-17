@@ -18,9 +18,7 @@ describe("FileStorageController - Real Integration", () => {
   const SIMPLE_GCODE = "G28\nG1 X10 Y10 Z0.2 F1500\nG1 X20 Y20 E0.5\n";
 
   const uploadFile = (filename: string, content: string, options?: { filePath?: string }) => {
-    const req = testRequest
-      .post(`${baseRoute}/upload`)
-      .set("Accept", "application/json");
+    const req = testRequest.post(`${baseRoute}/upload`).set("Accept", "application/json");
 
     if (options?.filePath) {
       req.field("filePath", options.filePath);
@@ -1425,7 +1423,9 @@ describe("FileStorageController - Real Integration", () => {
       });
 
       it("should reject creating directory with non-existent parent (404)", async () => {
-        const response = await testRequest.post(`${baseRoute}/directories`).send({ name: "new-folder", parentId: 99999 });
+        const response = await testRequest
+          .post(`${baseRoute}/directories`)
+          .send({ name: "new-folder", parentId: 99999 });
 
         expect(response.status).toBe(404);
       });

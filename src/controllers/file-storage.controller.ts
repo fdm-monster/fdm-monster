@@ -654,17 +654,16 @@ export class FileStorageController {
         throw error;
       }
     } else if (filePathRaw) {
-      const pathSeparatorRegex = /[\/\\]/;
+      const pathSeparatorRegex = /[/\\]/;
 
       if (pathSeparatorRegex.test(filePathRaw)) {
-        const lastSeparatorIndex = Math.max(
-          filePathRaw.lastIndexOf("/"),
-          filePathRaw.lastIndexOf("\\"),
-        );
+        const lastSeparatorIndex = Math.max(filePathRaw.lastIndexOf("/"), filePathRaw.lastIndexOf("\\"));
         const directoryPath = filePathRaw.substring(0, lastSeparatorIndex);
         const actualFileName = filePathRaw.substring(lastSeparatorIndex + 1);
 
-        this.logger.log(`Detected path in filePath field: "${filePathRaw}" -> dir: "${directoryPath}", file: "${actualFileName}"`);
+        this.logger.log(
+          `Detected path in filePath field: "${filePathRaw}" -> dir: "${directoryPath}", file: "${actualFileName}"`,
+        );
 
         try {
           parentId = await this.fileStorageService.resolveOrCreatePath(directoryPath);

@@ -828,7 +828,9 @@ export class FileStorageService implements IFileStorageService {
 
     const updatedRecord = await this.updateFileRecord(fileRecord.id, { parentId: newParentId });
 
-    this.logger.log(`Moved ${fileRecord.name} (id: ${fileRecord.id}) from parent ${fileRecord.parentId} to ${newParentId}`);
+    this.logger.log(
+      `Moved ${fileRecord.name} (id: ${fileRecord.id}) from parent ${fileRecord.parentId} to ${newParentId}`,
+    );
 
     return updatedRecord;
   }
