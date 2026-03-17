@@ -8,7 +8,7 @@ import { MulterService } from "@/services/core/multer.service";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { FileAnalysisService } from "@/services/file-analysis.service";
-import { BadRequestException } from "@/exceptions/runtime.exceptions";
+import { BadRequestException, NotFoundException, ConflictException } from "@/exceptions/runtime.exceptions";
 import { copyFileSync, existsSync, unlinkSync } from "node:fs";
 import { extname } from "node:path";
 
@@ -127,6 +127,139 @@ export class FileStorageController {
     });
   }
 
+  @POST()
+  @route("/bulk/move")
+  async bulkMoveFiles(req: Request, res: Response) {
+    const { fileIds, parentId } = req.body as { fileIds?: string[]; parentId?: number };
+
+    if (!Array.isArray(fileIds) || fileIds.length === 0) {
+      res.status(400).send({ error: "fileIds must be a non-empty array" });
+      return;
+    }
+
+    if (fileIds.length > 100) {
+      res.status(400).send({ error: "Maximum 100 files can be moved at once" });
+      return;
+    }
+
+    if (parentId === undefined || parentId === null) {
+      res.status(400).send({ error: "parentId is required" });
+      return;
+    }
+
+    const parsedParentId = Number.parseInt(String(parentId), 10);
+    if (Number.isNaN(parsedParentId)) {
+      res.status(400).send({ error: "Invalid parentId - must be a number" });
+      return;
+    }
+
+    let moved = 0;
+    let failed = 0;
+    const errors: Array<{ fileId: string; error: string }> = [];
+
+    for (const fileId of fileIds) {
+      try {
+        await this.fileStorageService.moveFileRecord(fileId, parsedParentId);
+        moved++;
+        this.logger.log(`Bulk move: moved file ${fileId} to parent ${parsedParentId}`);
+      } catch (error) {
+        failed++;
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        errors.push({ fileId, error: errorMessage });
+        this.logger.error(`Bulk move: failed to move file ${fileId}: ${errorMessage}`);
+      }
+    }
+
+    res.send({
+      moved,
+      failed,
+      errors,
+    });
+  }
+
+  @POST()
+  @route("/directories")
+  async createDirectory(req: Request, res: Response) {
+    const { name, parentId } = req.body as { name?: string; parentId?: number };
+
+    if (!name || typeof name !== "string" || name.trim().length === 0) {
+      res.status(400).send({ error: "name is required and must be a non-empty string" });
+      return;
+    }
+
+    const parsedParentId = parentId === undefined || parentId === null ? 0 : Number.parseInt(String(parentId), 10);
+    if (Number.isNaN(parsedParentId)) {
+      res.status(400).send({ error: "Invalid parentId - must be a number" });
+      return;
+    }
+
+    try {
+      if (parsedParentId !== 0) {
+        await this.fileStorageService.validateParentDirectory(parsedParentId);
+      }
+
+      const existing = await this.fileStorageService.fileRecordRepository.findOne({
+        where: { name: name.trim(), parentId: parsedParentId, type: "dir" },
+      });
+
+      if (existing) {
+        res.status(409).send({ error: "Directory with this name already exists in the parent directory" });
+        return;
+      }
+
+      const newDir = await this.fileStorageService.createFileRecord({
+        name: name.trim(),
+        type: "dir",
+        parentId: parsedParentId,
+        fileGuid: this.fileStorageService.getDeterministicId(name.trim(), `dir-${Date.now()}`),
+      });
+
+      this.logger.log(`Created directory: ${name.trim()} (id: ${newDir.id}, parent: ${parsedParentId})`);
+
+      const path = await this.fileStorageService.getPath(newDir.id);
+
+      res.status(201).send({
+        message: "Directory created successfully",
+        directory: {
+          id: newDir.id,
+          fileGuid: newDir.fileGuid,
+          name: newDir.name,
+          type: newDir.type,
+          parentId: newDir.parentId,
+        },
+        path: path.map((record) => ({
+          id: record.id,
+          name: record.name,
+          type: record.type,
+          fileGuid: record.fileGuid,
+        })),
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        res.status(404).send({ error: error.message });
+        return;
+      }
+      if (error instanceof ConflictException) {
+        res.status(400).send({ error: error.message });
+        return;
+      }
+      this.logger.error(`Failed to create directory: ${error}`);
+      res.status(500).send({ error: "Failed to create directory" });
+    }
+  }
+
+  @GET()
+  @route("/tree")
+  async getTree(req: Request, res: Response) {
+    try {
+      const tree = await this.fileStorageService.buildTree();
+      res.send({ tree });
+    } catch (error) {
+      this.logger.error(`Failed to build file tree: ${error}`);
+      res.status(500).send({ error: "Failed to build file tree" });
+    }
+  }
+
   @GET()
   async listFiles(req: Request, res: Response) {
     try {
@@ -135,6 +268,7 @@ export class FileStorageController {
       const type = req.query.type as "gcode" | "3mf" | "bgcode" | undefined;
       const sortBy = (req.query.sortBy as "createdAt" | "name" | "type") || "createdAt";
       const sortOrder = (req.query.sortOrder as "ASC" | "DESC") || "DESC";
+      const parentId = req.query.parentId ? Number.parseInt(req.query.parentId as string) : undefined;
 
       const result = await this.fileStorageService.listAllFiles({
         page,
@@ -142,6 +276,7 @@ export class FileStorageController {
         type,
         sortBy,
         sortOrder,
+        parentId,
       });
 
       res.send({
@@ -172,6 +307,97 @@ export class FileStorageController {
     } catch (error) {
       this.logger.error(`Failed to list files: ${error}`);
       res.status(500).send({ error: "Failed to list files" });
+    }
+  }
+
+  @GET()
+  @route("/:fileStorageId/path")
+  async getFilePath(req: Request, res: Response) {
+    const { fileStorageId } = req.params as { fileStorageId: string };
+
+    try {
+      const fileRecord = await this.fileStorageService.getFileRecordByGuid(fileStorageId);
+      if (!fileRecord) {
+        res.status(404).send({ error: "File not found" });
+        return;
+      }
+
+      const path = await this.fileStorageService.getPath(fileRecord.id);
+
+      res.send({
+        path: path.map((record) => ({
+          id: record.id,
+          name: record.name,
+          type: record.type,
+          fileGuid: record.fileGuid,
+        })),
+        targetId: fileRecord.id,
+        targetName: fileRecord.name,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to get file path for ${fileStorageId}: ${error}`);
+      res.status(500).send({ error: "Failed to get file path" });
+    }
+  }
+
+  /**
+   * Move file or directory to a new parent directory
+   * POST /api/file-storage/:fileStorageId/move
+   */
+  @POST()
+  @route("/:fileStorageId/move")
+  async moveFile(req: Request, res: Response) {
+    const { fileStorageId } = req.params as { fileStorageId: string };
+    const { parentId } = req.body;
+
+    if (parentId === undefined || parentId === null) {
+      res.status(400).send({ error: "parentId is required" });
+      return;
+    }
+
+    const parsedParentId = Number.parseInt(parentId, 10);
+    if (Number.isNaN(parsedParentId)) {
+      res.status(400).send({ error: "Invalid parentId - must be a number" });
+      return;
+    }
+
+    try {
+      const oldRecord = await this.fileStorageService.getFileRecordByGuid(fileStorageId);
+      if (!oldRecord) {
+        res.status(404).send({ error: "File not found" });
+        return;
+      }
+
+      const oldParentId = oldRecord.parentId;
+
+      const updatedRecord = await this.fileStorageService.moveFileRecord(fileStorageId, parsedParentId);
+
+      const newPath = await this.fileStorageService.getPath(updatedRecord.id);
+
+      res.send({
+        message: "File moved successfully",
+        fileStorageId,
+        fileName: updatedRecord.name,
+        oldParentId,
+        newParentId: parsedParentId,
+        path: newPath.map((record) => ({
+          id: record.id,
+          name: record.name,
+          type: record.type,
+          fileGuid: record.fileGuid,
+        })),
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        res.status(404).send({ error: error.message });
+        return;
+      }
+      if (error instanceof ConflictException) {
+        res.status(400).send({ error: error.message });
+        return;
+      }
+      this.logger.error(`Failed to move file ${fileStorageId}: ${error}`);
+      res.status(500).send({ error: "Failed to move file" });
     }
   }
 
@@ -401,6 +627,56 @@ export class FileStorageController {
     }
 
     const file = files[0];
+    const parentIdRaw = req.body.parentId;
+    const filePathRaw = req.body.filePath;
+
+    let parentId = 0;
+
+    if (parentIdRaw) {
+      const parsedParentId = Number.parseInt(parentIdRaw, 10);
+      if (Number.isNaN(parsedParentId)) {
+        res.status(400).send({ error: "Invalid parentId - must be a number" });
+        return;
+      }
+
+      try {
+        await this.fileStorageService.validateParentDirectory(parsedParentId);
+        parentId = parsedParentId;
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          res.status(404).send({ error: error.message });
+          return;
+        }
+        if (error instanceof ConflictException) {
+          res.status(400).send({ error: error.message });
+          return;
+        }
+        throw error;
+      }
+    } else if (filePathRaw) {
+      const pathSeparatorRegex = /[\/\\]/;
+
+      if (pathSeparatorRegex.test(filePathRaw)) {
+        const lastSeparatorIndex = Math.max(
+          filePathRaw.lastIndexOf("/"),
+          filePathRaw.lastIndexOf("\\"),
+        );
+        const directoryPath = filePathRaw.substring(0, lastSeparatorIndex);
+        const actualFileName = filePathRaw.substring(lastSeparatorIndex + 1);
+
+        this.logger.log(`Detected path in filePath field: "${filePathRaw}" -> dir: "${directoryPath}", file: "${actualFileName}"`);
+
+        try {
+          parentId = await this.fileStorageService.resolveOrCreatePath(directoryPath);
+          file.originalname = actualFileName;
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          res.status(500).send({ error: `Failed to resolve directory path: ${errorMessage}` });
+          return;
+        }
+      }
+    }
+
     await this.fileStorageService.validateUniqueFilename(file.originalname);
 
     const ext = extname(file.originalname);
@@ -414,7 +690,7 @@ export class FileStorageController {
       const analysisResult = await this.fileAnalysisService.analyzeFile(tempPathWithExt);
       const { metadata, thumbnails } = analysisResult;
 
-      const fileStorageId = await this.fileStorageService.saveFile(file, fileHash);
+      const fileStorageId = await this.fileStorageService.saveFile(file, fileHash, parentId);
       this.logger.log(`Saved ${file.originalname} as ${fileStorageId}`);
 
       const thumbnailMetadata =
