@@ -7,7 +7,11 @@ export default defineConfig({
     ssr: true,
     rolldownOptions: {
       input: "src/index.ts",
+      external: ["snappy", "@napi-rs/snappy"],
     },
+  },
+  optimizeDeps: {
+    exclude: ["snappy", "@napi-rs/snappy"],
   },
   fmt: {
     printWidth: 120,
@@ -32,6 +36,9 @@ export default defineConfig({
       skipNodeModulesBundle: true,
     },
     onSuccess: process.env.START_SERVER === "true" ? "node --enable-source-maps dist/index.js" : undefined,
+  },
+  ssr: {
+    external: ["snappy", "@napi-rs/snappy"],
   },
   test: {
     globals: true,
