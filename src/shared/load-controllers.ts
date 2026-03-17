@@ -8,8 +8,7 @@ import {
 } from "awilix-express";
 import { Router } from "express";
 import { ClassOrFunctionReturning } from "awilix";
-
-const controllerModules = import.meta.glob("@/controllers/*.controller.ts");
+import controllerModules from "virtual:controllers";
 
 export async function loadControllersFunc(): Promise<Router> {
   const found = await findControllers();
@@ -19,12 +18,7 @@ export async function loadControllersFunc(): Promise<Router> {
 }
 
 export async function findControllers(): Promise<FindControllersResult> {
-  const modules = await Promise.all(
-    Object.values(controllerModules).map((load) =>
-      (load as () => Promise<unknown>)().then(extractStateAndTargetFromExports),
-    ),
-  );
-  return modules.flat();
+  return controllerModules.map(extractStateAndTargetFromExports).flat();
 }
 
 function extractStateAndTargetFromExports(exports: unknown): FindControllersResult {

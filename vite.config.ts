@@ -1,8 +1,10 @@
 import { defineConfig } from "vite-plus";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { controllersPlugin } from "./src/plugins/controllers-plugin";
 
 export default defineConfig({
+  plugins: [controllersPlugin()],
   build: {
     ssr: true,
     rolldownOptions: {
@@ -32,10 +34,12 @@ export default defineConfig({
     fixedExtension: false,
     outDir: "dist",
     sourcemap: true,
+    plugins: [controllersPlugin()],
     deps: {
       skipNodeModulesBundle: true,
     },
-    onSuccess: process.env.START_SERVER === "true" ? "node --enable-source-maps dist/index.js" : undefined,
+    onSuccess:
+      process.env.START_SERVER === "true" ? "node --enable-source-maps dist/index.js" : undefined,
   },
   ssr: {
     external: ["snappy", "@napi-rs/snappy"],
@@ -52,7 +56,14 @@ export default defineConfig({
       provider: "v8",
       reporter: ["clover", "json", "lcov", "text"],
       include: ["src/**/*.ts"],
-      exclude: ["**/node_modules/**", "test/**", "coverage/**", "docker/**", "media/**", "setups/**"],
+      exclude: [
+        "**/node_modules/**",
+        "test/**",
+        "coverage/**",
+        "docker/**",
+        "media/**",
+        "setups/**",
+      ],
     },
     exclude: ["**/node_modules/**", "**/dist/**", "**/coverage/**", "setups/**"],
   },
