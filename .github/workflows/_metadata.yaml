@@ -38,7 +38,7 @@ jobs:
     steps:
       - name: Docker metadata (regular)
         id: meta
-        uses: docker/metadata-action@dde548f1603e003959483c86c72ec03454216f9c
+        uses: docker/metadata-action@d24d429af23073facc066506898a0eae1f24b9ad
         with:
           images: fdmmonster/fdm-monster
           tags: |
@@ -49,7 +49,7 @@ jobs:
 
       - name: Docker metadata (mDNS)
         id: meta_mdns
-        uses: docker/metadata-action@dde548f1603e003959483c86c72ec03454216f9c
+        uses: docker/metadata-action@d24d429af23073facc066506898a0eae1f24b9ad
         with:
           images: fdmmonster/fdm-monster
           flavor: |
