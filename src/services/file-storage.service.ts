@@ -1,6 +1,7 @@
-import { Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { PrintJob } from "@/entities/print-job.entity";
-import type { ILoggerFactory } from "@/handlers/logger-factory";
+import { FileRecord } from "@/entities/file-record.entity";
+import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { AppConstants } from "@/server.constants";
 import { getMediaPath } from "@/utils/fs.utils";
@@ -9,10 +10,10 @@ import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access }
 import { createHash } from "node:crypto";
 import { existsSync, createReadStream, statSync } from "node:fs";
 import { Readable } from "node:stream";
-import { ConflictException } from "@/exceptions/runtime.exceptions";
+import { NotFoundException, ConflictException } from "@/exceptions/runtime.exceptions";
 
 export interface IFileStorageService {
-  saveFile(file: Express.Multer.File, fileHash?: string): Promise<string>;
+  saveFile(file: Express.Multer.File, fileHash?: string, parentId?: number): Promise<string>;
   getFile(fileStorageId: string): Promise<Buffer>;
   deleteFile(fileStorageId: string): Promise<void>;
   getFilePath(fileStorageId: string): string;
@@ -46,16 +47,29 @@ export interface IFileStorageService {
   >;
   getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null>;
   listThumbnails(fileStorageId: string): Promise<string[]>;
+  listFileRecords(parentId?: number): Promise<FileRecord[]>;
+  getFileRecordById(id: number): Promise<FileRecord | null>;
+  getFileRecordByGuid(guid: string): Promise<FileRecord | null>;
+  createFileRecord(data: Partial<FileRecord>): Promise<FileRecord>;
+  updateFileRecord(id: number, data: Partial<FileRecord>): Promise<FileRecord>;
+  deleteFileRecord(id: number): Promise<void>;
+  getPath(fileRecordId: number): Promise<FileRecord[]>;
+  validateParentDirectory(parentId: number): Promise<void>;
+  resolveOrCreatePath(pathString: string): Promise<number>;
+  moveFileRecord(fileStorageId: string, newParentId: number): Promise<FileRecord>;
+  validateMove(sourceId: number, targetParentId: number): Promise<void>;
 }
 
 export class FileStorageService implements IFileStorageService {
   printJobRepository: Repository<PrintJob>;
+  fileRecordRepository: Repository<FileRecord>;
   private readonly logger;
   private readonly storageBasePath: string;
   private readonly STORAGE_SUBDIRS = ["gcode", "3mf", "bgcode"] as const;
 
   constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService) {
     this.printJobRepository = typeormService.getDataSource().getRepository(PrintJob);
+    this.fileRecordRepository = typeormService.getDataSource().getRepository(FileRecord);
     this.logger = loggerFactory(FileStorageService.name);
 
     this.storageBasePath = join(getMediaPath(), AppConstants.defaultPrintFilesStorage);
@@ -99,7 +113,7 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  async saveFile(file: Express.Multer.File, fileHash?: string): Promise<string> {
+  async saveFile(file: Express.Multer.File, fileHash?: string, parentId: number = 0): Promise<string> {
     const fileExt = extname(file.originalname).toLowerCase();
 
     let fileId: string;
@@ -114,10 +128,13 @@ export class FileStorageService implements IFileStorageService {
     }
 
     let subdir = "gcode";
+    let fileType: "gcode" | "3mf" | "bgcode" = "gcode";
     if (fileExt === ".3mf" || file.originalname.includes(".gcode.3mf")) {
       subdir = "3mf";
+      fileType = "3mf";
     } else if (fileExt === ".bgcode") {
       subdir = "bgcode";
+      fileType = "bgcode";
     }
 
     const targetDir = join(this.storageBasePath, subdir);
@@ -130,6 +147,14 @@ export class FileStorageService implements IFileStorageService {
     } else {
       throw new Error("File has no path or buffer");
     }
+
+    await this.createFileRecord({
+      parentId,
+      type: fileType,
+      name: file.originalname,
+      fileGuid: fileId,
+      metadata: null,
+    });
 
     this.logger.log(`Saved file ${file.originalname} as ${fileId}`);
     return fileId;
@@ -164,6 +189,11 @@ export class FileStorageService implements IFileStorageService {
       await rm(thumbnailDir, { recursive: true, force: true });
       this.logger.debug(`Deleted thumbnails for ${fileStorageId}`);
     } catch {}
+
+    const fileRecord = await this.getFileRecordByGuid(fileStorageId);
+    if (fileRecord) {
+      await this.deleteFileRecord(fileRecord.id);
+    }
 
     this.logger.log(`Deleted file ${fileStorageId}`);
   }
@@ -425,8 +455,15 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  async listAllFiles(): Promise<
-    Array<{
+  async listAllFiles(options?: {
+    page?: number;
+    pageSize?: number;
+    type?: "gcode" | "3mf" | "bgcode";
+    sortBy?: "createdAt" | "name" | "type";
+    sortOrder?: "ASC" | "DESC";
+    parentId?: number;
+  }): Promise<{
+    files: Array<{
       fileStorageId: string;
       fileName: string;
       fileFormat: string;
@@ -435,43 +472,102 @@ export class FileStorageService implements IFileStorageService {
       createdAt: Date;
       thumbnailCount: number;
       metadata?: any;
-    }>
-  > {
-    const files: any[] = [];
+    }>;
+    page: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+  }> {
+    // First, check ALL file records (across all pages) for orphans and clean them up
+    const allRecords = (await this.listFileRecords(options?.parentId, {
+      type: options?.type,
+      sortBy: options?.sortBy,
+      sortOrder: options?.sortOrder,
+      // Don't paginate - get ALL records to check for orphans
+    })) as FileRecord[];
 
-    for (const subdir of this.STORAGE_SUBDIRS) {
-      const dirPath = join(this.storageBasePath, subdir);
-      try {
-        const dirFiles = await readdir(dirPath);
+    const orphanedIds: number[] = [];
+    for (const record of allRecords) {
+      if (record.type === "dir") continue;
 
-        for (const file of dirFiles) {
-          if (file.endsWith("_thumbnails") || file.endsWith(".json")) continue;
-
-          const fileId = path.parse(file).name;
-          const filePath = join(dirPath, file);
-          const stats = await stat(filePath);
-
-          const metadata = await this.loadMetadata(fileId);
-
-          const thumbnails = await this.listThumbnails(fileId);
-
-          files.push({
-            fileStorageId: fileId,
-            fileName: metadata?._fileName || file,
-            fileFormat: subdir,
-            fileSize: stats.size,
-            fileHash: metadata?._fileHash || "",
-            createdAt: stats.birthtime,
-            thumbnailCount: thumbnails.length,
-            metadata: metadata,
-          });
-        }
-      } catch (error) {
-        this.logger.error(`Error listing files in ${subdir}`, error);
+      const filePath = await this.findFilePath(record.fileGuid);
+      if (!filePath) {
+        this.logger.warn(
+          `FileRecord ${record.id} (${record.fileGuid}) will be deleted - ` + `physical file missing: ${record.name}`,
+        );
+        orphanedIds.push(record.id);
       }
     }
 
-    return files.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    // Batch delete orphaned records if any found
+    if (orphanedIds.length > 0) {
+      await this.fileRecordRepository
+        .createQueryBuilder()
+        .delete()
+        .from(FileRecord)
+        .where("id IN (:...ids)", { ids: orphanedIds })
+        .andWhere("type != :type", { type: "dir" })
+        .execute();
+
+      this.logger.log(`Deleted ${orphanedIds.length} orphaned FileRecords during list operation`);
+    }
+
+    // Now get the paginated results (after cleanup)
+    const result = await this.listFileRecords(options?.parentId, { ...options, paginate: true });
+    const files: any[] = [];
+
+    for (const record of result.items) {
+      if (record.type === "dir") continue;
+
+      try {
+        const filePath = await this.findFilePath(record.fileGuid);
+        if (!filePath) {
+          // This shouldn't happen since we just cleaned up, but log if it does
+          this.logger.warn(`FileRecord ${record.id} still missing after cleanup - skipping`);
+          continue;
+        }
+
+        const stats = await stat(filePath);
+        const metadata = await this.loadMetadata(record.fileGuid);
+        const thumbnails = await this.listThumbnails(record.fileGuid);
+
+        files.push({
+          fileStorageId: record.fileGuid,
+          fileName: metadata?._originalFileName || record.name,
+          fileFormat: record.type,
+          fileSize: stats.size,
+          fileHash: metadata?._fileHash || "",
+          createdAt: record.createdAt,
+          thumbnailCount: thumbnails.length,
+          metadata: metadata,
+        });
+      } catch (error) {
+        this.logger.error(`Error getting file info for ${record.fileGuid}`, error);
+      }
+    }
+
+    // Recalculate accurate count after orphan deletion (if any were deleted)
+    let totalCount = result.totalCount;
+    let totalPages = result.totalPages;
+
+    if (orphanedIds.length > 0) {
+      // Build where clause matching the filter used in listFileRecords
+      const where: any = { type: Not("dir") };
+      if (options?.type) {
+        where.type = options.type;
+      }
+
+      totalCount = await this.fileRecordRepository.count({ where });
+      totalPages = Math.ceil(totalCount / result.pageSize);
+    }
+
+    return {
+      files,
+      page: result.page,
+      pageSize: result.pageSize,
+      totalCount,
+      totalPages,
+    };
   }
 
   async getFileInfo(fileStorageId: string): Promise<{
@@ -507,5 +603,275 @@ export class FileStorageService implements IFileStorageService {
       this.logger.error(`Error getting file info for ${fileStorageId}`, error);
       return null;
     }
+  }
+
+  async listFileRecords(
+    parentId?: number,
+    options?: {
+      paginate?: boolean;
+      page?: number;
+      pageSize?: number;
+      type?: "gcode" | "3mf" | "bgcode";
+      sortBy?: "createdAt" | "name" | "type";
+      sortOrder?: "ASC" | "DESC";
+    },
+  ): Promise<
+    FileRecord[] | { items: FileRecord[]; totalCount: number; page: number; pageSize: number; totalPages: number }
+  > {
+    const sortBy = options?.sortBy || "createdAt";
+    const sortOrder = options?.sortOrder || "DESC";
+
+    const where: any = {};
+    if (parentId !== undefined) {
+      where.parentId = parentId;
+    }
+    if (options?.type) {
+      where.type = options.type;
+    }
+
+    if (options?.paginate) {
+      const page = options.page || 1;
+      const pageSize = options.pageSize || 50;
+
+      const [items, totalCount] = await this.fileRecordRepository.findAndCount({
+        where,
+        order: { [sortBy]: sortOrder },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
+
+      return {
+        items,
+        totalCount,
+        page,
+        pageSize,
+        totalPages: Math.ceil(totalCount / pageSize),
+      };
+    }
+
+    return await this.fileRecordRepository.find({
+      where,
+      order: { [sortBy]: sortOrder },
+    });
+  }
+
+  async getFileRecordById(id: number): Promise<FileRecord | null> {
+    return await this.fileRecordRepository.findOne({
+      where: { id },
+    });
+  }
+
+  async getFileRecordByGuid(guid: string): Promise<FileRecord | null> {
+    return await this.fileRecordRepository.findOne({
+      where: { fileGuid: guid },
+    });
+  }
+
+  async createFileRecord(data: Partial<FileRecord>): Promise<FileRecord> {
+    if (data.fileGuid) {
+      const existing = await this.getFileRecordByGuid(data.fileGuid);
+      if (existing) {
+        throw new ConflictException(
+          `File record with fileGuid "${data.fileGuid}" already exists`,
+          existing.id.toString(),
+        );
+      }
+    }
+
+    const record = this.fileRecordRepository.create(data);
+    const saved = await this.fileRecordRepository.save(record);
+
+    this.logger.log(`Created file record ${saved.id}: ${saved.name} (type: ${saved.type})`);
+    return saved;
+  }
+
+  async updateFileRecord(id: number, data: Partial<FileRecord>): Promise<FileRecord> {
+    const record = await this.getFileRecordById(id);
+    if (!record) {
+      throw new NotFoundException(`File record ${id} not found`);
+    }
+
+    if (data.fileGuid && data.fileGuid !== record.fileGuid) {
+      const existing = await this.getFileRecordByGuid(data.fileGuid);
+      if (existing) {
+        throw new ConflictException(
+          `File record with fileGuid "${data.fileGuid}" already exists`,
+          existing.id.toString(),
+        );
+      }
+    }
+
+    Object.assign(record, data);
+    const updated = await this.fileRecordRepository.save(record);
+
+    this.logger.log(`Updated file record ${id}`);
+    return updated;
+  }
+
+  async deleteFileRecord(id: number): Promise<void> {
+    const record = await this.getFileRecordById(id);
+    if (!record) {
+      throw new NotFoundException(`File record ${id} not found`);
+    }
+
+    await this.fileRecordRepository.remove(record);
+    this.logger.log(`Deleted file record ${id}: ${record.name}`);
+  }
+
+  async getPath(fileRecordId: number): Promise<FileRecord[]> {
+    const path: FileRecord[] = [];
+    let current = await this.getFileRecordById(fileRecordId);
+
+    if (!current) {
+      throw new NotFoundException(`File record ${fileRecordId} not found`);
+    }
+
+    while (current && current.id !== 0) {
+      path.unshift(current);
+      if (current.parentId === null || current.parentId === 0) break;
+      current = await this.getFileRecordById(current.parentId);
+    }
+
+    if (path[0]?.id !== 0) {
+      const root = await this.getFileRecordById(0);
+      if (root) path.unshift(root);
+    }
+
+    return path;
+  }
+
+  async validateParentDirectory(parentId: number): Promise<void> {
+    const parent = await this.getFileRecordById(parentId);
+
+    if (!parent) {
+      throw new NotFoundException(`Parent directory ${parentId} not found`);
+    }
+
+    if (parent.type !== "dir") {
+      throw new ConflictException(`Parent ${parentId} is not a directory (type: ${parent.type})`);
+    }
+  }
+
+  async resolveOrCreatePath(pathString: string): Promise<number> {
+    if (!pathString || pathString === "/" || pathString === ".") {
+      return 0;
+    }
+
+    const normalizedPath = pathString.replace(/\\/g, "/").replace(/^\/+/, "").replace(/\/+$/, "");
+
+    if (!normalizedPath) {
+      return 0;
+    }
+
+    const segments = normalizedPath.split("/").filter((s) => s.length > 0);
+
+    let currentParentId = 0;
+
+    for (const segment of segments) {
+      const existing = await this.fileRecordRepository.findOne({
+        where: {
+          parentId: currentParentId,
+          name: segment,
+          type: "dir",
+        },
+      });
+
+      if (existing) {
+        currentParentId = existing.id;
+      } else {
+        const newDir = await this.createFileRecord({
+          name: segment,
+          type: "dir",
+          parentId: currentParentId,
+          fileGuid: this.getDeterministicId(segment, `dir-${Date.now()}`),
+        });
+
+        this.logger.log(`Auto-created directory: ${segment} (id: ${newDir.id}, parent: ${currentParentId})`);
+        currentParentId = newDir.id;
+      }
+    }
+
+    return currentParentId;
+  }
+
+  async validateMove(sourceId: number, targetParentId: number): Promise<void> {
+    if (sourceId === targetParentId) {
+      throw new ConflictException("Cannot move item into itself");
+    }
+
+    if (sourceId === 0) {
+      throw new ConflictException("Cannot move root directory");
+    }
+
+    if (targetParentId !== 0) {
+      const targetPath = await this.getPath(targetParentId);
+      const isDescendant = targetPath.some((record) => record.id === sourceId);
+
+      if (isDescendant) {
+        throw new ConflictException("Cannot move directory into its own subdirectory (circular reference)");
+      }
+    }
+  }
+
+  async moveFileRecord(fileStorageId: string, newParentId: number): Promise<FileRecord> {
+    const fileRecord = await this.getFileRecordByGuid(fileStorageId);
+
+    if (!fileRecord) {
+      throw new NotFoundException(`File ${fileStorageId} not found`);
+    }
+
+    if (newParentId !== 0) {
+      await this.validateParentDirectory(newParentId);
+    }
+
+    await this.validateMove(fileRecord.id, newParentId);
+
+    const updatedRecord = await this.updateFileRecord(fileRecord.id, { parentId: newParentId });
+
+    this.logger.log(
+      `Moved ${fileRecord.name} (id: ${fileRecord.id}) from parent ${fileRecord.parentId} to ${newParentId}`,
+    );
+
+    return updatedRecord;
+  }
+
+  async buildTree(): Promise<any[]> {
+    const allRecords = await this.fileRecordRepository.find({
+      order: { name: "ASC" },
+    });
+
+    const recordMap = new Map<number, any>();
+
+    for (const record of allRecords) {
+      recordMap.set(record.id, {
+        id: record.id,
+        fileGuid: record.fileGuid,
+        name: record.name,
+        type: record.type,
+        parentId: record.parentId,
+        children: [],
+      });
+    }
+
+    const rootNodes: any[] = [];
+
+    for (const record of allRecords) {
+      const node = recordMap.get(record.id);
+      if (record.parentId === 0) {
+        rootNodes.push(node);
+      } else {
+        const parentNode = recordMap.get(record.parentId);
+        if (parentNode) {
+          parentNode.children.push(node);
+        } else {
+          this.logger.warn(
+            `Orphaned record found: ${record.name} (id: ${record.id}, parent: ${record.parentId}) - parent does not exist`,
+          );
+          rootNodes.push(node);
+        }
+      }
+    }
+
+    return rootNodes;
   }
 }

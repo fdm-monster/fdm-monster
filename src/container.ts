@@ -71,6 +71,7 @@ import { PrintJobService } from "@/services/orm/print-job.service";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { PrintJobAnalysisTask } from "@/tasks/print-job-analysis.task";
 import { PrintFileDownloaderService } from "@/services/print-file-downloader.service";
+import { BackfillFileRecordsTask } from "@/tasks/backfill-file-records.task";
 
 export function configureContainer() {
   const container = createContainer({
@@ -177,6 +178,7 @@ export function configureContainer() {
     [di.printerWebsocketTask]: asClass(PrinterWebsocketTask).singleton(), // This task is a recurring heartbeat task
     [di.printerWebsocketRestoreTask]: asClass(PrinterWebsocketRestoreTask).singleton(), // Task aimed at testing the printer API
     [di.printJobAnalysisTask]: asClass(PrintJobAnalysisTask).singleton(),
+    [di.backfillFileRecordsTask]: asClass(BackfillFileRecordsTask).singleton(),
   });
 
   return container;
