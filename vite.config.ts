@@ -1,13 +1,19 @@
 import { defineConfig } from "vite-plus";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { controllersPlugin } from "./src/plugins/controllers-plugin.ts";
 
 export default defineConfig({
+  plugins: [controllersPlugin()],
   build: {
     ssr: true,
     rolldownOptions: {
       input: "src/index.ts",
+      external: ["snappy", "@napi-rs/snappy"],
     },
+  },
+  optimizeDeps: {
+    exclude: ["snappy", "@napi-rs/snappy"],
   },
   fmt: {
     printWidth: 120,
@@ -28,10 +34,14 @@ export default defineConfig({
     fixedExtension: false,
     outDir: "dist",
     sourcemap: true,
+    plugins: [controllersPlugin()],
     deps: {
       skipNodeModulesBundle: true,
     },
     onSuccess: process.env.START_SERVER === "true" ? "node --enable-source-maps dist/index.js" : undefined,
+  },
+  ssr: {
+    external: ["snappy", "@napi-rs/snappy"],
   },
   test: {
     globals: true,
