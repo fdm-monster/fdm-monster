@@ -1,6 +1,6 @@
 import { Not, Repository } from "typeorm";
 import { PrintJob } from "@/entities/print-job.entity";
-import { FileRecord } from "@/entities/file-record.entity";
+import { LocalFileRecord } from "@/entities/file-record.entity";
 import { ILoggerFactory } from "@/handlers/logger-factory";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { AppConstants } from "@/server.constants";
@@ -47,29 +47,29 @@ export interface IFileStorageService {
   >;
   getThumbnail(fileStorageId: string, index: number): Promise<Buffer | null>;
   listThumbnails(fileStorageId: string): Promise<string[]>;
-  listFileRecords(parentId?: number): Promise<FileRecord[]>;
-  getFileRecordById(id: number): Promise<FileRecord | null>;
-  getFileRecordByGuid(guid: string): Promise<FileRecord | null>;
-  createFileRecord(data: Partial<FileRecord>): Promise<FileRecord>;
-  updateFileRecord(id: number, data: Partial<FileRecord>): Promise<FileRecord>;
+  listFileRecords(parentId?: number): Promise<LocalFileRecord[]>;
+  getFileRecordById(id: number): Promise<LocalFileRecord | null>;
+  getFileRecordByGuid(guid: string): Promise<LocalFileRecord | null>;
+  createFileRecord(data: Partial<LocalFileRecord>): Promise<LocalFileRecord>;
+  updateFileRecord(id: number, data: Partial<LocalFileRecord>): Promise<LocalFileRecord>;
   deleteFileRecord(id: number): Promise<void>;
-  getPath(fileRecordId: number): Promise<FileRecord[]>;
+  getPath(fileRecordId: number): Promise<LocalFileRecord[]>;
   validateParentDirectory(parentId: number): Promise<void>;
   resolveOrCreatePath(pathString: string): Promise<number>;
-  moveFileRecord(fileStorageId: string, newParentId: number): Promise<FileRecord>;
+  moveFileRecord(fileStorageId: string, newParentId: number): Promise<LocalFileRecord>;
   validateMove(sourceId: number, targetParentId: number): Promise<void>;
 }
 
 export class FileStorageService implements IFileStorageService {
   printJobRepository: Repository<PrintJob>;
-  fileRecordRepository: Repository<FileRecord>;
+  fileRecordRepository: Repository<LocalFileRecord>;
   private readonly logger;
   private readonly storageBasePath: string;
   private readonly STORAGE_SUBDIRS = ["gcode", "3mf", "bgcode"] as const;
 
   constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService) {
     this.printJobRepository = typeormService.getDataSource().getRepository(PrintJob);
-    this.fileRecordRepository = typeormService.getDataSource().getRepository(FileRecord);
+    this.fileRecordRepository = typeormService.getDataSource().getRepository(LocalFileRecord);
     this.logger = loggerFactory(FileStorageService.name);
 
     this.storageBasePath = join(getMediaPath(), AppConstants.defaultPrintFilesStorage);
@@ -484,7 +484,7 @@ export class FileStorageService implements IFileStorageService {
       sortBy: options?.sortBy,
       sortOrder: options?.sortOrder,
       // Don't paginate - get ALL records to check for orphans
-    })) as FileRecord[];
+    })) as LocalFileRecord[];
 
     const orphanedIds: number[] = [];
     for (const record of allRecords) {
@@ -504,7 +504,7 @@ export class FileStorageService implements IFileStorageService {
       await this.fileRecordRepository
         .createQueryBuilder()
         .delete()
-        .from(FileRecord)
+        .from(LocalFileRecord)
         .where("id IN (:...ids)", { ids: orphanedIds })
         .andWhere("type != :type", { type: "dir" })
         .execute();
@@ -616,7 +616,7 @@ export class FileStorageService implements IFileStorageService {
       sortOrder?: "ASC" | "DESC";
     },
   ): Promise<
-    FileRecord[] | { items: FileRecord[]; totalCount: number; page: number; pageSize: number; totalPages: number }
+    LocalFileRecord[] | { items: LocalFileRecord[]; totalCount: number; page: number; pageSize: number; totalPages: number }
   > {
     const sortBy = options?.sortBy || "createdAt";
     const sortOrder = options?.sortOrder || "DESC";
@@ -655,19 +655,19 @@ export class FileStorageService implements IFileStorageService {
     });
   }
 
-  async getFileRecordById(id: number): Promise<FileRecord | null> {
+  async getFileRecordById(id: number): Promise<LocalFileRecord | null> {
     return await this.fileRecordRepository.findOne({
       where: { id },
     });
   }
 
-  async getFileRecordByGuid(guid: string): Promise<FileRecord | null> {
+  async getFileRecordByGuid(guid: string): Promise<LocalFileRecord | null> {
     return await this.fileRecordRepository.findOne({
       where: { fileGuid: guid },
     });
   }
 
-  async createFileRecord(data: Partial<FileRecord>): Promise<FileRecord> {
+  async createFileRecord(data: Partial<LocalFileRecord>): Promise<LocalFileRecord> {
     if (data.fileGuid) {
       const existing = await this.getFileRecordByGuid(data.fileGuid);
       if (existing) {
@@ -685,7 +685,7 @@ export class FileStorageService implements IFileStorageService {
     return saved;
   }
 
-  async updateFileRecord(id: number, data: Partial<FileRecord>): Promise<FileRecord> {
+  async updateFileRecord(id: number, data: Partial<LocalFileRecord>): Promise<LocalFileRecord> {
     const record = await this.getFileRecordById(id);
     if (!record) {
       throw new NotFoundException(`File record ${id} not found`);
@@ -718,8 +718,8 @@ export class FileStorageService implements IFileStorageService {
     this.logger.log(`Deleted file record ${id}: ${record.name}`);
   }
 
-  async getPath(fileRecordId: number): Promise<FileRecord[]> {
-    const path: FileRecord[] = [];
+  async getPath(fileRecordId: number): Promise<LocalFileRecord[]> {
+    const path: LocalFileRecord[] = [];
     let current = await this.getFileRecordById(fileRecordId);
 
     if (!current) {
@@ -813,7 +813,7 @@ export class FileStorageService implements IFileStorageService {
     }
   }
 
-  async moveFileRecord(fileStorageId: string, newParentId: number): Promise<FileRecord> {
+  async moveFileRecord(fileStorageId: string, newParentId: number): Promise<LocalFileRecord> {
     const fileRecord = await this.getFileRecordByGuid(fileStorageId);
 
     if (!fileRecord) {

@@ -5,7 +5,7 @@ import { Floor } from "@/entities/floor.entity";
 import { FloorPosition } from "@/entities/floor-position.entity";
 import { Printer } from "@/entities/printer.entity";
 import { Settings } from "@/entities/settings.entity";
-import { PrintJob, RefreshToken, User, PrinterMaintenanceLog, FileRecord } from "@/entities";
+import { PrintJob, RefreshToken, User, PrinterMaintenanceLog, LocalFileRecord } from "@/entities";
 import { CameraStream } from "@/entities/camera-stream.entity";
 import { Role } from "@/entities/role.entity";
 import { UserRole } from "@/entities/user-role.entity";
@@ -50,7 +50,7 @@ export const AppDataSource = new DataSource({
     PrinterTag,
     PrintJob,
     PrinterMaintenanceLog,
-    FileRecord,
+    LocalFileRecord,
   ],
   migrations: [
     InitSqlite1706829146617,

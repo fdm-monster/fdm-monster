@@ -3,7 +3,7 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, Update
 export type FileRecordType = "dir" | "gcode" | "bgcode" | "3mf";
 
 @Entity()
-export class FileRecord {
+export class LocalFileRecord {
   @PrimaryGeneratedColumn()
   id: number;
 

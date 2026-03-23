@@ -4,7 +4,7 @@ import { FileStorageService } from "@/services/file-storage.service";
 import { setupTestApp } from "../test-server";
 import { randomUUID } from "node:crypto";
 import { ConflictException, NotFoundException } from "@/exceptions/runtime.exceptions";
-import { FileRecord } from "@/entities/file-record.entity";
+import { LocalFileRecord } from "@/entities/file-record.entity";
 
 let container: AwilixContainer;
 let service: FileStorageService;
