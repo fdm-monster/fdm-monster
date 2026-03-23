@@ -39,3 +39,5 @@ bambu-link/
 setups/
 
 .claude/settings.local.json
+.cursorrules
+docs/ai-docs
