@@ -11,4 +11,4 @@ export { PrinterTag } from "./printer-tag.entity";
 export { Tag } from "./tag.entity";
 export { PrintJob } from "./print-job.entity";
 export { PrinterMaintenanceLog } from "./printer-maintenance-log.entity";
-export { FileRecord } from "./file-record.entity";
+export { LocalFileRecord } from "./file-record.entity";
