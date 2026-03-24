@@ -374,7 +374,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:4.1.1"
     "@vitest/ui": "npm:4.1.1"
     adm-zip: "npm:0.5.16"
-    awilix: "npm:12.1.1"
+    awilix: "npm:13.0.3"
     awilix-express: "npm:11.0.1"
     axios: "npm:1.13.6"
     basic-ftp: "npm:5.2.0"
@@ -3019,12 +3019,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"awilix@npm:12.1.1":
-  version: 12.1.1
-  resolution: "awilix@npm:12.1.1"
+"awilix@npm:13.0.3":
+  version: 13.0.3
+  resolution: "awilix@npm:13.0.3"
   dependencies:
     fast-glob: "npm:^3.3.3"
-  checksum: 10c0/44b0c51b955547d7375d86af5811f837ead0920695d2a5ba5516f791f3e7345f2ba328240302ca4fda38b1766efae93efd62452d0b1cd58c8299abb4dab2f1ef
+  checksum: 10c0/68953888ad3900cb6e85f7a0dc9d58f713db00b571c036bf2aff0a0a8416d2d7ae82db87bd95ef0191910bb08494e6f144e7e4064e6ff53cae44d7c40e6be871
   languageName: node
   linkType: hard
 
