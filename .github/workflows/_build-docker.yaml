@@ -39,7 +39,7 @@ jobs:
         uses: docker/setup-buildx-action@d91f340399fb2345e3e45f5461e116862b08261d
 
       - name: Login to DockerHub
-        uses: docker/login-action@292fe2d7ee5389e283d2c71e565819146798c2e2
+        uses: docker/login-action@a0d57b8e43b6ef1cca20559d68cec2227e63fccd
         if: inputs.push
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
