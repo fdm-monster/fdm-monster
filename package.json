@@ -60,7 +60,7 @@
     "adm-zip": "0.5.16",
     "awilix": "13.0.3",
     "awilix-express": "11.0.1",
-    "axios": "1.13.6",
+    "axios": "1.14.0",
     "basic-ftp": "5.2.0",
     "bcryptjs": "3.0.3",
     "better-sqlite3": "12.8.0",
