@@ -345,7 +345,7 @@ __metadata:
     "@types/ws": "npm:8.18.1"
     "@vitest/coverage-v8": "npm:4.1.2"
     "@vitest/ui": "npm:4.1.2"
-    adm-zip: "npm:0.5.16"
+    adm-zip: "npm:0.5.17"
     awilix: "npm:13.0.3"
     awilix-express: "npm:11.0.1"
     axios: "npm:1.14.0"
@@ -2833,10 +2833,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"adm-zip@npm:0.5.16":
-  version: 0.5.16
-  resolution: "adm-zip@npm:0.5.16"
-  checksum: 10c0/6f10119d4570c7ba76dcf428abb8d3f69e63f92e51f700a542b43d4c0130373dd2ddfc8f85059f12d4a843703a90c3970cfd17876844b4f3f48bf042bfa6b49f
+"adm-zip@npm:0.5.17":
+  version: 0.5.17
+  resolution: "adm-zip@npm:0.5.17"
+  checksum: 10c0/29b8f2a1070fc540ad9a45b13d0ceffd141d78e5a4501f102e978f0256f8290326009ccd3411213e90f3a810c830b39453548638879b3295ddc3814c20a8307b
   languageName: node
   linkType: hard
 

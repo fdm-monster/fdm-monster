@@ -57,7 +57,7 @@
     "@fdm-monster/client-next": "2.3.3",
     "@octokit/plugin-throttling": "11.0.3",
     "@sentry/node": "10.46.0",
-    "adm-zip": "0.5.16",
+    "adm-zip": "0.5.17",
     "awilix": "13.0.3",
     "awilix-express": "11.0.1",
     "axios": "1.14.0",
