@@ -302,7 +302,7 @@ __metadata:
     axios: "npm:1.14.0"
     better-sqlite3: "npm:12.8.0"
     chalk: "npm:5.6.2"
-    dotenv: "npm:17.3.1"
+    dotenv: "npm:17.4.0"
     express: "npm:4.22.1"
     ftp-srv: "npm:4.6.3"
     mqtt: "npm:5.15.1"
@@ -359,7 +359,7 @@ __metadata:
     cors: "npm:2.8.6"
     cross-env: "npm:10.1.0"
     deprecation: "npm:2.3.1"
-    dotenv: "npm:17.3.1"
+    dotenv: "npm:17.4.0"
     eventemitter2: "npm:6.4.9"
     express: "npm:4.22.1"
     form-data: "npm:4.0.5"
@@ -3776,10 +3776,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:17.3.1":
-  version: 17.3.1
-  resolution: "dotenv@npm:17.3.1"
-  checksum: 10c0/c78e0c2d5a549c751e544cc60e2b95e7cb67e0c551f42e094d161c6b297aa44b630a3c2dcacf5569e529a6c2a6b84e2ab9be8d37b299d425df5a18b81ce4a35f
+"dotenv@npm:17.4.0":
+  version: 17.4.0
+  resolution: "dotenv@npm:17.4.0"
+  checksum: 10c0/f040215466f9a0b0eef5053951c048ee613f587bf050d4e73b39261ec315a5e0331d246a99a2fdcfd38051fce13e9bd7e2801ae83c4368fc86c2ff0f758dd1db
   languageName: node
   linkType: hard
 
