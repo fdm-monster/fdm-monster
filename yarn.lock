@@ -343,8 +343,8 @@ __metadata:
     "@types/supertest": "npm:7.2.0"
     "@types/uuid": "npm:10.0.0"
     "@types/ws": "npm:8.18.1"
-    "@vitest/coverage-v8": "npm:4.1.3"
-    "@vitest/ui": "npm:4.1.3"
+    "@vitest/coverage-v8": "npm:4.1.4"
+    "@vitest/ui": "npm:4.1.4"
     adm-zip: "npm:0.5.17"
     awilix: "npm:13.0.3"
     awilix-express: "npm:11.0.1"
@@ -2539,12 +2539,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-v8@npm:4.1.3":
-  version: 4.1.3
-  resolution: "@vitest/coverage-v8@npm:4.1.3"
+"@vitest/coverage-v8@npm:4.1.4":
+  version: 4.1.4
+  resolution: "@vitest/coverage-v8@npm:4.1.4"
   dependencies:
     "@bcoe/v8-coverage": "npm:^1.0.2"
-    "@vitest/utils": "npm:4.1.3"
+    "@vitest/utils": "npm:4.1.4"
     ast-v8-to-istanbul: "npm:^1.0.0"
     istanbul-lib-coverage: "npm:^3.2.2"
     istanbul-lib-report: "npm:^3.0.1"
@@ -2554,29 +2554,29 @@ __metadata:
     std-env: "npm:^4.0.0-rc.1"
     tinyrainbow: "npm:^3.1.0"
   peerDependencies:
-    "@vitest/browser": 4.1.3
-    vitest: 4.1.3
+    "@vitest/browser": 4.1.4
+    vitest: 4.1.4
   peerDependenciesMeta:
     "@vitest/browser":
       optional: true
-  checksum: 10c0/d42f8ef4740e26d33937b9c7087cda999b82de1dc9fa418bbab21db2d31c91126d5fe3cb1364ab3bf86a5145febc36cb8bb3983384a95229c5256387c39635fe
+  checksum: 10c0/e128a70b15eeee55ad201b9f2a9d88f3a2ccd630c1518ec8ab1d80a6e7b557d23d426244ce09748c8553a53725137d92696bd1be3bd9349863dd375749988a4a
   languageName: node
   linkType: hard
 
-"@vitest/pretty-format@npm:4.1.3":
-  version: 4.1.3
-  resolution: "@vitest/pretty-format@npm:4.1.3"
+"@vitest/pretty-format@npm:4.1.4":
+  version: 4.1.4
+  resolution: "@vitest/pretty-format@npm:4.1.4"
   dependencies:
     tinyrainbow: "npm:^3.1.0"
-  checksum: 10c0/07ce23b95588ae15ae0447575f8f35a65f18253a74f73ec8da01a29ff2f31f2915ced1e67fc71911521c0a317910b35967bdbcdcf97c95bb847a4bccf38d7b36
+  checksum: 10c0/14a25c5acd02b1d18f9fab01d884658edb9137008d01025273617fb000e36391e4fda1513e94a257f5e611fb09041a0c042d145a90d359c9e810c0044b12763e
   languageName: node
   linkType: hard
 
-"@vitest/ui@npm:4.1.3":
-  version: 4.1.3
-  resolution: "@vitest/ui@npm:4.1.3"
+"@vitest/ui@npm:4.1.4":
+  version: 4.1.4
+  resolution: "@vitest/ui@npm:4.1.4"
   dependencies:
-    "@vitest/utils": "npm:4.1.3"
+    "@vitest/utils": "npm:4.1.4"
     fflate: "npm:^0.8.2"
     flatted: "npm:^3.4.2"
     pathe: "npm:^2.0.3"
@@ -2584,19 +2584,19 @@ __metadata:
     tinyglobby: "npm:^0.2.15"
     tinyrainbow: "npm:^3.1.0"
   peerDependencies:
-    vitest: 4.1.3
-  checksum: 10c0/daecbbf295405d7ba5435d05d1b73f2ecf1f85c3b03a5a8607965aa693b0c1d3568296d91fa3dbefb64581b8ffa802b18dbc136aedb326dedc565a65d7b20e97
+    vitest: 4.1.4
+  checksum: 10c0/2bd711f9f20b479e0b118508b1a1ea3b3dfe1ebd55905aed7a9324a1a59c07b3e7f82b58c94ffc7dbcb91bc66355883d932b1325bba7a96824c25d0e8b5c8ac7
   languageName: node
   linkType: hard
 
-"@vitest/utils@npm:4.1.3":
-  version: 4.1.3
-  resolution: "@vitest/utils@npm:4.1.3"
+"@vitest/utils@npm:4.1.4":
+  version: 4.1.4
+  resolution: "@vitest/utils@npm:4.1.4"
   dependencies:
-    "@vitest/pretty-format": "npm:4.1.3"
+    "@vitest/pretty-format": "npm:4.1.4"
     convert-source-map: "npm:^2.0.0"
     tinyrainbow: "npm:^3.1.0"
-  checksum: 10c0/1cc0a0a107322a42aa6d03f578f34316da7ccfded4810400f1b2bc6e11dae8715a2b213da36878a38bb5c621b5a7a264b29b0f06d344db30f46e18f326238c70
+  checksum: 10c0/7f81db08e5a8db1e83a37a8d64db011ae3a08b5bcc9aa220a6da428385acb75b11c77b169ab7a9f753529cc25ec11406cff6099b92711fda6291f844fb840a4e
   languageName: node
   linkType: hard
 
