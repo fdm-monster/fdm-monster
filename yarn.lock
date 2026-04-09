@@ -299,7 +299,7 @@ __metadata:
     "@types/multer": "npm:2.1.0"
     "@types/node": "npm:24.12.2"
     "@types/ws": "npm:8.18.1"
-    axios: "npm:1.14.0"
+    axios: "npm:1.15.0"
     better-sqlite3: "npm:12.8.0"
     chalk: "npm:5.6.2"
     dotenv: "npm:17.4.1"
@@ -348,7 +348,7 @@ __metadata:
     adm-zip: "npm:0.5.17"
     awilix: "npm:13.0.3"
     awilix-express: "npm:11.0.1"
-    axios: "npm:1.14.0"
+    axios: "npm:1.15.0"
     basic-ftp: "npm:5.2.1"
     bcryptjs: "npm:3.0.3"
     better-sqlite3: "npm:12.8.0"
@@ -3018,14 +3018,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.14.0":
-  version: 1.14.0
-  resolution: "axios@npm:1.14.0"
+"axios@npm:1.15.0":
+  version: 1.15.0
+  resolution: "axios@npm:1.15.0"
   dependencies:
     follow-redirects: "npm:^1.15.11"
     form-data: "npm:^4.0.5"
     proxy-from-env: "npm:^2.1.0"
-  checksum: 10c0/2541f4aa215a7d1842429dad006fc682d82bc0e74bd14500823f7d8cce3bbae0e0a8c328c8538946718f366ab8ce5a4c12e9ad40e5a0f3482ff8bff0cd115d45
+  checksum: 10c0/47e0f860e98d4d7aa145e89ce0cae00e1fb0f1d2485f065c21fce955ddb1dba4103a46bd0e47acd18a27208a7f62c96249e620db575521b92a968619ab133409
   languageName: node
   linkType: hard
 
