@@ -56,7 +56,7 @@
   "dependencies": {
     "@fdm-monster/client-next": "2.3.3",
     "@octokit/plugin-throttling": "11.0.3",
-    "@sentry/node": "10.47.0",
+    "@sentry/node": "10.48.0",
     "adm-zip": "0.5.17",
     "awilix": "13.0.3",
     "awilix-express": "11.0.1",
