@@ -300,7 +300,7 @@ __metadata:
     "@types/node": "npm:24.12.2"
     "@types/ws": "npm:8.18.1"
     axios: "npm:1.15.0"
-    better-sqlite3: "npm:12.8.0"
+    better-sqlite3: "npm:12.9.0"
     chalk: "npm:5.6.2"
     dotenv: "npm:17.4.2"
     express: "npm:4.22.1"
@@ -351,7 +351,7 @@ __metadata:
     axios: "npm:1.15.0"
     basic-ftp: "npm:5.2.2"
     bcryptjs: "npm:3.0.3"
-    better-sqlite3: "npm:12.8.0"
+    better-sqlite3: "npm:12.9.0"
     chalk: "npm:5.6.2"
     class-validator: "npm:0.15.1"
     connect-history-api-fallback: "npm:2.0.0"
@@ -3066,14 +3066,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:12.8.0":
-  version: 12.8.0
-  resolution: "better-sqlite3@npm:12.8.0"
+"better-sqlite3@npm:12.9.0":
+  version: 12.9.0
+  resolution: "better-sqlite3@npm:12.9.0"
   dependencies:
     bindings: "npm:^1.5.0"
     node-gyp: "npm:latest"
     prebuild-install: "npm:^7.1.1"
-  checksum: 10c0/b31da8a8a9bd0dd77d44c11fbfc72141a18b7267aed1ee5bedd481397415ace18eb54140706f82aca8149e4102fb2a543f833761e80f9668470ed53d03958515
+  checksum: 10c0/69ee0d908fa6a5c8643872aa664686ed02476e88cb654fe37f0fef5845081430d4280c82f5d370e169c2abe7a14a85d9bc718ea720058abf4f7cd9a8dbe227f0
   languageName: node
   linkType: hard
 
