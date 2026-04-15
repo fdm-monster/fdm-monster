@@ -4423,11 +4423,11 @@ __metadata:
   linkType: hard
 
 "get-tsconfig@npm:^4.7.5":
-  version: 4.13.7
-  resolution: "get-tsconfig@npm:4.13.7"
+  version: 4.13.8
+  resolution: "get-tsconfig@npm:4.13.8"
   dependencies:
     resolve-pkg-maps: "npm:^1.0.0"
-  checksum: 10c0/1118eb7e9b27bce0b9b6f042e98f0d067e26dfa1ca32bc4b56e892b615b57a5a4af9e6f801c7b0611a4afef2e31c4941be4c6026e0e6a480aaf1ddaf261113d5
+  checksum: 10c0/8fa2c7bb2d21503fc2662e263d4d25f4de6e532ef806c4ba9d026d18f0650f2fb341697be5a46fb37c887827cf5c4bb05b705b07207c0086a563f676b62e6265
   languageName: node
   linkType: hard
 
