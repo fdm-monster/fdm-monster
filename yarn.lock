@@ -380,7 +380,7 @@ __metadata:
     semver: "npm:7.7.4"
     socket.io: "npm:4.8.3"
     supertest: "npm:7.2.2"
-    swagger-ui-dist: "npm:5.32.3"
+    swagger-ui-dist: "npm:5.32.4"
     toad-scheduler: "npm:3.1.0"
     tsx: "npm:4.21.0"
     typeorm: "npm:0.3.28"
@@ -6909,12 +6909,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swagger-ui-dist@npm:5.32.3":
-  version: 5.32.3
-  resolution: "swagger-ui-dist@npm:5.32.3"
+"swagger-ui-dist@npm:5.32.4":
+  version: 5.32.4
+  resolution: "swagger-ui-dist@npm:5.32.4"
   dependencies:
     "@scarf/scarf": "npm:=1.4.0"
-  checksum: 10c0/146e758ab832f29b16c83247bd65de510efe4f70b74952d15f6363ae2e40b2de151f97ad987c06dc9e02ea2196c2986fd358ebf27af655ea3c91323ded38aef9
+  checksum: 10c0/3622e845557b842e4ded510c5043c970f11a3bdeb6c09c5829647e04bf6637a705a4d4faaf978b819cc5ea8785289a18a5050fe74fcc64b760b6b8a1f22e3e7b
   languageName: node
   linkType: hard
 
