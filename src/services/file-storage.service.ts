@@ -5,7 +5,17 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { AppConstants } from "@/server.constants";
 import { getMediaPath } from "@/utils/fs.utils";
 import path, { basename, extname, join } from "node:path";
-import { mkdir, readdir, readFile, rename, rm, stat, unlink, writeFile, access } from "node:fs/promises";
+import {
+  mkdir,
+  readdir,
+  readFile,
+  rename,
+  rm,
+  stat,
+  unlink,
+  writeFile,
+  access,
+} from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { existsSync, createReadStream, statSync } from "node:fs";
 import { Readable } from "node:stream";
@@ -29,7 +39,9 @@ export interface IFileStorageService {
   loadMetadata(fileStorageId: string): Promise<any | null>;
   hasMetadata(fileStorageId: string): Promise<boolean>;
   getDeterministicId(fileHash: string, fileName: string): string;
-  findDuplicateByOriginalFileName(originalFileName: string): Promise<{ fileStorageId: string; metadata: any } | null>;
+  findDuplicateByOriginalFileName(
+    originalFileName: string,
+  ): Promise<{ fileStorageId: string; metadata: any } | null>;
   saveThumbnails(
     fileStorageId: string,
     thumbnails: Array<{ data?: string; format?: string; width?: number; height?: number }>,
@@ -457,7 +469,7 @@ export class FileStorageService implements IFileStorageService {
 
           files.push({
             fileStorageId: fileId,
-            fileName: metadata?._fileName || file,
+            fileName: metadata?._originalFileName || file,
             fileFormat: subdir,
             fileSize: stats.size,
             fileHash: metadata?._fileHash || "",
