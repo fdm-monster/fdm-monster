@@ -422,27 +422,36 @@ export class BambuMqttAdapter implements IWebsocketAdapter {
   private transformStateToCurrentMessage(state: PrintData): any {
     const isPrinting = state.gcode_state === "PRINTING" || state.mc_print_stage === "printing";
     const isPaused = state.mc_print_stage === "paused";
+    const isFailed = state.gcode_state === "FAILED";
 
     // Check if connection is alive
     const isConnected = this.mqttClient?.connected || false;
-    const hasError = !isConnected || state.print_error !== 0;
+    // print_error is a side-channel hint that often carries non-zero stale codes when idle;
+    // gcode_state is the authoritative print-state machine. Use FAILED for the error flag,
+    // and surface print_error via debug logs so anomalies are still discoverable.
+    const hasError = !isConnected || isFailed;
+    if (state.print_error && state.print_error !== 0) {
+      this.logger.debug(
+        `Bambu print_error=${state.print_error} gcode_state=${state.gcode_state ?? "?"} (informational only)`,
+      );
+    }
 
     const isPausedText = isPaused ? "Paused" : "Printing";
 
     const onlineText = isPrinting ? isPausedText : "Operational";
     return {
       state: {
-        text: isConnected ? onlineText : "Offline",
+        text: isConnected ? (isFailed ? "Error" : onlineText) : "Offline",
         flags: {
-          operational: isConnected,
+          operational: isConnected && !isFailed,
           printing: isConnected && isPrinting && !isPaused,
           paused: isConnected && isPaused,
-          ready: isConnected && !isPrinting,
+          ready: isConnected && !isPrinting && !isFailed,
           error: hasError,
           cancelling: false,
           pausing: false,
           sdReady: isConnected,
-          closedOrError: !isConnected,
+          closedOrError: !isConnected || isFailed,
         },
       },
       temps: [
