@@ -3,6 +3,7 @@ describe("load-controllers test", () => {
     // @ts-ignore
     const result = await import.meta.glob("@/controllers/*.controller.*");
     expect(Object.keys(result), "API Controllers loaded should match").toMatchObject([
+      "/src/controllers/api-key.controller.ts",
       "/src/controllers/auth.controller.ts",
       "/src/controllers/batch-call.controller.ts",
       "/src/controllers/camera-stream.controller.ts",

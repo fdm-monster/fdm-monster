@@ -43,6 +43,7 @@ import { JwtService } from "./services/authentication/jwt.service";
 import { AuthService } from "./services/authentication/auth.service";
 import { throttling, ThrottlingOptions } from "@octokit/plugin-throttling";
 import { RefreshTokenService } from "@/services/orm/refresh-token.service";
+import { ApiKeyService } from "@/services/orm/api-key.service";
 import { SettingsService } from "@/services/orm/settings.service";
 import { FloorService } from "@/services/orm/floor.service";
 import { FloorPositionService } from "@/services/orm/floor-position.service";
@@ -99,6 +100,7 @@ export function configureContainer() {
     [di.printerMaintenanceLogService]: asClass(PrinterMaintenanceLogService),
     [di.printerTagService]: asClass(PrinterTagService),
     [di.refreshTokenService]: asClass(RefreshTokenService).singleton(),
+    [di.apiKeyService]: asClass(ApiKeyService).singleton(),
     [di.userService]: asClass(UserService).singleton(),
     [di.userRoleService]: asClass(UserRoleService).singleton(),
     [di.roleService]: asClass(RoleService).singleton(),
