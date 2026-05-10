@@ -163,6 +163,23 @@ describe(ApiKeyController.name, () => {
       const refreshed = list.body.find((k: any) => k.id === created.body.id);
       expect(refreshed?.lastUsedAt).not.toBeNull();
     });
+
+    it("rejects api-key auth when the bound user is no longer verified", async () => {
+      // Issue a key while the user is verified, then flip them to unverified
+      // (e.g. admin disabled the account after key issuance). The key must
+      // stop authenticating without needing an explicit revoke.
+      const user = await ensureTestUserCreated("apikey-unverified-user", "pw", false);
+      const created = await apiKeyService.createForUser(user.id, "unverified-test");
+      // Sanity: works while verified.
+      const before = await request.get(baseRoute).set("Authorization", `Bearer ${created.token}`);
+      expectOkResponse(before);
+
+      // Flip verified → false.
+      await ensureTestUserCreated("apikey-unverified-user", "pw", false, undefined, false);
+
+      const after = await request.get(baseRoute).set("Authorization", `Bearer ${created.token}`);
+      expectUnauthenticatedResponse(after);
+    });
   });
 });
 

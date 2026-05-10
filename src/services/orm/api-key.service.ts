@@ -3,6 +3,8 @@ import { ApiKey } from "@/entities";
 import { TypeormService } from "@/services/typeorm/typeorm.service";
 import type { IApiKeyService } from "@/services/interfaces/api-key.service.interface";
 import { ApiKeyDto, CreatedApiKeyDto } from "@/services/interfaces/api-key.dto";
+// `ApiKeyDto` is passed to BaseService() above as a constructor argument
+// (not an instance) — it's purely a generic-type marker.
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
@@ -30,7 +32,7 @@ function generateToken(): { token: string; prefix: string; hashedSecret: string 
   return { token, prefix, hashedSecret };
 }
 
-export class ApiKeyService extends BaseService(ApiKey, class {} as any) implements IApiKeyService {
+export class ApiKeyService extends BaseService(ApiKey, ApiKeyDto) implements IApiKeyService {
   private readonly logger: LoggerService;
 
   constructor(loggerFactory: ILoggerFactory, typeormService: TypeormService) {

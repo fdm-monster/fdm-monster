@@ -44,7 +44,10 @@ export class ApiKeyStrategy extends Strategy {
       }
       return this.success(this.userService.toDto(user));
     } catch (err) {
-      return this.error(err as Error);
+      // `passport.Strategy.error()` is typed `(err: Error)`. Defend against a
+      // non-Error throw (e.g. a string from a misbehaving dependency) instead
+      // of a bare type assertion.
+      return this.error(err instanceof Error ? err : new Error(String(err)));
     }
   }
 }
