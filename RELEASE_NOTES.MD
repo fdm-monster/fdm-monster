@@ -1,5 +1,19 @@
 # Develop
 
+# FDM Monster 2.0.11
+
+## Features
+
+- Move to vitest, vite, viteplus and esm
+
+## Fixes
+
+- Drive Bambu error flag from gcode_state instead of stale print_error
+- Controllers loaded using vite plugin
+- Speed up PR build docker x64 only
+- Refactor Docker build process with reusable workflows
+- Switch to main as default branch
+
 # FDM Monster 2.0.10
 
 ## Fixes
