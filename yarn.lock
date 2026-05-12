@@ -314,7 +314,7 @@ __metadata:
     typeorm: "npm:0.3.29"
     typescript: "npm:6.0.3"
     vite-plus: "npm:latest"
-    ws: "npm:8.20.0"
+    ws: "npm:8.20.1"
     zod: "npm:3.25.76"
   languageName: unknown
   linkType: soft
@@ -390,7 +390,7 @@ __metadata:
     vitest: "npm:@voidzero-dev/vite-plus-test@latest"
     winston: "npm:3.19.0"
     winston-loki: "npm:6.1.4"
-    ws: "npm:8.20.0"
+    ws: "npm:8.20.1"
     zod: "npm:3.25.76"
   bin:
     fdm-monster-server: dist/index.js
@@ -7314,7 +7314,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.20.0, ws@npm:^8.18.3":
+"ws@npm:8.20.1":
+  version: 8.20.1
+  resolution: "ws@npm:8.20.1"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/ce162433218399cdedeb76fd33363d4d86a7d910058d4e3c679dce08cea65d6da6b39f11baa4d7808d024cf46ed88f6a05c17611621aaad8fc5e62edacc30c5d
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.18.3":
   version: 8.20.0
   resolution: "ws@npm:8.20.0"
   peerDependencies:
