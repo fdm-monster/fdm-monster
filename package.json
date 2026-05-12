@@ -88,7 +88,7 @@
     "reflect-metadata": "0.2.2",
     "semver": "7.8.0",
     "socket.io": "4.8.3",
-    "toad-scheduler": "3.1.0",
+    "toad-scheduler": "4.0.1",
     "typeorm": "0.3.29",
     "uuid": "11.1.1",
     "winston": "3.19.0",
