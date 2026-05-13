@@ -37,6 +37,25 @@ async function operatorRoleId(): Promise<number> {
   return role.id;
 }
 
+function authHeader(token: string): [string, string] {
+  return ["Authorization", `Bearer ${token}`];
+}
+
+function postCreate(token: string, body: Record<string, unknown>) {
+  return request
+    .post(baseRoute)
+    .set(...authHeader(token))
+    .send(body);
+}
+
+function getList(token: string) {
+  return request.get(baseRoute).set(...authHeader(token));
+}
+
+function deleteKeyRequest(token: string, id: number | string) {
+  return request.delete(`${baseRoute}/${id}`).set(...authHeader(token));
+}
+
 beforeAll(async () => {
   ({ request, container } = await setupTestApp(true));
   apiKeyService = container.resolve<IApiKeyService>(DITokens.apiKeyService);
@@ -67,22 +86,19 @@ describe(ApiKeyController.name, () => {
 
     it("rejects non-admin users with 403 on list", async () => {
       const { token } = await loginTestUser(request, "apikey-non-admin-list", "pw", ROLES.OPERATOR);
-      const response = await request.get(baseRoute).set("Authorization", `Bearer ${token}`);
+      const response = await getList(token);
       expectForbiddenResponse(response);
     });
 
     it("rejects non-admin users with 403 on create", async () => {
       const { token } = await loginTestUser(request, "apikey-non-admin-create", "pw", ROLES.OPERATOR);
-      const response = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${token}`)
-        .send({ label: "blocked", roleIds: [await operatorRoleId()] });
+      const response = await postCreate(token, { label: "blocked", roleIds: [await operatorRoleId()] });
       expectForbiddenResponse(response);
     });
 
     it("rejects non-admin users with 403 on delete", async () => {
       const { token } = await loginTestUser(request, "apikey-non-admin-delete", "pw", ROLES.OPERATOR);
-      const response = await request.delete(`${baseRoute}/1`).set("Authorization", `Bearer ${token}`);
+      const response = await deleteKeyRequest(token, 1);
       expectForbiddenResponse(response);
     });
   });
@@ -90,11 +106,7 @@ describe(ApiKeyController.name, () => {
   describe("create", () => {
     it("issues a fdmm_pat_ token and returns it once with the requested roles", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-create");
-      const roleId = await adminRoleId();
-      const response = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "my-script", roleIds: [roleId] });
+      const response = await postCreate(jwt, { label: "my-script", roleIds: [await adminRoleId()] });
       expectOkResponse(response);
 
       expect(response.body.token).toMatch(/^fdmm_pat_[A-Za-z0-9_-]{20,}$/);
@@ -107,43 +119,31 @@ describe(ApiKeyController.name, () => {
 
     it("rejects empty label", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-empty-label");
-      const response = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "", roleIds: [await adminRoleId()] });
+      const response = await postCreate(jwt, { label: "", roleIds: [await adminRoleId()] });
       expectInvalidResponse(response);
     });
 
     it("rejects whitespace-only label", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-ws-label");
-      const response = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "   ", roleIds: [await adminRoleId()] });
+      const response = await postCreate(jwt, { label: "   ", roleIds: [await adminRoleId()] });
       expectInvalidResponse(response);
     });
 
     it("rejects empty roleIds", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-empty-roles");
-      const response = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "no-roles", roleIds: [] });
+      const response = await postCreate(jwt, { label: "no-roles", roleIds: [] });
       expectInvalidResponse(response);
     });
 
     it("rejects missing roleIds field", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-missing-roles");
-      const response = await request.post(baseRoute).set("Authorization", `Bearer ${jwt}`).send({ label: "no-roles" });
+      const response = await postCreate(jwt, { label: "no-roles" });
       expectInvalidResponse(response);
     });
 
     it("rejects roleIds referencing nonexistent roles", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-bad-role-id");
-      const response = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "fake-role", roleIds: [99999] });
+      const response = await postCreate(jwt, { label: "fake-role", roleIds: [99999] });
       expectNotFoundResponse(response);
     });
 
@@ -152,12 +152,13 @@ describe(ApiKeyController.name, () => {
       // any role via user management, so the api-key create path doesn't need
       // an additional escalation check.
       const { token: jwt } = await loginTestUser(request, "apikey-cross-role");
-      const response = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "broad", roleIds: [await adminRoleId(), await operatorRoleId()] });
+      const response = await postCreate(jwt, {
+        label: "broad",
+        roleIds: [await adminRoleId(), await operatorRoleId()],
+      });
       expectOkResponse(response);
-      expect(response.body.roles.sort()).toEqual([ROLES.ADMIN, ROLES.OPERATOR].sort());
+      expect(response.body.roles).toEqual(expect.arrayContaining([ROLES.ADMIN, ROLES.OPERATOR]));
+      expect(response.body.roles).toHaveLength(2);
     });
   });
 
@@ -166,16 +167,10 @@ describe(ApiKeyController.name, () => {
       // Create two keys as the admin user — list should show both.
       const { token: jwt } = await loginTestUser(request, "apikey-list-admin");
       const adminId = await adminRoleId();
-      await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "first", roleIds: [adminId] });
-      await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "second", roleIds: [adminId] });
+      await postCreate(jwt, { label: "first", roleIds: [adminId] });
+      await postCreate(jwt, { label: "second", roleIds: [adminId] });
 
-      const response = await request.get(baseRoute).set("Authorization", `Bearer ${jwt}`);
+      const response = await getList(jwt);
       expectOkResponse(response);
       const labels = response.body.map((k: any) => k.label);
       expect(labels).toEqual(expect.arrayContaining(["first", "second"]));
@@ -189,23 +184,20 @@ describe(ApiKeyController.name, () => {
   describe("delete (hard delete)", () => {
     it("removes the row, key stops authenticating, subsequent delete is 404", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-delete");
-      const created = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "to-delete", roleIds: [await adminRoleId()] });
+      const created = await postCreate(jwt, { label: "to-delete", roleIds: [await adminRoleId()] });
       const apiKeyToken: string = created.body.token;
       const apiKeyId: number = created.body.id;
 
-      const before = await request.get(baseRoute).set("Authorization", `Bearer ${apiKeyToken}`);
+      const before = await getList(apiKeyToken);
       expectOkResponse(before);
 
-      const del = await request.delete(`${baseRoute}/${apiKeyId}`).set("Authorization", `Bearer ${jwt}`);
+      const del = await deleteKeyRequest(jwt, apiKeyId);
       expect(del.statusCode).toBe(204);
 
-      const after = await request.get(baseRoute).set("Authorization", `Bearer ${apiKeyToken}`);
+      const after = await getList(apiKeyToken);
       expectUnauthenticatedResponse(after);
 
-      const delAgain = await request.delete(`${baseRoute}/${apiKeyId}`).set("Authorization", `Bearer ${jwt}`);
+      const delAgain = await deleteKeyRequest(jwt, apiKeyId);
       expectNotFoundResponse(delAgain);
     });
 
@@ -214,14 +206,10 @@ describe(ApiKeyController.name, () => {
       // delete the other's key without a 404 — admin scope is global.
       const { token: jwtA } = await loginTestUser(request, "apikey-delete-admin-a");
       const { token: jwtB } = await loginTestUser(request, "apikey-delete-admin-b");
-      const adminId = await adminRoleId();
-      const aCreated = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwtA}`)
-        .send({ label: "a-owned", roleIds: [adminId] });
+      const aCreated = await postCreate(jwtA, { label: "a-owned", roleIds: [await adminRoleId()] });
       const aKeyId: number = aCreated.body.id;
 
-      const del = await request.delete(`${baseRoute}/${aKeyId}`).set("Authorization", `Bearer ${jwtB}`);
+      const del = await deleteKeyRequest(jwtB, aKeyId);
       expect(del.statusCode).toBe(204);
     });
   });
@@ -232,22 +220,15 @@ describe(ApiKeyController.name, () => {
       // The key should authenticate but only have operator permissions — the
       // admin role of the bound user does NOT leak through.
       const { token: jwt } = await loginTestUser(request, "apikey-roles-from-key");
-      const operatorId = await operatorRoleId();
-      const created = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "operator-only", roleIds: [operatorId] });
+      const created = await postCreate(jwt, { label: "operator-only", roleIds: [await operatorRoleId()] });
       const apiKeyToken: string = created.body.token;
 
       // Hit an ADMIN-only route with the operator-scoped key — should be 403.
-      const adminOnly = await request.get(baseRoute).set("Authorization", `Bearer ${apiKeyToken}`);
-      expectForbiddenResponse(adminOnly);
+      expectForbiddenResponse(await getList(apiKeyToken));
 
       // But the key still authenticates at all — hit a route accepting any
       // authenticated user.
-      const anyAuth = await request
-        .get(`${AppConstants.apiRoute}/auth/login-required`)
-        .set("Authorization", `Bearer ${apiKeyToken}`);
+      const anyAuth = await request.get(`${AppConstants.apiRoute}/auth/login-required`).set(...authHeader(apiKeyToken));
       expectOkResponse(anyAuth);
     });
 
@@ -260,17 +241,14 @@ describe(ApiKeyController.name, () => {
 
     it("bumps lastUsedAt on successful api-key auth", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-lastused");
-      const created = await request
-        .post(baseRoute)
-        .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "lastused", roleIds: [await adminRoleId()] });
+      const created = await postCreate(jwt, { label: "lastused", roleIds: [await adminRoleId()] });
       const apiKeyToken: string = created.body.token;
       expect(created.body.lastUsedAt).toBeNull();
 
-      await request.get(baseRoute).set("Authorization", `Bearer ${apiKeyToken}`);
+      await getList(apiKeyToken);
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      const list = await request.get(baseRoute).set("Authorization", `Bearer ${jwt}`);
+      const list = await getList(jwt);
       const refreshed = list.body.find((k: any) => k.id === created.body.id);
       expect(refreshed?.lastUsedAt).not.toBeNull();
     });
