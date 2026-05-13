@@ -16,7 +16,7 @@ import { Role } from "@/entities/role.entity";
 /**
  * Long-lived bearer credential for programmatic API access.
  *
- * Token format: `fdmm_pat_<base64url>` (high-entropy CSPRNG). The `prefix`
+ * Token format: `fdmm_api_<base64url>` (high-entropy CSPRNG). The `prefix`
  * is the indexable lookup column; `hashedSecret` is sha256 of the full
  * token, verified with timingSafeEqual.
  *

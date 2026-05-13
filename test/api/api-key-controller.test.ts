@@ -104,12 +104,12 @@ describe(ApiKeyController.name, () => {
   });
 
   describe("create", () => {
-    it("issues a fdmm_pat_ token and returns it once with the requested roles", async () => {
+    it("issues a fdmm_api_ token and returns it once with the requested roles", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-create");
       const response = await postCreate(jwt, { label: "my-script", roleIds: [await adminRoleId()] });
       expectOkResponse(response);
 
-      expect(response.body.token).toMatch(/^fdmm_pat_[A-Za-z0-9_-]{20,}$/);
+      expect(response.body.token).toMatch(/^fdmm_api_[A-Za-z0-9_-]{20,}$/);
       expect(response.body.label).toBe("my-script");
       expect(response.body.prefix).toHaveLength(16);
       expect(response.body.createdByUserId).toBeGreaterThan(0);
@@ -235,7 +235,7 @@ describe(ApiKeyController.name, () => {
     it("rejects garbage api-key-shaped tokens", async () => {
       const response = await request
         .get(baseRoute)
-        .set("Authorization", "Bearer fdmm_pat_garbageABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        .set("Authorization", "Bearer fdmm_api_garbageABCDEFGHIJKLMNOPQRSTUVWXYZ");
       expectUnauthenticatedResponse(response);
     });
 
@@ -257,8 +257,8 @@ describe(ApiKeyController.name, () => {
 
 describe("ApiKeyService", () => {
   describe("looksLikeApiKey", () => {
-    it("recognises the fdmm_pat_ prefix shape", () => {
-      expect(apiKeyService.looksLikeApiKey("fdmm_pat_" + "x".repeat(40))).toBe(true);
+    it("recognises the fdmm_api_ prefix shape", () => {
+      expect(apiKeyService.looksLikeApiKey("fdmm_api_" + "x".repeat(40))).toBe(true);
     });
 
     it("rejects JWT-shaped strings", () => {
@@ -270,8 +270,8 @@ describe("ApiKeyService", () => {
       expect(apiKeyService.looksLikeApiKey(undefined as any)).toBe(false);
     });
 
-    it("rejects fdmm_pat_ that's too short to contain a prefix+secret", () => {
-      expect(apiKeyService.looksLikeApiKey("fdmm_pat_short")).toBe(false);
+    it("rejects fdmm_api_ that's too short to contain a prefix+secret", () => {
+      expect(apiKeyService.looksLikeApiKey("fdmm_api_short")).toBe(false);
     });
   });
 
@@ -286,7 +286,7 @@ describe("ApiKeyService", () => {
     it("returns null for a tampered token (same prefix, different secret)", async () => {
       const user = await ensureTestUserCreated("apikey-svc-tamper", "pw", false);
       const created = await apiKeyService.create(user.id, "tamper-key", [await adminRoleId()]);
-      const tampered = `fdmm_pat_${created.prefix}${"X".repeat(30)}`;
+      const tampered = `fdmm_api_${created.prefix}${"X".repeat(30)}`;
       const verified = await apiKeyService.verify(tampered);
       expect(verified).toBeNull();
     });
@@ -300,7 +300,7 @@ describe("ApiKeyService", () => {
     });
 
     it("returns null for completely unknown prefixes", async () => {
-      const verified = await apiKeyService.verify("fdmm_pat_" + "Z".repeat(48));
+      const verified = await apiKeyService.verify("fdmm_api_" + "Z".repeat(48));
       expect(verified).toBeNull();
     });
 

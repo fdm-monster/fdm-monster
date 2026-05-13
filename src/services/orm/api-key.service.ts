@@ -9,7 +9,7 @@ import { LoggerService } from "@/handlers/logger";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { In } from "typeorm";
 
-const TOKEN_PREFIX = "fdmm_pat_";
+const TOKEN_PREFIX = "fdmm_api_";
 const SECRET_BYTES = 32;
 const PREFIX_LEN = 16;
 
