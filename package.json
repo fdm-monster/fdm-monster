@@ -90,7 +90,7 @@
     "socket.io": "4.8.3",
     "toad-scheduler": "4.0.1",
     "typeorm": "0.3.29",
-    "uuid": "11.1.1",
+    "uuid": "14.0.0",
     "winston": "3.19.0",
     "winston-loki": "6.1.4",
     "ws": "8.20.1",
