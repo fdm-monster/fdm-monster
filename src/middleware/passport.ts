@@ -13,10 +13,12 @@ import { PassportStatic } from "passport";
 import { SettingsStore } from "@/state/settings.store";
 import { ConfigService } from "@/services/core/config.service";
 import type { IUserService } from "@/services/interfaces/user-service.interface";
+import type { IApiKeyService } from "@/services/interfaces/api-key.service.interface";
 import { Socket } from "socket.io";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 import { AUTH_ERROR_REASON } from "@/constants/authorization.constants";
 import { User } from "@/entities";
+import { ApiKeyStrategy } from "@/middleware/api-key.strategy";
 
 export type JwtFromSocketFunction = (socket: Socket) => string | null;
 
@@ -68,6 +70,7 @@ export function initializePassportStrategies(passport: PassportStatic, container
   const settingsStore = container.resolve<SettingsStore>(DITokens.settingsStore);
   const configService = container.resolve<ConfigService>(DITokens.configService);
   const userService = container.resolve<IUserService>(DITokens.userService);
+  const apiKeyService = container.resolve<IApiKeyService>(DITokens.apiKeyService);
 
   const opts = getPassportJwtOptions(settingsStore, configService, ExtractJwt.fromAuthHeaderAsBearerToken());
 
@@ -76,6 +79,7 @@ export function initializePassportStrategies(passport: PassportStatic, container
       verifyUserCallback(userService)(jwt_payload, done);
     }),
   );
+  passport.use(new ApiKeyStrategy(apiKeyService));
   passport.use(new AnonymousStrategy());
   return passport;
 }

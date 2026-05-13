@@ -74,7 +74,7 @@ export async function setupServer() {
     .use(cookieParser())
     .use(urlencoded({ extended: false }))
     .use(passport.initialize())
-    .use(passport.authenticate(["jwt", "anonymous"], { session: false }))
+    .use(passport.authenticate(["jwt", "api-key", "anonymous"], { session: false }))
     .use(scopePerRequest(container))
     .use(interceptDatabaseError)
     // Global guards

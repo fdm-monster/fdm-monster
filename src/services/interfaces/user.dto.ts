@@ -9,6 +9,8 @@ export class UserDto {
   isVerified: boolean;
   needsPasswordChange: boolean;
   roles: RoleName[];
+  /** True when the principal was authenticated via an API key, not a user login. */
+  isApiKey?: boolean;
 }
 
 export class RegisterUserDto {
