@@ -79,7 +79,7 @@ export function initializePassportStrategies(passport: PassportStatic, container
       verifyUserCallback(userService)(jwt_payload, done);
     }),
   );
-  passport.use(new ApiKeyStrategy(apiKeyService, userService));
+  passport.use(new ApiKeyStrategy(apiKeyService));
   passport.use(new AnonymousStrategy());
   return passport;
 }

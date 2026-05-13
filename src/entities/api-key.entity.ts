@@ -4,22 +4,25 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   type Relation,
 } from "typeorm";
 import { User } from "@/entities/user.entity";
+import { Role } from "@/entities/role.entity";
 
 /**
  * Long-lived bearer credential for programmatic API access.
  *
- * The cleartext token is shown to the user once at creation time and never
- * stored. We persist:
- *   - a fixed `prefix` (token's leading characters) for O(1) lookup, and
- *   - `hashedSecret` (sha256 of the full token) for verification.
+ * Token format: `fdmm_pat_<base64url>` (high-entropy CSPRNG). The `prefix`
+ * is the indexable lookup column; `hashedSecret` is sha256 of the full
+ * token, verified with timingSafeEqual.
  *
- * Tokens inherit the role/permissions of the bound user. Revoking a key
- * sets `revokedAt`; revoked rows are kept for audit and never re-issue.
+ * Permissions are derived from `roles` (via the `api_key_role` join table),
+ * NOT from the bound user's roles. The `userId` FK records who minted the
+ * key for audit; it does not drive authorisation.
  */
 @Entity()
 export class ApiKey {
@@ -49,6 +52,11 @@ export class ApiKey {
   @Column({ type: "datetime", nullable: true })
   lastUsedAt: Date | null;
 
-  @Column({ type: "datetime", nullable: true })
-  revokedAt: Date | null;
+  @ManyToMany(() => Role, { eager: true })
+  @JoinTable({
+    name: "api_key_role",
+    joinColumn: { name: "apiKeyId", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "roleId", referencedColumnName: "id" },
+  })
+  roles: Relation<Role>[];
 }

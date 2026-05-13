@@ -1,42 +1,29 @@
 import { before, DELETE, GET, POST, route } from "awilix-express";
-import { authenticate } from "@/middleware/authenticate";
+import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { demoUserNotAllowed } from "@/middleware/demo.middleware";
+import { ROLES } from "@/constants/authorization.constants";
 import { AppConstants } from "@/server.constants";
 import { validateInput, validateMiddleware } from "@/handlers/validators";
 import { apiKeyIdParamSchema, createApiKeySchema } from "@/controllers/validation/api-key-controller.validation";
-import type { ILoggerFactory } from "@/handlers/logger-factory";
-import { LoggerService } from "@/handlers/logger";
 import type { Request, Response } from "express";
 import type { IApiKeyService } from "@/services/interfaces/api-key.service.interface";
 import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 
 /**
- * Per-user API key management.
- *
- * The whole controller is gated by `authenticate()` + `demoUserNotAllowed`:
- *   - You must be a real, logged-in user to mint or list keys.
- *   - Demo users can't create persistent state.
- *
- * Authorisation is per-user: a user only ever sees their own keys. The
- * service layer enforces the userId scope on every operation.
+ * Admin-only API key management. Keys are m2m credentials with their own
+ * role assignment (stored in the `api_key_role` join table); they are NOT
+ * user impersonation tokens. The `userId` FK on each key records who minted
+ * it, not whose permissions the key holds.
  */
 @route(AppConstants.apiRoute + "/api-keys")
-@before([authenticate(), demoUserNotAllowed])
+@before([authenticate(), authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
 export class ApiKeyController {
-  private readonly logger: LoggerService;
-
-  constructor(
-    loggerFactory: ILoggerFactory,
-    private readonly apiKeyService: IApiKeyService,
-  ) {
-    this.logger = loggerFactory(ApiKeyController.name);
-  }
+  constructor(private readonly apiKeyService: IApiKeyService) {}
 
   @GET()
   @route("/")
-  async list(req: Request, res: Response) {
-    const userId = this.requireUserId(req);
-    const keys = await this.apiKeyService.listForUser(userId);
+  async list(_req: Request, res: Response) {
+    const keys = await this.apiKeyService.list();
     res.send(keys);
   }
 
@@ -44,24 +31,25 @@ export class ApiKeyController {
   @route("/")
   async create(req: Request, res: Response) {
     const userId = this.requireUserId(req);
-    const { label } = await validateMiddleware(req, createApiKeySchema);
-    const created = await this.apiKeyService.createForUser(userId, label);
+    const { label, roleIds } = await validateMiddleware(req, createApiKeySchema);
+    const created = await this.apiKeyService.create(userId, label, roleIds);
     res.send(created);
   }
 
   @DELETE()
   @route("/:id")
-  async revoke(req: Request, res: Response) {
-    const userId = this.requireUserId(req);
+  async delete(req: Request, res: Response) {
     const { id } = await validateInput(req.params, apiKeyIdParamSchema);
-    const revoked = await this.apiKeyService.revokeForUser(userId, id);
-    res.send(revoked);
+    await this.apiKeyService.delete(id);
+    res.status(204).send();
   }
 
   private requireUserId(req: Request): number {
+    // Reachable when loginRequired=false (passport-anonymous falls through
+    // without setting req.user); the @before authorizeRoles guard then
+    // refuses, but defend the boundary anyway in case the chain is changed.
     const id = req.user?.id;
-    if (!id) {
-      // Should never happen given the @before guards, but defend the boundary.
+    if (!id || id < 0) {
       throw new AuthenticationError("Authenticated user is required");
     }
     return id;

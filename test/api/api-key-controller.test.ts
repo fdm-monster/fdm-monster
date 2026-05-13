@@ -1,6 +1,7 @@
 import { AppConstants } from "@/server.constants";
 import { setupTestApp } from "../test-server";
 import {
+  expectForbiddenResponse,
   expectInvalidResponse,
   expectNotFoundResponse,
   expectOkResponse,
@@ -14,16 +15,37 @@ import { loginTestUser } from "./auth/login-test-user";
 import { ApiKeyController } from "@/controllers/api-key.controller";
 import TestAgent from "supertest/lib/agent";
 import type { IApiKeyService } from "@/services/interfaces/api-key.service.interface";
+import { ROLES } from "@/constants/authorization.constants";
+import { Role } from "@/entities";
+import { getDatasource } from "../typeorm.manager";
+import { SettingsStore } from "@/state/settings.store";
 
 let request: TestAgent<Test>;
 let container: AwilixContainer;
 let apiKeyService: IApiKeyService;
+let settingsStore: SettingsStore;
 
 const baseRoute = AppConstants.apiRoute + "/api-keys";
+
+async function adminRoleId(): Promise<number> {
+  const role = await getDatasource().getRepository(Role).findOneByOrFail({ name: ROLES.ADMIN });
+  return role.id;
+}
+
+async function operatorRoleId(): Promise<number> {
+  const role = await getDatasource().getRepository(Role).findOneByOrFail({ name: ROLES.OPERATOR });
+  return role.id;
+}
 
 beforeAll(async () => {
   ({ request, container } = await setupTestApp(true));
   apiKeyService = container.resolve<IApiKeyService>(DITokens.apiKeyService);
+  settingsStore = container.resolve(DITokens.settingsStore);
+  // The test env defaults to loginRequired=false, which makes the auth
+  // middleware fall through for unauthenticated requests. The api-keys
+  // controller is admin-only and depends on the auth chain rejecting bare
+  // requests with 401, so flip the setting on for this file.
+  await settingsStore.setLoginRequired(true);
 });
 
 describe(ApiKeyController.name, () => {
@@ -34,110 +56,199 @@ describe(ApiKeyController.name, () => {
     });
 
     it("rejects create without auth", async () => {
-      const response = await request.post(baseRoute).send({ label: "x" });
+      const response = await request.post(baseRoute).send({ label: "x", roleIds: [1] });
       expectUnauthenticatedResponse(response);
     });
 
-    it("rejects revoke without auth", async () => {
+    it("rejects delete without auth", async () => {
       const response = await request.delete(`${baseRoute}/1`);
       expectUnauthenticatedResponse(response);
+    });
+
+    it("rejects non-admin users with 403 on list", async () => {
+      const { token } = await loginTestUser(request, "apikey-non-admin-list", "pw", ROLES.OPERATOR);
+      const response = await request.get(baseRoute).set("Authorization", `Bearer ${token}`);
+      expectForbiddenResponse(response);
+    });
+
+    it("rejects non-admin users with 403 on create", async () => {
+      const { token } = await loginTestUser(request, "apikey-non-admin-create", "pw", ROLES.OPERATOR);
+      const response = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${token}`)
+        .send({ label: "blocked", roleIds: [await operatorRoleId()] });
+      expectForbiddenResponse(response);
+    });
+
+    it("rejects non-admin users with 403 on delete", async () => {
+      const { token } = await loginTestUser(request, "apikey-non-admin-delete", "pw", ROLES.OPERATOR);
+      const response = await request.delete(`${baseRoute}/1`).set("Authorization", `Bearer ${token}`);
+      expectForbiddenResponse(response);
     });
   });
 
   describe("create", () => {
-    it("issues a fdmm_pat_ token and returns it once", async () => {
-      const { token: jwt } = await loginTestUser(request, "apikey-user-create");
-      const response = await request.post(baseRoute).set("Authorization", `Bearer ${jwt}`).send({ label: "my-script" });
+    it("issues a fdmm_pat_ token and returns it once with the requested roles", async () => {
+      const { token: jwt } = await loginTestUser(request, "apikey-create");
+      const roleId = await adminRoleId();
+      const response = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "my-script", roleIds: [roleId] });
       expectOkResponse(response);
 
       expect(response.body.token).toMatch(/^fdmm_pat_[A-Za-z0-9_-]{20,}$/);
       expect(response.body.label).toBe("my-script");
       expect(response.body.prefix).toHaveLength(16);
       expect(response.body.userId).toBeGreaterThan(0);
-      expect(response.body.revokedAt).toBeNull();
       expect(response.body.lastUsedAt).toBeNull();
+      expect(response.body.roles).toEqual([ROLES.ADMIN]);
     });
 
-    it("rejects empty label with invalid response", async () => {
-      const { token: jwt } = await loginTestUser(request, "apikey-user-empty-label");
-      const response = await request.post(baseRoute).set("Authorization", `Bearer ${jwt}`).send({ label: "" });
+    it("rejects empty label", async () => {
+      const { token: jwt } = await loginTestUser(request, "apikey-empty-label");
+      const response = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "", roleIds: [await adminRoleId()] });
       expectInvalidResponse(response);
     });
 
     it("rejects whitespace-only label", async () => {
-      const { token: jwt } = await loginTestUser(request, "apikey-user-ws-label");
-      const response = await request.post(baseRoute).set("Authorization", `Bearer ${jwt}`).send({ label: "   " });
+      const { token: jwt } = await loginTestUser(request, "apikey-ws-label");
+      const response = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "   ", roleIds: [await adminRoleId()] });
       expectInvalidResponse(response);
+    });
+
+    it("rejects empty roleIds", async () => {
+      const { token: jwt } = await loginTestUser(request, "apikey-empty-roles");
+      const response = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "no-roles", roleIds: [] });
+      expectInvalidResponse(response);
+    });
+
+    it("rejects missing roleIds field", async () => {
+      const { token: jwt } = await loginTestUser(request, "apikey-missing-roles");
+      const response = await request.post(baseRoute).set("Authorization", `Bearer ${jwt}`).send({ label: "no-roles" });
+      expectInvalidResponse(response);
+    });
+
+    it("rejects roleIds referencing nonexistent roles", async () => {
+      const { token: jwt } = await loginTestUser(request, "apikey-bad-role-id");
+      const response = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "fake-role", roleIds: [99999] });
+      expectNotFoundResponse(response);
+    });
+
+    it("allows admins to assign any role to a key (no escalation check)", async () => {
+      // David's call: admins are super users; they can already grant themselves
+      // any role via user management, so the api-key create path doesn't need
+      // an additional escalation check.
+      const { token: jwt } = await loginTestUser(request, "apikey-cross-role");
+      const response = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "broad", roleIds: [await adminRoleId(), await operatorRoleId()] });
+      expectOkResponse(response);
+      expect(response.body.roles.sort()).toEqual([ROLES.ADMIN, ROLES.OPERATOR].sort());
     });
   });
 
   describe("list", () => {
-    it("returns only the calling user's keys, never the secret", async () => {
-      const { token: jwtA } = await loginTestUser(request, "apikey-user-isolation-a");
-      const { token: jwtB } = await loginTestUser(request, "apikey-user-isolation-b");
-      await request.post(baseRoute).set("Authorization", `Bearer ${jwtA}`).send({ label: "a-key" });
-      await request.post(baseRoute).set("Authorization", `Bearer ${jwtB}`).send({ label: "b-key" });
+    it("returns all keys across users (admin scope), never the secret", async () => {
+      // Create two keys as the admin user — list should show both.
+      const { token: jwt } = await loginTestUser(request, "apikey-list-admin");
+      const adminId = await adminRoleId();
+      await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "first", roleIds: [adminId] });
+      await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "second", roleIds: [adminId] });
 
-      const responseA = await request.get(baseRoute).set("Authorization", `Bearer ${jwtA}`);
-      expectOkResponse(responseA);
-      const labelsA = responseA.body.map((k: any) => k.label);
-      expect(labelsA).toContain("a-key");
-      expect(labelsA).not.toContain("b-key");
-      // Secret-bearing fields are never returned.
-      for (const k of responseA.body) {
+      const response = await request.get(baseRoute).set("Authorization", `Bearer ${jwt}`);
+      expectOkResponse(response);
+      const labels = response.body.map((k: any) => k.label);
+      expect(labels).toEqual(expect.arrayContaining(["first", "second"]));
+      for (const k of response.body) {
         expect(k).not.toHaveProperty("token");
         expect(k).not.toHaveProperty("hashedSecret");
       }
     });
   });
 
-  describe("revoke", () => {
-    it("sets revokedAt and the token stops authenticating", async () => {
-      const { token: jwt } = await loginTestUser(request, "apikey-user-revoke");
-      const created = await request.post(baseRoute).set("Authorization", `Bearer ${jwt}`).send({ label: "to-revoke" });
+  describe("delete (hard delete)", () => {
+    it("removes the row, key stops authenticating, subsequent delete is 404", async () => {
+      const { token: jwt } = await loginTestUser(request, "apikey-delete");
+      const created = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "to-delete", roleIds: [await adminRoleId()] });
       const apiKeyToken: string = created.body.token;
       const apiKeyId: number = created.body.id;
 
-      // Token should auth before revoke.
       const before = await request.get(baseRoute).set("Authorization", `Bearer ${apiKeyToken}`);
       expectOkResponse(before);
 
-      // Revoke via JWT.
-      const revoke = await request.delete(`${baseRoute}/${apiKeyId}`).set("Authorization", `Bearer ${jwt}`);
-      expectOkResponse(revoke);
-      expect(revoke.body.revokedAt).toBeTruthy();
+      const del = await request.delete(`${baseRoute}/${apiKeyId}`).set("Authorization", `Bearer ${jwt}`);
+      expect(del.statusCode).toBe(204);
 
-      // Token should fail after revoke.
       const after = await request.get(baseRoute).set("Authorization", `Bearer ${apiKeyToken}`);
       expectUnauthenticatedResponse(after);
+
+      const delAgain = await request.delete(`${baseRoute}/${apiKeyId}`).set("Authorization", `Bearer ${jwt}`);
+      expectNotFoundResponse(delAgain);
     });
 
-    it("returns 404 when revoking a foreign user's key", async () => {
-      const { token: jwtOwner } = await loginTestUser(request, "apikey-user-foreign-owner");
-      const { token: jwtIntruder } = await loginTestUser(request, "apikey-user-foreign-intruder");
-      const created = await request.post(baseRoute).set("Authorization", `Bearer ${jwtOwner}`).send({ label: "owned" });
-      const otherId: number = created.body.id;
+    it("admins can delete any user's key (no foreign-user 404)", async () => {
+      // Create two distinct admin users; each mints a key. Either admin can
+      // delete the other's key without a 404 — admin scope is global.
+      const { token: jwtA } = await loginTestUser(request, "apikey-delete-admin-a");
+      const { token: jwtB } = await loginTestUser(request, "apikey-delete-admin-b");
+      const adminId = await adminRoleId();
+      const aCreated = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwtA}`)
+        .send({ label: "a-owned", roleIds: [adminId] });
+      const aKeyId: number = aCreated.body.id;
 
-      const response = await request.delete(`${baseRoute}/${otherId}`).set("Authorization", `Bearer ${jwtIntruder}`);
-      expectNotFoundResponse(response);
+      const del = await request.delete(`${baseRoute}/${aKeyId}`).set("Authorization", `Bearer ${jwtB}`);
+      expect(del.statusCode).toBe(204);
     });
   });
 
   describe("api-key bearer auth path", () => {
-    it("authenticates via API key against any protected route", async () => {
-      const { token: jwt } = await loginTestUser(request, "apikey-bearer-test");
+    it("authenticates with the key's own roles, NOT the bound user's roles", async () => {
+      // Create a user, give them ADMIN. Mint a key with ONLY operator role.
+      // The key should authenticate but only have operator permissions — the
+      // admin role of the bound user does NOT leak through.
+      const { token: jwt } = await loginTestUser(request, "apikey-roles-from-key");
+      const operatorId = await operatorRoleId();
       const created = await request
         .post(baseRoute)
         .set("Authorization", `Bearer ${jwt}`)
-        .send({ label: "bearer-test" });
+        .send({ label: "operator-only", roleIds: [operatorId] });
       const apiKeyToken: string = created.body.token;
 
-      // Hit a sibling protected route to prove the auth pipeline accepts the
-      // api key as a JWT-equivalent bearer.
-      const printerList = await request
-        .get(`${AppConstants.apiRoute}/printer`)
+      // Hit an ADMIN-only route with the operator-scoped key — should be 403.
+      const adminOnly = await request.get(baseRoute).set("Authorization", `Bearer ${apiKeyToken}`);
+      expectForbiddenResponse(adminOnly);
+
+      // But the key still authenticates at all — hit a route accepting any
+      // authenticated user.
+      const anyAuth = await request
+        .get(`${AppConstants.apiRoute}/auth/login-required`)
         .set("Authorization", `Bearer ${apiKeyToken}`);
-      expectOkResponse(printerList);
+      expectOkResponse(anyAuth);
     });
 
     it("rejects garbage api-key-shaped tokens", async () => {
@@ -149,36 +260,19 @@ describe(ApiKeyController.name, () => {
 
     it("bumps lastUsedAt on successful api-key auth", async () => {
       const { token: jwt } = await loginTestUser(request, "apikey-lastused");
-      const created = await request.post(baseRoute).set("Authorization", `Bearer ${jwt}`).send({ label: "lastused" });
+      const created = await request
+        .post(baseRoute)
+        .set("Authorization", `Bearer ${jwt}`)
+        .send({ label: "lastused", roleIds: [await adminRoleId()] });
       const apiKeyToken: string = created.body.token;
       expect(created.body.lastUsedAt).toBeNull();
 
-      // Use the key.
       await request.get(baseRoute).set("Authorization", `Bearer ${apiKeyToken}`);
-
-      // Allow the best-effort async bump to land.
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       const list = await request.get(baseRoute).set("Authorization", `Bearer ${jwt}`);
       const refreshed = list.body.find((k: any) => k.id === created.body.id);
       expect(refreshed?.lastUsedAt).not.toBeNull();
-    });
-
-    it("rejects api-key auth when the bound user is no longer verified", async () => {
-      // Issue a key while the user is verified, then flip them to unverified
-      // (e.g. admin disabled the account after key issuance). The key must
-      // stop authenticating without needing an explicit revoke.
-      const user = await ensureTestUserCreated("apikey-unverified-user", "pw", false);
-      const created = await apiKeyService.createForUser(user.id, "unverified-test");
-      // Sanity: works while verified.
-      const before = await request.get(baseRoute).set("Authorization", `Bearer ${created.token}`);
-      expectOkResponse(before);
-
-      // Flip verified → false.
-      await ensureTestUserCreated("apikey-unverified-user", "pw", false, undefined, false);
-
-      const after = await request.get(baseRoute).set("Authorization", `Bearer ${created.token}`);
-      expectUnauthenticatedResponse(after);
     });
   });
 });
@@ -204,29 +298,25 @@ describe("ApiKeyService", () => {
   });
 
   describe("verify", () => {
-    it("returns the entity for a valid, non-revoked token", async () => {
+    it("returns the entity for a valid token", async () => {
       const user = await ensureTestUserCreated("apikey-svc-valid", "pw", false);
-      const created = await apiKeyService.createForUser(user.id, "valid-key");
-
+      const created = await apiKeyService.create(user.id, "valid-key", [await adminRoleId()]);
       const verified = await apiKeyService.verify(created.token);
       expect(verified?.id).toBe(created.id);
-      expect(verified?.userId).toBe(user.id);
     });
 
     it("returns null for a tampered token (same prefix, different secret)", async () => {
       const user = await ensureTestUserCreated("apikey-svc-tamper", "pw", false);
-      const created = await apiKeyService.createForUser(user.id, "tamper-key");
+      const created = await apiKeyService.create(user.id, "tamper-key", [await adminRoleId()]);
       const tampered = `fdmm_pat_${created.prefix}${"X".repeat(30)}`;
-
       const verified = await apiKeyService.verify(tampered);
       expect(verified).toBeNull();
     });
 
-    it("returns null for revoked tokens", async () => {
-      const user = await ensureTestUserCreated("apikey-svc-revoke", "pw", false);
-      const created = await apiKeyService.createForUser(user.id, "revoke-key");
-      await apiKeyService.revokeForUser(user.id, created.id);
-
+    it("returns null for deleted tokens", async () => {
+      const user = await ensureTestUserCreated("apikey-svc-deleted", "pw", false);
+      const created = await apiKeyService.create(user.id, "delete-key", [await adminRoleId()]);
+      await apiKeyService.delete(created.id);
       const verified = await apiKeyService.verify(created.token);
       expect(verified).toBeNull();
     });
