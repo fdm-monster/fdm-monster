@@ -21,8 +21,8 @@ import { Role } from "@/entities/role.entity";
  * token, verified with timingSafeEqual.
  *
  * Permissions are derived from `roles` (via the `api_key_role` join table),
- * NOT from the bound user's roles. The `userId` FK records who minted the
- * key for audit; it does not drive authorisation.
+ * NOT from the bound user's roles. `createdByUserId` is audit-only — it
+ * records who minted the key and does not drive authorisation.
  */
 @Entity()
 export class ApiKey {
@@ -30,11 +30,11 @@ export class ApiKey {
   id: number;
 
   @ManyToOne(() => User, { nullable: false, onDelete: "CASCADE" })
-  @JoinColumn({ name: "userId" })
-  user: Relation<User>;
+  @JoinColumn({ name: "createdByUserId" })
+  createdByUser: Relation<User>;
 
   @Column()
-  userId: number;
+  createdByUserId: number;
 
   @Column()
   label: string;

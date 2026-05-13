@@ -112,7 +112,7 @@ describe(ApiKeyController.name, () => {
       expect(response.body.token).toMatch(/^fdmm_pat_[A-Za-z0-9_-]{20,}$/);
       expect(response.body.label).toBe("my-script");
       expect(response.body.prefix).toHaveLength(16);
-      expect(response.body.userId).toBeGreaterThan(0);
+      expect(response.body.createdByUserId).toBeGreaterThan(0);
       expect(response.body.lastUsedAt).toBeNull();
       expect(response.body.roles).toEqual([ROLES.ADMIN]);
     });
@@ -148,9 +148,9 @@ describe(ApiKeyController.name, () => {
     });
 
     it("allows admins to assign any role to a key (no escalation check)", async () => {
-      // David's call: admins are super users; they can already grant themselves
-      // any role via user management, so the api-key create path doesn't need
-      // an additional escalation check.
+      // Admins are super users — they can already grant themselves any role
+      // via user management, so the api-key create path doesn't need an
+      // additional escalation check.
       const { token: jwt } = await loginTestUser(request, "apikey-cross-role");
       const response = await postCreate(jwt, {
         label: "broad",

@@ -36,7 +36,7 @@ export class ApiKeyService extends BaseService(ApiKey, ApiKeyDto) implements IAp
   toDto(entity: ApiKey): ApiKeyDto {
     return {
       id: entity.id,
-      userId: entity.userId,
+      createdByUserId: entity.createdByUserId,
       label: entity.label,
       prefix: entity.prefix,
       createdAt: entity.createdAt,
@@ -51,7 +51,7 @@ export class ApiKeyService extends BaseService(ApiKey, ApiKeyDto) implements IAp
     );
   }
 
-  async create(userId: number, label: string, roleIds: number[]): Promise<CreatedApiKeyDto> {
+  async create(createdByUserId: number, label: string, roleIds: number[]): Promise<CreatedApiKeyDto> {
     const trimmed = label?.trim();
     if (!trimmed?.length) {
       throw new Error("API key label is required");
@@ -68,7 +68,7 @@ export class ApiKeyService extends BaseService(ApiKey, ApiKeyDto) implements IAp
     const { token, prefix, hashedSecret } = generateToken();
     const entity = await this.repository.save(
       this.repository.create({
-        userId,
+        createdByUserId,
         label: trimmed,
         prefix,
         hashedSecret,
@@ -77,7 +77,9 @@ export class ApiKeyService extends BaseService(ApiKey, ApiKeyDto) implements IAp
       }),
     );
 
-    this.logger.log(`Created API key id=${entity.id} prefix=${prefix} by user ${userId} with roles ${roleIds}`);
+    this.logger.log(
+      `Created API key id=${entity.id} prefix=${prefix} by user ${createdByUserId} with roles ${roleIds}`,
+    );
     return {
       ...this.toDto(entity),
       token,

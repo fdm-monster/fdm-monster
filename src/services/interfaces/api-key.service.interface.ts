@@ -4,8 +4,8 @@ import { ApiKeyDto, CreatedApiKeyDto } from "@/services/interfaces/api-key.dto";
 export interface IApiKeyService {
   toDto(entity: ApiKey): ApiKeyDto;
 
-  /** Mint a new API key for `userId` with the given roles. Returns the cleartext token exactly once. */
-  create(userId: number, label: string, roleIds: number[]): Promise<CreatedApiKeyDto>;
+  /** Mint a new API key with the given roles. `createdByUserId` is audit-only. Returns the cleartext token exactly once. */
+  create(createdByUserId: number, label: string, roleIds: number[]): Promise<CreatedApiKeyDto>;
 
   /** All keys across all users (admin-only feature). Never returns secrets. */
   list(): Promise<ApiKeyDto[]>;

@@ -12,8 +12,8 @@ import { AuthenticationError } from "@/exceptions/runtime.exceptions";
 /**
  * Admin-only API key management. Keys are m2m credentials with their own
  * role assignment (stored in the `api_key_role` join table); they are NOT
- * user impersonation tokens. The `userId` FK on each key records who minted
- * it, not whose permissions the key holds.
+ * user impersonation tokens. `createdByUserId` is audit-only — it records
+ * who minted the key, not whose permissions the key holds.
  */
 @route(AppConstants.apiRoute + "/api-keys")
 @before([authenticate(), authorizeRoles([ROLES.ADMIN]), demoUserNotAllowed])
@@ -30,9 +30,9 @@ export class ApiKeyController {
   @POST()
   @route("/")
   async create(req: Request, res: Response) {
-    const userId = this.requireUserId(req);
+    const createdByUserId = this.requireUserId(req);
     const { label, roleIds } = await validateMiddleware(req, createApiKeySchema);
-    const created = await this.apiKeyService.create(userId, label, roleIds);
+    const created = await this.apiKeyService.create(createdByUserId, label, roleIds);
     res.send(created);
   }
 

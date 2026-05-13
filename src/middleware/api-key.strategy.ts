@@ -10,8 +10,8 @@ import type { RoleName } from "@/constants/authorization.constants";
  *
  * Important: we do NOT look up the bound user. The api_key_role join is the
  * sole permission source for the request — keys are self-contained credentials,
- * not user impersonation. `req.user.id = -1` is a sentinel; downstream audit
- * code can branch on it if it needs an api-key-aware identity.
+ * not user impersonation. `req.user.isApiKey === true` and `req.user.id = -1`
+ * are how downstream audit/branching code can detect an api-key principal.
  */
 export class ApiKeyStrategy extends Strategy {
   name = "api-key";
@@ -41,6 +41,7 @@ export class ApiKeyStrategy extends Strategy {
         needsPasswordChange: false,
         createdAt: apiKey.createdAt,
         roles: (apiKey.roles ?? []).map((r) => r.name as RoleName),
+        isApiKey: true,
       };
       return this.success(principal);
     } catch (err) {

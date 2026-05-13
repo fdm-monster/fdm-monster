@@ -7,14 +7,14 @@ export class AddApiKey1778446203015 implements MigrationInterface {
     await queryRunner.query(`
       CREATE TABLE "api_key"
       (
-        "id"           integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-        "userId"       integer                           NOT NULL,
-        "label"        varchar                           NOT NULL,
-        "prefix"       varchar                           NOT NULL,
-        "hashedSecret" varchar                           NOT NULL,
-        "createdAt"    datetime                          NOT NULL DEFAULT (datetime('now')),
-        "lastUsedAt"   datetime,
-        CONSTRAINT "FK_api_key_user" FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
+        "id"                integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+        "createdByUserId"   integer                           NOT NULL,
+        "label"             varchar                           NOT NULL,
+        "prefix"            varchar                           NOT NULL,
+        "hashedSecret"      varchar                           NOT NULL,
+        "createdAt"         datetime                          NOT NULL DEFAULT (datetime('now')),
+        "lastUsedAt"        datetime,
+        CONSTRAINT "FK_api_key_created_by_user" FOREIGN KEY ("createdByUserId") REFERENCES "user" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
       )
     `);
     await queryRunner.query(`
