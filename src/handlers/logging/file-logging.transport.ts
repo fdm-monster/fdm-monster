@@ -1,4 +1,3 @@
-import { DateTime } from "luxon";
 import { join } from "node:path";
 import { getMediaPath } from "@/utils/fs.utils";
 import { AppConstants } from "@/server.constants";
@@ -13,8 +12,7 @@ export function createFileLoggingTransport(options: FileLoggerOptions): winston.
   if (!options.enabled) {
     return;
   }
-
-  const date = DateTime.now().toISODate();
+  const date = new Date().toISOString().slice(0, 10);
   const logFilePath = join(getMediaPath(), AppConstants.defaultLogsFolder, `${AppConstants.logAppName}-${date}.log`);
 
   return new winston.transports.File({

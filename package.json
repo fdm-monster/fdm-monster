@@ -81,7 +81,6 @@
     "helmet": "8.1.0",
     "js-yaml": "4.1.1",
     "jsonwebtoken": "9.0.3",
-    "luxon": "3.7.2",
     "mqtt": "5.15.1",
     "multer": "2.1.1",
     "octokit": "5.0.5",
