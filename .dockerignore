@@ -14,3 +14,8 @@
 /dist
 /fdm-monster
 /media
+/database
+/test
+/.all-contributorsrc
+/.whitesource
+/renovate.json
