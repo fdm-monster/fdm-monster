@@ -74,7 +74,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "2.4.0",
+  defaultClientMinimum: "2.4.2",
 
   // Websocket values
   defaultWebsocketHandshakeTimeout: 3000,

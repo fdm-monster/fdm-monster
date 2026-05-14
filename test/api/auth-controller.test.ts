@@ -153,6 +153,8 @@ describe(AuthController.name, () => {
   });
 
   it("should get loginRequired", async () => {
+    process.env.INSTANCE_LABEL = "";
+    
     await settingsStore.setLoginRequired(true);
     await settingsStore.setRegistrationEnabled(true);
     const response = await request.get(`${baseRoute}/login-required`).send();
@@ -162,6 +164,8 @@ describe(AuthController.name, () => {
     expect(response.body.registration).toBe(true);
     expect(response.body.isDemoMode).toBe(false);
     expect(response.body.instanceLabel).toBeNull();
+
+    delete process.env.INSTANCE_LABEL;
   });
 
   it("should include INSTANCE_LABEL in loginRequired response when set", async () => {
