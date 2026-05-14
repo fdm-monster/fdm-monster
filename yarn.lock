@@ -365,7 +365,6 @@ __metadata:
     helmet: "npm:8.1.0"
     js-yaml: "npm:4.1.1"
     jsonwebtoken: "npm:9.0.3"
-    luxon: "npm:3.7.2"
     mqtt: "npm:5.15.1"
     multer: "npm:2.1.1"
     nock: "npm:13.5.6"
@@ -4984,13 +4983,6 @@ __metadata:
   version: 10.4.3
   resolution: "lru-cache@npm:10.4.3"
   checksum: 10c0/ebd04fbca961e6c1d6c0af3799adcc966a1babe798f685bb84e6599266599cd95d94630b10262f5424539bc4640107e8a33aa28585374abf561d30d16f4b39fb
-  languageName: node
-  linkType: hard
-
-"luxon@npm:3.7.2":
-  version: 3.7.2
-  resolution: "luxon@npm:3.7.2"
-  checksum: 10c0/ed8f0f637826c08c343a29dd478b00628be93bba6f068417b1d8896b61cb61c6deacbe1df1e057dbd9298334044afa150f9aaabbeb3181418ac8520acfdc2ae2
   languageName: node
   linkType: hard
 
