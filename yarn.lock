@@ -358,7 +358,6 @@ __metadata:
     cookie-parser: "npm:1.4.7"
     cors: "npm:2.8.6"
     cross-env: "npm:10.1.0"
-    deprecation: "npm:2.3.1"
     dotenv: "npm:17.4.2"
     eventemitter2: "npm:6.4.9"
     express: "npm:4.22.2"
@@ -392,6 +391,9 @@ __metadata:
     winston-loki: "npm:6.1.4"
     ws: "npm:8.20.1"
     zod: "npm:3.25.76"
+  dependenciesMeta:
+    better-sqlite3:
+      built: true
   bin:
     fdm-monster-server: dist/index.js
     fdmm-server: dist/index.js
@@ -3635,13 +3637,6 @@ __metadata:
   version: 2.0.0
   resolution: "depd@npm:2.0.0"
   checksum: 10c0/58bd06ec20e19529b06f7ad07ddab60e504d9e0faca4bd23079fac2d279c3594334d736508dc350e06e510aba5e22e4594483b3a6562ce7c17dd797f4cc4ad2c
-  languageName: node
-  linkType: hard
-
-"deprecation@npm:2.3.1":
-  version: 2.3.1
-  resolution: "deprecation@npm:2.3.1"
-  checksum: 10c0/23d688ba66b74d09b908c40a76179418acbeeb0bfdf218c8075c58ad8d0c315130cb91aa3dffb623aa3a411a3569ce56c6460de6c8d69071c17fe6dd2442f032
   languageName: node
   linkType: hard
 
