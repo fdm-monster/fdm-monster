@@ -175,6 +175,17 @@ describe(AuthController.name, () => {
     }
   });
 
+  it("should return null instanceLabel when INSTANCE_LABEL is whitespace-only", async () => {
+    process.env.INSTANCE_LABEL = "   ";
+    try {
+      const response = await request.get(`${baseRoute}/login-required`).send();
+      expectOkResponse(response);
+      expect(response.body.instanceLabel).toBeNull();
+    } finally {
+      delete process.env.INSTANCE_LABEL;
+    }
+  });
+
   it("should get verifyLogin", async () => {
     await settingsStore.setLoginRequired();
     const response = await request.post(verifyLoginRoute).send();
