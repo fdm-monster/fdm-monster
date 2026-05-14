@@ -142,8 +142,7 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
     let current = "";
     let inQuotes = false;
 
-    for (let i = 0; i < headerValue.length; i++) {
-      const ch = headerValue[i];
+    for (const ch of headerValue) {
       if (ch === '"') {
         inQuotes = !inQuotes;
         current += ch;
