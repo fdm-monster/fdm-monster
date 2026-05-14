@@ -112,7 +112,7 @@ describe(AuthController.name, () => {
   });
 
   it("should fail new user registration when server:registration is disabled", async () => {
-    await container.resolve(DITokens.settingsStore).setRegistrationEnabled(false);
+    await container.resolve<SettingsStore>(DITokens.settingsStore).setRegistrationEnabled(false);
     const response = await request.post(registerRoute).send();
     expectBadRequestError(response);
   });
@@ -154,7 +154,7 @@ describe(AuthController.name, () => {
 
   it("should get loginRequired", async () => {
     process.env.INSTANCE_LABEL = "";
-    
+
     await settingsStore.setLoginRequired(true);
     await settingsStore.setRegistrationEnabled(true);
     const response = await request.get(`${baseRoute}/login-required`).send();
