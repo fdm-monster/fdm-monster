@@ -45,11 +45,12 @@ export class AuthController {
     const registration = this.settingsStore.isRegistrationEnabled();
     let wizardState = this.settingsStore.getWizardState();
     const isDemoMode = this.configService.isDemoMode();
+    const instanceLabel = this.configService.instanceLabel();
     wizardState = {
       ...wizardState,
       wizardCompleted: isDemoMode ? true : wizardState.wizardCompleted,
     };
-    res.send({ loginRequired, registration, wizardState, isDemoMode });
+    res.send({ loginRequired, registration, wizardState, isDemoMode, instanceLabel });
   }
 
   @POST()

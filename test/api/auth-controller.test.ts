@@ -161,6 +161,18 @@ describe(AuthController.name, () => {
     expect(response.body.wizardState.wizardCompleted).toBe(true);
     expect(response.body.registration).toBe(true);
     expect(response.body.isDemoMode).toBe(false);
+    expect(response.body.instanceLabel).toBeNull();
+  });
+
+  it("should include INSTANCE_LABEL in loginRequired response when set", async () => {
+    process.env.INSTANCE_LABEL = "  STAGING  ";
+    try {
+      const response = await request.get(`${baseRoute}/login-required`).send();
+      expectOkResponse(response);
+      expect(response.body.instanceLabel).toBe("STAGING");
+    } finally {
+      delete process.env.INSTANCE_LABEL;
+    }
   });
 
   it("should get verifyLogin", async () => {
