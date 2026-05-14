@@ -112,7 +112,7 @@ describe(AuthController.name, () => {
   });
 
   it("should fail new user registration when server:registration is disabled", async () => {
-    await container.resolve(DITokens.settingsStore).setRegistrationEnabled(false);
+    await container.resolve<SettingsStore>(DITokens.settingsStore).setRegistrationEnabled(false);
     const response = await request.post(registerRoute).send();
     expectBadRequestError(response);
   });
@@ -153,6 +153,8 @@ describe(AuthController.name, () => {
   });
 
   it("should get loginRequired", async () => {
+    process.env.INSTANCE_LABEL = "";
+
     await settingsStore.setLoginRequired(true);
     await settingsStore.setRegistrationEnabled(true);
     const response = await request.get(`${baseRoute}/login-required`).send();
@@ -161,6 +163,31 @@ describe(AuthController.name, () => {
     expect(response.body.wizardState.wizardCompleted).toBe(true);
     expect(response.body.registration).toBe(true);
     expect(response.body.isDemoMode).toBe(false);
+    expect(response.body.instanceLabel).toBeNull();
+
+    delete process.env.INSTANCE_LABEL;
+  });
+
+  it("should include INSTANCE_LABEL in loginRequired response when set", async () => {
+    process.env.INSTANCE_LABEL = "  STAGING  ";
+    try {
+      const response = await request.get(`${baseRoute}/login-required`).send();
+      expectOkResponse(response);
+      expect(response.body.instanceLabel).toBe("STAGING");
+    } finally {
+      delete process.env.INSTANCE_LABEL;
+    }
+  });
+
+  it("should return null instanceLabel when INSTANCE_LABEL is whitespace-only", async () => {
+    process.env.INSTANCE_LABEL = "   ";
+    try {
+      const response = await request.get(`${baseRoute}/login-required`).send();
+      expectOkResponse(response);
+      expect(response.body.instanceLabel).toBeNull();
+    } finally {
+      delete process.env.INSTANCE_LABEL;
+    }
   });
 
   it("should get verifyLogin", async () => {

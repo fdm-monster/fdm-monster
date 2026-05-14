@@ -7,6 +7,8 @@ export interface IConfigService {
   getOrThrow(key: string): void;
 
   isDemoMode(): boolean;
+
+  instanceLabel(): string | null;
 }
 
 export class ConfigService implements IConfigService {
@@ -23,5 +25,10 @@ export class ConfigService implements IConfigService {
 
   isDemoMode() {
     return this.get<string>(AppConstants.OVERRIDE_IS_DEMO_MODE, "false") === "true";
+  }
+
+  instanceLabel() {
+    const raw = this.get<string>(AppConstants.INSTANCE_LABEL, "")?.trim();
+    return raw?.length ? raw : null;
   }
 }

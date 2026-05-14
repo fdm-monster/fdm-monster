@@ -51,6 +51,7 @@ export const AppConstants = {
   DEFAULT_JWT_AUDIENCE: "fdm-monster-client-next",
 
   OVERRIDE_IS_DEMO_MODE: "OVERRIDE_IS_DEMO_MODE",
+  INSTANCE_LABEL: "INSTANCE_LABEL",
   OVERRIDE_DEMO_USERNAME: "OVERRIDE_DEMO_USERNAME",
   DEFAULT_DEMO_USERNAME: "demo",
   OVERRIDE_DEMO_PASSWORD: "OVERRIDE_DEMO_PASSWORD",
@@ -73,7 +74,7 @@ export const AppConstants = {
   orgName: "fdm-monster",
   // Wizard version changes will trigger a re-run of the wizard
   currentWizardVersion: 1,
-  defaultClientMinimum: "2.4.0",
+  defaultClientMinimum: "2.4.2",
 
   // Websocket values
   defaultWebsocketHandshakeTimeout: 3000,
