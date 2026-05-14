@@ -1,3 +1,17 @@
+# FDM Monster 15/05/2026 2.1.1
+
+## Features
+
+- feat(auth): expose INSTANCE_LABEL env var on /auth/login-required response for better client-side handling of multi-instance setups
+
+## Fixes
+
+- Extends Digest auth for broader PrusaLink support (especially for MK2/MK3 printers with PrusaLink extension on Raspberry Pi)
+
+## Chores
+
+- Remove unused package Luxon, moved chalk to devDependencies
+
 # FDM Monster 13/05/2026 2.1.0
 
 ## Features
