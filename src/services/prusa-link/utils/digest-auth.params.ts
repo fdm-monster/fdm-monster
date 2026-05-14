@@ -8,4 +8,6 @@ export interface DigestAuthParams {
   qop?: string;
   nc?: string;
   cnonce?: string;
+  opaque?: string;
+  algorithm?: string;
 }

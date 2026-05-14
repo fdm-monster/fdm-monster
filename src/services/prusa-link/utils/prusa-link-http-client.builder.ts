@@ -12,6 +12,8 @@ export interface DigestAuthInfo {
   nonce: string;
   qop?: string;
   hasQop: boolean;
+  opaque?: string;
+  algorithm?: string;
 }
 
 export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
@@ -33,35 +35,38 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
     // Add request interceptor for digest auth
     if (this.username && this.password) {
       axiosInstance.interceptors.request.use(async (config) => {
-        // If we have auth info, add the digest header
         if (this.authHeaderContext) {
-          const computedDigestHeader = this.generateDigestHeader(
-            config.method?.toUpperCase() ?? "GET",
-            config.url ?? "/",
-          );
+          const method = config.method?.toUpperCase() ?? "GET";
+          const rawUrl = config.url ?? "/";
+          let uri = rawUrl;
 
-          config.headers[authorizationHeaderKey] = computedDigestHeader;
+          if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
+            try {
+              const parsed = new URL(rawUrl);
+              uri = `${parsed.pathname}${parsed.search ?? ""}`;
+            } catch {
+              // If URL parsing fails, use the raw URL
+            }
+          }
+
+          config.headers[authorizationHeaderKey] = this.generateDigestHeader(method, uri);
         }
         return config;
       });
 
-      // Add response interceptor to handle 401s
       axiosInstance.interceptors.response.use(
         (response) => response,
         async (error: AxiosError) => {
           const originalRequest = error.config as AxiosRequestConfig & { _retryCount?: number };
 
-          // If we get a 401 and have credentials but no auth info or retried less than once
           if (
             error.response?.status === 401 &&
             this.username?.length &&
             this.password?.length &&
             (!originalRequest._retryCount || originalRequest._retryCount < this.maxRetries)
           ) {
-            // Extract WWW-Authenticate header
             const wwwAuthHeader = error.response.headers[wwwAuthenticationHeaderKey] as string;
             if (wwwAuthHeader) {
-              // Allow caching the value for reuse
               if (typeof this.onAuthSuccess === "function") {
                 this.onAuthSuccess(wwwAuthHeader);
               }
@@ -76,12 +81,10 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
             }
           }
 
-          // If this is an auth error, and we have a callback, invoke it
           if (error.response?.status === 401 && this.onAuthError && typeof this.onAuthError === "function") {
             this.onAuthError(error);
           }
 
-          // If we can't handle it, pass the error on
           return Promise.reject(error);
         },
       );
@@ -132,23 +135,64 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
   }
 
   private saveParsedAuthHeaderContext(authHeader: string): void {
-    const headerValue = authHeader.startsWith("Digest ") ? authHeader.substring(7) : authHeader;
+    const cleanedHeader = authHeader.trim();
+    const headerValue = cleanedHeader.startsWith("Digest ") ? cleanedHeader.substring(7) : cleanedHeader;
+
+    const tokens: string[] = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < headerValue.length; i++) {
+      const ch = headerValue[i];
+      if (ch === '"') {
+        inQuotes = !inQuotes;
+        current += ch;
+        continue;
+      }
+      if (ch === "," && !inQuotes) {
+        if (current.trim().length) {
+          tokens.push(current.trim());
+        }
+        current = "";
+        continue;
+      }
+      current += ch;
+    }
+    if (current.trim().length) {
+      tokens.push(current.trim());
+    }
 
     const authParams = Object.fromEntries(
-      headerValue.split(", ").map((param) => {
-        const parts = param.split("=");
-        if (parts.length === 2) {
-          return [parts[0], parts[1].replace(/"/g, "")];
+      tokens.map((param) => {
+        const idx = param.indexOf("=");
+        if (idx === -1) {
+          return [param.trim(), ""];
         }
-        return [parts[0], ""];
+        const key = param.slice(0, idx).trim();
+        let value = param.slice(idx + 1).trim();
+        // Remove quotes if present
+        if (value.startsWith('"') && value.endsWith('"')) {
+          value = value.slice(1, -1);
+        }
+        return [key, value];
       }),
     );
+
+    const qopRaw = authParams.qop;
+    const qop = qopRaw
+      ? qopRaw
+          .split(",")
+          .map((q) => q.trim())
+          .find((q) => q === "auth") ?? qopRaw.split(",")[0].trim()
+      : undefined;
 
     this.authHeaderContext = {
       realm: authParams.realm,
       nonce: authParams.nonce,
-      qop: authParams.qop,
-      hasQop: "qop" in authParams,
+      qop,
+      hasQop: !!qop,
+      opaque: authParams.opaque,
+      algorithm: authParams.algorithm,
     };
   }
 
@@ -157,7 +201,9 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
       throw new Error("Digest auth not properly configured");
     }
 
-    const { realm, nonce, qop, hasQop } = this.authHeaderContext;
+    const { realm, nonce, qop, hasQop, opaque, algorithm } = this.authHeaderContext;
+    const needsCnonce = hasQop || algorithm?.toLowerCase() === "md5-sess";
+    const cnonce = needsCnonce ? randomBytes(8).toString("hex") : undefined;
 
     return generateDigestAuthHeader({
       username: this.username,
@@ -167,8 +213,10 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
       realm,
       nonce,
       qop: hasQop ? qop : undefined,
-      nc: hasQop ? "00000001" : undefined, // For simplicity, always use 00000001
-      cnonce: hasQop ? randomBytes(8).toString("hex") : undefined,
+      nc: hasQop ? "00000001" : undefined,
+      cnonce,
+      opaque,
+      algorithm,
     });
   }
 }
