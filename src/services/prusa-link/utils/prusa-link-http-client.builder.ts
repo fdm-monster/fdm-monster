@@ -180,10 +180,10 @@ export class PrusaLinkHttpClientBuilder extends DefaultHttpClientBuilder {
 
     const qopRaw = authParams.qop;
     const qop = qopRaw
-      ? qopRaw
+      ? (qopRaw
           .split(",")
           .map((q) => q.trim())
-          .find((q) => q === "auth") ?? qopRaw.split(",")[0].trim()
+          .find((q) => q === "auth") ?? qopRaw.split(",")[0].trim())
       : undefined;
 
     this.authHeaderContext = {

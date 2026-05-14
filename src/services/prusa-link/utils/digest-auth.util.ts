@@ -19,12 +19,7 @@ export function generateDigestAuthHeader(params: DigestAuthParams): string {
     ? createHash("md5").update(`${ha1}:${nonce}:${nc}:${cnonce}:${qop}:${ha2}`).digest("hex")
     : createHash("md5").update(`${ha1}:${nonce}:${ha2}`).digest("hex");
 
-  const headerParts = [
-    `Digest username="${username}"`,
-    `realm="${realm}"`,
-    `nonce="${nonce}"`,
-    `uri="${uri}"`,
-  ];
+  const headerParts = [`Digest username="${username}"`, `realm="${realm}"`, `nonce="${nonce}"`, `uri="${uri}"`];
 
   if (algorithm?.length) {
     headerParts.push(`algorithm=${algorithm}`);
