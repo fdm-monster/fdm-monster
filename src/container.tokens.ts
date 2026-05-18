@@ -22,6 +22,7 @@ export const DITokens = {
   floorPositionService: "floorPositionService",
   printJobService: "printJobService",
   printQueueService: "printQueueService",
+  routingService: "routingService",
   fileStorageService: "fileStorageService",
   fileAnalysisService: "fileAnalysisService",
   printFileDownloaderService: "printFileDownloaderService",

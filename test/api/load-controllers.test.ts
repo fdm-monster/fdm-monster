@@ -18,6 +18,7 @@ describe("load-controllers test", () => {
       "/src/controllers/printer-settings.controller.ts",
       "/src/controllers/printer-tag.controller.ts",
       "/src/controllers/printer.controller.ts",
+      "/src/controllers/routing.controller.ts",
       "/src/controllers/server-private.controller.ts",
       "/src/controllers/server-public.controller.ts",
       "/src/controllers/settings.controller.ts",

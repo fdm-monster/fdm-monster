@@ -68,6 +68,7 @@ import { BambuFtpAdapter } from "@/services/bambu/bambu-ftp.adapter";
 import { BambuApi } from "@/services/bambu.api";
 import { PrintQueueService } from "@/services/print-queue.service";
 import { FileStorageService } from "@/services/file-storage.service";
+import { RoutingService } from "@/services/routing.service";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { PrintJobAnalysisTask } from "@/tasks/print-job-analysis.task";
@@ -168,6 +169,7 @@ export function configureContainer() {
     [di.testPrinterSocketStore]: asClass(TestPrinterSocketStore).singleton(),
     [di.printJobService]: asClass(PrintJobService).singleton(),
     [di.printQueueService]: asClass(PrintQueueService).singleton(),
+    [di.routingService]: asClass(RoutingService).singleton(),
     [di.fileStorageService]: asClass(FileStorageService).singleton(),
     [di.fileAnalysisService]: asClass(FileAnalysisService).singleton(),
     [di.printFileDownloaderService]: asClass(PrintFileDownloaderService).singleton(),
