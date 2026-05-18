@@ -311,7 +311,7 @@ __metadata:
     ts-node: "npm:10.9.2"
     tsconfig-paths: "npm:4.2.0"
     tsx: "npm:4.22.2"
-    typeorm: "npm:0.3.29"
+    typeorm: "npm:0.3.30"
     typescript: "npm:6.0.3"
     vite-plus: "npm:latest"
     ws: "npm:8.20.1"
@@ -381,7 +381,7 @@ __metadata:
     swagger-ui-dist: "npm:5.32.6"
     toad-scheduler: "npm:4.0.1"
     tsx: "npm:4.22.2"
-    typeorm: "npm:0.3.29"
+    typeorm: "npm:0.3.30"
     typescript: "npm:6.0.3"
     uuid: "npm:14.0.0"
     vite-plus: "npm:latest"
@@ -6896,9 +6896,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeorm@npm:0.3.29":
-  version: 0.3.29
-  resolution: "typeorm@npm:0.3.29"
+"typeorm@npm:0.3.30":
+  version: 0.3.30
+  resolution: "typeorm@npm:0.3.30"
   dependencies:
     "@sqltools/formatter": "npm:^1.2.5"
     ansis: "npm:^4.2.0"
@@ -6969,7 +6969,7 @@ __metadata:
     typeorm: cli.js
     typeorm-ts-node-commonjs: cli-ts-node-commonjs.js
     typeorm-ts-node-esm: cli-ts-node-esm.js
-  checksum: 10c0/9fe642e87657ff81005edfcf983f183a3172adba0eaca90fdc36fba1dd1348b41444f2b168d98adc57f3dc16b20b86bdde65c489cad9ba35bb7627c103dcc413
+  checksum: 10c0/7102d1e1d65ed69642414bfb4705ef658ecdd00eb73b557b79a2c7be5b2aadeb366d623762a4773d31088737d30f331e42378e4e66d77572dd94181b37b30c9e
   languageName: node
   linkType: hard
 
