@@ -80,6 +80,7 @@ export interface NormalizedThumbnail {
 export interface GCodeMetadata extends BaseMetadata {
   fileFormat: "gcode";
   generatedBy?: string;
+  routingTarget: string | null;
   thumbnails?: NormalizedThumbnail[];
 }
 
