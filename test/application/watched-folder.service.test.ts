@@ -6,7 +6,8 @@ import type { FileAnalysisService } from "@/services/file-analysis.service";
 import type { RoutingService } from "@/services/routing.service";
 
 function makeService(config: { mode?: WatchedFolderMode; metadata?: any } = {}) {
-  const loggerFactory = (() => ({ log: () => {}, warn: () => {}, error: () => {} })) as unknown as ILoggerFactory;
+  const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() };
+  const loggerFactory = (() => logger) as unknown as ILoggerFactory;
 
   const configService = {
     watchedFolderPath: () => "/watched",
@@ -47,7 +48,7 @@ function makeService(config: { mode?: WatchedFolderMode; metadata?: any } = {}) 
     fileAnalysisService,
     routingService,
   );
-  return { service, calculateFileHash, saveFile, saveMetadata, queueForFile };
+  return { service, logger, calculateFileHash, saveFile, saveMetadata, queueForFile };
 }
 
 describe("WatchedFolderService.isAccepted", () => {
@@ -92,5 +93,14 @@ describe("WatchedFolderService.handleFile", () => {
     const { service, saveFile } = makeService({ mode: "library" });
     await service.handleFile("/watched", "/watched/prusa-mini/part.gcode");
     expect(saveFile).not.toHaveBeenCalled();
+  });
+
+  it("warns when the gcode fdmm_target contradicts the subfolder, and the folder wins", async () => {
+    const { service, saveMetadata, logger } = makeService({
+      metadata: { fileFormat: "gcode", routingTarget: "voron" },
+    });
+    await service.handleFile("/watched", "/watched/prusa-mini/part.gcode");
+    expect(saveMetadata.mock.calls[0][1].routingTarget).toBe("prusa-mini");
+    expect(logger.warn).toHaveBeenCalled();
   });
 });

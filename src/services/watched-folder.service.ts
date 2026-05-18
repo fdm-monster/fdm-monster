@@ -82,6 +82,10 @@ export class WatchedFolderService {
       const metadata: any = analysis.metadata ?? {};
       // The subfolder is the primary routing signal and overrides any gcode token
       if (subfolder) {
+        const gcodeTarget = metadata.routingTarget;
+        if (gcodeTarget && String(gcodeTarget).toLowerCase() !== subfolder.toLowerCase()) {
+          this.logger.warn(`${originalName}: folder "${subfolder}" overrides gcode fdmm_target "${gcodeTarget}"`);
+        }
         metadata.routingTarget = subfolder;
       }
 
