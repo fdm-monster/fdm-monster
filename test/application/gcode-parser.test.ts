@@ -9,9 +9,10 @@ const FOOTER_PAD = "G1 X1 Y1 E1 ; move\n".repeat(2000);
 describe("GCodeParser routing token", () => {
   const parser = new GCodeParser();
   const tmpFiles: string[] = [];
+  let fileSeq = 0;
 
   function writeGcode(name: string, content: string): string {
-    const filePath = path.join(os.tmpdir(), `fdmm-gcode-${Date.now()}-${Math.random().toString(36).slice(2)}-${name}`);
+    const filePath = path.join(os.tmpdir(), `fdmm-gcode-${process.pid}-${++fileSeq}-${name}`);
     fs.writeFileSync(filePath, content);
     tmpFiles.push(filePath);
     return filePath;
