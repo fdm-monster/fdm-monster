@@ -23,7 +23,7 @@ Environment variables:
 | Variable | Meaning |
 |---|---|
 | `WATCHED_FOLDER_PATH` | Absolute path FDM Monster watches. Unset = feature off. |
-| `WATCHED_FOLDER_MODE` | `consume` (default) moves imported files into the library. `library` (keep files in place) is reserved and not yet implemented. |
+| `WATCHED_FOLDER_MODE` | `consume` (default) moves imported files into the library. `library` copies them, leaving the originals in the watched folder; already-imported files are skipped on re-scan. |
 
 The **subfolder name is the routing target**:
 

@@ -1,9 +1,10 @@
 import { watch, type FSWatcher } from "chokidar";
+import { readFile } from "node:fs/promises";
 import { basename, dirname, extname, relative, sep } from "node:path";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
-import type { ConfigService } from "@/services/core/config.service";
+import type { ConfigService, WatchedFolderMode } from "@/services/core/config.service";
 import type { FileStorageService } from "@/services/file-storage.service";
 import type { FileAnalysisService } from "@/services/file-analysis.service";
 import type { RoutingService } from "@/services/routing.service";
@@ -63,20 +64,21 @@ export class WatchedFolderService {
       return;
     }
 
-    if (this.configService.watchedFolderMode() === "library") {
-      this.logger.warn(`Watched-folder library mode is not yet implemented; leaving ${filePath} in place`);
-      return;
-    }
-
+    const mode = this.configService.watchedFolderMode();
     try {
       const originalName = basename(filePath);
       const subfolder = this.subfolderOf(rootPath, filePath);
-
       const fileHash = await this.fileStorageService.calculateFileHash(filePath);
-      const fileStorageId = await this.fileStorageService.saveFile(
-        { originalname: originalName, path: filePath } as Express.Multer.File,
-        fileHash,
-      );
+
+      // Library mode leaves the file in place, so a re-scan must not re-import it
+      if (mode === "library") {
+        const existingId = this.fileStorageService.getDeterministicId(fileHash, originalName);
+        if (await this.fileStorageService.fileExists(existingId)) {
+          return;
+        }
+      }
+
+      const fileStorageId = await this.storeFile(filePath, originalName, fileHash, mode);
 
       const analysis = await this.fileAnalysisService.analyzeFile(this.fileStorageService.getFilePath(fileStorageId));
       const metadata: any = analysis.metadata ?? {};
@@ -103,5 +105,23 @@ export class WatchedFolderService {
     } catch (e) {
       this.logger.error(`Failed to import watched-folder file ${filePath}: ${e}`);
     }
+  }
+
+  private async storeFile(
+    filePath: string,
+    originalName: string,
+    fileHash: string,
+    mode: WatchedFolderMode,
+  ): Promise<string> {
+    if (mode === "library") {
+      // Copy so the user's file stays in the watched folder
+      const buffer = await readFile(filePath);
+      return this.fileStorageService.saveFile({ originalname: originalName, buffer } as Express.Multer.File, fileHash);
+    }
+    // Consume: move the file into the library
+    return this.fileStorageService.saveFile(
+      { originalname: originalName, path: filePath } as Express.Multer.File,
+      fileHash,
+    );
   }
 }
