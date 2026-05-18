@@ -69,6 +69,7 @@
     "basic-ftp": "6.0.1",
     "bcryptjs": "3.0.3",
     "better-sqlite3": "12.10.0",
+    "chokidar": "5.0.0",
     "class-validator": "0.15.1",
     "connect-history-api-fallback": "2.0.0",
     "cookie-parser": "1.4.7",
