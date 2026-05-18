@@ -69,6 +69,7 @@ import { BambuApi } from "@/services/bambu.api";
 import { PrintQueueService } from "@/services/print-queue.service";
 import { FileStorageService } from "@/services/file-storage.service";
 import { RoutingService } from "@/services/routing.service";
+import { WatchedFolderService } from "@/services/watched-folder.service";
 import { PrintJobService } from "@/services/orm/print-job.service";
 import { FileAnalysisService } from "@/services/file-analysis.service";
 import { PrintJobAnalysisTask } from "@/tasks/print-job-analysis.task";
@@ -172,6 +173,7 @@ export function configureContainer() {
     [di.routingService]: asClass(RoutingService).singleton(),
     [di.fileStorageService]: asClass(FileStorageService).singleton(),
     [di.fileAnalysisService]: asClass(FileAnalysisService).singleton(),
+    [di.watchedFolderService]: asClass(WatchedFolderService).singleton(),
     [di.printFileDownloaderService]: asClass(PrintFileDownloaderService).singleton(),
 
     [di.bootTask]: asClass(BootTask),

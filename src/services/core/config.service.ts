@@ -9,7 +9,13 @@ export interface IConfigService {
   isDemoMode(): boolean;
 
   instanceLabel(): string | null;
+
+  watchedFolderPath(): string | null;
+
+  watchedFolderMode(): WatchedFolderMode;
 }
+
+export type WatchedFolderMode = "consume" | "library";
 
 export class ConfigService implements IConfigService {
   get<T>(key: string, defaultValue?: T) {
@@ -30,5 +36,16 @@ export class ConfigService implements IConfigService {
   instanceLabel() {
     const raw = this.get<string>(AppConstants.INSTANCE_LABEL, "")?.trim();
     return raw?.length ? raw : null;
+  }
+
+  watchedFolderPath() {
+    const raw = this.get<string>(AppConstants.WATCHED_FOLDER_PATH, "")?.trim();
+    return raw?.length ? raw : null;
+  }
+
+  // "library" (keep files in place) is reserved; only "consume" is wired up
+  watchedFolderMode(): WatchedFolderMode {
+    const raw = this.get<string>(AppConstants.WATCHED_FOLDER_MODE, "")?.trim().toLowerCase();
+    return raw === "library" ? "library" : "consume";
   }
 }

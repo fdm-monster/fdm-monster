@@ -18,6 +18,7 @@ import { PermissionService } from "@/services/orm/permission.service";
 import type { RoleName } from "@/constants/authorization.constants";
 import { PrintFileDownloaderService } from "@/services/print-file-downloader.service";
 import { FileStorageService } from "@/services/file-storage.service";
+import { WatchedFolderService } from "@/services/watched-folder.service";
 
 export class BootTask implements TaskService {
   logger: LoggerService;
@@ -37,6 +38,7 @@ export class BootTask implements TaskService {
     private readonly printerThumbnailCache: PrinterThumbnailCache,
     private readonly printFileDownloaderService: PrintFileDownloaderService,
     private readonly fileStorageService: FileStorageService,
+    private readonly watchedFolderService: WatchedFolderService,
   ) {
     this.logger = loggerFactory(BootTask.name);
   }
@@ -99,6 +101,8 @@ export class BootTask implements TaskService {
     await this.printerThumbnailCache.loadCache();
     const length = await this.printerThumbnailCache.getAllValues();
     this.logger.log(`Loaded ${length.length} thumbnail(s)`);
+
+    await this.watchedFolderService.start();
 
     if (process.env.SAFEMODE_ENABLED === "true") {
       this.logger.warn("Starting in safe mode due to SAFEMODE_ENABLED");
