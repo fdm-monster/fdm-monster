@@ -35,7 +35,7 @@ function makeService(
     loadMetadata: async () => config.metadata ?? null,
   } as unknown as FileStorageService;
 
-  const createPendingJob = vi.fn(async (printerId: number) => ({ id: 100, printerId }));
+  const createPendingJob = vi.fn(async (printerId: number | null) => ({ id: 100, printerId }));
   const updateJob = vi.fn(async (job: any) => job);
   const printJobService = { createPendingJob, updateJob } as unknown as PrintJobService;
 
@@ -140,24 +140,38 @@ describe("RoutingService.queueForFile", () => {
     expect(addToQueue).toHaveBeenCalledWith(7, 100);
   });
 
-  it("does not queue when the target resolves to multiple printers", async () => {
-    const { service, createPendingJob } = makeService({
+  it("creates an unassigned job (no auto-queue) when the target resolves to multiple printers", async () => {
+    const { service, createPendingJob, addToQueue } = makeService({
       tags: [{ id: 1, name: "farm", printerIds: [1, 2, 3] }],
       metadata: { routingTarget: "farm" },
     });
     const result = await service.queueForFile("file-2");
     expect(result.queued).toBe(false);
-    expect(createPendingJob).not.toHaveBeenCalled();
+    expect(result.printerId).toBeNull();
+    expect(result.jobId).toBe(100);
+    expect(createPendingJob).toHaveBeenCalledOnce();
+    expect(createPendingJob.mock.calls[0][0]).toBeNull();
+    expect(addToQueue).not.toHaveBeenCalled();
   });
 
-  it("does not queue when the file has no routing target", async () => {
-    const { service, createPendingJob } = makeService({
+  it("creates an unassigned job when the file has no routing target", async () => {
+    const { service, createPendingJob, addToQueue } = makeService({
       printers: [{ id: 1, name: "Voron" }],
       metadata: { routingTarget: null },
     });
     const result = await service.queueForFile("file-3");
     expect(result.queued).toBe(false);
     expect(result.resolution.kind).toBe("none");
+    expect(result.jobId).toBe(100);
+    expect(createPendingJob.mock.calls[0][0]).toBeNull();
+    expect(addToQueue).not.toHaveBeenCalled();
+  });
+
+  it("creates no job when the file has no metadata", async () => {
+    const { service, createPendingJob } = makeService({});
+    const result = await service.queueForFile("file-4");
+    expect(result.queued).toBe(false);
+    expect(result.jobId).toBeNull();
     expect(createPendingJob).not.toHaveBeenCalled();
   });
 });

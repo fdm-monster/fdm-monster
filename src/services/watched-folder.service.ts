@@ -153,7 +153,7 @@ export class WatchedFolderService {
       this.logger.log(
         result.queued
           ? `Imported ${originalName} from watched folder and queued it on printer ${result.printerId}`
-          : `Imported ${originalName} from watched folder (left unassigned)`,
+          : `Imported ${originalName} from watched folder — awaiting printer assignment (job ${result.jobId})`,
       );
     } catch (e) {
       this.logger.error(`Failed to import watched-folder file ${filePath}: ${e}`);

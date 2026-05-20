@@ -82,18 +82,24 @@ export class RoutingService {
     const metadata = await this.fileStorageService.loadMetadata(fileStorageId);
     const resolution = await this.resolve(metadata?.routingTarget ?? null, kind);
 
-    // Auto-queue only when routing is unambiguous: exactly one printer
-    if (resolution.printerIds.length !== 1) {
+    // Without metadata the file was never analyzed/stored properly — nothing to create
+    if (!metadata) {
       return { resolution, queued: false, jobId: null, printerId: null };
     }
 
-    const printerId = resolution.printerIds[0];
-    const printer = await this.printerCache.getCachedPrinterOrThrowAsync(printerId);
+    // Auto-assign only when routing is unambiguous: exactly one printer.
+    // Ambiguous (a tag with several printers) or unmatched files still get a
+    // PENDING job with no printer, so they stay visible and can be routed by hand.
+    const autoQueuePrinterId = resolution.printerIds.length === 1 ? resolution.printerIds[0] : null;
+    const printer = autoQueuePrinterId
+      ? await this.printerCache.getCachedPrinterOrThrowAsync(autoQueuePrinterId)
+      : null;
+
     const job = await this.printJobService.createPendingJob(
-      printerId,
+      autoQueuePrinterId,
       metadata._originalFileName || metadata.fileName || "Unknown",
       metadata,
-      printer.name,
+      printer?.name,
     );
 
     job.fileStorageId = fileStorageId;
@@ -104,8 +110,12 @@ export class RoutingService {
       job.fileFormat = metadata.fileFormat;
     }
     await this.printJobService.updateJob(job);
-    await this.printQueueService.addToQueue(printerId, job.id);
 
-    return { resolution, queued: true, jobId: job.id, printerId };
+    if (autoQueuePrinterId) {
+      await this.printQueueService.addToQueue(autoQueuePrinterId, job.id);
+      return { resolution, queued: true, jobId: job.id, printerId: autoQueuePrinterId };
+    }
+
+    return { resolution, queued: false, jobId: job.id, printerId: null };
   }
 }
