@@ -29,7 +29,9 @@ export class RoutingService {
     private readonly printQueueService: PrintQueueService,
   ) {}
 
-  async resolve(routingTarget: string | null): Promise<RoutingResolution> {
+  // kind narrows resolution to one scheme (the watched folder's by-printer / by-tag);
+  // omit it for the bare gcode fdmm_target token, which guesses printer-then-tag
+  async resolve(routingTarget: string | null, kind?: "printer" | "tag"): Promise<RoutingResolution> {
     const unresolved: RoutingResolution = { routingTarget, kind: "none", matchedName: null, printerIds: [] };
 
     const target = routingTarget?.trim().toLowerCase();
@@ -37,42 +39,48 @@ export class RoutingService {
       return unresolved;
     }
 
-    const printers = await this.printerCache.listCachedPrinters(true);
-    const printerMatch = printers.find((p) => p.name?.trim().toLowerCase() === target);
-    if (printerMatch) {
-      return { routingTarget, kind: "printer", matchedName: printerMatch.name, printerIds: [printerMatch.id] };
+    if (kind !== "tag") {
+      const printers = await this.printerCache.listCachedPrinters(true);
+      const printerMatch = printers.find((p) => p.name?.trim().toLowerCase() === target);
+      if (printerMatch) {
+        return { routingTarget, kind: "printer", matchedName: printerMatch.name, printerIds: [printerMatch.id] };
+      }
     }
 
-    const tags = await this.printerTagService.listTags();
-    const tagMatch = tags.find((t) => t.name?.trim().toLowerCase() === target);
-    if (tagMatch) {
-      return {
-        routingTarget,
-        kind: "tag",
-        matchedName: tagMatch.name,
-        printerIds: tagMatch.printers.map((pt) => pt.printerId),
-      };
+    if (kind !== "printer") {
+      const tags = await this.printerTagService.listTags();
+      const tagMatch = tags.find((t) => t.name?.trim().toLowerCase() === target);
+      if (tagMatch) {
+        return {
+          routingTarget,
+          kind: "tag",
+          matchedName: tagMatch.name,
+          printerIds: tagMatch.printers.map((pt) => pt.printerId),
+        };
+      }
     }
 
     return unresolved;
   }
 
-  // Every name a watched-folder subfolder can be routed by: printer names + tag names
-  async listRoutingTargets(): Promise<string[]> {
+  // Names the watched folder addresses by — printers under by-printer/, tags under by-tag/
+  async listRoutingTargets(): Promise<{ printers: string[]; tags: string[] }> {
     const printers = await this.printerCache.listCachedPrinters(true);
     const tags = await this.printerTagService.listTags();
-    const names = [...printers.map((p) => p.name), ...tags.map((t) => t.name)];
-    return [...new Set(names.map((n) => n?.trim()).filter((n): n is string => !!n))];
+    const dedupe = (names: (string | undefined)[]) => [
+      ...new Set(names.map((n) => n?.trim()).filter((n): n is string => !!n)),
+    ];
+    return { printers: dedupe(printers.map((p) => p.name)), tags: dedupe(tags.map((t) => t.name)) };
   }
 
-  async resolveForFile(fileStorageId: string): Promise<RoutingResolution> {
+  async resolveForFile(fileStorageId: string, kind?: "printer" | "tag"): Promise<RoutingResolution> {
     const metadata = await this.fileStorageService.loadMetadata(fileStorageId);
-    return this.resolve(metadata?.routingTarget ?? null);
+    return this.resolve(metadata?.routingTarget ?? null, kind);
   }
 
-  async queueForFile(fileStorageId: string): Promise<RoutingQueueResult> {
+  async queueForFile(fileStorageId: string, kind?: "printer" | "tag"): Promise<RoutingQueueResult> {
     const metadata = await this.fileStorageService.loadMetadata(fileStorageId);
-    const resolution = await this.resolve(metadata?.routingTarget ?? null);
+    const resolution = await this.resolve(metadata?.routingTarget ?? null, kind);
 
     // Auto-queue only when routing is unambiguous: exactly one printer
     if (resolution.printerIds.length !== 1) {

@@ -16,7 +16,7 @@ There are two ways a file gets its routing target.
 
 ## Signal 1 — watched folder (recommended)
 
-Point FDM Monster at a folder and drop files into per-printer subfolders. No slicer configuration, works with any slicer, and works for gcode downloaded from the web.
+Point FDM Monster at a folder and drop files into per-printer or per-tag subfolders. No slicer configuration, works with any slicer, and works for gcode downloaded from the web.
 
 Environment variables:
 
@@ -25,17 +25,19 @@ Environment variables:
 | `WATCHED_FOLDER_PATH` | Absolute path FDM Monster watches. Unset = feature off. |
 | `WATCHED_FOLDER_MODE` | `consume` (default) moves imported files into the library. `library` copies them, leaving the originals in the watched folder; already-imported files are skipped on re-scan. |
 
-The **subfolder name is the routing target**:
+FDM Monster auto-creates two **addressing schemes** at the root and keeps a subfolder under them for every printer and tag (created on startup and when printers change):
 
 ```
 /watched/
-  prusa-mini/      -> routes to a printer or tag named "prusa-mini"
-    bracket.gcode
-  voron-350/
-    case.gcode
+  by-printer/        -> address a specific printer instance
+    Prusa Mini #1/
+      bracket.gcode
+  by-tag/            -> address a printer tag (a group); FDM Monster picks the instance
+    voron-fleet/
+      case.gcode
 ```
 
-A file dropped directly in the watched root has no subfolder, so it keeps whatever target its gcode declares (see Signal 2), or stays unassigned.
+Drop a file under `by-printer/<name>/` to route it to that exact printer, or under `by-tag/<name>/` to route it to that tag's group of printers. A file dropped anywhere else (the root, an unknown folder) keeps whatever target its gcode declares (see Signal 2), or stays unassigned.
 
 ## Signal 2 — `fdmm_target` gcode comment
 
@@ -56,7 +58,7 @@ It's a comment — printers ignore it. Where to add it per slicer:
 
 ## Precedence
 
-If a file arrives through the watched folder **and** its gcode contains an `fdmm_target` line, the **subfolder wins**. A mismatch is logged as a warning so you can spot a misfiled print.
+If a file arrives through the watched folder **and** its gcode contains an `fdmm_target` line, the **folder wins**. A mismatch is logged as a warning so you can spot a misfiled print.
 
 ## API
 

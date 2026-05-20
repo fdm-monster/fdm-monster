@@ -49,18 +49,26 @@ export class WatchedFolderService {
     this.watcher.on("add", (filePath) => void this.handleFile(folderPath, filePath));
   }
 
-  // Auto-create a subfolder for every printer and tag so users have a folder to drop files into
+  // Auto-create by-printer/<name> and by-tag/<name> folders so users have somewhere to drop files
   async ensureTargetFolders(rootPath: string): Promise<void> {
+    const { printers, tags } = await this.routingService.listRoutingTargets();
+    await this.ensureScheme(rootPath, "by-printer", printers);
+    await this.ensureScheme(rootPath, "by-tag", tags);
+  }
+
+  private async ensureScheme(rootPath: string, scheme: string, names: string[]): Promise<void> {
+    const schemeDir = join(rootPath, scheme);
+    await mkdir(schemeDir, { recursive: true });
     const invalidChars = '\\/:*?"<>|';
-    for (const name of await this.routingService.listRoutingTargets()) {
+    for (const name of names) {
       if ([...name].some((c) => invalidChars.includes(c))) {
-        this.logger.warn(`Skipping watched-folder subfolder for "${name}": name has filesystem-invalid characters`);
+        this.logger.warn(`Skipping ${scheme} subfolder for "${name}": name has filesystem-invalid characters`);
         continue;
       }
       try {
-        await mkdir(join(rootPath, name), { recursive: true });
+        await mkdir(join(schemeDir, name), { recursive: true });
       } catch (e) {
-        this.logger.error(`Could not create watched-folder subfolder "${name}": ${e}`);
+        this.logger.error(`Could not create watched-folder subfolder "${scheme}/${name}": ${e}`);
       }
     }
   }
@@ -74,12 +82,23 @@ export class WatchedFolderService {
     return acceptedExtensions.includes(extname(filePath).toLowerCase());
   }
 
-  subfolderOf(rootPath: string, filePath: string): string | null {
+  // Maps a watched-folder path to its routing scheme: by-printer/<name>/ or by-tag/<name>/
+  routeOf(rootPath: string, filePath: string): { kind: "printer" | "tag"; key: string } | null {
     const rel = relative(rootPath, dirname(filePath));
     if (!rel || rel.startsWith("..")) {
       return null;
     }
-    return rel.split(sep)[0] || null;
+    const [scheme, key] = rel.split(sep);
+    if (!key) {
+      return null;
+    }
+    if (scheme === "by-printer") {
+      return { kind: "printer", key };
+    }
+    if (scheme === "by-tag") {
+      return { kind: "tag", key };
+    }
+    return null;
   }
 
   async handleFile(rootPath: string, filePath: string): Promise<void> {
@@ -90,7 +109,7 @@ export class WatchedFolderService {
     const mode = this.configService.watchedFolderMode();
     try {
       const originalName = basename(filePath);
-      const subfolder = this.subfolderOf(rootPath, filePath);
+      const route = this.routeOf(rootPath, filePath);
       const fileHash = await this.fileStorageService.calculateFileHash(filePath);
 
       // Library mode leaves the file in place, so a re-scan must not re-import it
@@ -105,13 +124,13 @@ export class WatchedFolderService {
 
       const analysis = await this.fileAnalysisService.analyzeFile(this.fileStorageService.getFilePath(fileStorageId));
       const metadata: any = analysis.metadata ?? {};
-      // The subfolder is the primary routing signal and overrides any gcode token
-      if (subfolder) {
+      // The folder is the primary routing signal and overrides any gcode token
+      if (route) {
         const gcodeTarget = metadata.routingTarget;
-        if (gcodeTarget && String(gcodeTarget).toLowerCase() !== subfolder.toLowerCase()) {
-          this.logger.warn(`${originalName}: folder "${subfolder}" overrides gcode fdmm_target "${gcodeTarget}"`);
+        if (gcodeTarget && String(gcodeTarget).toLowerCase() !== route.key.toLowerCase()) {
+          this.logger.warn(`${originalName}: folder "${route.key}" overrides gcode fdmm_target "${gcodeTarget}"`);
         }
-        metadata.routingTarget = subfolder;
+        metadata.routingTarget = route.key;
       }
 
       const thumbnails = analysis.thumbnails ?? [];
@@ -119,7 +138,7 @@ export class WatchedFolderService {
         thumbnails.length > 0 ? await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails) : [];
       await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, originalName, thumbnailMetadata);
 
-      const result = await this.routingService.queueForFile(fileStorageId);
+      const result = await this.routingService.queueForFile(fileStorageId, route?.kind);
       this.logger.log(
         result.queued
           ? `Imported ${originalName} from watched folder and queued it on printer ${result.printerId}`

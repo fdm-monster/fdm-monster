@@ -53,17 +53,17 @@ function makeService(
 }
 
 describe("RoutingService.listRoutingTargets", () => {
-  it("returns printer and tag names, de-duplicated", async () => {
+  it("returns printer names and tag names separately", async () => {
     const { service } = makeService({
       printers: [
         { id: 1, name: "Prusa Mini #1" },
         { id: 2, name: "Voron" },
       ],
-      tags: [{ id: 3, name: "prusa-group", printerIds: [1] }],
+      tags: [{ id: 3, name: "prusa-fleet", printerIds: [1] }],
     });
     const targets = await service.listRoutingTargets();
-    expect(targets).toEqual(expect.arrayContaining(["Prusa Mini #1", "Voron", "prusa-group"]));
-    expect(targets).toHaveLength(3);
+    expect(targets.printers).toEqual(["Prusa Mini #1", "Voron"]);
+    expect(targets.tags).toEqual(["prusa-fleet"]);
   });
 });
 

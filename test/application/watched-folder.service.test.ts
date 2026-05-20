@@ -11,15 +11,21 @@ import type { EventEmitter2 } from "eventemitter2";
 
 const tmpDirs: string[] = [];
 
-// Creates a real <tmp>/prusa-mini/<name> file; returns [rootPath, filePath]
+// Creates a real <tmp>/by-printer/prusa-mini/<name> file; returns [rootPath, filePath]
 function realFile(name: string): [string, string] {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "fdmm-wf-"));
-  const sub = path.join(root, "prusa-mini");
-  fs.mkdirSync(sub);
+  const sub = path.join(root, "by-printer", "prusa-mini");
+  fs.mkdirSync(sub, { recursive: true });
   const filePath = path.join(sub, name);
   fs.writeFileSync(filePath, "; gcode\nG28\n");
   tmpDirs.push(root);
   return [root, filePath];
+}
+
+function tmpRoot(): string {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "fdmm-wf-"));
+  tmpDirs.push(root);
+  return root;
 }
 
 afterAll(() => {
@@ -37,7 +43,8 @@ function makeService(
     mode?: WatchedFolderMode;
     metadata?: any;
     alreadyImported?: boolean;
-    routingTargets?: string[];
+    printers?: string[];
+    tags?: string[];
   } = {},
 ) {
   const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() };
@@ -77,7 +84,10 @@ function makeService(
     jobId: null,
     printerId: null,
   }));
-  const listRoutingTargets = vi.fn(async () => config.routingTargets ?? []);
+  const listRoutingTargets = vi.fn(async () => ({
+    printers: config.printers ?? [],
+    tags: config.tags ?? [],
+  }));
   const routingService = { queueForFile, listRoutingTargets } as unknown as RoutingService;
 
   const eventEmitter2 = { on: vi.fn() } as unknown as EventEmitter2;
@@ -103,40 +113,58 @@ describe("WatchedFolderService.isAccepted", () => {
   });
 });
 
-describe("WatchedFolderService.subfolderOf", () => {
-  it("returns the top-level subfolder of a file under the root", () => {
+describe("WatchedFolderService.routeOf", () => {
+  it("reads a by-printer route", () => {
     const { service } = makeService();
-    expect(service.subfolderOf("/watched", "/watched/prusa-mini/part.gcode")).toBe("prusa-mini");
-    expect(service.subfolderOf("/watched", "/watched/prusa-mini/nested/part.gcode")).toBe("prusa-mini");
+    expect(service.routeOf("/watched", "/watched/by-printer/Prusa Mini/part.gcode")).toEqual({
+      kind: "printer",
+      key: "Prusa Mini",
+    });
   });
 
-  it("returns null for a file directly in the root", () => {
+  it("reads a by-tag route", () => {
     const { service } = makeService();
-    expect(service.subfolderOf("/watched", "/watched/part.gcode")).toBeNull();
+    expect(service.routeOf("/watched", "/watched/by-tag/fleet/part.gcode")).toEqual({
+      kind: "tag",
+      key: "fleet",
+    });
+  });
+
+  it("returns null for the root, an unknown scheme, or a scheme with no key", () => {
+    const { service } = makeService();
+    expect(service.routeOf("/watched", "/watched/part.gcode")).toBeNull();
+    expect(service.routeOf("/watched", "/watched/random/sub/part.gcode")).toBeNull();
+    expect(service.routeOf("/watched", "/watched/by-printer/part.gcode")).toBeNull();
   });
 });
 
 describe("WatchedFolderService.handleFile (consume mode)", () => {
-  it("imports a print file and routes it, using the subfolder as routingTarget", async () => {
+  it("imports a by-printer file and routes it with the printer kind", async () => {
     const { service, saveFile, saveMetadata, queueForFile } = makeService();
-    await service.handleFile("/watched", "/watched/prusa-mini/part.gcode");
+    await service.handleFile("/watched", "/watched/by-printer/prusa-mini/part.gcode");
     expect(saveFile).toHaveBeenCalledOnce();
     expect(saveFile.mock.calls[0][0]).toHaveProperty("path");
-    expect(queueForFile).toHaveBeenCalledWith("stored-id");
     expect(saveMetadata.mock.calls[0][1].routingTarget).toBe("prusa-mini");
+    expect(queueForFile).toHaveBeenCalledWith("stored-id", "printer");
+  });
+
+  it("routes a by-tag file with the tag kind", async () => {
+    const { service, queueForFile } = makeService();
+    await service.handleFile("/watched", "/watched/by-tag/fleet/part.gcode");
+    expect(queueForFile).toHaveBeenCalledWith("stored-id", "tag");
   });
 
   it("ignores files with non-print extensions", async () => {
     const { service, saveFile } = makeService();
-    await service.handleFile("/watched", "/watched/prusa-mini/model.stl");
+    await service.handleFile("/watched", "/watched/by-printer/prusa-mini/model.stl");
     expect(saveFile).not.toHaveBeenCalled();
   });
 
-  it("warns when the gcode fdmm_target contradicts the subfolder, and the folder wins", async () => {
+  it("warns when the gcode fdmm_target contradicts the folder, and the folder wins", async () => {
     const { service, saveMetadata, logger } = makeService({
       metadata: { fileFormat: "gcode", routingTarget: "voron" },
     });
-    await service.handleFile("/watched", "/watched/prusa-mini/part.gcode");
+    await service.handleFile("/watched", "/watched/by-printer/prusa-mini/part.gcode");
     expect(saveMetadata.mock.calls[0][1].routingTarget).toBe("prusa-mini");
     expect(logger.warn).toHaveBeenCalled();
   });
@@ -149,33 +177,31 @@ describe("WatchedFolderService.handleFile (library mode)", () => {
     await service.handleFile(root, filePath);
     expect(saveFile).toHaveBeenCalledOnce();
     expect(saveFile.mock.calls[0][0]).toHaveProperty("buffer");
-    expect(queueForFile).toHaveBeenCalled();
+    expect(queueForFile).toHaveBeenCalledWith("stored-id", "printer");
     expect(fs.existsSync(filePath)).toBe(true);
   });
 
   it("skips a file that was already imported (no re-import on re-scan)", async () => {
     const { service, saveFile } = makeService({ mode: "library", alreadyImported: true });
-    await service.handleFile("/watched", "/watched/prusa-mini/part.gcode");
+    await service.handleFile("/watched", "/watched/by-printer/prusa-mini/part.gcode");
     expect(saveFile).not.toHaveBeenCalled();
   });
 });
 
 describe("WatchedFolderService.ensureTargetFolders", () => {
-  it("creates a subfolder for each printer and tag", async () => {
-    const { service } = makeService({ routingTargets: ["Prusa Mini #1", "voron-group"] });
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "fdmm-wf-"));
-    tmpDirs.push(root);
+  it("creates by-printer and by-tag subfolders for each printer and tag", async () => {
+    const { service } = makeService({ printers: ["Prusa Mini #1"], tags: ["voron-fleet"] });
+    const root = tmpRoot();
     await service.ensureTargetFolders(root);
-    expect(fs.existsSync(path.join(root, "Prusa Mini #1"))).toBe(true);
-    expect(fs.existsSync(path.join(root, "voron-group"))).toBe(true);
+    expect(fs.existsSync(path.join(root, "by-printer", "Prusa Mini #1"))).toBe(true);
+    expect(fs.existsSync(path.join(root, "by-tag", "voron-fleet"))).toBe(true);
   });
 
   it("skips names with filesystem-invalid characters", async () => {
-    const { service, logger } = makeService({ routingTargets: ["bad/name"] });
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "fdmm-wf-"));
-    tmpDirs.push(root);
+    const { service, logger } = makeService({ printers: ["bad/name"] });
+    const root = tmpRoot();
     await service.ensureTargetFolders(root);
-    expect(fs.readdirSync(root)).toHaveLength(0);
+    expect(fs.readdirSync(path.join(root, "by-printer"))).toHaveLength(0);
     expect(logger.warn).toHaveBeenCalled();
   });
 });
