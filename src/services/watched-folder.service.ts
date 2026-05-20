@@ -19,6 +19,7 @@ const acceptedExtensions = [
 export class WatchedFolderService {
   private readonly logger: LoggerService;
   private watcher: FSWatcher | null = null;
+  private readonly refreshHandlers = new Map<string, () => void>();
 
   constructor(
     loggerFactory: ILoggerFactory,
@@ -48,7 +49,9 @@ export class WatchedFolderService {
       tagEvents.tagDeleted,
     ];
     for (const event of refreshEvents) {
-      this.eventEmitter2.on(event, () => void this.ensureTargetFolders(folderPath));
+      const handler = () => void this.ensureTargetFolders(folderPath);
+      this.refreshHandlers.set(event, handler);
+      this.eventEmitter2.on(event, handler);
     }
 
     const usePolling = this.configService.watchedFolderPolling();
@@ -116,6 +119,10 @@ export class WatchedFolderService {
   }
 
   async stop(): Promise<void> {
+    for (const [event, handler] of this.refreshHandlers) {
+      this.eventEmitter2.off(event, handler);
+    }
+    this.refreshHandlers.clear();
     await this.watcher?.close();
     this.watcher = null;
   }

@@ -53,6 +53,7 @@ export class ConfigService implements IConfigService {
   // On by default — inotify events do not cross Docker Desktop bind mounts or
   // network shares; disable only for a watched folder on a native local mount
   watchedFolderPolling(): boolean {
-    return this.get<string>(AppConstants.WATCHED_FOLDER_POLLING, "true") !== "false";
+    const raw = this.get<string>(AppConstants.WATCHED_FOLDER_POLLING, "true")?.trim().toLowerCase();
+    return raw !== "false";
   }
 }
