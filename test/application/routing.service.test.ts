@@ -84,14 +84,34 @@ describe("RoutingService.resolve", () => {
     expect(res.printerIds).toEqual([1, 2, 5]);
   });
 
-  it("prefers a printer-name match over a tag-name match", async () => {
+  it("flags a name matching both a printer and a tag as ambiguous", async () => {
     const { service } = makeService({
       printers: [{ id: 9, name: "shared" }],
       tags: [{ id: 4, name: "shared", printerIds: [1, 2] }],
     });
     const res = await service.resolve("shared");
+    expect(res.kind).toBe("ambiguous");
+    expect(res.printerIds).toEqual([]);
+  });
+
+  it("narrows to the printer when kind is 'printer', ignoring a same-named tag", async () => {
+    const { service } = makeService({
+      printers: [{ id: 9, name: "shared" }],
+      tags: [{ id: 4, name: "shared", printerIds: [1, 2] }],
+    });
+    const res = await service.resolve("shared", "printer");
     expect(res.kind).toBe("printer");
     expect(res.printerIds).toEqual([9]);
+  });
+
+  it("narrows to the tag when kind is 'tag', ignoring a same-named printer", async () => {
+    const { service } = makeService({
+      printers: [{ id: 9, name: "shared" }],
+      tags: [{ id: 4, name: "shared", printerIds: [1, 2] }],
+    });
+    const res = await service.resolve("shared", "tag");
+    expect(res.kind).toBe("tag");
+    expect(res.printerIds).toEqual([1, 2]);
   });
 
   it("returns kind 'none' when nothing matches", async () => {
@@ -123,6 +143,17 @@ describe("RoutingService.resolveForFile", () => {
     const res = await service.resolveForFile("file-x");
     expect(res.kind).toBe("printer");
     expect(res.printerIds).toEqual([5]);
+  });
+
+  it("uses the routingTargetKind stored in metadata to narrow resolution", async () => {
+    const { service } = makeService({
+      printers: [{ id: 9, name: "shared" }],
+      tags: [{ id: 4, name: "shared", printerIds: [1, 2] }],
+      metadata: { routingTarget: "shared", routingTargetKind: "tag" },
+    });
+    const res = await service.resolveForFile("file-y");
+    expect(res.kind).toBe("tag");
+    expect(res.printerIds).toEqual([1, 2]);
   });
 });
 
@@ -173,5 +204,19 @@ describe("RoutingService.queueForFile", () => {
     expect(result.queued).toBe(false);
     expect(result.jobId).toBeNull();
     expect(createPendingJob).not.toHaveBeenCalled();
+  });
+
+  it("creates an unassigned job with a reason when the target matches a printer and a tag", async () => {
+    const { service, createPendingJob, updateJob, addToQueue } = makeService({
+      printers: [{ id: 9, name: "shared" }],
+      tags: [{ id: 4, name: "shared", printerIds: [1, 2] }],
+      metadata: { routingTarget: "shared" },
+    });
+    const result = await service.queueForFile("file-5");
+    expect(result.queued).toBe(false);
+    expect(result.resolution.kind).toBe("ambiguous");
+    expect(addToQueue).not.toHaveBeenCalled();
+    expect(createPendingJob).toHaveBeenCalledOnce();
+    expect(updateJob.mock.calls[0][0].statusReason).toContain("matches both a printer and a tag");
   });
 });

@@ -29,6 +29,18 @@ export class GCodeParser {
     const metadata = await this.extractMetadata(filePath);
     const thumbnails = await this.extractThumbnails(filePath);
 
+    // fdmm_target_printer / fdmm_target_tag carry the kind explicitly; the bare
+    // fdmm_target token leaves the kind unset for name-based resolution.
+    const explicitPrinterTarget = metadata.fdmm_target_printer?.trim();
+    const explicitTagTarget = metadata.fdmm_target_tag?.trim();
+    const bareTarget = metadata.fdmm_target?.trim();
+    const routingTarget = explicitPrinterTarget || explicitTagTarget || bareTarget || null;
+    const routingTargetKind: "printer" | "tag" | null = explicitPrinterTarget
+      ? "printer"
+      : explicitTagTarget
+        ? "tag"
+        : null;
+
     const normalized: GCodeMetadata = {
       fileName,
       fileFormat: "gcode",
@@ -54,7 +66,8 @@ export class GCodeParser {
       maxLayerZ: this.parseFloat(metadata.max_layer_z),
       totalLayers: this.parseInt(metadata.total_layers) || this.parseInt(metadata.layer_count),
       generatedBy: metadata.generated_by,
-      routingTarget: metadata.fdmm_target || null,
+      routingTarget,
+      routingTargetKind,
       thumbnails:
         thumbnails.length > 0
           ? thumbnails.map((t) => ({

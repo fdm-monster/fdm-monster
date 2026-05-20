@@ -4,7 +4,7 @@ import type { FileStorageService } from "@/services/file-storage.service";
 import type { PrintJobService } from "@/services/orm/print-job.service";
 import type { PrintQueueService } from "@/services/print-queue.service";
 
-export type RoutingMatchKind = "printer" | "tag" | "none";
+export type RoutingMatchKind = "printer" | "tag" | "none" | "ambiguous";
 
 export interface RoutingResolution {
   routingTarget: string | null;
@@ -39,25 +39,28 @@ export class RoutingService {
       return unresolved;
     }
 
-    if (kind !== "tag") {
-      const printers = await this.printerCache.listCachedPrinters(true);
-      const printerMatch = printers.find((p) => p.name?.trim().toLowerCase() === target);
-      if (printerMatch) {
-        return { routingTarget, kind: "printer", matchedName: printerMatch.name, printerIds: [printerMatch.id] };
-      }
-    }
+    const printers = kind !== "tag" ? await this.printerCache.listCachedPrinters(true) : [];
+    const printerMatch = printers.find((p) => p.name?.trim().toLowerCase() === target);
 
-    if (kind !== "printer") {
-      const tags = await this.printerTagService.listTags();
-      const tagMatch = tags.find((t) => t.name?.trim().toLowerCase() === target);
-      if (tagMatch) {
-        return {
-          routingTarget,
-          kind: "tag",
-          matchedName: tagMatch.name,
-          printerIds: tagMatch.printers.map((pt) => pt.printerId),
-        };
-      }
+    const tags = kind !== "printer" ? await this.printerTagService.listTags() : [];
+    const tagMatch = tags.find((t) => t.name?.trim().toLowerCase() === target);
+
+    // A bare token that matches both a printer and a tag is ambiguous: refuse to
+    // guess, leave it for manual routing. Only reachable when kind is unset —
+    // fdmm_target_printer / fdmm_target_tag narrow to one side up front.
+    if (printerMatch && tagMatch) {
+      return { routingTarget, kind: "ambiguous", matchedName: target, printerIds: [] };
+    }
+    if (printerMatch) {
+      return { routingTarget, kind: "printer", matchedName: printerMatch.name, printerIds: [printerMatch.id] };
+    }
+    if (tagMatch) {
+      return {
+        routingTarget,
+        kind: "tag",
+        matchedName: tagMatch.name,
+        printerIds: tagMatch.printers.map((pt) => pt.printerId),
+      };
     }
 
     return unresolved;
@@ -75,12 +78,16 @@ export class RoutingService {
 
   async resolveForFile(fileStorageId: string, kind?: "printer" | "tag"): Promise<RoutingResolution> {
     const metadata = await this.fileStorageService.loadMetadata(fileStorageId);
-    return this.resolve(metadata?.routingTarget ?? null, kind);
+    return this.resolve(metadata?.routingTarget ?? null, kind ?? metadata?.routingTargetKind ?? undefined);
   }
 
   async queueForFile(fileStorageId: string, kind?: "printer" | "tag"): Promise<RoutingQueueResult> {
     const metadata = await this.fileStorageService.loadMetadata(fileStorageId);
-    const resolution = await this.resolve(metadata?.routingTarget ?? null, kind);
+    // A folder kind (by-printer/by-tag) wins; otherwise the gcode token's own kind applies
+    const resolution = await this.resolve(
+      metadata?.routingTarget ?? null,
+      kind ?? metadata?.routingTargetKind ?? undefined,
+    );
 
     // Without metadata the file was never analyzed/stored properly — nothing to create
     if (!metadata) {
@@ -108,6 +115,9 @@ export class RoutingService {
     job.analyzedAt = new Date();
     if (metadata.fileFormat) {
       job.fileFormat = metadata.fileFormat;
+    }
+    if (resolution.kind === "ambiguous") {
+      job.statusReason = `Routing target "${resolution.routingTarget}" matches both a printer and a tag — slice with fdmm_target_printer or fdmm_target_tag to be explicit.`;
     }
     await this.printJobService.updateJob(job);
 

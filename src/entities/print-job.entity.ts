@@ -81,6 +81,8 @@ export interface GCodeMetadata extends BaseMetadata {
   fileFormat: "gcode";
   generatedBy?: string;
   routingTarget: string | null;
+  // "printer"/"tag" when the gcode used fdmm_target_printer/fdmm_target_tag; null for the bare fdmm_target token
+  routingTargetKind?: "printer" | "tag" | null;
   thumbnails?: NormalizedThumbnail[];
 }
 

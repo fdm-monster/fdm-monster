@@ -142,6 +142,7 @@ export class WatchedFolderService {
           this.logger.warn(`${originalName}: folder "${route.key}" overrides gcode fdmm_target "${gcodeTarget}"`);
         }
         metadata.routingTarget = route.key;
+        metadata.routingTargetKind = route.kind;
       }
 
       const thumbnails = analysis.thumbnails ?? [];
@@ -150,11 +151,17 @@ export class WatchedFolderService {
       await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, originalName, thumbnailMetadata);
 
       const result = await this.routingService.queueForFile(fileStorageId, route?.kind);
-      this.logger.log(
-        result.queued
-          ? `Imported ${originalName} from watched folder and queued it on printer ${result.printerId}`
-          : `Imported ${originalName} from watched folder — awaiting printer assignment (job ${result.jobId})`,
-      );
+      if (result.queued) {
+        this.logger.log(`Imported ${originalName} from watched folder and queued it on printer ${result.printerId}`);
+      } else if (result.resolution.kind === "ambiguous") {
+        this.logger.log(
+          `Imported ${originalName} from watched folder — "${result.resolution.routingTarget}" matches both a printer and a tag, awaiting manual routing (job ${result.jobId})`,
+        );
+      } else {
+        this.logger.log(
+          `Imported ${originalName} from watched folder — awaiting printer assignment (job ${result.jobId})`,
+        );
+      }
     } catch (e) {
       this.logger.error(`Failed to import watched-folder file ${filePath}: ${e}`);
     }

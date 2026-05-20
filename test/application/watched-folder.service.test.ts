@@ -154,6 +154,7 @@ describe("WatchedFolderService.handleFile (consume mode)", () => {
     expect(saveFile).toHaveBeenCalledOnce();
     expect(saveFile.mock.calls[0][0]).toHaveProperty("path");
     expect(saveMetadata.mock.calls[0][1].routingTarget).toBe("prusa-mini");
+    expect(saveMetadata.mock.calls[0][1].routingTargetKind).toBe("printer");
     expect(queueForFile).toHaveBeenCalledWith("stored-id", "printer");
   });
 
