@@ -7,6 +7,7 @@ import type { ConfigService, WatchedFolderMode } from "@/services/core/config.se
 import type { FileStorageService } from "@/services/file-storage.service";
 import type { FileAnalysisService } from "@/services/file-analysis.service";
 import type { RoutingService } from "@/services/routing.service";
+import type { EventEmitter2 } from "eventemitter2";
 
 const tmpDirs: string[] = [];
 
@@ -31,7 +32,14 @@ afterAll(() => {
   }
 });
 
-function makeService(config: { mode?: WatchedFolderMode; metadata?: any; alreadyImported?: boolean } = {}) {
+function makeService(
+  config: {
+    mode?: WatchedFolderMode;
+    metadata?: any;
+    alreadyImported?: boolean;
+    routingTargets?: string[];
+  } = {},
+) {
   const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() };
   const loggerFactory = (() => logger) as unknown as ILoggerFactory;
 
@@ -69,7 +77,10 @@ function makeService(config: { mode?: WatchedFolderMode; metadata?: any; already
     jobId: null,
     printerId: null,
   }));
-  const routingService = { queueForFile } as unknown as RoutingService;
+  const listRoutingTargets = vi.fn(async () => config.routingTargets ?? []);
+  const routingService = { queueForFile, listRoutingTargets } as unknown as RoutingService;
+
+  const eventEmitter2 = { on: vi.fn() } as unknown as EventEmitter2;
 
   const service = new WatchedFolderService(
     loggerFactory,
@@ -77,6 +88,7 @@ function makeService(config: { mode?: WatchedFolderMode; metadata?: any; already
     fileStorageService,
     fileAnalysisService,
     routingService,
+    eventEmitter2,
   );
   return { service, logger, saveFile, saveMetadata, queueForFile };
 }
@@ -145,5 +157,25 @@ describe("WatchedFolderService.handleFile (library mode)", () => {
     const { service, saveFile } = makeService({ mode: "library", alreadyImported: true });
     await service.handleFile("/watched", "/watched/prusa-mini/part.gcode");
     expect(saveFile).not.toHaveBeenCalled();
+  });
+});
+
+describe("WatchedFolderService.ensureTargetFolders", () => {
+  it("creates a subfolder for each printer and tag", async () => {
+    const { service } = makeService({ routingTargets: ["Prusa Mini #1", "voron-group"] });
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "fdmm-wf-"));
+    tmpDirs.push(root);
+    await service.ensureTargetFolders(root);
+    expect(fs.existsSync(path.join(root, "Prusa Mini #1"))).toBe(true);
+    expect(fs.existsSync(path.join(root, "voron-group"))).toBe(true);
+  });
+
+  it("skips names with filesystem-invalid characters", async () => {
+    const { service, logger } = makeService({ routingTargets: ["bad/name"] });
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "fdmm-wf-"));
+    tmpDirs.push(root);
+    await service.ensureTargetFolders(root);
+    expect(fs.readdirSync(root)).toHaveLength(0);
+    expect(logger.warn).toHaveBeenCalled();
   });
 });

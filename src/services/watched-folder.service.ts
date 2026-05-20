@@ -1,6 +1,7 @@
 import { watch, type FSWatcher } from "chokidar";
-import { readFile } from "node:fs/promises";
-import { basename, dirname, extname, relative, sep } from "node:path";
+import { mkdir, readFile } from "node:fs/promises";
+import { basename, dirname, extname, join, relative, sep } from "node:path";
+import type { EventEmitter2 } from "eventemitter2";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
 import { LoggerService } from "@/handlers/logger";
 import { AppConstants } from "@/server.constants";
@@ -24,6 +25,7 @@ export class WatchedFolderService {
     private readonly fileStorageService: FileStorageService,
     private readonly fileAnalysisService: FileAnalysisService,
     private readonly routingService: RoutingService,
+    private readonly eventEmitter2: EventEmitter2,
   ) {
     this.logger = loggerFactory(WatchedFolderService.name);
   }
@@ -34,12 +36,33 @@ export class WatchedFolderService {
       return;
     }
 
+    await this.ensureTargetFolders(folderPath);
+    for (const event of ["printerCreated", "batchPrinterCreated", "printerUpdated"]) {
+      this.eventEmitter2.on(event, () => void this.ensureTargetFolders(folderPath));
+    }
+
     this.logger.log(`Watching folder for dropped print files: ${folderPath}`);
     this.watcher = watch(folderPath, {
       ignoreInitial: false,
       awaitWriteFinish: { stabilityThreshold: 2000, pollInterval: 200 },
     });
     this.watcher.on("add", (filePath) => void this.handleFile(folderPath, filePath));
+  }
+
+  // Auto-create a subfolder for every printer and tag so users have a folder to drop files into
+  async ensureTargetFolders(rootPath: string): Promise<void> {
+    const invalidChars = '\\/:*?"<>|';
+    for (const name of await this.routingService.listRoutingTargets()) {
+      if ([...name].some((c) => invalidChars.includes(c))) {
+        this.logger.warn(`Skipping watched-folder subfolder for "${name}": name has filesystem-invalid characters`);
+        continue;
+      }
+      try {
+        await mkdir(join(rootPath, name), { recursive: true });
+      } catch (e) {
+        this.logger.error(`Could not create watched-folder subfolder "${name}": ${e}`);
+      }
+    }
   }
 
   async stop(): Promise<void> {

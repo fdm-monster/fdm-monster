@@ -52,6 +52,21 @@ function makeService(
   return { service, createPendingJob, updateJob, addToQueue };
 }
 
+describe("RoutingService.listRoutingTargets", () => {
+  it("returns printer and tag names, de-duplicated", async () => {
+    const { service } = makeService({
+      printers: [
+        { id: 1, name: "Prusa Mini #1" },
+        { id: 2, name: "Voron" },
+      ],
+      tags: [{ id: 3, name: "prusa-group", printerIds: [1] }],
+    });
+    const targets = await service.listRoutingTargets();
+    expect(targets).toEqual(expect.arrayContaining(["Prusa Mini #1", "Voron", "prusa-group"]));
+    expect(targets).toHaveLength(3);
+  });
+});
+
 describe("RoutingService.resolve", () => {
   it("matches a printer by exact name, case-insensitively", async () => {
     const { service } = makeService({ printers: [{ id: 7, name: "Prusa MK4" }] });

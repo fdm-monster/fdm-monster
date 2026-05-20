@@ -57,6 +57,14 @@ export class RoutingService {
     return unresolved;
   }
 
+  // Every name a watched-folder subfolder can be routed by: printer names + tag names
+  async listRoutingTargets(): Promise<string[]> {
+    const printers = await this.printerCache.listCachedPrinters(true);
+    const tags = await this.printerTagService.listTags();
+    const names = [...printers.map((p) => p.name), ...tags.map((t) => t.name)];
+    return [...new Set(names.map((n) => n?.trim()).filter((n): n is string => !!n))];
+  }
+
   async resolveForFile(fileStorageId: string): Promise<RoutingResolution> {
     const metadata = await this.fileStorageService.loadMetadata(fileStorageId);
     return this.resolve(metadata?.routingTarget ?? null);
