@@ -53,6 +53,7 @@ function makeService(
   const configService = {
     watchedFolderPath: () => "/watched",
     watchedFolderMode: () => config.mode ?? "consume",
+    watchedFolderPolling: () => true,
   } as unknown as ConfigService;
 
   const calculateFileHash = vi.fn(async () => "hash123");

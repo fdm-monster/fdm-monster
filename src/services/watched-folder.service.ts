@@ -41,9 +41,12 @@ export class WatchedFolderService {
       this.eventEmitter2.on(event, () => void this.ensureTargetFolders(folderPath));
     }
 
-    this.logger.log(`Watching folder for dropped print files: ${folderPath}`);
+    const usePolling = this.configService.watchedFolderPolling();
+    this.logger.log(`Watching folder for dropped print files: ${folderPath} (polling: ${usePolling})`);
     this.watcher = watch(folderPath, {
       ignoreInitial: false,
+      usePolling,
+      interval: 1000,
       awaitWriteFinish: { stabilityThreshold: 2000, pollInterval: 200 },
     });
     this.watcher.on("add", (filePath) => void this.handleFile(folderPath, filePath));

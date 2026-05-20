@@ -13,6 +13,8 @@ export interface IConfigService {
   watchedFolderPath(): string | null;
 
   watchedFolderMode(): WatchedFolderMode;
+
+  watchedFolderPolling(): boolean;
 }
 
 export type WatchedFolderMode = "consume" | "library";
@@ -43,9 +45,14 @@ export class ConfigService implements IConfigService {
     return raw?.length ? raw : null;
   }
 
-  // "library" (keep files in place) is reserved; only "consume" is wired up
   watchedFolderMode(): WatchedFolderMode {
     const raw = this.get<string>(AppConstants.WATCHED_FOLDER_MODE, "")?.trim().toLowerCase();
     return raw === "library" ? "library" : "consume";
+  }
+
+  // On by default — inotify events do not cross Docker Desktop bind mounts or
+  // network shares; disable only for a watched folder on a native local mount
+  watchedFolderPolling(): boolean {
+    return this.get<string>(AppConstants.WATCHED_FOLDER_POLLING, "true") !== "false";
   }
 }

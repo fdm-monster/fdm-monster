@@ -24,6 +24,7 @@ Environment variables:
 |---|---|
 | `WATCHED_FOLDER_PATH` | Absolute path FDM Monster watches. Unset = feature off. |
 | `WATCHED_FOLDER_MODE` | `consume` (default) moves imported files into the library. `library` copies them, leaving the originals in the watched folder; already-imported files are skipped on re-scan. |
+| `WATCHED_FOLDER_POLLING` | `true` (default) — polls for changes. Required for Docker Desktop bind mounts and network shares (NFS/SMB), where filesystem change events do not propagate. Set `false` only for a watched folder on a native local mount. |
 
 FDM Monster auto-creates two **addressing schemes** at the root and keeps a subfolder under them for every printer and tag (created on startup and when printers change):
 
