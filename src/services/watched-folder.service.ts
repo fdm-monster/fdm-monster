@@ -1,5 +1,5 @@
 import { watch, type FSWatcher } from "chokidar";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, rm } from "node:fs/promises";
 import { basename, dirname, extname, join, relative, sep } from "node:path";
 import type { EventEmitter2 } from "eventemitter2";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
@@ -163,10 +163,25 @@ export class WatchedFolderService {
       const buffer = await readFile(filePath);
       return this.fileStorageService.saveFile({ originalname: originalName, buffer } as Express.Multer.File, fileHash);
     }
-    // Consume: move the file into the library
-    return this.fileStorageService.saveFile(
-      { originalname: originalName, path: filePath } as Express.Multer.File,
-      fileHash,
-    );
+
+    // Consume: move the file into the library. rename() fails across devices
+    // (a bind-mounted watched folder vs the media volume), so fall back to copy + delete.
+    try {
+      return await this.fileStorageService.saveFile(
+        { originalname: originalName, path: filePath } as Express.Multer.File,
+        fileHash,
+      );
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== "EXDEV") {
+        throw e;
+      }
+      const buffer = await readFile(filePath);
+      const fileStorageId = await this.fileStorageService.saveFile(
+        { originalname: originalName, buffer } as Express.Multer.File,
+        fileHash,
+      );
+      await rm(filePath, { force: true });
+      return fileStorageId;
+    }
   }
 }

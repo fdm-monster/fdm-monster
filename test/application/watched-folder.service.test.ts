@@ -45,6 +45,7 @@ function makeService(
     alreadyImported?: boolean;
     printers?: string[];
     tags?: string[];
+    exdev?: boolean;
   } = {},
 ) {
   const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() };
@@ -57,7 +58,14 @@ function makeService(
   } as unknown as ConfigService;
 
   const calculateFileHash = vi.fn(async () => "hash123");
-  const saveFile = vi.fn(async () => "stored-id");
+  const saveFile = vi.fn(async (file: any) => {
+    if (config.exdev && file?.path) {
+      const err = new Error("EXDEV: cross-device link not permitted") as NodeJS.ErrnoException;
+      err.code = "EXDEV";
+      throw err;
+    }
+    return "stored-id";
+  });
   const getFilePath = vi.fn(() => "/storage/gcode/stored-id.gcode");
   const getDeterministicId = vi.fn(() => "det-id");
   const fileExists = vi.fn(async () => config.alreadyImported ?? false);
@@ -168,6 +176,15 @@ describe("WatchedFolderService.handleFile (consume mode)", () => {
     await service.handleFile("/watched", "/watched/by-printer/prusa-mini/part.gcode");
     expect(saveMetadata.mock.calls[0][1].routingTarget).toBe("prusa-mini");
     expect(logger.warn).toHaveBeenCalled();
+  });
+
+  it("falls back to copy + delete when the move crosses devices (EXDEV)", async () => {
+    const { service, saveFile, queueForFile } = makeService({ exdev: true });
+    const [root, filePath] = realFile("part.gcode");
+    await service.handleFile(root, filePath);
+    expect(saveFile.mock.calls.some((c: any[]) => c[0]?.buffer)).toBe(true);
+    expect(queueForFile).toHaveBeenCalled();
+    expect(fs.existsSync(filePath)).toBe(false);
   });
 });
 
