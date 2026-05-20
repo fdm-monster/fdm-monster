@@ -9,6 +9,7 @@ import type { ConfigService, WatchedFolderMode } from "@/services/core/config.se
 import type { FileStorageService } from "@/services/file-storage.service";
 import type { FileAnalysisService } from "@/services/file-analysis.service";
 import type { RoutingService } from "@/services/routing.service";
+import { printerEvents, tagEvents } from "@/constants/event.constants";
 
 const acceptedExtensions = [
   ...AppConstants.defaultAcceptedGcodeExtensions,
@@ -37,7 +38,14 @@ export class WatchedFolderService {
     }
 
     await this.ensureTargetFolders(folderPath);
-    for (const event of ["printerCreated", "batchPrinterCreated", "printerUpdated"]) {
+    const refreshEvents = [
+      printerEvents.printerCreated,
+      printerEvents.batchPrinterCreated,
+      printerEvents.printerUpdated,
+      tagEvents.tagCreated,
+      tagEvents.tagUpdated,
+    ];
+    for (const event of refreshEvents) {
       this.eventEmitter2.on(event, () => void this.ensureTargetFolders(folderPath));
     }
 

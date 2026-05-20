@@ -16,6 +16,11 @@ export const printerEvents = {
   batchPrinterCreated: "batchPrinterCreated",
 };
 
+export const tagEvents = {
+  tagCreated: "tagCreated",
+  tagUpdated: "tagUpdated",
+};
+
 export interface PrinterCreatedEvent {
   printer: Printer;
 }
