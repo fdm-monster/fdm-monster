@@ -91,6 +91,7 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
   async deleteTag(tagId: number): Promise<void> {
     const tag = await this.getTag(tagId);
     await this.tagRepository.delete({ id: tag.id });
+    this.eventEmitter2.emit(tagEvents.tagDeleted, { tagId });
   }
 
   async addPrinterToTag(tagId: number, printerId: number): Promise<PrinterTag> {

@@ -223,4 +223,24 @@ describe("WatchedFolderService.ensureTargetFolders", () => {
     expect(fs.readdirSync(path.join(root, "by-printer"))).toHaveLength(0);
     expect(logger.warn).toHaveBeenCalled();
   });
+
+  it("removes an orphaned empty subfolder left by a renamed or deleted printer", async () => {
+    const { service } = makeService({ printers: ["voron-2"] });
+    const root = tmpRoot();
+    fs.mkdirSync(path.join(root, "by-printer", "voron-1"), { recursive: true });
+    await service.ensureTargetFolders(root);
+    expect(fs.existsSync(path.join(root, "by-printer", "voron-2"))).toBe(true);
+    expect(fs.existsSync(path.join(root, "by-printer", "voron-1"))).toBe(false);
+  });
+
+  it("keeps an orphaned subfolder that still holds files", async () => {
+    const { service, logger } = makeService({ printers: ["voron-2"] });
+    const root = tmpRoot();
+    const orphan = path.join(root, "by-printer", "voron-1");
+    fs.mkdirSync(orphan, { recursive: true });
+    fs.writeFileSync(path.join(orphan, "part.gcode"), "; gcode\n");
+    await service.ensureTargetFolders(root);
+    expect(fs.existsSync(orphan)).toBe(true);
+    expect(logger.warn).toHaveBeenCalled();
+  });
 });

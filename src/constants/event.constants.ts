@@ -19,6 +19,7 @@ export const printerEvents = {
 export const tagEvents = {
   tagCreated: "tagCreated",
   tagUpdated: "tagUpdated",
+  tagDeleted: "tagDeleted",
 };
 
 export interface PrinterCreatedEvent {

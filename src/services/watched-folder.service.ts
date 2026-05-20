@@ -1,5 +1,5 @@
 import { watch, type FSWatcher } from "chokidar";
-import { mkdir, readFile, rm } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, rmdir } from "node:fs/promises";
 import { basename, dirname, extname, join, relative, sep } from "node:path";
 import type { EventEmitter2 } from "eventemitter2";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
@@ -42,8 +42,10 @@ export class WatchedFolderService {
       printerEvents.printerCreated,
       printerEvents.batchPrinterCreated,
       printerEvents.printerUpdated,
+      printerEvents.printersDeleted,
       tagEvents.tagCreated,
       tagEvents.tagUpdated,
+      tagEvents.tagDeleted,
     ];
     for (const event of refreshEvents) {
       this.eventEmitter2.on(event, () => void this.ensureTargetFolders(folderPath));
@@ -71,15 +73,44 @@ export class WatchedFolderService {
     const schemeDir = join(rootPath, scheme);
     await mkdir(schemeDir, { recursive: true });
     const invalidChars = '\\/:*?"<>|';
+    const validNames: string[] = [];
     for (const name of names) {
       if ([...name].some((c) => invalidChars.includes(c))) {
         this.logger.warn(`Skipping ${scheme} subfolder for "${name}": name has filesystem-invalid characters`);
         continue;
       }
+      validNames.push(name);
       try {
         await mkdir(join(schemeDir, name), { recursive: true });
       } catch (e) {
         this.logger.error(`Could not create watched-folder subfolder "${scheme}/${name}": ${e}`);
+      }
+    }
+    await this.pruneOrphanFolders(schemeDir, scheme, validNames);
+  }
+
+  // Removes subfolders left behind by a renamed or deleted printer/tag — but only
+  // when empty, so a file dropped there and not yet imported is never lost.
+  private async pruneOrphanFolders(schemeDir: string, scheme: string, validNames: string[]): Promise<void> {
+    const keep = new Set(validNames.map((n) => n.toLowerCase()));
+    const entries = await readdir(schemeDir, { withFileTypes: true }).catch(() => []);
+    for (const entry of entries) {
+      if (!entry.isDirectory() || keep.has(entry.name.toLowerCase())) {
+        continue;
+      }
+      const orphanPath = join(schemeDir, entry.name);
+      const contents = await readdir(orphanPath).catch(() => [] as string[]);
+      if (contents.length > 0) {
+        this.logger.warn(
+          `Watched-folder subfolder "${scheme}/${entry.name}" no longer matches a printer or tag but still has files; leaving it in place`,
+        );
+        continue;
+      }
+      try {
+        await rmdir(orphanPath);
+        this.logger.log(`Removed orphaned watched-folder subfolder "${scheme}/${entry.name}"`);
+      } catch (e) {
+        this.logger.error(`Could not remove orphaned subfolder "${scheme}/${entry.name}": ${e}`);
       }
     }
   }
