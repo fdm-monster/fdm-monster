@@ -6,12 +6,12 @@ import { AppConstants } from "@/server.constants";
 import { asValue } from "awilix";
 import type { PrinterDto } from "@/services/interfaces/printer.dto";
 
-describe("RoutingController", () => {
+describe("PrintFileRoutingController", () => {
   let testRequest: any;
   let printerCache: PrinterCache;
   let loadMetadata: ReturnType<typeof vi.fn>;
   let printer: PrinterDto;
-  const baseRoute = `${AppConstants.apiRoute}/routing`;
+  const baseRoute = `${AppConstants.apiRoute}/print-file-routing`;
 
   beforeAll(async () => {
     // Mock file storage so a stored file's routingTarget can be injected

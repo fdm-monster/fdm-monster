@@ -5,9 +5,9 @@ import { authenticate, authorizeRoles } from "@/middleware/authenticate";
 import { ROLES } from "@/constants/authorization.constants";
 import type { RoutingService } from "@/services/routing.service";
 
-@route(AppConstants.apiRoute + "/routing")
+@route(AppConstants.apiRoute + "/print-file-routing")
 @before([authenticate(), authorizeRoles([ROLES.OPERATOR, ROLES.ADMIN])])
-export class RoutingController {
+export class PrintFileRoutingController {
   constructor(private readonly routingService: RoutingService) {}
 
   @GET()

@@ -36,24 +36,26 @@ export class ConfigService implements IConfigService {
   }
 
   instanceLabel() {
-    const raw = this.get<string>(AppConstants.INSTANCE_LABEL, "")?.trim();
-    return raw?.length ? raw : null;
+    const raw = this.getTrimmedString(AppConstants.INSTANCE_LABEL);
+    return raw.length ? raw : null;
   }
 
   watchedFolderPath() {
-    const raw = this.get<string>(AppConstants.WATCHED_FOLDER_PATH, "")?.trim();
-    return raw?.length ? raw : null;
+    const raw = this.getTrimmedString(AppConstants.WATCHED_FOLDER_PATH);
+    return raw.length ? raw : null;
   }
 
   watchedFolderMode(): WatchedFolderMode {
-    const raw = this.get<string>(AppConstants.WATCHED_FOLDER_MODE, "")?.trim().toLowerCase();
+    const raw = this.getTrimmedString(AppConstants.WATCHED_FOLDER_MODE).toLowerCase();
     return raw === "library" ? "library" : "consume";
   }
 
-  // On by default — inotify events do not cross Docker Desktop bind mounts or
-  // network shares; disable only for a watched folder on a native local mount
   watchedFolderPolling(): boolean {
-    const raw = this.get<string>(AppConstants.WATCHED_FOLDER_POLLING, "true")?.trim().toLowerCase();
+    const raw = this.getTrimmedString(AppConstants.WATCHED_FOLDER_POLLING, "true").toLowerCase();
     return raw !== "false";
+  }
+
+  private getTrimmedString(key: string, defaultValue = ""): string {
+    return (this.get<string>(key, defaultValue) ?? "").trim();
   }
 }
