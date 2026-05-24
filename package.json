@@ -78,7 +78,7 @@
     "eventemitter2": "6.4.9",
     "express": "4.22.2",
     "form-data": "4.0.5",
-    "helmet": "8.1.0",
+    "helmet": "8.2.0",
     "js-yaml": "4.1.1",
     "jsonwebtoken": "9.0.3",
     "mqtt": "5.15.1",
