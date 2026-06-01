@@ -20,6 +20,7 @@ interface GCodeParseResult {
 export class GCodeParser {
   private readonly maxHeaderLinesToRead = 500; // Read from start
   private readonly maxFooterLinesToRead = 500; // Read from end
+  private readonly maxHeaderScanLines = 20000; // Absolute scan bound, incl. thumbnail data
 
   async parse(filePath: string): Promise<GCodeParseResult> {
     const stats = await fs.stat(filePath);
@@ -27,6 +28,18 @@ export class GCodeParser {
 
     const metadata = await this.extractMetadata(filePath);
     const thumbnails = await this.extractThumbnails(filePath);
+
+    // fdmm_target_printer / fdmm_target_tag carry the kind explicitly; the bare
+    // fdmm_target token leaves the kind unset for name-based resolution.
+    const explicitPrinterTarget = metadata.fdmm_target_printer?.trim();
+    const explicitTagTarget = metadata.fdmm_target_tag?.trim();
+    const bareTarget = metadata.fdmm_target?.trim();
+    const routingTarget = explicitPrinterTarget || explicitTagTarget || bareTarget || null;
+    const routingTargetKind: "printer" | "tag" | null = explicitPrinterTarget
+      ? "printer"
+      : explicitTagTarget
+        ? "tag"
+        : null;
 
     const normalized: GCodeMetadata = {
       fileName,
@@ -53,6 +66,8 @@ export class GCodeParser {
       maxLayerZ: this.parseFloat(metadata.max_layer_z),
       totalLayers: this.parseInt(metadata.total_layers) || this.parseInt(metadata.layer_count),
       generatedBy: metadata.generated_by,
+      routingTarget,
+      routingTargetKind,
       thumbnails:
         thumbnails.length > 0
           ? thumbnails.map((t) => ({
@@ -86,7 +101,9 @@ export class GCodeParser {
   }
 
   private async extractMetadataFromStart(filePath: string, metadata: Record<string, string>): Promise<void> {
-    let linesRead = 0;
+    let metadataLinesRead = 0;
+    let totalLinesScanned = 0;
+    let inThumbnail = false;
 
     const fileStream = createReadStream(filePath);
     const rl = readline.createInterface({
@@ -95,8 +112,20 @@ export class GCodeParser {
     });
 
     for await (const line of rl) {
-      if (linesRead >= this.maxHeaderLinesToRead) break;
-      linesRead++;
+      if (++totalLinesScanned > this.maxHeaderScanLines) break;
+
+      // Skip thumbnail blocks so their base64 lines don't exhaust the line budget
+      if (inThumbnail) {
+        if (/^;\s*thumbnail(?:_\w+)?\s+end\b/i.test(line)) inThumbnail = false;
+        continue;
+      }
+      if (/^;\s*thumbnail(?:_\w+)?\s+begin\b/i.test(line)) {
+        inThumbnail = true;
+        continue;
+      }
+
+      if (metadataLinesRead >= this.maxHeaderLinesToRead) break;
+      metadataLinesRead++;
 
       this.parseMetadataLine(line, metadata);
     }
