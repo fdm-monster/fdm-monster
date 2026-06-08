@@ -1734,9 +1734,9 @@ __metadata:
   linkType: hard
 
 "@types/aws-lambda@npm:^8.10.83":
-  version: 8.10.161
-  resolution: "@types/aws-lambda@npm:8.10.161"
-  checksum: 10c0/5a779901bb29a1989fe0ef30e4a515522af8fc66c237e0eedc954ab650651920540196b4629df25068c130a05a2a6142f661db7e26c7fbacc17ce11338367eb1
+  version: 8.10.162
+  resolution: "@types/aws-lambda@npm:8.10.162"
+  checksum: 10c0/0b93ebe339bf79d40e0811fb6ba658b425a5f9a45c2b07a2240e4260036ac949e6e5a5776db6269bc71218f127b046d7793f950f61ed7e94262b4fecf643eb7c
   languageName: node
   linkType: hard
 
@@ -4353,9 +4353,9 @@ __metadata:
   linkType: hard
 
 "libphonenumber-js@npm:^1.11.1":
-  version: 1.13.5
-  resolution: "libphonenumber-js@npm:1.13.5"
-  checksum: 10c0/b854017ba36beee77727205cc479905a2f1e43d9b0989b4ea265bda089d345aa4b39a569ec414e237b85485a3cc276f54a21c11328e25f804bef1e638e969622
+  version: 1.13.6
+  resolution: "libphonenumber-js@npm:1.13.6"
+  checksum: 10c0/fcd6eef6a3c105da0e5674b1caa11983829b8ad6f71fee18147ae09a82e9d139d948a5e283cd2459ba9e07ebe85efd5523773fdbef997352105f2dc821a1b5fe
   languageName: node
   linkType: hard
 
