@@ -11,6 +11,7 @@ describe("load-controllers test", () => {
       "/src/controllers/first-time-setup.controller.ts",
       "/src/controllers/floor.controller.ts",
       "/src/controllers/metrics.controller.ts",
+      "/src/controllers/print-file-routing.controller.ts",
       "/src/controllers/print-job.controller.ts",
       "/src/controllers/print-queue.controller.ts",
       "/src/controllers/printer-files.controller.ts",

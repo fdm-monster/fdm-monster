@@ -8,11 +8,16 @@ import { TypeormService } from "@/services/typeorm/typeorm.service";
 import { validate } from "class-validator";
 import { NotFoundException } from "@/exceptions/runtime.exceptions";
 import { TagWithPrintersDto } from "@/services/interfaces/tag.dto";
+import { tagEvents } from "@/constants/event.constants";
+import EventEmitter2 from "eventemitter2";
 
 export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) implements IPrinterTagService {
   private readonly tagRepository: Repository<Tag>;
 
-  constructor(typeormService: TypeormService) {
+  constructor(
+    typeormService: TypeormService,
+    private readonly eventEmitter2: EventEmitter2,
+  ) {
     super(typeormService);
 
     this.tagRepository = typeormService.getDataSource().getRepository(Tag);
@@ -62,6 +67,7 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
     await validate(entity);
     const tag = await this.tagRepository.save(entity);
 
+    this.eventEmitter2.emit(tagEvents.tagCreated, { tagId: tag.id });
     return await this.getPrintersByTag(tag.id);
   }
 
@@ -71,6 +77,7 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
     await validate(updateDto);
     await validate(Object.assign(entity, updateDto));
     await this.tagRepository.update(entity.id, updateDto);
+    this.eventEmitter2.emit(tagEvents.tagUpdated, { tagId });
   }
 
   async updateTagColor(tagId: number, color: string): Promise<void> {
@@ -84,6 +91,7 @@ export class PrinterTagService extends BaseService(PrinterTag, PrinterTagDto) im
   async deleteTag(tagId: number): Promise<void> {
     const tag = await this.getTag(tagId);
     await this.tagRepository.delete({ id: tag.id });
+    this.eventEmitter2.emit(tagEvents.tagDeleted, { tagId });
   }
 
   async addPrinterToTag(tagId: number, printerId: number): Promise<PrinterTag> {

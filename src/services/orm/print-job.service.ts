@@ -100,7 +100,7 @@ export interface IPrintJobService {
 
   // Job creation
   createPendingJob(
-    printerId: number,
+    printerId: number | null,
     fileName: string,
     metadata: PrintJobMetadata,
     printerName?: string,
@@ -645,7 +645,7 @@ export class PrintJobService implements IPrintJobService {
    * Used when a file is uploaded to a printer, creating a job ready for analysis
    */
   async createPendingJob(
-    printerId: number,
+    printerId: number | null,
     fileName: string,
     metadata: PrintJobMetadata,
     printerName?: string,
@@ -678,7 +678,7 @@ export class PrintJobService implements IPrintJobService {
     await this.printJobRepository.save(job);
 
     this.logger.log(
-      `Created ${analysisState.toLowerCase()} print job ${job.id} for printer ${printerId}: ${fileName} (format: ${metadata.fileFormat})`,
+      `Created ${analysisState.toLowerCase()} print job ${job.id} for printer ${printerId ?? "(unassigned)"}: ${fileName} (format: ${metadata.fileFormat})`,
     );
     return job;
   }

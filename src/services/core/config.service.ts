@@ -9,7 +9,15 @@ export interface IConfigService {
   isDemoMode(): boolean;
 
   instanceLabel(): string | null;
+
+  watchedFolderPath(): string | null;
+
+  watchedFolderMode(): WatchedFolderMode;
+
+  watchedFolderPolling(): boolean;
 }
+
+export type WatchedFolderMode = "consume" | "library";
 
 export class ConfigService implements IConfigService {
   get<T>(key: string, defaultValue?: T) {
@@ -28,7 +36,26 @@ export class ConfigService implements IConfigService {
   }
 
   instanceLabel() {
-    const raw = this.get<string>(AppConstants.INSTANCE_LABEL, "")?.trim();
-    return raw?.length ? raw : null;
+    const raw = this.getTrimmedString(AppConstants.INSTANCE_LABEL);
+    return raw.length ? raw : null;
+  }
+
+  watchedFolderPath() {
+    const raw = this.getTrimmedString(AppConstants.WATCHED_FOLDER_PATH);
+    return raw.length ? raw : null;
+  }
+
+  watchedFolderMode(): WatchedFolderMode {
+    const raw = this.getTrimmedString(AppConstants.WATCHED_FOLDER_MODE).toLowerCase();
+    return raw === "library" ? "library" : "consume";
+  }
+
+  watchedFolderPolling(): boolean {
+    const raw = this.getTrimmedString(AppConstants.WATCHED_FOLDER_POLLING, "true").toLowerCase();
+    return raw !== "false";
+  }
+
+  private getTrimmedString(key: string, defaultValue = ""): string {
+    return (this.get<string>(key, defaultValue) ?? "").trim();
   }
 }
