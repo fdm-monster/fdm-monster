@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "axios": "1.18.1",
-    "better-sqlite3": "12.10.1",
+    "better-sqlite3": "12.11.1",
     "chalk": "5.6.2",
     "dotenv": "17.4.2",
     "express": "4.22.2",
