@@ -282,7 +282,7 @@ __metadata:
   resolution: "@fdm-monster/consoles@workspace:packages/consoles"
   dependencies:
     "@types/express": "npm:5.0.1"
-    "@types/multer": "npm:2.1.0"
+    "@types/multer": "npm:2.2.0"
     "@types/node": "npm:24.13.2"
     "@types/ws": "npm:8.18.1"
     axios: "npm:1.18.1"
@@ -321,7 +321,7 @@ __metadata:
     "@types/ip": "npm:1.1.3"
     "@types/js-yaml": "npm:4.0.9"
     "@types/luxon": "npm:3.7.2"
-    "@types/multer": "npm:2.1.0"
+    "@types/multer": "npm:2.2.0"
     "@types/node": "npm:24.13.2"
     "@types/passport-anonymous": "npm:1.0.5"
     "@types/passport-jwt": "npm:4.0.1"
@@ -1899,12 +1899,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/multer@npm:2.1.0":
-  version: 2.1.0
-  resolution: "@types/multer@npm:2.1.0"
+"@types/multer@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@types/multer@npm:2.2.0"
   dependencies:
     "@types/express": "npm:*"
-  checksum: 10c0/f1f512918f79c5dac007d8d30de74372ad24932b34b43d09f250178dcce6da426297e0ea9c939322545519f133cd525dca0552781967d05f43d782ff0b169333
+  checksum: 10c0/72472c2da0a9afe86e2d64cfec53f4564727affcb691f78fcbdef495978857903f03326e4ecf58f6d1c3c4c89bb39e5d94fb97d4722a1f448f777c4fa690754b
   languageName: node
   linkType: hard
 
