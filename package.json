@@ -114,7 +114,7 @@
     "@types/passport-anonymous": "1.0.5",
     "@types/passport-jwt": "4.0.1",
     "@types/semver": "7.7.1",
-    "@types/supertest": "7.2.0",
+    "@types/supertest": "7.2.1",
     "@types/uuid": "11.0.0",
     "@types/ws": "8.18.1",
     "@vitest/coverage-v8": "4.1.9",
