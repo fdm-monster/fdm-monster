@@ -1,5 +1,11 @@
 import { apiKeyLengthMaxDefault, apiKeyLengthMinDefault } from "@/constants/service.constants";
-import { OctoprintType, PrinterTypesEnum, PrusaLinkType, BambuType } from "@/services/printer-api.interface";
+import {
+  OctoprintType,
+  PrinterTypesEnum,
+  PrusaLinkType,
+  BambuType,
+  MoonrakerType,
+} from "@/services/printer-api.interface";
 import { RefinementCtx, z } from "zod";
 
 const octoPrintApiKeySchema = z
@@ -57,6 +63,20 @@ export const refineApiKeyValidator = <T extends ApiKeyPrinterTypeSchema>(data: T
           path: ["apiKey", ...issue.path],
         });
       });
+    }
+  } else if (data.printerType === MoonrakerType) {
+    // Moonraker apiKey is optional (auth may be disabled/trusted-client), but if provided it must be well-formed
+    if (data.apiKey?.length) {
+      const result = octoPrintApiKeySchema.safeParse(data.apiKey);
+      if (!result.success) {
+        result.error.issues.forEach((issue) => {
+          ctx.addIssue({
+            ...issue,
+            // Nesting misses path under "apiKey"
+            path: ["apiKey", ...issue.path],
+          });
+        });
+      }
     }
   } else if (data.printerType === PrusaLinkType || data.printerType === BambuType) {
     const result = prusaLinkAuthSchema.safeParse({
