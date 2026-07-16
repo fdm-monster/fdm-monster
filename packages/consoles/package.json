@@ -33,7 +33,7 @@
   "devDependencies": {
     "@types/express": "5.0.1",
     "@types/multer": "2.2.0",
-    "@types/node": "24.13.2",
+    "@types/node": "24.13.3",
     "@types/ws": "8.18.1",
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
