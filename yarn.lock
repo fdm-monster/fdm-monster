@@ -330,7 +330,7 @@ __metadata:
     dotenv: "npm:17.4.2"
     express: "npm:4.22.2"
     ftp-srv: "npm:4.6.3"
-    mqtt: "npm:5.15.1"
+    mqtt: "npm:5.15.2"
     multer: "npm:2.2.0"
     selfsigned: "npm:5.5.0"
     ts-node: "npm:10.9.2"
@@ -390,7 +390,7 @@ __metadata:
     helmet: "npm:8.2.0"
     js-yaml: "npm:4.3.0"
     jsonwebtoken: "npm:9.0.3"
-    mqtt: "npm:5.15.1"
+    mqtt: "npm:5.15.2"
     multer: "npm:2.2.0"
     nock: "npm:13.5.6"
     octokit: "npm:5.0.5"
@@ -4859,9 +4859,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mqtt@npm:5.15.1":
-  version: 5.15.1
-  resolution: "mqtt@npm:5.15.1"
+"mqtt@npm:5.15.2":
+  version: 5.15.2
+  resolution: "mqtt@npm:5.15.2"
   dependencies:
     "@types/readable-stream": "npm:^4.0.21"
     "@types/ws": "npm:^8.18.1"
@@ -4883,7 +4883,7 @@ __metadata:
     mqtt: build/bin/mqtt.js
     mqtt_pub: build/bin/pub.js
     mqtt_sub: build/bin/sub.js
-  checksum: 10c0/7f422deb8175b8f01427a8369e872837429d2ca294971d79f12398a368eb99e32aafa388a0eae156a7d98c393873836fa588d2ae4dc022526ae69daf381bf5a0
+  checksum: 10c0/9a05da52e82797613a2e1b09b205c950808d3b5845c327e89a458669718ce42950269ba0f468abc75d1a2425db4a1953266de39ecc41d19a7dea595492975c1c
   languageName: node
   linkType: hard
 
