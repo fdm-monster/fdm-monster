@@ -23,7 +23,7 @@
     "dotenv": "17.4.2",
     "express": "4.22.2",
     "ftp-srv": "4.6.3",
-    "mqtt": "5.15.1",
+    "mqtt": "5.15.2",
     "multer": "2.2.0",
     "selfsigned": "5.5.0",
     "typeorm": "0.3.30",
