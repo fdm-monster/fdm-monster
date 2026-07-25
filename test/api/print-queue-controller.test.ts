@@ -749,6 +749,65 @@ describe("PrintQueueController", () => {
       expect(queue.some((item) => item.id === job.id)).toBe(true);
     });
 
+    it("should fail a job removed from the queue while submission is in progress", async () => {
+      const printer = await createTestPrinter(testRequest);
+      const job = await printJobService.createPendingJob(printer.id, "test-submit-removed.gcode", {
+        fileName: "test-submit-removed.gcode",
+        fileFormat: "gcode",
+        gcodePrintTimeSeconds: null,
+        nozzleDiameterMm: null,
+        filamentDiameterMm: null,
+        filamentDensityGramsCm3: null,
+        filamentUsedMm: null,
+        filamentUsedCm3: null,
+        filamentUsedGrams: null,
+        totalFilamentUsedGrams: null,
+        layerHeight: null,
+        firstLayerHeight: null,
+        bedTemperature: null,
+        nozzleTemperature: null,
+        fillDensity: null,
+        filamentType: null,
+        printerModel: null,
+        slicerVersion: null,
+        maxLayerZ: null,
+        totalLayers: null,
+      });
+
+      const mockFile = {
+        originalname: "test-submit-removed.gcode",
+        buffer: Buffer.from("; test gcode\nG28\n"),
+      } as Express.Multer.File;
+      job.fileStorageId = await fileStorageService.saveFile(mockFile);
+      await printJobService.printJobRepository.save(job);
+      await printQueueService.addToQueue(printer.id, job.id);
+
+      let rejectUpload: ((reason?: unknown) => void) | undefined;
+      mockUploadFile.mockImplementationOnce(
+        () =>
+          new Promise<void>((_resolve, reject) => {
+            rejectUpload = reject;
+          }),
+      );
+
+      const res = await testRequest
+        .post(`${baseRoute}/${printer.id}/submit/${job.id}`)
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(200);
+      await vi.waitFor(() => expect(rejectUpload).toBeDefined());
+      await printQueueService.removeFromQueue(job.id);
+      rejectUpload!(new Error("test upload failure after queue removal"));
+
+      await vi.waitFor(async () => {
+        const updatedJob = await printJobService.printJobRepository.findOne({ where: { id: job.id } });
+        expect(updatedJob?.status).toBe("FAILED");
+        expect(updatedJob?.queuePosition).toBeNull();
+        expect(updatedJob?.endedAt).not.toBeNull();
+        expect(updatedJob?.statusReason).toContain("test upload failure after queue removal");
+      });
+    });
+
     it("should validate printer ID and job ID", async () => {
       const res = await testRequest.post(`${baseRoute}/invalid/submit/invalid`).set("Accept", "application/json");
 

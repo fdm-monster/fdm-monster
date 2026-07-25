@@ -364,7 +364,7 @@ export class PrintQueueService implements IPrintQueueService {
         const job = await this.printJobRepository.findOne({ where: { id: jobId } });
         if (job) {
           job.statusReason = `Print submission failed: ${error instanceof Error ? error.message : "Unknown error"}`;
-          if (queuePosition !== null && queuePosition !== undefined) {
+          if (job.queuePosition !== null) {
             job.status = "QUEUED";
             job.startedAt = null;
             job.endedAt = null;
@@ -374,7 +374,7 @@ export class PrintQueueService implements IPrintQueueService {
           }
           await this.printJobRepository.save(job);
           this.logger.log(
-            queuePosition !== null && queuePosition !== undefined
+            job.queuePosition !== null
               ? `Returned job ${jobId} to the queue after submission failed`
               : `Updated job ${jobId} status to FAILED`,
           );
