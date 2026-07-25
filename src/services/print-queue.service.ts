@@ -305,14 +305,10 @@ export class PrintQueueService implements IPrintQueueService {
     this.ensurePrinterAssignment(job, printerId);
 
     const queuePosition = job.queuePosition;
-    if (job.queuePosition !== null) {
-      const oldPosition = job.queuePosition;
-      job.queuePosition = null;
-      await this.compactQueuePositions(printerId, oldPosition);
-    }
-
     job.status = "PRINTING";
+    job.statusReason = null;
     job.startedAt = new Date();
+    job.endedAt = null;
     await this.printJobRepository.save(job);
 
     this.logger.log(`Submitting job ${jobId} (${job.fileName}) to printer ${printerId}`);
@@ -367,11 +363,21 @@ export class PrintQueueService implements IPrintQueueService {
       try {
         const job = await this.printJobRepository.findOne({ where: { id: jobId } });
         if (job) {
-          job.status = "FAILED";
           job.statusReason = `Print submission failed: ${error instanceof Error ? error.message : "Unknown error"}`;
-          job.endedAt = new Date();
+          if (queuePosition !== null && queuePosition !== undefined) {
+            job.status = "QUEUED";
+            job.startedAt = null;
+            job.endedAt = null;
+          } else {
+            job.status = "FAILED";
+            job.endedAt = new Date();
+          }
           await this.printJobRepository.save(job);
-          this.logger.log(`Updated job ${jobId} status to FAILED (still in queue for retry)`);
+          this.logger.log(
+            queuePosition !== null && queuePosition !== undefined
+              ? `Returned job ${jobId} to the queue after submission failed`
+              : `Updated job ${jobId} status to FAILED`,
+          );
         }
       } catch (updateError) {
         this.logger.error(`Failed to update job ${jobId} status after submission error`, updateError);

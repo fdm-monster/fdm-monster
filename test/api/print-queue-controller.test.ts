@@ -13,12 +13,14 @@ describe("PrintQueueController", () => {
   let printJobService: PrintJobService;
   let printQueueService: PrintQueueService;
   let fileStorageService: FileStorageService;
+  let mockUploadFile: ReturnType<typeof vi.fn>;
   const baseRoute = `${AppConstants.apiRoute}/print-queue`;
 
   beforeAll(async () => {
     // Mock printer API factory to prevent actual file uploads
+    mockUploadFile = vi.fn().mockResolvedValue(undefined);
     const mockPrinterApi = {
-      uploadFile: vi.fn().mockResolvedValue(undefined),
+      uploadFile: mockUploadFile,
     };
     const mockPrinterApiFactory = {
       getById: vi.fn().mockReturnValue(mockPrinterApi),
@@ -690,6 +692,61 @@ describe("PrintQueueController", () => {
       const updatedJob = await printJobService.printJobRepository.findOne({ where: { id: job.id } });
       expect(updatedJob?.queuePosition).toBeNull();
       expect(["PRINTING"]).toContain(updatedJob?.status);
+    });
+
+    it("should keep a queued job available when submission fails", async () => {
+      const printer = await createTestPrinter(testRequest);
+      const job = await printJobService.createPendingJob(printer.id, "test-submit-failed.gcode", {
+        fileName: "test-submit-failed.gcode",
+        fileFormat: "gcode",
+        gcodePrintTimeSeconds: null,
+        nozzleDiameterMm: null,
+        filamentDiameterMm: null,
+        filamentDensityGramsCm3: null,
+        filamentUsedMm: null,
+        filamentUsedCm3: null,
+        filamentUsedGrams: null,
+        totalFilamentUsedGrams: null,
+        layerHeight: null,
+        firstLayerHeight: null,
+        bedTemperature: null,
+        nozzleTemperature: null,
+        fillDensity: null,
+        filamentType: null,
+        printerModel: null,
+        slicerVersion: null,
+        maxLayerZ: null,
+        totalLayers: null,
+      });
+
+      const mockFile = {
+        originalname: "test-submit-failed.gcode",
+        buffer: Buffer.from("; test gcode\nG28\n"),
+      } as Express.Multer.File;
+      job.fileStorageId = await fileStorageService.saveFile(mockFile);
+      await printJobService.printJobRepository.save(job);
+      await printQueueService.addToQueue(printer.id, job.id);
+
+      const queuedJob = await printJobService.printJobRepository.findOne({ where: { id: job.id } });
+      const queuePosition = queuedJob?.queuePosition;
+      mockUploadFile.mockRejectedValueOnce(new Error("test upload failure"));
+
+      const res = await testRequest
+        .post(`${baseRoute}/${printer.id}/submit/${job.id}`)
+        .set("Accept", "application/json");
+
+      expect(res.status).toBe(200);
+      await vi.waitFor(async () => {
+        const updatedJob = await printJobService.printJobRepository.findOne({ where: { id: job.id } });
+        expect(updatedJob?.status).toBe("QUEUED");
+        expect(updatedJob?.queuePosition).toBe(queuePosition);
+        expect(updatedJob?.startedAt).toBeNull();
+        expect(updatedJob?.endedAt).toBeNull();
+        expect(updatedJob?.statusReason).toContain("test upload failure");
+      });
+
+      const queue = await printQueueService.getQueue(printer.id);
+      expect(queue.some((item) => item.id === job.id)).toBe(true);
     });
 
     it("should validate printer ID and job ID", async () => {
