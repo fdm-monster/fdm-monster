@@ -87,11 +87,9 @@ Thanks to the following parties for their financial support:
 - [thatguymendel](https://github.com/thatguymendel)
 
 ### Tier 3
-- [MrHitchcock](https://github.com/MrHitchcock)
 - [That Guy Jaysen](https://github.com/thatguy-jaysenodell)
 
 ### Tier 4
-- [doucettom](https://github.com/doucettom)
 
 ### One Time
 - [th3dstudio](https://github.com/th3dstudio)
