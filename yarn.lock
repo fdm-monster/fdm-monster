@@ -394,7 +394,7 @@ __metadata:
     multer: "npm:2.2.0"
     nock: "npm:13.5.6"
     octokit: "npm:5.0.5"
-    openapi3-ts: "npm:4.6.0"
+    openapi3-ts: "npm:4.6.1"
     passport: "npm:0.7.0"
     passport-anonymous: "npm:1.0.1"
     passport-jwt: "npm:4.0.1"
@@ -5114,12 +5114,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openapi3-ts@npm:4.6.0":
-  version: 4.6.0
-  resolution: "openapi3-ts@npm:4.6.0"
+"openapi3-ts@npm:4.6.1":
+  version: 4.6.1
+  resolution: "openapi3-ts@npm:4.6.1"
   dependencies:
     yaml: "npm:^2.9.0"
-  checksum: 10c0/c6d867c84e57145134bdbf8dcc8942f0dab550b7acad6b5c481ee340d98fbf2701a59add25d436fe36150932eb243916fd302137591ba54dae323594acb6a433
+  checksum: 10c0/6593453cb4cc39de4216118946a473244cfc2a1cbc766df27e15be1922e202016fed6e2fc568e67a82535f596f62cbbe5c66e8aafd6c4891849d677140096932
   languageName: node
   linkType: hard
 
