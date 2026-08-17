@@ -412,7 +412,7 @@ __metadata:
     vite-plus: "npm:latest"
     vitest: "npm:@voidzero-dev/vite-plus-test@latest"
     winston: "npm:3.19.0"
-    winston-loki: "npm:6.1.5"
+    winston-loki: "npm:6.1.7"
     ws: "npm:8.21.1"
     zod: "npm:3.25.76"
   dependenciesMeta:
@@ -6887,9 +6887,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston-loki@npm:6.1.5":
-  version: 6.1.5
-  resolution: "winston-loki@npm:6.1.5"
+"winston-loki@npm:6.1.7":
+  version: 6.1.7
+  resolution: "winston-loki@npm:6.1.7"
   dependencies:
     async-exit-hook: "npm:2.0.1"
     btoa: "npm:^1.2.1"
@@ -6900,7 +6900,7 @@ __metadata:
   dependenciesMeta:
     snappy:
       optional: true
-  checksum: 10c0/7b43b94df525b997c73295ad36fd70260c06d51e15b4edcba78e7ce3601396e1831a1db69e30f1d5e6473162987c8604e382e85ae4833ff8b489f8036b65c959
+  checksum: 10c0/90d64bfee04ed04059853309914b27c5b5847523408dd558be0011b53579e25faf8881d943648e76bb237d4dd9624e85382b5285b31b751a1b0d1bc18a65a3f7
   languageName: node
   linkType: hard
 
