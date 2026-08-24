@@ -66,7 +66,7 @@
     "awilix": "13.0.5",
     "awilix-express": "11.0.1",
     "axios": "1.19.0",
-    "basic-ftp": "6.0.1",
+    "basic-ftp": "6.2.0",
     "bcryptjs": "3.0.3",
     "better-sqlite3": "12.11.1",
     "class-validator": "0.15.1",
