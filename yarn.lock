@@ -342,7 +342,7 @@ __metadata:
     "@types/ws": "npm:8.18.1"
     axios: "npm:1.19.0"
     better-sqlite3: "npm:12.11.1"
-    chalk: "npm:5.6.2"
+    chalk: "npm:6.0.0"
     dotenv: "npm:17.4.2"
     express: "npm:4.22.2"
     ftp-srv: "npm:4.6.3"
@@ -393,7 +393,7 @@ __metadata:
     basic-ftp: "npm:6.2.0"
     bcryptjs: "npm:3.0.3"
     better-sqlite3: "npm:12.11.1"
-    chalk: "npm:5.6.2"
+    chalk: "npm:6.0.0"
     class-validator: "npm:0.15.1"
     connect-history-api-fallback: "npm:2.0.0"
     cookie-parser: "npm:1.4.7"
@@ -2981,10 +2981,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:5.6.2":
-  version: 5.6.2
-  resolution: "chalk@npm:5.6.2"
-  checksum: 10c0/99a4b0f0e7991796b1e7e3f52dceb9137cae2a9dfc8fc0784a550dc4c558e15ab32ed70b14b21b52beb2679b4892b41a0aa44249bcb996f01e125d58477c6976
+"chalk@npm:6.0.0":
+  version: 6.0.0
+  resolution: "chalk@npm:6.0.0"
+  checksum: 10c0/47fd9028aa66fa532295525fe3ac5aec5e467e0d86847d4b5f6e01f9c9bb70b6fd1edca79cddc78a0f31a357baa65cc752d30c6557d025904207d113c82d8962
   languageName: node
   linkType: hard
 
