@@ -213,6 +213,12 @@ export class PrusaLinkApi implements IPrinterApi {
     const validated = uploadFileInputSchema.parse(input);
 
     try {
+      // Complete the Digest challenge before the PUT so a 401 retry does not
+      // attempt to replay the already-consumed upload stream.
+      if (!this.authHeader) {
+        await this.getVersion();
+      }
+
       const response = await this.createClient((b) => {
         b.withHeaders({
           "Content-Type": "application/octet-stream",
