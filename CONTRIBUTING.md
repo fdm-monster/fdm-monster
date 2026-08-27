@@ -26,7 +26,7 @@ This project and everyone participating in it is governed by the [FDM Monster Co
 
 ## Get Started Quickly
 
-### Im Stuck with a quick question!
+### I'm Stuck with a quick question!
 
 Sorry we do not have a documentation with F.A.Q. yet. Please visit us on discord instead! Our GitHub repo is not the place for support questions. Find the link in [README.md - contact](README.md#contact).
 
@@ -69,7 +69,7 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 #### Before Submitting A Bug Report
 
-- You might need to find the cause of the problem by debugging and fix things yourself. Most importantly, check if you can reproduce the problem in the latest version of FDM Monster which is always on the `main` branch of github
+- You might need to find the cause of the problem by debugging and fix things yourself. Most importantly, check if you can reproduce the problem in the latest version of FDM Monster which is always on the `main` branch of GitHub
 - **Check the [discussions](https://github.com/fdm-monster/fdm-monster/discussions)** for a list of common questions and problems.
 - **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Afdm-monster)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
@@ -80,7 +80,7 @@ Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/).
 Explain the problem and include additional details to help maintainers reproduce the problem:
 
 - **Use a clear and descriptive title** for the issue to identify the problem.
-- **Describe the exact steps which reproduce the problem** in as many details as possible. For example, start by explaining how you started FDM Monster, e.g. which command exactly you used to install it or start it, or how you started FDM Monster otherwise. When listing steps, **don't just say what you did, but explain how you did it**. For example, if you added an OctoPrint printer where did you get the URL for the OctoPrint server and which place did you get the API Key to make FDM Monster access you OctoPrint Server?
+- **Describe the exact steps which reproduce the problem** in as many details as possible. For example, start by explaining how you started FDM Monster, e.g. which command exactly you used to install it or start it, or how you started FDM Monster otherwise. When listing steps, **don't just say what you did, but explain how you did it**. For example, if you added an OctoPrint printer where did you get the URL for the OctoPrint server and which place did you get the API Key to make FDM Monster access your OctoPrint Server?
 - **Provide specific examples to demonstrate the steps**. Include links to files or GitHub projects, or copy/pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
 - **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
 - **Explain which behavior you expected to see instead and why.**
