@@ -72,6 +72,15 @@ describe(PrinterFilesController.name, () => {
     expectOkResponse(response, { dirs: [], files: [] });
   });
 
+  it("should fallback to non-recursive file listing when recursive mode is unsupported", async () => {
+    const bambuPrinter = await createTestBambuPrinter(request);
+
+    const response = await request.get(`${getFilesRoute(bambuPrinter.id)}?recursive=true`).send();
+
+    expectOkResponse(response);
+    expect(response.body.files.length).toBeGreaterThan(0);
+  });
+
   it("should retrieve file with hash character on GET for existing printer", async () => {
     const printer = await createTestPrinter(request);
     const filename = "test#.gcode";
@@ -88,7 +97,9 @@ describe(PrinterFilesController.name, () => {
           "content-disposition": "attachment; filename=test#.gcode",
         } as ReplyHeaders,
       );
-    const response = await request.get(downloadFileRoute(printer.id, encodeURIComponent(filename))).send();
+    const response = await request
+      .get(downloadFileRoute(printer.id, encodeURIComponent(filename)))
+      .send();
     expectOkResponse(response, reply0);
   });
 
