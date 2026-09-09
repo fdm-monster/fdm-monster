@@ -347,7 +347,7 @@ __metadata:
     express: "npm:4.22.2"
     ftp-srv: "npm:4.6.3"
     mqtt: "npm:5.15.2"
-    multer: "npm:2.2.0"
+    multer: "npm:2.3.0"
     selfsigned: "npm:5.5.0"
     ts-node: "npm:10.9.2"
     tsconfig-paths: "npm:4.2.0"
@@ -407,7 +407,7 @@ __metadata:
     js-yaml: "npm:4.3.1"
     jsonwebtoken: "npm:9.0.3"
     mqtt: "npm:5.15.2"
-    multer: "npm:2.2.0"
+    multer: "npm:2.3.0"
     nock: "npm:13.5.6"
     octokit: "npm:5.0.5"
     openapi3-ts: "npm:4.6.1"
@@ -4966,15 +4966,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"multer@npm:2.2.0":
-  version: 2.2.0
-  resolution: "multer@npm:2.2.0"
+"multer@npm:2.3.0":
+  version: 2.3.0
+  resolution: "multer@npm:2.3.0"
   dependencies:
     append-field: "npm:^1.0.0"
     busboy: "npm:^1.6.0"
     concat-stream: "npm:^2.0.0"
     type-is: "npm:^1.6.18"
-  checksum: 10c0/7aa366d89042427347b6ab8e4a203405d7fe942e4a3095648a14526fcf3691d98ffc2da62abf85d8aca0a341f828168eb197b33cfdcfcce29d6ef593a5625591
+  checksum: 10c0/e78fe6b1fe2132cdd33eeec4146643b906046edc1bbbcc90a43ea3d3aed6a7271272897a6d2e40e711e595a156d99b6761848a76fecca6ae3b9a7ee4892ee30c
   languageName: node
   linkType: hard
 

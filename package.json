@@ -82,7 +82,7 @@
     "js-yaml": "4.3.1",
     "jsonwebtoken": "9.0.3",
     "mqtt": "5.15.2",
-    "multer": "2.2.0",
+    "multer": "2.3.0",
     "octokit": "5.0.5",
     "passport": "0.7.0",
     "passport-anonymous": "1.0.1",
