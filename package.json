@@ -92,7 +92,7 @@
     "semver": "7.8.5",
     "socket.io": "4.8.3",
     "toad-scheduler": "4.1.0",
-    "typeorm": "0.3.31",
+    "typeorm": "1.1.1",
     "uuid": "14.0.2",
     "winston": "3.19.0",
     "winston-loki": "6.1.7",
