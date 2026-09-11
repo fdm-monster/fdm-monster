@@ -77,6 +77,7 @@ import type { HistoryLastTotalsDto } from "@/services/moonraker/dto/server-histo
 import type { HistoryJobDto } from "@/services/moonraker/dto/server-history/history-job.dto";
 import type { PrinterObjectsQueryDto } from "@/services/moonraker/dto/objects/printer-objects-query.dto";
 import { DefaultHttpClientBuilder } from "@/shared/default-http-client.builder";
+import { apiKeyHeaderKey } from "@/services/octoprint/constants/octoprint-service.constants";
 import { HttpClientFactory } from "@/services/core/http-client.factory";
 import { LoggerService } from "@/handlers/logger";
 import type { ILoggerFactory } from "@/handlers/logger-factory";
@@ -912,6 +913,9 @@ export class MoonrakerClient {
     const baseAddress = login.printerURL;
 
     return this.createAnonymousClient(baseAddress, (o) => {
+      if (login.apiKey?.length) {
+        o.withHeaders({ [apiKeyHeaderKey]: login.apiKey });
+      }
       if (buildFluentOptions) {
         buildFluentOptions(o);
       }
