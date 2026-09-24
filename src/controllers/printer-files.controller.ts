@@ -60,8 +60,32 @@ export class PrinterFilesController {
     const { recursive: recursiveStr, startDir } = await validateInput(req.query, getFilesSchema);
     const recursive = recursiveStr === "true";
 
-    const files = await printerApi.getFiles(recursive, startDir);
+    const files = await this.getFilesWithRecursiveFallback(printerApi, recursive, startDir);
     res.send(files);
+  }
+
+  private async getFilesWithRecursiveFallback(
+    printerApi: IPrinterApi,
+    recursive: boolean,
+    startDir?: string,
+  ) {
+    try {
+      return await printerApi.getFiles(recursive, startDir);
+    } catch (error) {
+      if (!recursive || !this.isUnsupportedRecursiveError(error)) {
+        throw error;
+      }
+      this.logger.warn(
+        `Recursive listing unsupported for this printer. Falling back to non-recursive mode. ${errorSummary(error)}`,
+      );
+      return await printerApi.getFiles(false, startDir);
+    }
+  }
+
+  private isUnsupportedRecursiveError(error: unknown) {
+    const message =
+      error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+    return message.includes("recursive") && message.includes("not supported");
   }
 
   @POST()
@@ -161,7 +185,9 @@ export class PrinterFilesController {
         try {
           this.multerService.clearUploadedFile(uploadedFile);
         } catch (e) {
-          this.logger.error(`Could not remove uploaded file from temporary storage ${errorSummary(e)}`);
+          this.logger.error(
+            `Could not remove uploaded file from temporary storage ${errorSummary(e)}`,
+          );
         }
         throw e;
       });
@@ -192,7 +218,9 @@ export class PrinterFilesController {
 
       if (existingJob && existingJob.fileStorageId) {
         // Found duplicate by hash - REUSE existing storage file
-        const cachedMetadata = await this.fileStorageService.loadMetadata(existingJob.fileStorageId);
+        const cachedMetadata = await this.fileStorageService.loadMetadata(
+          existingJob.fileStorageId,
+        );
 
         if (cachedMetadata) {
           // Use cached metadata from JSON file (fastest - no re-analysis, no re-storage)
@@ -216,10 +244,17 @@ export class PrinterFilesController {
           fileStorageId = existingJob.fileStorageId; // REUSE existing storage!
 
           // Save metadata JSON for future deduplication (preserve original filename)
-          await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, uploadedFile.originalname);
+          await this.fileStorageService.saveMetadata(
+            fileStorageId,
+            metadata,
+            fileHash,
+            uploadedFile.originalname,
+          );
         } else {
           // Duplicate hash but not analyzed - reuse storage, analyze file
-          this.logger.log(`Duplicate file not analyzed - reusing storage ${existingJob.fileStorageId}, analyzing now`);
+          this.logger.log(
+            `Duplicate file not analyzed - reusing storage ${existingJob.fileStorageId}, analyzing now`,
+          );
 
           // Get existing file for analysis
           const existingFilePath = this.fileStorageService.getFilePath(existingJob.fileStorageId);
@@ -227,7 +262,12 @@ export class PrinterFilesController {
           metadata = analysisResult.metadata;
 
           fileStorageId = existingJob.fileStorageId; // REUSE existing storage!
-          await this.fileStorageService.saveMetadata(fileStorageId, metadata, fileHash, uploadedFile.originalname);
+          await this.fileStorageService.saveMetadata(
+            fileStorageId,
+            metadata,
+            fileHash,
+            uploadedFile.originalname,
+          );
           this.logger.log(`Analysis complete and cached: ${fileStorageId}`);
         }
       } else {
@@ -247,7 +287,10 @@ export class PrinterFilesController {
         // Save thumbnails
         let thumbnailMetadata: any[] = [];
         if (thumbnails.length > 0) {
-          thumbnailMetadata = await this.fileStorageService.saveThumbnails(fileStorageId, thumbnails);
+          thumbnailMetadata = await this.fileStorageService.saveThumbnails(
+            fileStorageId,
+            thumbnails,
+          );
           this.logger.log(`Saved ${thumbnailMetadata.length} thumbnail(s) for ${fileStorageId}`);
         }
 
@@ -297,7 +340,9 @@ export class PrinterFilesController {
       try {
         this.multerService.clearUploadedFile(uploadedFile);
       } catch (e) {
-        this.logger.error(`Could not remove uploaded file from temporary storage ${errorSummary(e)}`);
+        this.logger.error(
+          `Could not remove uploaded file from temporary storage ${errorSummary(e)}`,
+        );
       }
     }
 
