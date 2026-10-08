@@ -123,7 +123,7 @@
     "nock": "13.5.6",
     "openapi3-ts": "4.6.1",
     "supertest": "7.3.1",
-    "swagger-ui-dist": "5.32.14",
+    "swagger-ui-dist": "5.33.1",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
     "vite-plus": "latest",
