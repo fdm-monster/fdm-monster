@@ -37,29 +37,35 @@ describe("FileStorageController", () => {
     });
 
     vi.spyOn(fileStorageService, "calculateFileHash").mockResolvedValue("mock-hash-abc123");
-    vi.spyOn(fileStorageService, "getFilePath").mockImplementation((id: string) => `/mock/path/${id}`);
+    vi.spyOn(fileStorageService, "getFilePath").mockImplementation(
+      (id: string) => `/mock/path/${id}`,
+    );
     vi.spyOn(fileStorageService, "saveMetadata").mockResolvedValue(undefined);
     vi.spyOn(fileStorageService, "saveThumbnails").mockResolvedValue([]);
 
-    vi.spyOn(fileStorageService, "validateUniqueFilename").mockImplementation(async (filename: string) => {
-      if (uploadedFilenames.has(filename)) {
-        throw new ConflictException(
-          `A file named "${filename}" already exists in storage. Please rename the file, delete the existing file (ID: ${uploadedFilenames.get(filename)}), or choose a different name.`,
-          uploadedFilenames.get(filename),
-        );
-      }
-    });
+    vi.spyOn(fileStorageService, "validateUniqueFilename").mockImplementation(
+      async (filename: string) => {
+        if (uploadedFilenames.has(filename)) {
+          throw new ConflictException(
+            `A file named "${filename}" already exists in storage. Please rename the file, delete the existing file (ID: ${uploadedFilenames.get(filename)}), or choose a different name.`,
+            uploadedFilenames.get(filename),
+          );
+        }
+      },
+    );
 
-    vi.spyOn(fileStorageService, "findDuplicateByOriginalFileName").mockImplementation(async (filename: string) => {
-      const existingFileId = uploadedFilenames.get(filename);
-      if (existingFileId) {
-        return {
-          fileStorageId: existingFileId,
-          metadata: { _originalFileName: filename },
-        };
-      }
-      return null;
-    });
+    vi.spyOn(fileStorageService, "findDuplicateByOriginalFileName").mockImplementation(
+      async (filename: string) => {
+        const existingFileId = uploadedFilenames.get(filename);
+        if (existingFileId) {
+          return {
+            fileStorageId: existingFileId,
+            metadata: { _originalFileName: filename },
+          };
+        }
+        return null;
+      },
+    );
   });
 
   beforeEach(() => {
@@ -102,6 +108,29 @@ describe("FileStorageController", () => {
       expect(res.body.files.length).toBe(1);
       expect(res.body.files[0].fileName).toBe("test.gcode");
       expect(res.body.files[0].fileStorageId).toBe("file-123");
+    });
+
+    it("fileName should be the original name, not the internal storage UUID", async () => {
+      // Regression test: listAllFiles was using metadata._fileName (inexistent)
+      // instead of metadata._originalFileName, causing fileName to fall back to
+      // the raw UUID on disk. The search in the Files page never matched anything.
+      vi.spyOn(fileStorageService, "listAllFiles").mockResolvedValue([
+        {
+          fileStorageId: "5a83295c86b5593d05ea9b28f78435d1",
+          fileName: "02.Cara_0.4n_0.2mm_PLA_COREONEMMU3_59m.gcode",
+          fileFormat: "gcode",
+          fileSize: 10 * 1024 * 1024,
+          fileHash: "abc123",
+          createdAt: new Date(),
+          thumbnailCount: 0,
+          metadata: { _originalFileName: "02.Cara_0.4n_0.2mm_PLA_COREONEMMU3_59m.gcode" },
+        },
+      ]);
+
+      const res = await testRequest.get(baseRoute);
+      expectOkResponse(res);
+      expect(res.body.files[0].fileName).toBe("02.Cara_0.4n_0.2mm_PLA_COREONEMMU3_59m.gcode");
+      expect(res.body.files[0].fileName).not.toBe("5a83295c86b5593d05ea9b28f78435d1");
     });
   });
 
@@ -198,7 +227,11 @@ describe("FileStorageController", () => {
     });
 
     it("should handle files with special characters in name", async () => {
-      const specialNames = ["test with spaces.gcode", "test-with-dashes.gcode", "test_with_underscores.gcode"];
+      const specialNames = [
+        "test with spaces.gcode",
+        "test-with-dashes.gcode",
+        "test_with_underscores.gcode",
+      ];
 
       for (const name of specialNames) {
         const res = await uploadFile(name, SIMPLE_GCODE);
