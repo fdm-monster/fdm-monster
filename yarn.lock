@@ -335,7 +335,7 @@ __metadata:
     awilix: "npm:13.0.5"
     awilix-express: "npm:11.0.1"
     axios: "npm:1.20.0"
-    basic-ftp: "npm:6.2.2"
+    basic-ftp: "npm:6.2.3"
     bcryptjs: "npm:3.0.3"
     better-sqlite3: "npm:12.11.1"
     chalk: "npm:5.6.2"
@@ -2639,10 +2639,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"basic-ftp@npm:6.2.2":
-  version: 6.2.2
-  resolution: "basic-ftp@npm:6.2.2"
-  checksum: 10c0/d287861da9fe3f017da06fd122b8e8679ec316d25d4e15cd4b232c4d0b4638a973a61e90c11e5e097a5f3452e7ed0312a86fcec44c0e50441a7a1b9ad7e6df84
+"basic-ftp@npm:6.2.3":
+  version: 6.2.3
+  resolution: "basic-ftp@npm:6.2.3"
+  checksum: 10c0/d3760bbadb213f3b60cd5b4c0dc61d1419abdec41ba6966faf0bea0f14b9a283317135ed0ccfdc954a94832019bf042b43e363b211315c22a553e776a951b0ba
   languageName: node
   linkType: hard
 
