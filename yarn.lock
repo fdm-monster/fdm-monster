@@ -291,7 +291,7 @@ __metadata:
     dotenv: "npm:17.4.2"
     express: "npm:4.22.3"
     ftp-srv: "npm:4.6.3"
-    mqtt: "npm:5.15.2"
+    mqtt: "npm:5.16.1"
     multer: "npm:2.4.0"
     selfsigned: "npm:5.5.0"
     ts-node: "npm:10.9.2"
@@ -351,7 +351,7 @@ __metadata:
     helmet: "npm:8.3.0"
     js-yaml: "npm:4.3.2"
     jsonwebtoken: "npm:9.0.3"
-    mqtt: "npm:5.15.2"
+    mqtt: "npm:5.16.1"
     multer: "npm:2.4.0"
     nock: "npm:13.5.6"
     octokit: "npm:5.0.5"
@@ -3221,7 +3221,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.3.1, debug@npm:^4.3.4, debug@npm:^4.3.5, debug@npm:^4.3.7, debug@npm:^4.4.1, debug@npm:^4.4.3, debug@npm:~4.4.1":
+"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.3.4, debug@npm:^4.3.5, debug@npm:^4.3.7, debug@npm:^4.4.1, debug@npm:^4.4.3, debug@npm:~4.4.1":
   version: 4.4.3
   resolution: "debug@npm:4.4.3"
   dependencies:
@@ -4300,13 +4300,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-sdsl@npm:4.3.0":
-  version: 4.3.0
-  resolution: "js-sdsl@npm:4.3.0"
-  checksum: 10c0/cd3c342d08ed646d271bc59e5da12d732fee4a6fa32a30f6552d66cdf5c744b1fc5b61cddaff80702c1c6bb92add3b17ce0b6ff8a2cc7f9188df4065183aa7fb
-  languageName: node
-  linkType: hard
-
 "js-tokens@npm:^10.0.0":
   version: 10.0.0
   resolution: "js-tokens@npm:10.0.0"
@@ -4811,9 +4804,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mqtt@npm:5.15.2":
-  version: 5.15.2
-  resolution: "mqtt@npm:5.15.2"
+"mqtt@npm:5.16.1":
+  version: 5.16.1
+  resolution: "mqtt@npm:5.16.1"
   dependencies:
     "@types/readable-stream": "npm:^4.0.21"
     "@types/ws": "npm:^8.18.1"
@@ -4824,7 +4817,6 @@ __metadata:
     lru-cache: "npm:^10.4.3"
     minimist: "npm:^1.2.8"
     mqtt-packet: "npm:^9.0.2"
-    number-allocator: "npm:^1.0.14"
     readable-stream: "npm:^4.7.0"
     rfdc: "npm:^1.4.1"
     socks: "npm:^2.8.6"
@@ -4835,7 +4827,7 @@ __metadata:
     mqtt: build/bin/mqtt.js
     mqtt_pub: build/bin/pub.js
     mqtt_sub: build/bin/sub.js
-  checksum: 10c0/9a05da52e82797613a2e1b09b205c950808d3b5845c327e89a458669718ce42950269ba0f468abc75d1a2425db4a1953266de39ecc41d19a7dea595492975c1c
+  checksum: 10c0/7211336b71481da56141ce43499a3770d944efdb47eedddd28d9320da5510ac000a2b5812e751ab29ad6c5cfcbbadf480aaf36621a39d40cc0bbd5977e2f6f58
   languageName: node
   linkType: hard
 
@@ -4971,16 +4963,6 @@ __metadata:
   bin:
     nopt: bin/nopt.js
   checksum: 10c0/980d89257f9587f3e1f77877ddbf905d6aa3b738ec33e49a4fa1a059a0dd82eb28063982b150654a7ae9de386f2ead60e56172db7d37cf56de545f7392a2a26a
-  languageName: node
-  linkType: hard
-
-"number-allocator@npm:^1.0.14":
-  version: 1.0.14
-  resolution: "number-allocator@npm:1.0.14"
-  dependencies:
-    debug: "npm:^4.3.1"
-    js-sdsl: "npm:4.3.0"
-  checksum: 10c0/273fc81f61018fddaee4277cb08a7d994838e9d202cf90f5f329d087e605e4ac82405b397f1ea608f46ae26f47e17b7b4318ed2a8dd6541bf794c1ced47b876a
   languageName: node
   linkType: hard
 
