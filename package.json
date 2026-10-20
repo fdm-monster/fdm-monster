@@ -121,7 +121,7 @@
     "@vitest/ui": "4.1.11",
     "chalk": "5.6.2",
     "nock": "13.5.6",
-    "openapi3-ts": "4.6.1",
+    "openapi3-ts": "4.6.2",
     "supertest": "7.3.1",
     "swagger-ui-dist": "5.33.2",
     "tsx": "4.23.15",
