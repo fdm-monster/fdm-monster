@@ -365,7 +365,7 @@ __metadata:
     socket.io: "npm:4.8.4"
     supertest: "npm:7.3.1"
     swagger-ui-dist: "npm:5.34.0"
-    toad-scheduler: "npm:4.1.0"
+    toad-scheduler: "npm:4.2.0"
     tsx: "npm:4.23.15"
     typeorm: "npm:0.3.31"
     typescript: "npm:6.0.3"
@@ -6314,12 +6314,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"toad-scheduler@npm:4.1.0":
-  version: 4.1.0
-  resolution: "toad-scheduler@npm:4.1.0"
+"toad-scheduler@npm:4.2.0":
+  version: 4.2.0
+  resolution: "toad-scheduler@npm:4.2.0"
   dependencies:
     croner: "npm:^10.0.1"
-  checksum: 10c0/617307661a7dc4b5ef6e1ebd8ff2539187a7673b735090ca65b8de11063d435e4e4a1280680ebf0e9633c954cde34fe8e72135c3ee6e3f75e69bc40d58db05fe
+  checksum: 10c0/f7fc4cdf3aa031c02c1bd67ec79cd54aebd75918381ee7b2f54ef46c247dc8b134ee2d78f43a365be324c1ea0d6ca4f52f73aaad4e6853c304800a2f1d161861
   languageName: node
   linkType: hard
 
