@@ -24,7 +24,7 @@
     "express": "4.22.3",
     "ftp-srv": "4.6.3",
     "mqtt": "5.16.1",
-    "multer": "2.4.0",
+    "multer": "2.5.0",
     "selfsigned": "5.5.0",
     "typeorm": "0.3.31",
     "ws": "8.22.0",
