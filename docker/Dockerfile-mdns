@@ -1,6 +1,10 @@
 FROM node:24-bookworm-slim AS build
 WORKDIR /build
 
+# Vite+ requires system CA certificates to initialize its HTTP client.
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY .yarn/releases ./.yarn/releases
 COPY vite.config.ts tsconfig.json package.json yarn.lock .yarnrc.yml ./
 
