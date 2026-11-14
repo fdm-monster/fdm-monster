@@ -164,11 +164,6 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
   async setupSocketSession(): Promise<void> {
     this.resetSocketState();
 
-    // Can 404 or 503
-    // const oneshot = await this.client.getAccessOneshotToken(this.login);
-    // this.logger.log(`Oneshot ${oneshot.data.result}`);
-    // await this.client.getAccessOneshotToken(this.login);
-
     await this.moonrakerClient.getApiVersion(this.login).catch((e: AxiosError) => {
       this.setSocketState("aborted");
       this.logger.error(`Printer (${this.printerId}) network or transport error, marking it as unreachable; ${e}`);
@@ -220,6 +215,7 @@ export class MoonrakerWebsocketAdapter extends WebsocketRpcExtendedAdapter imple
         version: this.serverVersion,
         type: "other",
         url: AppConstants.githubUrl,
+        ...(this.login.apiKey?.length ? { api_key: this.login.apiKey } : {}),
       },
       id: 1,
     });
