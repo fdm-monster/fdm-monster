@@ -27,7 +27,7 @@
     "multer": "2.5.0",
     "selfsigned": "5.5.0",
     "typeorm": "0.3.31",
-    "ws": "8.22.0",
+    "ws": "8.23.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
