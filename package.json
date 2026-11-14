@@ -120,7 +120,7 @@
     "@vitest/coverage-v8": "4.1.12",
     "@vitest/ui": "4.1.12",
     "chalk": "6.0.1",
-    "nock": "13.5.6",
+    "nock": "15.0.6",
     "openapi3-ts": "4.6.2",
     "supertest": "7.3.2",
     "swagger-ui-dist": "5.34.0",
