@@ -88,21 +88,51 @@ describe("printer transport dependency compatibility", () => {
 
     try {
       const response = await new Promise<unknown>((resolve, reject) => {
-        client.once("error", reject);
-        client.on("message", (data) => {
-          const packet = data.toString();
-          if (packet.startsWith("0")) {
-            client.send("40");
-          } else if (packet.startsWith("40")) {
-            client.send(`42${JSON.stringify(["printer-command", payload])}`);
-          } else if (packet.startsWith("42")) {
-            resolve(JSON.parse(packet.slice(2)));
+        function cleanup() {
+          clearTimeout(deadline);
+          client.off("error", onError);
+          client.off("close", onClose);
+          client.off("message", onMessage);
+        }
+
+        function onError(error: unknown) {
+          cleanup();
+          reject(error);
+        }
+
+        function onClose() {
+          onError(new Error("WebSocket closed before receiving a response"));
+        }
+
+        function onMessage(data: WebSocket.RawData) {
+          try {
+            const packet = data.toString();
+            if (packet.startsWith("0")) {
+              client.send("40");
+            } else if (packet.startsWith("40")) {
+              client.send(`42${JSON.stringify(["printer-command", payload])}`);
+            } else if (packet.startsWith("42")) {
+              const response = JSON.parse(packet.slice(2));
+              cleanup();
+              resolve(response);
+            }
+          } catch (error) {
+            onError(error);
           }
-        });
+        }
+
+        const deadline = setTimeout(() => onError(new Error("Timed out waiting for a WebSocket response")), 3000);
+        client.once("error", onError);
+        client.once("close", onClose);
+        client.on("message", onMessage);
       });
 
       expect(response).toEqual(["printer-response", payload]);
     } finally {
+      if (client.readyState === WebSocket.CONNECTING) {
+        // Terminating an unfinished handshake emits an error after the exchange listeners have been removed.
+        client.once("error", () => undefined);
+      }
       client.terminate();
       await new Promise<void>((resolve) => io.close(() => resolve()));
     }
