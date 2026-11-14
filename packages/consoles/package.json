@@ -39,6 +39,6 @@
     "tsconfig-paths": "4.2.0",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vite-plus": "latest"
+    "vite-plus": "1.6.0"
   }
 }

@@ -117,8 +117,8 @@
     "@types/supertest": "7.2.1",
     "@types/uuid": "11.0.0",
     "@types/ws": "8.18.2",
-    "@vitest/coverage-v8": "4.1.12",
-    "@vitest/ui": "4.1.12",
+    "@vitest/coverage-v8": "5.1.0",
+    "@vitest/ui": "5.1.0",
     "chalk": "6.0.1",
     "nock": "13.5.6",
     "openapi3-ts": "4.6.2",
@@ -126,12 +126,13 @@
     "swagger-ui-dist": "5.35.0",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vite-plus": "latest",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0",
+    "vite-plus": "1.6.0",
+    "vitest": "5.1.0"
   },
   "resolutions": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0",
+    "vitest": "5.1.0"
   },
   "engines": {
     "node": ">= 22.0.0",
