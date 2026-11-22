@@ -305,14 +305,10 @@ export class PrintQueueService implements IPrintQueueService {
     this.ensurePrinterAssignment(job, printerId);
 
     const queuePosition = job.queuePosition;
-    if (job.queuePosition !== null) {
-      const oldPosition = job.queuePosition;
-      job.queuePosition = null;
-      await this.compactQueuePositions(printerId, oldPosition);
-    }
-
     job.status = "PRINTING";
+    job.statusReason = null;
     job.startedAt = new Date();
+    job.endedAt = null;
     await this.printJobRepository.save(job);
 
     this.logger.log(`Submitting job ${jobId} (${job.fileName}) to printer ${printerId}`);
@@ -352,32 +348,59 @@ export class PrintQueueService implements IPrintQueueService {
       });
       this.logger.log(`Successfully submitted job ${jobId} to printer ${printerId}`);
 
-      if (queuePosition !== null && queuePosition !== undefined) {
-        const job = await this.printJobRepository.findOne({ where: { id: jobId } });
-        if (job?.queuePosition === queuePosition) {
-          job.queuePosition = null;
-          await this.printJobRepository.save(job);
-          await this.compactQueuePositions(printerId, queuePosition);
-          this.logger.log(`Removed job ${jobId} from queue after successful submission`);
-        }
-      }
+      await this.removeSubmittedJobFromQueue(printerId, jobId, queuePosition);
     } catch (error) {
       this.logger.error(`Failed to submit job ${jobId} to printer ${printerId}`, error);
 
-      try {
-        const job = await this.printJobRepository.findOne({ where: { id: jobId } });
-        if (job) {
-          job.status = "FAILED";
-          job.statusReason = `Print submission failed: ${error instanceof Error ? error.message : "Unknown error"}`;
-          job.endedAt = new Date();
-          await this.printJobRepository.save(job);
-          this.logger.log(`Updated job ${jobId} status to FAILED (still in queue for retry)`);
-        }
-      } catch (updateError) {
-        this.logger.error(`Failed to update job ${jobId} status after submission error`, updateError);
+      await this.restoreJobAfterSubmissionFailure(jobId, error);
+      throw error;
+    }
+  }
+
+  private async removeSubmittedJobFromQueue(
+    printerId: number,
+    jobId: number,
+    queuePosition?: number | null,
+  ): Promise<void> {
+    if (queuePosition === null || queuePosition === undefined) {
+      return;
+    }
+
+    const job = await this.printJobRepository.findOne({ where: { id: jobId } });
+    if (job?.queuePosition !== queuePosition) {
+      return;
+    }
+
+    job.queuePosition = null;
+    await this.printJobRepository.save(job);
+    await this.compactQueuePositions(printerId, queuePosition);
+    this.logger.log(`Removed job ${jobId} from queue after successful submission`);
+  }
+
+  private async restoreJobAfterSubmissionFailure(jobId: number, error: unknown): Promise<void> {
+    try {
+      const job = await this.printJobRepository.findOne({ where: { id: jobId } });
+      if (!job) {
+        return;
       }
 
-      throw error;
+      job.statusReason = `Print submission failed: ${error instanceof Error ? error.message : "Unknown error"}`;
+      if (job.queuePosition !== null) {
+        job.status = "QUEUED";
+        job.startedAt = null;
+        job.endedAt = null;
+      } else {
+        job.status = "FAILED";
+        job.endedAt = new Date();
+      }
+      await this.printJobRepository.save(job);
+      this.logger.log(
+        job.queuePosition !== null
+          ? `Returned job ${jobId} to the queue after submission failed`
+          : `Updated job ${jobId} status to FAILED`,
+      );
+    } catch (updateError) {
+      this.logger.error(`Failed to update job ${jobId} status after submission error`, updateError);
     }
   }
 }
