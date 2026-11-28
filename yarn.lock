@@ -358,7 +358,7 @@ __metadata:
     "@vitest/ui": "npm:5.1.0"
     adm-zip: "npm:0.6.1"
     awilix: "npm:13.0.7"
-    awilix-express: "npm:11.0.1"
+    awilix-express: "npm:11.0.2"
     axios: "npm:1.20.0"
     basic-ftp: "npm:6.2.6"
     bcryptjs: "npm:3.0.3"
@@ -2812,12 +2812,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"awilix-express@npm:11.0.1":
-  version: 11.0.1
-  resolution: "awilix-express@npm:11.0.1"
+"awilix-express@npm:11.0.2":
+  version: 11.0.2
+  resolution: "awilix-express@npm:11.0.2"
   dependencies:
     awilix-router-core: "npm:^4.0.0"
-  checksum: 10c0/660cdfebed51d2223cc6f4acea22e9e5cc8785fd8bfe1edc652fc0aeee7753343daf2af09e8dfe0850b3bc41f216c5f677467e635ef6722088c8155c6a31edfc
+  checksum: 10c0/d93be1cdaab34b77137b1e6f4b9ebf11e4fe7535d473042576350d6fe0659575fae8e6ae24ec01497e1a970aa7bd5ca1989a12c0062d069d8b10c62f8d9d78cc
   languageName: node
   linkType: hard
 
