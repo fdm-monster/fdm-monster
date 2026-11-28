@@ -349,7 +349,7 @@ __metadata:
     "@types/multer": "npm:2.3.0"
     "@types/node": "npm:24.19.4"
     "@types/passport-anonymous": "npm:1.0.5"
-    "@types/passport-jwt": "npm:4.0.1"
+    "@types/passport-jwt": "npm:4.0.2"
     "@types/semver": "npm:7.8.0"
     "@types/supertest": "npm:7.2.1"
     "@types/uuid": "npm:11.0.0"
@@ -2020,13 +2020,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/passport-jwt@npm:4.0.1":
-  version: 4.0.1
-  resolution: "@types/passport-jwt@npm:4.0.1"
+"@types/passport-jwt@npm:4.0.2":
+  version: 4.0.2
+  resolution: "@types/passport-jwt@npm:4.0.2"
   dependencies:
     "@types/jsonwebtoken": "npm:*"
     "@types/passport-strategy": "npm:*"
-  checksum: 10c0/0ced0eaa7bb379d674821108d9bc6758223f1a5f2b9790ec78d3eaaccce6a58a424cf8ed22b53d813740ec53d929e21d92cf794ef0fb30c732866750763c0d7a
+  checksum: 10c0/33bc859e6db83faace50454cf45f7fba4ef6d0dd958b3628842014957ba6513876e2fa87f4db24a723529ce6afaa0d8be0e8fe2df3799d48668f215ebb8520a7
   languageName: node
   linkType: hard
 
