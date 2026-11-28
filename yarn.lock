@@ -308,7 +308,7 @@ __metadata:
   dependencies:
     "@types/express": "npm:5.0.1"
     "@types/multer": "npm:2.3.0"
-    "@types/node": "npm:24.19.4"
+    "@types/node": "npm:26.6.11"
     "@types/ws": "npm:8.18.2"
     axios: "npm:1.20.0"
     better-sqlite3: "npm:12.11.1"
@@ -347,7 +347,7 @@ __metadata:
     "@types/js-yaml": "npm:4.0.9"
     "@types/luxon": "npm:3.7.6"
     "@types/multer": "npm:2.3.0"
-    "@types/node": "npm:24.19.4"
+    "@types/node": "npm:26.6.11"
     "@types/passport-anonymous": "npm:1.0.5"
     "@types/passport-jwt": "npm:4.0.2"
     "@types/semver": "npm:7.8.0"
@@ -2002,12 +2002,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:24.19.4":
-  version: 24.19.4
-  resolution: "@types/node@npm:24.19.4"
+"@types/node@npm:26.6.11":
+  version: 26.6.11
+  resolution: "@types/node@npm:26.6.11"
   dependencies:
-    undici-types: "npm:>=7.24.0 <7.24.7"
-  checksum: 10c0/3fce002ce5d6baa78be1b03f24ef676a12d14ef22a600ad07e78308d10ae62fb10d8ac18a67bcdcdd631a6f1de2129cb9e0c1d2badab85e36fc075d319191d99
+    undici-types: "npm:~8.9.0"
+  checksum: 10c0/9771f1140557ee98f65de05fdc50a4da8d0e602bbbedf206b41f679f95fb52c9a39d854ad813dc3e4f1fb9a4c22f1b4d324607eb299670c515d3ab093701e815
   languageName: node
   linkType: hard
 
@@ -6952,13 +6952,6 @@ __metadata:
   bin:
     tsc: bin/tsc
   checksum: 10c0/6b3cdc369cd829d46e00734ea64233ee84419c2825ad8fe408915adde77abced4b7a2401f7eed517d54a7a4f5d1c1869753cb99018df1c2159c761d9f33483a6
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:>=7.24.0 <7.24.7":
-  version: 7.24.6
-  resolution: "undici-types@npm:7.24.6"
-  checksum: 10c0/d9cd8befb643ac904615c280a095ba4240531f6bb4a5e75a22a7483630ca8d3f1016d2ab6ace6ceda1f63b3a2db2fe037fafe121d6917a0187573aa548ff78ca
   languageName: node
   linkType: hard
 
