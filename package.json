@@ -126,12 +126,12 @@
     "swagger-ui-dist": "5.35.1",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0",
+    "vite": "npm:@voidzero-dev/vite-plus-core@8.3.8001",
     "vite-plus": "1.6.0",
     "vitest": "5.1.0"
   },
   "resolutions": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0",
+    "vite": "npm:@voidzero-dev/vite-plus-core@8.3.8001",
     "vitest": "5.1.0"
   },
   "engines": {
